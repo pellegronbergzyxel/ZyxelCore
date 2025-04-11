@@ -1,0 +1,19 @@
+{
+    "al.assemblyProbingPaths": [
+        "./.netpackages",
+        "C:\\Windows\\assembly",
+        "C:\\Windows\\Microsoft.NET\\assembly\\GAC_MSIL"
+    ],
+    "al.enableCodeAnalysis": true,
+    "al.codeAnalyzers": [
+        "${CodeCop}",
+        "${UICop}"
+    ],
+    "al.ruleSetPath": "./.codeAnalysis/visionpeople.ruleset.json",
+    "al.backgroundCodeAnalysis": false,
+    "al.enableCodeActions": true,
+    "alOutline.defaultAppArea": "Basic,Suite",
+    "CRS.FileNamePattern": "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
+    "CRS.FileNamePatternExtensions": "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
+    "CRS.FileNamePatternPageCustomizations": "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al"
+}

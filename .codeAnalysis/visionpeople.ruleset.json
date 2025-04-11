@@ -1,0 +1,36 @@
+{
+    "name": "VisionPeople ruleset",
+    "description": "These rules must be respected by all the AL code written within the company.",
+    "rules": [
+        {
+            "id": "AA0001",
+            "action": "Error",
+            "justification": "This diagnostic helps to improve readability. It must be respected in all cases."
+        },
+        {
+            "id": "AA0214",
+            "action": "None",
+            "justification": "Rule does not work. Not checking for modify"
+        },
+        {
+            "id": "AA0072",
+            "action": "None",
+            "justification": "Dont use stupid naming conventions"
+        },
+        {
+            "id": "AA0074",
+            "action": "None",
+            "justification": "Labels must must have a suffix from this list: Msg, Tok, Err, Qst, Lbl, Txt."
+        },
+        {
+            "id": "AA0470",
+            "action": "None",
+            "justification": "Labels with placeholders should have a comment explaining their content"
+        },
+        {
+            "id": "AL0667",
+            "action": "None",
+            "justification": "Compiler Warning (Future Error)"
+        }        
+    ]
+}
