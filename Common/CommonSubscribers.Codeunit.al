@@ -33,4 +33,36 @@ codeunit 50029 CommonSubscribers
             Page.Run(Page::"Travel Expense", TravelExpHeader);
         end;
     end;
+
+
+    // 491247 >>
+    [EventSubscriber(ObjectType::Table, Database::"Report Selections", 'OnBeforeGetEmailBodyCustomer', '', false, false)]
+    local procedure OnBeforeGetEmailBodyCustomer(ReportUsage: Integer; RecordVariant: Variant; var TempBodyReportSelections: Record "Report Selections" temporary; CustNo: Code[20]; var CustEmailAddress: Text[250]; var EmailBodyText: Text; var IsHandled: Boolean; var Result: Boolean)
+    var
+        SalesHeader: Record "Sales Header";
+        recref: RecordRef;
+        CustReptMgt: Codeunit "Custom Report Management";
+        CustomReportSelection: Record "Custom Report Selection";
+        temptext: text[250];
+    begin
+        if RecordVariant.IsRecord then begin
+            recref.GetTable(RecordVariant);
+            Case recref.Number of
+
+                36:
+                    begin
+                        SalesHeader := RecordVariant;
+                        if SalesHeader."Document Type" = SalesHeader."Document Type"::Order then begin
+                            temptext := CustReptMgt.GetEmailAddress(Database::Customer, SalesHeader."Sell-to Customer No.", CustomReportSelection.Usage::"S.Order", temptext);
+                            if temptext <> '' then
+                                CustEmailAddress := temptext;
+                        end
+                    end;
+            end;
+
+        end
+
+    end;
+    // 491247 <<
+
 }
