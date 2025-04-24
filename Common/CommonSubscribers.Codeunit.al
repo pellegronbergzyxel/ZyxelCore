@@ -63,6 +63,40 @@ codeunit 50029 CommonSubscribers
         end
 
     end;
+
+
+    [EventSubscriber(ObjectType::Table, Database::"Report Selections", 'OnAfterGetEmailBodyCustomer', '', false, false)]
+
+    local procedure OnAfterGetEmailBodyCustomer(var CustomerEmailAddress: Text[250]; ServerEmailBodyFilePath: Text[250]; RecordVariant: Variant; var Result: Boolean; var IsHandled: Boolean)
+    var
+        SalesHeader: Record "Sales Header";
+        recref: RecordRef;
+        CustReptMgt: Codeunit "Custom Report Management";
+        CustomReportSelection: Record "Custom Report Selection";
+        temptext: text[250];
+    begin
+        if RecordVariant.IsRecord then begin
+            recref.GetTable(RecordVariant);
+            Case recref.Number of
+
+                36:
+                    begin
+                        SalesHeader := RecordVariant;
+                        if SalesHeader."Document Type" = SalesHeader."Document Type"::Order then begin
+                            temptext := CustReptMgt.GetEmailAddress(Database::Customer, SalesHeader."Sell-to Customer No.", CustomReportSelection.Usage::"S.Order", temptext);
+                            if temptext <> '' then
+                                CustomerEmailAddress := temptext;
+                        end
+                    end;
+            end;
+
+        end
+
+    end;
+
+
+
+
     // 491247 <<
 
 }

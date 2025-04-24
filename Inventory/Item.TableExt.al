@@ -778,8 +778,8 @@ tableextension 50114 ItemZX extends Item
             Caption = 'RMA Category';
             Description = 'PAB 1.0';
             InitValue = Normal;
-            OptionCaption = 'Basic,Professional,Unused Category,Normal';
-            OptionMembers = Basic,Professional,"Unused Category",Normal;
+            OptionCaption = 'Basic,Professional,Unused Category,Normal,Standard,Standard+';
+            OptionMembers = Basic,Professional,"Unused Category",Normal,Standard,"Standard+";
         }
         field(50119; "RMA count"; Integer)
         {

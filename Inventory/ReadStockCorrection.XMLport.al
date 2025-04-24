@@ -34,6 +34,7 @@ XmlPort 50061 "Read Stock Correction"
                             "Whse. Stock Corr. Led. Entry"."Posting Type" := "Whse. Stock Corr. Led. Entry"."posting type"::Move;
                         else
                             Error(Text001);
+
                     end;
                 end;
             }

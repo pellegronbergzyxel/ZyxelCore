@@ -375,7 +375,7 @@ Table 50086 "Automation Setup"
         {
             Caption = 'E-mail Download Gif Filename';
         }
-        // #490711
+        // 490711
         field(208; ContainerEtaProdMode; Boolean)
         {
 
@@ -383,6 +383,14 @@ Table 50086 "Automation Setup"
 
         }
         // #490711
+        // Main warehouse = 0 from TW >>
+        field(209; SkipPOMainWareHouseZero; Boolean)
+        {
+
+            Caption = 'Skip warehause inbound to VCK on PO with mainwarehause zero on all lines.';
+
+        }
+        // Main warehouse = 0 from TW <<
     }
 
     keys

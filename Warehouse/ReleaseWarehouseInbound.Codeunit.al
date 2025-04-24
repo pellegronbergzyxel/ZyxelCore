@@ -19,41 +19,44 @@ Codeunit 50006 "Release Warehouse Inbound"
             //>> 09-03-21 ZY-LD 001
             //IF "Location Code" = ItemLogEvent.GetMainWarehouseLocation THEN BEGIN
             recLocation.Get("Location Code");
-            if recLocation.Warehouse <> recLocation.Warehouse::" " then begin  //<< 09-03-21 ZY-LD 001
-                if not "Sent To Warehouse" then
-                    if VCKComMgt.SendInboundOrderRequest(Rec) then begin
-                        Validate("Document Status", "document status"::Released);
-                        "Sent To Warehouse" := true;
-                        "Sent to Warehouse Date" := "Last Status Update Date";
-                        Modify;
-                        Commit;
-                        SentToWarehouse := true;
-                    end;
+            if recLocation.Warehouse <> recLocation.Warehouse::" " then   //<< 09-03-21 ZY-LD 001
+                // >>
+                if CheckforCVKbutNoMainwarehause(rec) then begin
+                    // <<                                          // PGR: add extra check-> check if one line is Main warehause = true) and from PO
+                    if not "Sent To Warehouse" then
+                        if VCKComMgt.SendInboundOrderRequest(Rec) then begin
+                            Validate("Document Status", "document status"::Released);
+                            "Sent To Warehouse" := true;
+                            "Sent to Warehouse Date" := "Last Status Update Date";
+                            Modify;
+                            Commit;
+                            SentToWarehouse := true;
+                        end;
 
-                if "Document Status" = "document status"::Released then  // 14-10-21 ZY-LD 002
-                    if not "Container Details is Sent" then
-                        ContainerDetailsSent := SendContainerDetails;
+                    if "Document Status" = "document status"::Released then  // 14-10-21 ZY-LD 002
+                        if not "Container Details is Sent" then
+                            ContainerDetailsSent := SendContainerDetails;
 
-                //"Document Status" := "Document Status"::Released;  // We set the status above.
-                //MODIFY(TRUE);
+                    //"Document Status" := "Document Status"::Released;  // We set the status above.
+                    //MODIFY(TRUE);
 
-                if GuiAllowed then
-                    if SentToWarehouse and ContainerDetailsSent then
-                        Message(lText001, "No.")
-                    else
-                        if SentToWarehouse then
-                            Message(lText002, "No.")
+                    if GuiAllowed then
+                        if SentToWarehouse and ContainerDetailsSent then
+                            Message(lText001, "No.")
                         else
-                            if ContainerDetailsSent then
-                                Message(lText003, "No.")
+                            if SentToWarehouse then
+                                Message(lText002, "No.")
                             else
-                                //>> 14-10-21 ZY-LD 002
-                                if "Document Status" = "document status"::Error then
-                                    Message("Error Description");
-                //<< 14-10-21 ZY-LD 002
+                                if ContainerDetailsSent then
+                                    Message(lText003, "No.")
+                                else
+                                    //>> 14-10-21 ZY-LD 002
+                                    if "Document Status" = "document status"::Error then
+                                        Message("Error Description");
+                    //<< 14-10-21 ZY-LD 002
 
-                CreateResponse(Rec, false);
-            end;
+                    CreateResponse(Rec, false);
+                end;
         end;
     end;
 
@@ -203,5 +206,31 @@ Codeunit 50006 "Release Warehouse Inbound"
                         until recWhseIndbLine.Next() = 0;
                 end;
             end;
+    end;
+
+    procedure CheckforCVKbutNoMainwarehause(WIH: record "Warehouse Inbound Header"): Boolean
+    var
+        AutoSetup: record "Automation Setup";
+        recWhseIndbLine: Record "VCK Shipping Detail";
+    begin
+        if not AutoSetup.get() then
+            exit(true);
+        if not AutoSetup.SkipPOMainWareHouseZero then
+            exit(true);
+
+        if WIH."Order Type" <> WIH."Order Type"::"Purchase Order" then
+            exit(true);
+
+        recWhseIndbLine.SetRange("Document No.", WIH."No.");
+        recWhseIndbLine.setrange("Main Warehouse", true);
+        if not recWhseIndbLine.IsEmpty then
+            exit(true);
+
+        recWhseIndbLine.SetRange("Document No.", WIH."No.");
+        recWhseIndbLine.setrange("Main Warehouse", false);
+        if not recWhseIndbLine.IsEmpty then
+            exit(false);
+
+
     end;
 }

@@ -38,11 +38,19 @@ Codeunit 50092 "Post Stock Movement Mgt."
                     Clear(xmlStockCorr);
                     xmlStockCorr.SetSource(InStream);
                     xmlStockCorr.Init(recZyFileMgt."Entry No.");
-                    if xmlStockCorr.Import then begin
-                        recZyFileMgt.Open := false;
-                        recZyFileMgt."Error Text" := '';
-                    end else
-                        recZyFileMgt."Error Text" := CopyStr(GetLastErrorText, 1, MaxStrLen(recZyFileMgt."Error Text"));
+                    // temp >>
+                    xmlStockCorr.Import(); // Pelle 
+                                           // temp <<
+
+                    // ori >>
+                    //if xmlStockCorr.Import then begin
+                    recZyFileMgt.Open := false;
+                    //    recZyFileMgt."Error Text" := '';
+                    //end else
+                    //    recZyFileMgt."Error Text" := CopyStr(GetLastErrorText, 1, MaxStrLen(recZyFileMgt."Error Text"));
+                    // ori <<
+
+                    // temp >>
                     recZyFileMgt.Modify;
                     ArchiveFile.Close;
 

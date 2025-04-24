@@ -337,6 +337,11 @@ Page 50322 "Automation Setup"
                             ApplicationArea = Basic, Suite;
                             ToolTip = 'Enter the number of days before "ETA Date" you want to send the inbound order to the warehouse';
                         }
+                        field(SkipPOMainWareHouseZero; Rec.SkipPOMainWareHouseZero)
+                        {
+                            ApplicationArea = Basic, Suite;
+
+                        }
                         field("Release EMEA Whse. Inbound"; Rec."Release EMEA Whse. Inbound")
                         {
                             ApplicationArea = Basic, Suite;
