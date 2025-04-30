@@ -1057,7 +1057,7 @@ Report 50067 "Sales - Credit Memo TR"
     {
         ShipmentDate = 'Shipment Date';
         ShippingAgent = 'Shipping Agent';
-        ExternalDocument = 'Ext. Doc. No.:';
+        ExternalDocument = 'Customer PO. No.:'; //28-04-25 BK #486528
         Tariff = 'Tariff No.:';
         PaymentFoot = 'Please provide payment according to the specific terms';
         PaymentFoot1 = 'Origin of products: TAIWAN';

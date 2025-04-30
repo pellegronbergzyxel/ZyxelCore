@@ -70,6 +70,10 @@ page 50133 "Amazon setup list"
                 {
                     ApplicationArea = All;
                 }
+                field(testmode; Rec.testmode)
+                {
+                    ApplicationArea = All;
+                }
             }
         }
     }

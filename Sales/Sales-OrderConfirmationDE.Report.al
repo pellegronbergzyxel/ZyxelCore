@@ -1392,7 +1392,7 @@ Report 50009 "Sales - Order Confirmation DE"
         OrderConf = 'Auftragsbestätigung';
         ShipmentDate = 'Erwartetes Packdatum';
         //ExternalDocument = 'Kunden Ref. Nr.:';  // 01-11-23 ZY-LD 008
-        ExternalDocument = 'Externe Dok. Nr.';  // 01-11-23 ZY-LD 008
+        ExternalDocument = 'Kundenbestellnummer';  // 01-11-23 ZY-LD 008 Externe Dok. Nr. 
         Salesperson = 'Verkäufer';
         PhoneNo = 'Telefon-Nr.:';
         Fax = 'Fax-Nr.:';

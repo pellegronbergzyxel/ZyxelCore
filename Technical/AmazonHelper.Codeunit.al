@@ -63,7 +63,7 @@ codeunit 50055 AmazonHelper
                                     if orderDetails.SelectToken('buyingParty', temptoken) then
                                         if temptoken.SelectToken('partyId', TokenValue) then
                                             EVALUATE(buyingParty, TokenValue.AsValue().AsText());
-                                custno := AmazonID2CustNo(buyingParty);
+                                custno := AmazonID2CustNo(buyingParty, Amazonsetup.code);
 
                                 if (custno <> '') and (AmazonORder <> '') then begin
                                     if createorClearAmazonorder(custno, AmazonORder, Salesheader, Amazonsetup.ZyxelPartyid) then begin
@@ -188,7 +188,7 @@ codeunit 50055 AmazonHelper
                                         if orderDetails.SelectToken('buyingParty', temptoken) then
                                             if temptoken.SelectToken('partyId', TokenValue) then
                                                 EVALUATE(buyingParty, TokenValue.AsValue().AsText());
-                                    custno := AmazonID2CustNo(buyingParty);
+                                    custno := AmazonID2CustNo(buyingParty, Amazonsetup.code);
 
                                     if (custno <> '') and (AmazonORder <> '') then begin
                                         if createorClearAmazonorder(custno, AmazonORder, Salesheader, Amazonsetup.ZyxelPartyid) then begin
@@ -449,12 +449,14 @@ codeunit 50055 AmazonHelper
         end else begin
             SalesRecord.init;
             SalesRecord.validate("Document Type", SalesRecord."Document Type"::Order);
-            SalesRecord.validate("No.", NoSeriesMgt.GetNextNo(SalesRecord.GetNoSeriesCode(), today, true));
+            //SalesRecord.validate("No.", NoSeriesMgt.GetNextNo(SalesRecord.GetNoSeriesCode(), today, true));
             SalesRecord.validate("Sell-to Customer No.", customerno);
             SalesRecord.Validate(AmazonSellpartyid, NordiskPartyid);
             SalesRecord.validate(AmazonePoNo, Amazonorder);
             SalesRecord.validate("External Document No.", Amazonorder);
             SalesRecord.Validate("Your Reference", Amazonorder);
+            SalesRecord."Posting Date" := Today;
+            salesrecord."Sales Order Type" := salesrecord."Sales Order Type"::Normal;
             SalesRecord.insert(true);
             SalesRecord.validate("Requested delivery Date", Today);
 
@@ -476,17 +478,32 @@ codeunit 50055 AmazonHelper
             error('Amazon ID missing for customer', CustNo);
     end;
 
-    procedure AmazonID2CustNo(Amazonid: Code[10]): code[20]
+    procedure AmazonID2CustNo(Amazonid: Code[10]; partyid: Code[10]): code[20]
     var
         customer: record customer;
+        customerCreate: record customer;
+        Amazonsetup: Record "Amazon Setup";
 
     begin
         customer.setrange(AMAZONID, Amazonid);
         if customer.findset then begin
             exit(customer."No.")
-        end else
+        end else begin
+            Amazonsetup.get(partyid);
+            if Amazonsetup.testmode then begin
+                customer.setrange(AMAZONID, Amazonsetup.ZyxelPartyid);
+                if customer.findset then begin
+                    customerCreate.init;
+                    customerCreate.insert(true);
+                    customerCreate.TransferFields(customer, false);
+                    customer.Name := customer.Name + ' ' + Amazonid;
+                    customer.AMAZONID := Amazonid;
+                    customer.Modify(false);
+                    exit(customer."No.");
+                end;
+            end;
             error('%1 is missing', Amazonid);
-
+        end;
 
     end;
 

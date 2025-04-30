@@ -1346,7 +1346,7 @@ report 50029 "Sales - Customs Invoice ZNet"
     {
         ShipmentDate = 'Shipment Date';
         ShippingAgent = 'Shipping Agent';
-        ExternalDocument = 'External Document No.:';
+        ExternalDocument = 'Customer PO. No.:'; //28-04-25 BK #486528
         Tariff = 'Tariff No.:';
         PaymentFoot = 'Please provide payment according to the specific terms';
         PaymentFoot1 = 'Please transfer all payments to:';

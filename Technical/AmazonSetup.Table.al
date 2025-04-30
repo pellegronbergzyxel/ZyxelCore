@@ -77,7 +77,10 @@ table 50090 "Amazon Setup"
         {
             Caption = 'Amazon PO No.';
         }
-
+        field(20; testmode; boolean)
+        {
+            Caption = 'Amazon import running in testmode';
+        }
 
     }
     keys

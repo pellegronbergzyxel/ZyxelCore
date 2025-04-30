@@ -1067,7 +1067,7 @@ Report 50018 "Sales - Credit Memo DE"
     {
         ShipmentDate = 'Shipment Date';
         ShippingAgent = 'Shipping Agent';
-        ExternalDocument = 'Ext. Doc. No.:';
+        ExternalDocument = 'Customer PO. No.:'; //28-04-25 BK #486528
         Tariff = 'Tariff No.:';
         PaymentFoot = 'Der Gutschriftsbetrag wird Ihrem Konto gutgeschrieben.';
         PaymentFoot1 = 'Origin of products: TAIWAN';
