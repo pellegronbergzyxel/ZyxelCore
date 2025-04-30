@@ -1409,8 +1409,7 @@ Report 50008 "Sales - Order Confirmation RHQ"
     {
         OrderConf = 'Order Confirmation';
         ShipmentDate = 'Expected Pick. Date';
-        //ExternalDocument = 'Cust. Order Nr.:';  // 01-11-23 ZY-LD 009
-        ExternalDocument = 'External Doc. No.';  // 01-11-23 ZY-LD 009
+        ExternalDocument = 'Customer PO. No.';  // 28-04-25 BK #486528
         Salesperson = 'Salesperson';
         PhoneNo = 'Phone No.';
         Fax = 'Fax No.';

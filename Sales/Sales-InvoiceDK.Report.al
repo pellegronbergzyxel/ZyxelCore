@@ -1289,7 +1289,7 @@ Report 50014 "Sales - Invoice DK"
     {
         ShipmentDate = 'Shipment Date';
         ShippingAgent = 'Shipping Agent';
-        ExternalDocument = 'Ext. Doc. No.:';
+        ExternalDocument = 'Customer PO. No.:'; // 8-04-2025 BK #486528
         Tariff = 'Tariff No.:';
         PaymentFoot = 'Please provide payment according to the specific terms';
         PaymentFoot1 = 'Please transfer all payments to:';

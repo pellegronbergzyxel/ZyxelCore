@@ -1243,7 +1243,7 @@ Report 50010 "Sales - Invoice DE"
     {
         ShipmentDate = 'Shipment Date';
         ShippingAgent = 'Shipping Agent';
-        ExternalDocument = 'Ext. Doc. No.:';
+        ExternalDocument = 'Customer PO. No.:'; //28-04-25 BK #486528
         Tariff = 'Tariff No.:';
         PaymentFoot = 'Please provide payment according to the specific terms';
         PaymentFoot1 = 'Please transfer all payments to:';

@@ -1110,7 +1110,7 @@ Report 50007 "Sales - Credit Memo RHQ"
     {
         ShipmentDate = 'Shipment Date';
         ShippingAgent = 'Shipping Agent';
-        ExternalDocument = 'Ext. Doc. No.:';
+        ExternalDocument = 'Customer PO. No.:';  // 28-04-2025 BK #486528
         Tariff = 'Tariff No.:';
         PaymentFoot = 'Please provide payment according to the specific terms';
         PaymentFoot1 = 'Origin of products: TAIWAN';
