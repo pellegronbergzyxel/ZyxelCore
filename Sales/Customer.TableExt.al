@@ -381,8 +381,14 @@ tableextension 50110 CustomerZX extends Customer
         {
             Caption = 'Warning on invocing for not-delivery on DD';
         }
-
         // 463541 <<
+        field(50073; "AMAZONID"; Code[10])
+        {
+            caption = 'Amazon party id';
+            Description = 'Amazon party id';
+        }
+
+
 
         field(55025; "Creation Date"; Date)
         {

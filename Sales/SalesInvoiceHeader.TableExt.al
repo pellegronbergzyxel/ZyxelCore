@@ -190,6 +190,32 @@ tableextension 50129 SalesInvoiceHeaderZX extends "Sales Invoice Header"
             Description = 'For samples we sometime ship products to Denmark to rework, but due to intrastat the item ledger entry must still be the receiving country.';
             TableRelation = "Ship-to Address" where("Customer No." = field("Sell-to Customer No."));
         }
+
+        field(55015; AmazonePoNo; Code[35])
+        {
+            Caption = 'Amazon PO No.';
+            DataClassification = ToBeClassified;
+        }
+
+        field(55016; AmazonpurchaseOrderState; text[20])
+        {
+            Caption = 'Amazon purchaseOrderState';
+            DataClassification = ToBeClassified;
+        }
+        field(55017; AmazonSellpartyid; text[20])
+        {
+            Caption = 'Amazon AmazonSellpartyid';
+            DataClassification = ToBeClassified;
+        }
+        field(55020; AmazonInvSent; DateTime)
+        {
+            Caption = 'Amazon invoice sent on';
+        }
+        field(55019; AmazconfirmationStatus; text[20])
+        {
+            Caption = 'Amazon confirmationStatus';
+            DataClassification = ToBeClassified;
+        }
         field(61300; "E-Invoice Comment"; Text[25])
         {
             Caption = 'E-Invoice Comment';

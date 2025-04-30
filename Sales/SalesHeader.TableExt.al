@@ -396,6 +396,30 @@ tableextension 50116 SalesHeaderZX extends "Sales Header"
             Caption = 'From RHQ';
             Description = 'Unused';
         }
+
+        field(55015; AmazonePoNo; Code[35])
+        {
+            Caption = 'Amazon PO No.';
+            DataClassification = ToBeClassified;
+        }
+
+        field(55016; AmazonpurchaseOrderState; text[20])
+        {
+            Caption = 'Amazon purchaseOrderState';
+            DataClassification = ToBeClassified;
+        }
+        field(55017; AmazonSellpartyid; text[20])
+        {
+            Caption = 'Amazon AmazonSellpartyid';
+            DataClassification = ToBeClassified;
+        }
+
+        field(55019; AmazconfirmationStatus; text[20])
+        {
+            Caption = 'Amazon confirmationStatus';
+            DataClassification = ToBeClassified;
+        }
+
         field(61300; "E-Invoice Comment"; Text[25])
         {
             Caption = 'E-Invoice Comment';

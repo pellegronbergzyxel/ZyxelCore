@@ -509,6 +509,11 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 {
                     ApplicationArea = Basic, Suite;
                 }
+                field(AMAZONID; Rec.AMAZONID)
+                {
+                    ApplicationArea = Basic, Suite;
+
+                }
             }
             group(Forecasting)
             {
@@ -548,6 +553,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 ApplicationArea = Basic, Suite;
                 ToolTip = 'Show warning when delivery document is no on Deilvered status';
             }
+
         }
         // 463541 <<
     }
