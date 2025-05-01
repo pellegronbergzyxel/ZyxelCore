@@ -475,6 +475,9 @@ Report 50008 "Sales - Order Confirmation RHQ"
                         column(CressRef_SalesInvLine; "Sales Line"."Item Reference No.")
                         {
                         }
+                        column(QtyCarton; "Sales Line"."Number Per Carton") //01-05-25 BK #865599
+                        {
+                        }
                         column(RequestedDeliveryDateLine; "Sales Line"."Requested Delivery Date")
                         {
                         }
@@ -484,6 +487,7 @@ Report 50008 "Sales - Order Confirmation RHQ"
                         column(ExtDocNoSl; ExtDocNoSl)  // 21-08-24 ZY-LD 011
                         {
                         }
+
 
                         trigger OnAfterGetRecord()
                         begin
@@ -521,10 +525,14 @@ Report 50008 "Sales - Order Confirmation RHQ"
 
                             //>> 21-08-24 ZY-LD 011
                             ExtDocNoSl := '';
-                            if ("Sales Header"."External Document No." <> "Sales Line"."External Document No.") and
-                               ("Sales Line"."External Document No." <> '')
-                             then
-                                ExtDocNoSl := "Sales Line"."External Document No.";
+                            IF ("Sales Line"."External Document Position No." = '') then begin
+                                if ("Sales Header"."External Document No." <> "Sales Line"."External Document No.") and
+                                ("Sales Line"."External Document No." <> '')
+                                then
+                                    ExtDocNoSl := "Sales Line"."External Document No.";
+                            End else begin
+                                ExtDocNoSl := "Sales Line"."External Document No." + Text012 + "Sales Line"."External Document Position No.";
+                            end;
                             //<< 21-08-24 ZY-LD 011                                
                         end;
 
@@ -1423,7 +1431,7 @@ Report 50008 "Sales - Order Confirmation RHQ"
         ShipQty = 'Ship Quantity';
         UnitPrice = 'Unit Price';
         Amount = 'Amount';
-        Confirmed = 'Confirmed Pick. Date';
+        Confirmed = 'Con P. DD';
         TotalEur = 'Total';
         VATEXCL = 'VAT Excluded';
         PaymentTerms = 'Payment Terms';
@@ -1432,6 +1440,7 @@ Report 50008 "Sales - Order Confirmation RHQ"
         Shiptoadress = 'Ship to:';
         SelltoCustomer = 'Customer No.:';
         Text001 = 'Requested delivery date:';
+        NoPerCarton = 'Qty Carton'; //01-05-2025 BK #865599
     }
 
     trigger OnInitReport()
@@ -1475,6 +1484,8 @@ Report 50008 "Sales - Order Confirmation RHQ"
         Text009: label 'Exchange rate: %1/%2';
         Text010: label 'Sales - Prepayment Invoice %1';
         Text011: label 'Sales - Prepmt. Credit Memo %1';
+
+        Text012: label ', Pos: '; //01-05-25 BK #502498
         CompanyInfoPhoneNoCaptionLbl: label 'Phone No.';
         CompanyInfoVATRegNoCptnLbl: label 'VAT Reg. No.';
         CompanyInfoGiroNoCaptionLbl: label 'Giro No.';
@@ -1508,6 +1519,7 @@ Report 50008 "Sales - Order Confirmation RHQ"
         VATIdentifierCaptionLbl: label 'VAT Identifier';
         HomePageCaptionCap: label 'Home Page';
         EMailCaptionLbl: label 'E-Mail';
+        NoPerCarton: label 'Qty Carton'; //01-05-2025 BK #865599
         GLSetup: Record "General Ledger Setup";
         ShipmentMethod: Record "Shipment Method";
         PaymentTerms: Record "Payment Terms";
