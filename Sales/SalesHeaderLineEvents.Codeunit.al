@@ -1288,6 +1288,7 @@ codeunit 50067 "Sales Header/Line Events"
             (not Rec."eCommerce Order") and
             (not Rec.EDI) and  // 15-11-18 ZY-LD 012
             (not SI.GetHideSalesDialog) and  // 18-06-19 ZY-LD 030
+            (rec.AmazonePoNo = '') AND // Amazon order skip
             (Rec."Sales Order Type" <> Rec."sales order type"::"G/L Account")  // xx
         then
             if Rec."Document Type" in [Rec."document type"::Order, Rec."document type"::Invoice, Rec."document type"::"Credit Memo"] then begin

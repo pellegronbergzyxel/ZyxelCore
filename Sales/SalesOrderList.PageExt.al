@@ -58,6 +58,30 @@ pageextension 50303 SalesOrderListZX extends "Sales Order List"
                 ApplicationArea = Basic, Suite;
                 Visible = false;
             }
+            field(AmazonePoNo; Rec.AmazonePoNo)
+            {
+                ApplicationArea = Basic, Suite;
+                Editable = false;
+                Visible = false;
+            }
+            field(AmazconfirmationStatus; Rec.AmazconfirmationStatus)
+            {
+                ApplicationArea = Basic, Suite;
+                Editable = false;
+                Visible = false;
+            }
+            field(AmazonpurchaseOrderState; Rec.AmazonpurchaseOrderState)
+            {
+                ApplicationArea = Basic, Suite;
+                Editable = false;
+                Visible = false;
+            }
+            field(AmazonSellpartyid; Rec.AmazonSellpartyid)
+            {
+                ApplicationArea = Basic, Suite;
+                Editable = false;
+                Visible = false;
+            }
         }
     }
     actions

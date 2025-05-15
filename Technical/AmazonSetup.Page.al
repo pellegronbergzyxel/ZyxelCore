@@ -22,6 +22,11 @@ page 50133 "Amazon setup list"
                 {
                     ApplicationArea = All;
                 }
+                field(Customerno; Rec.Customerno)
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                }
                 field(lastimport; rec.lastimport)
                 {
                     ApplicationArea = All;
@@ -70,6 +75,10 @@ page 50133 "Amazon setup list"
                 {
                     ApplicationArea = All;
                 }
+                field(URL_packingSlips_order; Rec.URL_packingSlips_order)
+                {
+                    ApplicationArea = All;
+                }
                 field(testmode; Rec.testmode)
                 {
                     ApplicationArea = All;
@@ -79,6 +88,46 @@ page 50133 "Amazon setup list"
     }
     actions
     {
+        area(Navigation)
+        {
+            action(ShowCustomer)
+            {
+                caption = 'Amazon Bill/Sell-to customer';
+                Image = CustomerList;
+                ApplicationArea = all;
+
+                trigger OnAction()
+                var
+                    Customer: record Customer;
+                    CustomerList: Page "Customer List";
+
+                begin
+                    Customer.setfilter(AMAZONID, '<>%1', '');
+                    CustomerList.SetTableView(Customer);
+                    CustomerList.run();
+                end;
+            }
+            action(showSO)
+            {
+                caption = 'Open Amazon Sales orders';
+                Image = OrderList;
+                ApplicationArea = all;
+
+                trigger OnAction()
+                var
+                    Salesheader: record "Sales Header";
+                    LookupPageId: page "Sales Order List";
+                begin
+                    Salesheader.setrange("Document Type", Salesheader."Document Type"::Order);
+                    Salesheader.setfilter(AmazonePoNo, '<>%1', '');
+                    LookupPageId.SetTableView(Salesheader);
+                    LookupPageId.run();
+
+
+                end;
+            }
+        }
+
         area(Processing)
         {
             action(run)
@@ -137,44 +186,25 @@ page 50133 "Amazon setup list"
                 end;
             }
 
-            action(showSO)
-            {
-                caption = 'Amazon Sales orders';
-                Image = GetSourceDoc;
-                ApplicationArea = all;
-
-                trigger OnAction()
-                var
-                    Salesheader: record "Sales Header";
-                    LookupPageId: page "Sales Order List";
-
-                begin
-                    Salesheader.setrange("Document Type", Salesheader."Document Type"::Order);
-                    Salesheader.setfilter(AmazonePoNo, '<>%1', '');
-                    LookupPageId.SetTableView(Salesheader);
-                    LookupPageId.run();
 
 
-                end;
-            }
+            // action(Onetime1)
+            // {
+            //     caption = 'Onetime: update shippingtime';
+            //     Image = GetSourceDoc;
+            //     ApplicationArea = all;
 
-            action(Onetime1)
-            {
-                caption = 'Onetime: update shippingtime';
-                Image = GetSourceDoc;
-                ApplicationArea = all;
+            //     trigger OnAction()
+            //     var
+            //         amazhelper: codeunit amazonHelper;
 
-                trigger OnAction()
-                var
-                    amazhelper: codeunit amazonHelper;
-
-                begin
-                    amazhelper.OnetimeUpdateshipping();
+            //     begin
+            //         amazhelper.OnetimeUpdateshipping();
 
 
 
-                end;
-            }
+            //     end;
+            // }
 
         }
     }

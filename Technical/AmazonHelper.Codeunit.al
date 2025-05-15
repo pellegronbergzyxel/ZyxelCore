@@ -35,12 +35,15 @@ codeunit 50055 AmazonHelper
         deliveryWindow: text;
         lineno: integer;
         itemno: code[20];
+        shipno: code[10];
         purchaseOrderState: text;
         Amazonsetup: record "Amazon Setup";
+        shiptoadd: record "Ship-to Address";
         DD: integer;
         MM: integer;
         YYYY: integer;
         Shipdate: Date;
+        amt: Decimal;
     begin
         Amazonsetup.setrange(ActiveClient, true);
         if Amazcode <> '' then
@@ -73,9 +76,15 @@ codeunit 50055 AmazonHelper
                                             orderdate := XMLdate2Date(format(TokenValue.AsValue().asText()));
                                             Salesheader.validate("Document Date", orderdate);
                                             Salesheader.validate("Order Date", orderdate);
+
                                             Salesheader.modify(true);
 
                                         end;
+                                        shipno := AmazonID2CustNoShipto(buyingParty, Amazonsetup.code);
+                                        if shiptoadd.get(shipno) then
+                                            salesheader.SetShipToCustomerAddressFieldsFromShipToAddr(shiptoadd);
+                                        Salesheader.Validate("Ship-to Code", shipno);
+                                        Salesheader.modify(true);
                                         // 
                                         saleslineinit(Salesline, Salesheader, lineno);
                                         Salesline.Type := Salesline.Type::" ";
@@ -146,8 +155,8 @@ codeunit 50055 AmazonHelper
                                                     //netCost  > amount 
                                                     if TokenValue.SelectToken('netCost', TokenValue2) then
                                                         if TokenValue2.SelectToken('amount', TokenValue3) then begin
-                                                            EVALUATE(Salesline.Quantity, TokenValue3.AsValue().AsText());
-                                                            Salesline.validate(Quantity);
+                                                            EVALUATE(Salesline."Unit Price", TokenValue3.AsValue().AsText());
+                                                            Salesline.validate("Unit Price");
                                                             Salesline.Modify(true);
                                                         end;
                                                     //orderedQuantity > amount
@@ -201,6 +210,12 @@ codeunit 50055 AmazonHelper
                                                 Salesheader.modify(true);
 
                                             end;
+
+                                            shipno := AmazonID2CustNoShipto(buyingParty, Amazonsetup.code);
+                                            if shiptoadd.get(shipno) then
+                                                salesheader.SetShipToCustomerAddressFieldsFromShipToAddr(shiptoadd);
+                                            Salesheader.Validate("Ship-to Code", shipno);
+                                            Salesheader.modify(true);
                                             // 
                                             saleslineinit(Salesline, Salesheader, lineno);
                                             Salesline.Type := Salesline.Type::" ";
@@ -268,10 +283,12 @@ codeunit 50055 AmazonHelper
                                                         end;
                                                         //TokenValue.SelectToken('vendorProductIdentifier', TokenValue2);
                                                         //netCost  > amount 
+                                                        amt := 0;
                                                         if TokenValue.SelectToken('netCost', TokenValue2) then
                                                             if TokenValue2.SelectToken('amount', TokenValue3) then begin
-                                                                EVALUATE(Salesline.Quantity, TokenValue3.AsValue().AsText());
-                                                                Salesline.validate(Quantity);
+                                                                EVALUATE(Salesline.Amount, TokenValue3.AsValue().AsText());
+                                                                amt := Salesline.Amount;
+                                                                Salesline.validate("amount");
                                                                 Salesline.Modify(true);
                                                             end;
                                                         //orderedQuantity > amount
@@ -279,6 +296,8 @@ codeunit 50055 AmazonHelper
                                                             if TokenValue2.SelectToken('amount', TokenValue3) then begin
                                                                 EVALUATE(Salesline.Quantity, TokenValue3.AsValue().AsText());
                                                                 Salesline.validate(Quantity);
+                                                                if (amt <> 0) and (Salesline.Quantity <> 0) then
+                                                                    salesline.validate("Unit Price", round(amt / Salesline.Quantity));
                                                                 Salesline.Modify(true);
                                                             end;
                                                         if Shipdate <> 0D then begin
@@ -286,18 +305,35 @@ codeunit 50055 AmazonHelper
                                                             Salesline.Validate("Requested Delivery Date", Shipdate);
                                                             Salesline.Modify(true);
                                                         end;
+
+                                                    end else begin
+                                                        // amazonitem missing
+                                                        saleslineinit(Salesline, Salesheader, lineno);
+                                                        salesline.Description := TokenValue2.AsValue().asText();
+                                                        if TokenValue.SelectToken('netCost', TokenValue2) then
+                                                            if TokenValue2.SelectToken('amount', TokenValue3) then begin
+                                                                EVALUATE(Salesline."Amount", TokenValue3.AsValue().AsText());
+                                                                Salesline."Description 2" := 'Price:' + format(Salesline.Amount);
+                                                                Salesline.Modify(true);
+                                                            end;
+                                                        //orderedQuantity > amount
+                                                        if TokenValue.SelectToken('orderedQuantity', TokenValue2) then
+                                                            if TokenValue2.SelectToken('amount', TokenValue3) then begin
+                                                                EVALUATE(Salesline.Quantity, TokenValue3.AsValue().AsText());
+                                                                Salesline."Description 2" := Salesline."Description 2" + ',amount:' + format(Salesline.Quantity);
+                                                                Salesline.Modify(true);
+                                                            end;
                                                     end;
-                                                end;
-                                            end
+                                                end
+                                            end;
                                         end;
+
                                     end;
                                 end;
                             end;
                         end;
                     end;
                 end;
-
-
             until Amazonsetup.next = 0;
     end;
 
@@ -426,14 +462,15 @@ codeunit 50055 AmazonHelper
         exit(today);
     end;
 
-    procedure createorClearAmazonorder(customerno: code[20]; Amazonorder: code[35]; var SalesRecord: record "Sales Header"; NordiskPartyid: code[10]): Boolean
+    procedure createorClearAmazonorder(customerno: code[20]; Amazonorder: code[35]; var SalesRecord: record "Sales Header"; Partyid: code[10]): Boolean
     var
         salesline: record "Sales Line";
         NoSeriesMgt: Codeunit NoSeriesManagement;
+        salesSetup: Record "Sales & Receivables Setup";
     begin
         SalesRecord.setrange("Document Type", SalesRecord."Document Type"::Order);
         SalesRecord.setrange(AmazonePoNo, Amazonorder);
-        SalesRecord.setrange(AmazonSellpartyid, NordiskPartyid);
+        SalesRecord.setrange(AmazonSellpartyid, Partyid);
         SalesRecord.setrange("Sell-to Customer No.", customerno);
         if SalesRecord.findset then begin
             if SalesRecord.status = SalesRecord.status::Released Then begin
@@ -447,22 +484,47 @@ codeunit 50055 AmazonHelper
             end;
 
         end else begin
+            salesSetup.get();
             SalesRecord.init;
-            SalesRecord.validate("Document Type", SalesRecord."Document Type"::Order);
-            //SalesRecord.validate("No.", NoSeriesMgt.GetNextNo(SalesRecord.GetNoSeriesCode(), today, true));
-            SalesRecord.validate("Sell-to Customer No.", customerno);
-            SalesRecord.Validate(AmazonSellpartyid, NordiskPartyid);
+            SalesRecord."Document Type" := SalesRecord."Document Type"::Order;
+            SalesRecord."No." := NoSeriesMgt.GetNextNo(salesSetup."Order Nos.", today, true);
             SalesRecord.validate(AmazonePoNo, Amazonorder);
             SalesRecord.validate("External Document No.", Amazonorder);
+            SalesRecord.insert(false);
+            // Flyt til setup >>
+            SalesRecord."VAT Registration No. Zyxel" := vatBilltocustomer(customerno);
+            salesrecord."Sales Order Type" := salesrecord."Sales Order Type"::Normal;
+            SalesRecord."Location Code" := 'VCK ZNET';
+            // Flyt til setup <<
+            //SalesRecord."eCommerce Order" := true;
+
+
+            SalesRecord.validate("Sell-to Customer No.", customerno);
+            SalesRecord."VAT Registration No. Zyxel" := vatBilltocustomer(customerno);
+            SalesRecord.Validate(AmazonSellpartyid, Partyid);
+
+
             SalesRecord.Validate("Your Reference", Amazonorder);
             SalesRecord."Posting Date" := Today;
-            salesrecord."Sales Order Type" := salesrecord."Sales Order Type"::Normal;
-            SalesRecord.insert(true);
+
+
             SalesRecord.validate("Requested delivery Date", Today);
 
             SalesRecord.Modify(true);
             exit(true);
         end;
+
+    end;
+
+
+    procedure vatBilltocustomer(CustNo: code[20]): Code[20]
+    var
+
+        Cust: record customer;
+    begin
+        Cust.get(custno);
+        //Cust.get(cust."SeBill-to Customer No.");
+        exit(cust."VAT Registration No.")
 
     end;
 
@@ -485,48 +547,46 @@ codeunit 50055 AmazonHelper
         Amazonsetup: Record "Amazon Setup";
 
     begin
-        customer.setrange(AMAZONID, Amazonid);
+        Amazonsetup.get(partyid);
+        customer.setrange(AMAZONID, Amazonsetup.ZyxelPartyid);
         if customer.findset then begin
             exit(customer."No.")
         end else begin
-            Amazonsetup.get(partyid);
-            if Amazonsetup.testmode then begin
-                customer.setrange(AMAZONID, Amazonsetup.ZyxelPartyid);
-                if customer.findset then begin
-                    customerCreate.init;
-                    customerCreate.insert(true);
-                    customerCreate.TransferFields(customer, false);
-                    customer.Name := customer.Name + ' ' + Amazonid;
-                    customer.AMAZONID := Amazonid;
-                    customer.Modify(false);
-                    exit(customer."No.");
-                end;
-            end;
             error('%1 is missing', Amazonid);
         end;
 
     end;
 
-
-
-
-    procedure GetOAuth2AuthorizationCode(): text
+    procedure AmazonID2CustNoShipto(Amazonid: Code[10]; partyid: Code[10]): code[20]
     var
-        Client: HttpClient;
-        httpResponse: HttpResponseMessage;
-        httpcontent: HttpContent;
-        temptext: text;
+        customer: record customer;
+        customerCreate: record customer;
+        ShiptoAddress: Record "Ship-to Address";
+        Amazonsetup: Record "Amazon Setup";
+
     begin
+        Amazonsetup.get(partyid);
+        customer.setrange(AMAZONID, Amazonsetup.ZyxelPartyid);
+        if customer.findset then begin
 
-        client.SetBaseAddress('https://app.iex.dk/#/oauth/authorize?moduleInstallId=d2045447-742a-45ca-820b-552571242ca6&client_id=92802577-bd3a-4121-9482-9409429276d6&redirect_uri=https://businesscentral.dynamics.com/OAuthLanding.htm');
-        client.Get('', httpResponse);
-        message('%1', httpResponse.IsSuccessStatusCode);
-        httpcontent := httpResponse.Content();
-        httpcontent.ReadAs(temptext);
-
-        message('%1', temptext);
-
+            ShiptoAddress.setrange("Customer No.", customer."No.");
+            ShiptoAddress.setrange(Code, Amazonid);
+            IF ShiptoAddress.findset then
+                exit(ShiptoAddress.code);
+            if Amazonsetup.testmode then begin
+                ShiptoAddress.init;
+                ShiptoAddress."Customer No." := customer."No.";
+                ShiptoAddress.code := Amazonid;
+                ShiptoAddress.insert;
+                exit(ShiptoAddress.code);
+            end;
+        end;
+        error('%1 is missing, ship %2', Amazonsetup.ZyxelPartyid, Amazonid);
     end;
+
+
+
+
 
     procedure GETAmazonOrder(var ResponseString: text; NordiskPartyid: code[10]; amazdocno: code[20]): Boolean
     var
@@ -1440,4 +1500,70 @@ codeunit 50055 AmazonHelper
 
             until Salesheader.Next() = 0;
     end;
+
+
+
+    procedure GETAmazonOrderpackingSlips(var ResponseString: text; Partyid: code[10]; salesheader: record "Sales Header"): Boolean
+    var
+
+        Amazsetup: record "amazon Setup";
+        Httpcontent: HttpContent;
+        contentHeaders: HttpHeaders;
+        request: HttpRequestMessage;
+        responseMessage: HttpResponseMessage;
+        client: HttpClient;
+        content: Text;
+        url: Text;
+        token: JsonToken;
+        token2: JsonToken;
+        JSonArray: JsonArray;
+        tiPartNumber: text;
+        quantity: Decimal;
+        newtoken: text;
+        // test
+        TempBlob: Codeunit "Temp Blob";
+        outStr: OutStream;
+        inStr: InStream;
+        filename: text;
+
+    begin
+        Amazsetup.get(Partyid);
+
+        IF GetnewToken(newtoken, Partyid) then begin
+            httpcontent.GetHeaders(contentHeaders);
+            contentHeaders.Clear();
+            request.GetHeaders(contentHeaders);
+            contentHeaders.Add('x-amz-access-token', newtoken);
+            contentHeaders.Add('Accept', 'application/json');
+            request.SetRequestUri(StrSubstNo(Amazsetup.URL_packingSlips_order, salesheader.AmazonePoNo));
+            request.Method := 'GET';
+
+            if not (client.send(request, responseMessage)) then begin
+                error('Url virker ikke: ' + url);
+                exit(false);
+            end;
+
+            if not (responseMessage.IsSuccessStatusCode()) then begin
+                Message('Status code: %1\Description: %2, (%3)', responseMessage.HttpStatusCode(), responseMessage.ReasonPhrase());
+                exit(false);
+            end;
+
+            responseMessage.Content().ReadAs(content);
+
+            // Save the data of the InStream as a file.
+            if (userid in ['PGR 1', 'ZYXEL\PELLE.GRONBERG']) and GuiAllowed then begin
+                TempBlob.CreateOutStream(outStr, TextEncoding::UTF8);
+                outStr.WriteText(content);
+                TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
+                fileName := StrSubstNo('Amazon__%1_.txt', format(responseMessage.HttpStatusCode()));
+                File.DownloadFromStream(inStr, 'Export', '', '', fileName);
+            end;
+            ResponseString := content;
+            exit(true);
+
+        end;
+
+
+    end;
+
 }

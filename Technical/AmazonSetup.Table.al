@@ -81,6 +81,19 @@ table 50090 "Amazon Setup"
         {
             Caption = 'Amazon import running in testmode';
         }
+        field(21; URL_packingSlips_order; text[200])
+        {
+            caption = 'URL packingSlips Order';
+        }
+        field(22; Customerno; code[20])
+        {
+            CalcFormula = lookup(Customer."No." where(AMAZONID = field(ZyxelPartyid)));
+
+            Caption = 'Bill-to customer';
+            Editable = false;
+            FieldClass = FlowField;
+
+        }
 
     }
     keys

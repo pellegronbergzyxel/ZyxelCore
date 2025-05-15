@@ -290,6 +290,30 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                 ToolTip = 'Fill this field only if the products must be sent to rework on a different location (ex. DK-Office). In all other situations the field must be left blank.';
             }
         }
+        addlast("Invoice Details")
+        {
+            field(AmazonePoNo; Rec.AmazonePoNo)
+            {
+                ApplicationArea = Basic, Suite;
+                Editable = false;
+            }
+            field(AmazconfirmationStatus; Rec.AmazconfirmationStatus)
+            {
+                ApplicationArea = Basic, Suite;
+                Editable = false;
+            }
+            field(AmazonpurchaseOrderState; Rec.AmazonpurchaseOrderState)
+            {
+                ApplicationArea = Basic, Suite;
+                Editable = false;
+            }
+            field(AmazonSellpartyid; Rec.AmazonSellpartyid)
+            {
+                ApplicationArea = Basic, Suite;
+                Editable = false;
+            }
+        }
+
     }
 
     actions
@@ -477,6 +501,30 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                     CurrPage.Update;
                     //<< 09-04-18 ZY-LD 006
                 end;
+            }
+        }
+
+        addLast("F&unctions")
+        {
+            group("Amazon")
+            {
+                Caption = 'Amazon';
+                Image = Documents;
+                action(packingSlips)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Download packingSlips';
+                    Image = Approval;
+
+                    trigger OnAction()
+                    var
+                        AmazonHelper: Codeunit AmazonHelper;
+                        texttemp: text;
+                    begin
+                        if AmazonHelper.GETAmazonOrderpackingSlips(texttemp, rec.AmazonSellpartyid, rec) then
+                            message(texttemp);
+                    end;
+                }
             }
         }
         addafter("F&unctions")
