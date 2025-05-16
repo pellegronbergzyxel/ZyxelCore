@@ -3773,4 +3773,21 @@ codeunit 50067 "Sales Header/Line Events"
             IsHandled := true;
         //<< 07-03-24 ZY-LD 138
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnSetShipToCustomerAddressFieldsFromShipToAddrOnAfterCalcShouldCopyLocationCode, '', false, false)]
+    local procedure "Sales Header_OnSetShipToCustomerAddressFieldsFromShipToAddrOnAfterCalcShouldCopyLocationCode"(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; ShipToAddress: Record "Ship-to Address"; var ShouldCopyLocationCode: Boolean)
+    var
+        ShipLocation: Record Location;
+
+    begin
+        // 15-05-2025 BK #493054
+        IF ShouldCopyLocationCode then begin
+            IF ShipToAddress."Location Code" <> '' then
+                ShipLocation.get(ShipToAddress."Location Code");
+            IF (ShipLocation."Sales Order Type" <> SalesHeader."Sales Order Type") then
+                ShouldCopyLocationCode := false;
+        end;
+        // 15-05-2025 BK #493054
+    end;
+
 }

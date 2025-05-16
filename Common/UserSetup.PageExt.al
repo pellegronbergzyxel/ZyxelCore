@@ -148,6 +148,11 @@ pageextension 50144 UserSetupZX extends "User Setup"
                 ApplicationArea = Basic, Suite;
                 Visible = false;
             }
+            field("Allow Force Validation"; Rec."Allow Force Validation")
+            {
+                ApplicationArea = Basic, Suite; ////05-05-2025 BK #485255
+                Visible = false;
+            }
         }
     }
 

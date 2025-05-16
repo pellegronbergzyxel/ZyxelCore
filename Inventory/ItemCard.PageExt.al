@@ -313,6 +313,12 @@ pageextension 50119 ItemCardZX extends "Item Card"
                     ToolTip = 'Specifies the value of the Product Length (cm) (WEEE) field.';
                     Editable = PLMSUpdateEditable;
                 }
+
+                field("Item Country Code"; Rec."Item Country Code") //15-05-2025 BK #499952
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Country only for country specific Items.';
+                }
             }
             group(ColourBox)
             {

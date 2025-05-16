@@ -1368,4 +1368,18 @@ table 50103 "eCommerce Order Header"
         Modify(true);
         //<< 24-05-23 ZY-LD 023
     end;
+
+    procedure ForceValidationDocument()
+    var
+        UserSetup: Record "User Setup";
+        ErrorAllowed: Label '%1 do not have permission to Force Validate Document';
+    begin
+        IF UserSetup.get(UserId) then
+            If UserSetup."Allow Force Validation" then begin
+                if "Error Description" <> '' then
+                    "Error Description" := '';//05-05-2025 BK #485255
+            end else
+                Error(ErrorAllowed, UserId);
+
+    end;
 }

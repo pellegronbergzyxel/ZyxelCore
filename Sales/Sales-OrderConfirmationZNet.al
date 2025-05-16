@@ -1,19 +1,8 @@
-Report 50008 "Sales - Order Confirmation RHQ"
+Report 50090 "Sales - Order ConfirmationZNet"
 {
-    // 001. 03-04-18 ZY-LD 2018032910000059 - Strange code but. If "Payment Terms Code" is changed on the sales order, we must use this code, otherwise it must code from the sell-to customer.
-    // 002. 04-09-19 ZY-LD 2019090310000095 - Company VAT Registration No. is not always the number in Company Info.
-    // 003. 03-01-20 ZY-LD 2020010310000052 - Dates are formatted as '<Closing><Day>. <Month Text> <Year4>' OR '<Closing><Day,2>-<Month,2>-<Year4>'.
-    // 004. 02-04-20 ZY-LD 2020030210000103 - Added cross reference to the line.
-    // 005. 31-05-21 ZY-LD 2021052810000131 - Buttom text in ZNet.
-    // 006. 23-06-21 ZY-LD 000 - Bill-to VAT Registration No. is not in use anymore.
-    // 007. 09-03-22 ZY-LD 2022030910000043 - Buttom text in ZCom.
-    // 008. 11-03-22 ZY-LD 2022031110000066 - Incoterms.
-    // 009. 01-11-23 ZY-LD 000 - Text changed due to request from Madlen.
-    // 010. 28-11-23 ZY-LD #7212500 - Read company info from correct company.
-    // 011. 21-08-24 ZY-LD #449671 - Show External Document No. from the lines if it´s different from the header.
 
     DefaultLayout = RDLC;
-    RDLCLayout = './Layouts/Sales - Order Confirmation RHQ.rdlc';
+    RDLCLayout = './Layouts/Sales - Order Confirmation ZNet.rdlc';
 
     Caption = 'Sales - Order Confirmation ';
     Permissions = TableData "Sales Shipment Buffer" = rimd;
@@ -1431,7 +1420,7 @@ Report 50008 "Sales - Order Confirmation RHQ"
         ShipQty = 'Ship Quantity';
         UnitPrice = 'Unit Price';
         Amount = 'Amount';
-        Confirmed = 'Confirmed Pick Date';
+        Confirmed = 'Con P. DD';
         TotalEur = 'Total';
         VATEXCL = 'VAT Excluded';
         PaymentTerms = 'Payment Terms';

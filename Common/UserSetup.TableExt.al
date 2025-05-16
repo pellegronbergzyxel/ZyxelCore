@@ -138,5 +138,9 @@ tableextension 50125 UserSetupZX extends "User Setup"
         {
             Caption = 'Employee ID';
         }
+        field(50071; "Allow Force Validation"; Boolean)
+        {
+            Caption = 'Allow Force Validation'; //05-05-2025 BK #485255
+        }
     }
 }

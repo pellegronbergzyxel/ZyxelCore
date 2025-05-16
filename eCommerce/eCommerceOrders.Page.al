@@ -222,6 +222,20 @@ page 50238 "eCommerce Orders"
                     IF Rec.Modify() then;
                 end;
             }
+            action("Force Validate")
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Force Validate';
+                Image = ValidateEmailLoggingSetup;
+                Promoted = true;
+                PromotedCategory = Process;
+
+                trigger OnAction() //05-05-2025 BK #485255
+                begin
+                    Rec.ForceValidationDocument;
+                    IF Rec.Modify() then;
+                end;
+            }
             action("Archive Manually")
             {
                 ApplicationArea = Basic, Suite;
