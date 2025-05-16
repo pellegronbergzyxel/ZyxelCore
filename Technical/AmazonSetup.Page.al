@@ -79,6 +79,10 @@ page 50133 "Amazon setup list"
                 {
                     ApplicationArea = All;
                 }
+                field(URL_GET_status_Purchase; rec.URL_GET_status_Purchase)
+                {
+                    ApplicationArea = All;
+                }
                 field(testmode; Rec.testmode)
                 {
                     ApplicationArea = All;

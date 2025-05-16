@@ -361,7 +361,7 @@ codeunit 50055 AmazonHelper
     begin
         Salesheader.setrange("Document Type", Salesheader."Document Type"::Order);
         Salesheader.setrange(Status, Salesheader.Status::Open);
-
+        Salesheader.setfilter(AmazonSellpartyid, '<>%1', '');
         salesheader.setfilter(AmazonePoNo, '<>%1', '');
         if Salesheader.findset Then
             repeat
