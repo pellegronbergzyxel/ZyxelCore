@@ -94,9 +94,15 @@ codeunit 50029 CommonSubscribers
 
     end;
 
-
-
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Notification Entry Dispatcher", 'OnBeforeCreateAndDispatch', '', false, false)]
+    local procedure OnBeforeCreateAndDispatch(NotificationSetup: Record "Notification Setup"; var NotificationEntry: Record "Notification Entry")
+    var
+    begin
+        if NotificationEntry.type = NotificationEntry.type::Approval then
+            NotificationEntry.Delete(false);
+    end;
 
     // 491247 <<
+
 
 }
