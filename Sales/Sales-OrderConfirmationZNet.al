@@ -489,11 +489,10 @@ Report 50090 "Sales - Order ConfirmationZNet"
                             ShipmentDateLimit := CalcDate('<+2Y>', Today);
                             if (ShipmentDateLimit > "Sales Line"."Shipment Date") then begin
                                 DisplShipDate := Format("Sales Line"."Shipment Date", 0, '<Closing><Day,2>-<Month,2>-<Year4>');  // 03-01-20 ZY-LD 003
-                                if ("Sales Line"."Shipment Date Confirmed") then begin
-                                    ConfirmText := 'Yes';
-                                end else begin
+                                if ("Sales Line"."Shipment Date Confirmed") then
+                                    ConfirmText := 'Yes'
+                                else
                                     ConfirmText := '';
-                                end;
                             end else begin
                                 DisplShipDate := ConfirmTxt;
                                 ConfirmText := ''
@@ -514,14 +513,14 @@ Report 50090 "Sales - Order ConfirmationZNet"
 
                             //>> 21-08-24 ZY-LD 011
                             ExtDocNoSl := '';
-                            IF ("Sales Line"."External Document Position No." = '') then begin
+                            IF ("Sales Line"."External Document Position No." = '') then
                                 if ("Sales Header"."External Document No." <> "Sales Line"."External Document No.") and
                                 ("Sales Line"."External Document No." <> '')
                                 then
-                                    ExtDocNoSl := "Sales Line"."External Document No.";
-                            End else begin
-                                ExtDocNoSl := "Sales Line"."External Document No." + Text012 + "Sales Line"."External Document Position No.";
-                            end;
+                                    ExtDocNoSl := "Sales Line"."External Document No."
+                                else
+                                    ExtDocNoSl := "Sales Line"."External Document No." + Text012 + "Sales Line"."External Document Position No.";
+
                             //<< 21-08-24 ZY-LD 011                                
                         end;
 
@@ -1305,9 +1304,9 @@ Report 50090 "Sales - Order ConfirmationZNet"
 
                 TarrifCode := '';
                 recItem.SetFilter("No.", "Sales Header"."No.");
-                if recItem.FindFirst then begin
+                if recItem.FindFirst then
                     TarrifCode := recItem."Tariff No.";
-                end;
+
 
                 ButtomText := '';  // 09-03-22 ZY-LD 007
                 if PrintButtomText then begin  // 09-03-22 ZY-LD 007
