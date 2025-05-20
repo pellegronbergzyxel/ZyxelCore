@@ -86,6 +86,24 @@ pageextension 50129 SalesOrderSubformZX extends "Sales Order Subform"
                 Visible = false;
                 Editable = true;
             }
+            field(AmazconUnitprice; Rec.AmazconUnitprice)
+            {
+                ApplicationArea = Basic, Suite;
+                Visible = false;
+                Editable = false;
+            }
+            field(AmazconfirmationStatus; Rec.AmazconfirmationStatus)
+            {
+                ApplicationArea = Basic, Suite;
+                Visible = false;
+                Editable = false;
+            }
+            field(AmazonpurchaseOrderState; Rec.AmazonpurchaseOrderState)
+            {
+                ApplicationArea = Basic, Suite;
+                Visible = false;
+                Editable = false;
+            }
         }
         addafter("No.")
         {
@@ -373,7 +391,16 @@ pageextension 50129 SalesOrderSubformZX extends "Sales Order Subform"
     end;
 
     trigger OnDeleteRecord(): Boolean
+    var
+        SH: record "Sales Header";
+        SLAmaz: label 'You are not allowed to delete line, set QTY to 0 pcs instead';
     begin
+        //  Amazon >>
+        if SH.get(rec."Document Type", rec."Document No.") then
+            if SH.AmazonePoNo <> '' then
+                error(SLAmaz);
+        // amazon <<
+
         SalesLineEvent.OnAfterDeleteSalesLinePage(Rec);  // 31-01-18 ZY-LD 004
     end;
 
@@ -400,6 +427,8 @@ pageextension 50129 SalesOrderSubformZX extends "Sales Order Subform"
         ShipmentDateConfirmedEnable: Boolean;
         EMSLicenseVisible: Boolean;
         GLCLicenseVisible: Boolean;
+
+        amazStyle: text;
 
     local procedure SetActions()
     var
@@ -556,5 +585,15 @@ pageextension 50129 SalesOrderSubformZX extends "Sales Order Subform"
             recSalesLine2.Insert();
         end;
         //<< 28-06-19 ZY-LD 011
+    end;
+
+
+    procedure makestyleAmazonPrice()
+    var
+
+    begin
+
+
+
     end;
 }

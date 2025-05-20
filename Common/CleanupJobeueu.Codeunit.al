@@ -21,6 +21,7 @@ codeunit 50061 "Cleanup Jobeueu"
         /// send invoice and credit memo
         ICOutboxTransaction.SETRANGE("Line Action", ICOutboxTransaction."Line Action"::"No Action", ICOutboxTransaction."Line Action"::"Send to IC Partner");
         ICOutboxTransaction.SETFILTER("Document Type", '%1|%2', ICOutboxTransaction."Document Type"::Invoice, ICOutboxTransaction."Document Type"::"Credit Memo");
+        ICOutboxTransaction.setfilter("IC Partner Code", '<>%1', '');
         IF ICOutboxTransaction.FINDSET THEN
             REPEAT
                 ICOutboxTransaction2.GET(ICOutboxTransaction."Transaction No.", ICOutboxTransaction."IC Partner Code", ICOutboxTransaction."Transaction Source",
@@ -46,6 +47,7 @@ codeunit 50061 "Cleanup Jobeueu"
         // Cancel order and return
         ICOutboxTransaction.SETRANGE("Line Action", ICOutboxTransaction."Line Action"::"No Action", ICOutboxTransaction."Line Action"::"Send to IC Partner");
         ICOutboxTransaction.SETFILTER("Document Type", '%1|%2', ICOutboxTransaction."Document Type"::Order, ICOutboxTransaction."Document Type"::"Return Order");
+        ICOutboxTransaction.setfilter("IC Partner Code", '<>%1', '');
         IF ICOutboxTransaction.FINDSET THEN
             REPEAT
                 ICOutboxTransaction2.GET(ICOutboxTransaction."Transaction No.", ICOutboxTransaction."IC Partner Code", ICOutboxTransaction."Transaction Source",
@@ -56,6 +58,15 @@ codeunit 50061 "Cleanup Jobeueu"
                 ICOutboxExport.RUN(ICOutboxTransaction2);
 
             UNTIL ICOutboxTransaction.NEXT = 0;
+
+        ICOutboxTransaction.SETRANGE("Line Action", ICOutboxTransaction."Line Action"::"No Action", ICOutboxTransaction."Line Action"::"Send to IC Partner");
+        ICOutboxTransaction.SETFILTER("Document Type", '%1|%2', ICOutboxTransaction."Document Type"::Order, ICOutboxTransaction."Document Type"::"Return Order");
+        ICOutboxTransaction.setfilter("IC Partner Code", '=%1', '');
+        IF ICOutboxTransaction.FINDSET THEN
+            repeat
+                ICOutboxTransaction.delete(true);
+            UNTIL ICOutboxTransaction.NEXT = 0;
+
     end;
 
 

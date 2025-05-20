@@ -137,8 +137,12 @@ codeunit 50055 AmazonHelper
                                         if orderDetails.SelectToken('items', TokenValue) then begin
                                             tokenarray := TokenValue.AsArray();
                                             foreach TokenValue in tokenarray do begin
-                                                TokenValue.SelectToken('vendorProductIdentifier', TokenValue2);
-                                                itemno := GLN2ItemNo(TokenValue2.AsValue().asText());
+                                                TokenValue.SelectToken('amazonProductIdentifier', TokenValue2);
+                                                itemno := AmazASIN2ItemNo(TokenValue2.AsValue().asText());
+                                                if itemno = '' then begin
+                                                    TokenValue.SelectToken('vendorProductIdentifier', TokenValue2);
+                                                    itemno := GLN2ItemNo(TokenValue2.AsValue().asText());
+                                                end;
                                                 if itemno <> '' then begin
                                                     saleslineinit(Salesline, Salesheader, lineno);
                                                     Salesline.Type := Salesline.Type::"item";
@@ -155,7 +159,8 @@ codeunit 50055 AmazonHelper
                                                     //netCost  > amount 
                                                     if TokenValue.SelectToken('netCost', TokenValue2) then
                                                         if TokenValue2.SelectToken('amount', TokenValue3) then begin
-                                                            EVALUATE(Salesline."Unit Price", TokenValue3.AsValue().AsText());
+                                                            EVALUATE(Salesline."Unit Price", format(TokenValue3.AsValue().AsDecimal()));
+                                                            EVALUATE(Salesline.AmazconUnitprice, format(TokenValue3.AsValue().AsDecimal()));
                                                             Salesline.validate("Unit Price");
                                                             Salesline.Modify(true);
                                                         end;
@@ -267,8 +272,12 @@ codeunit 50055 AmazonHelper
                                             if orderDetails.SelectToken('items', TokenValue) then begin
                                                 tokenarray := TokenValue.AsArray();
                                                 foreach TokenValue in tokenarray do begin
-                                                    TokenValue.SelectToken('vendorProductIdentifier', TokenValue2);
-                                                    itemno := GLN2ItemNo(TokenValue2.AsValue().asText());
+                                                    TokenValue.SelectToken('amazonProductIdentifier', TokenValue2);
+                                                    itemno := AmazASIN2ItemNo(TokenValue2.AsValue().asText());
+                                                    if itemno = '' then begin
+                                                        TokenValue.SelectToken('vendorProductIdentifier', TokenValue2);
+                                                        itemno := GLN2ItemNo(TokenValue2.AsValue().asText());
+                                                    end;
                                                     if itemno <> '' then begin
                                                         saleslineinit(Salesline, Salesheader, lineno);
                                                         Salesline.Type := Salesline.Type::"item";
@@ -283,21 +292,21 @@ codeunit 50055 AmazonHelper
                                                         end;
                                                         //TokenValue.SelectToken('vendorProductIdentifier', TokenValue2);
                                                         //netCost  > amount 
+
                                                         amt := 0;
                                                         if TokenValue.SelectToken('netCost', TokenValue2) then
                                                             if TokenValue2.SelectToken('amount', TokenValue3) then begin
-                                                                EVALUATE(Salesline.Amount, TokenValue3.AsValue().AsText());
-                                                                amt := Salesline.Amount;
-                                                                Salesline.validate("amount");
-                                                                Salesline.Modify(true);
+                                                                EVALUATE(Amt, format(TokenValue3.AsValue().AsDecimal()));
+
                                                             end;
                                                         //orderedQuantity > amount
                                                         if TokenValue.SelectToken('orderedQuantity', TokenValue2) then
                                                             if TokenValue2.SelectToken('amount', TokenValue3) then begin
                                                                 EVALUATE(Salesline.Quantity, TokenValue3.AsValue().AsText());
                                                                 Salesline.validate(Quantity);
-                                                                if (amt <> 0) and (Salesline.Quantity <> 0) then
-                                                                    salesline.validate("Unit Price", round(amt / Salesline.Quantity));
+                                                                salesline.AmazconUnitprice := amt;
+                                                                Salesline.validate("Unit Price", amt);
+
                                                                 Salesline.Modify(true);
                                                             end;
                                                         if Shipdate <> 0D then begin
@@ -312,15 +321,19 @@ codeunit 50055 AmazonHelper
                                                         salesline.Description := TokenValue2.AsValue().asText();
                                                         if TokenValue.SelectToken('netCost', TokenValue2) then
                                                             if TokenValue2.SelectToken('amount', TokenValue3) then begin
-                                                                EVALUATE(Salesline."Amount", TokenValue3.AsValue().AsText());
-                                                                Salesline."Description 2" := 'Price:' + format(Salesline.Amount);
-                                                                Salesline.Modify(true);
+                                                                EVALUATE(Amt, format(TokenValue3.AsValue().AsDecimal()));
+
+
+
                                                             end;
                                                         //orderedQuantity > amount
                                                         if TokenValue.SelectToken('orderedQuantity', TokenValue2) then
                                                             if TokenValue2.SelectToken('amount', TokenValue3) then begin
                                                                 EVALUATE(Salesline.Quantity, TokenValue3.AsValue().AsText());
-                                                                Salesline."Description 2" := Salesline."Description 2" + ',amount:' + format(Salesline.Quantity);
+                                                                Salesline."Description 2" := 'Price:' + format(amt);
+                                                                salesline.AmazconUnitprice := amt;
+                                                                Salesline.Modify(true);
+                                                                Salesline."Description 2" := Salesline."Description 2" + ',qty:' + format(Salesline.Quantity);
                                                                 Salesline.Modify(true);
                                                             end;
                                                     end;
@@ -442,6 +455,17 @@ codeunit 50055 AmazonHelper
         item: record item;
     begin
         item.setrange(GTIN, copystr(GLN, 1, 14));
+        if item.findset then
+            exit(item."No.");
+        exit('');
+    end;
+
+
+    procedure AmazASIN2ItemNo(AmazASIN: code[20]): code[20]
+    var
+        item: record item;
+    begin
+        item.setrange(Amaz_ASIN, AmazASIN);
         if item.findset then
             exit(item."No.");
         exit('');
