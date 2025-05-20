@@ -3778,15 +3778,17 @@ codeunit 50067 "Sales Header/Line Events"
     local procedure "Sales Header_OnSetShipToCustomerAddressFieldsFromShipToAddrOnAfterCalcShouldCopyLocationCode"(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; ShipToAddress: Record "Ship-to Address"; var ShouldCopyLocationCode: Boolean)
     var
         ShipLocation: Record Location;
-
+        ZGT: Codeunit "ZyXEL General Tools";
     begin
         // 15-05-2025 BK #493054
-        IF ShouldCopyLocationCode then begin
-            IF ShipToAddress."Location Code" <> '' then
-                ShipLocation.get(ShipToAddress."Location Code");
-            IF (ShipLocation."Sales Order Type" <> SalesHeader."Sales Order Type") then
-                ShouldCopyLocationCode := false;
-        end;
+        IF ZGT.IsZComCompany() then Begin
+            IF ShouldCopyLocationCode then begin
+                IF ShipToAddress."Location Code" <> '' then
+                    ShipLocation.get(ShipToAddress."Location Code");
+                IF (ShipLocation."Sales Order Type" <> SalesHeader."Sales Order Type") then
+                    ShouldCopyLocationCode := false;
+            end;
+        End;
         // 15-05-2025 BK #493054
     end;
 
