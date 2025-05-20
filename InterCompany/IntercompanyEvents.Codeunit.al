@@ -924,8 +924,8 @@ codeunit 50048 "Intercompany Events"
                 end else begin
                     //>> 13-01-21 ZY-LD 029
                     DimMgt.GetShortcutDimensions(PurchLine."Dimension Set ID", ShortcutDimCode);
-                    if ShortcutDimCode[7] <> '' then
-                        SalesLine.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                    //if ShortcutDimCode[5] <> '' then
+                    //    SalesLine.ValidateShortcutDimCode(5, ShortcutDimCode[5]); //20-05-2025 BK #480077
                     //<< 13-01-21 ZY-LD 029
 
                     //>> 01-12-22 ZY-LD 031

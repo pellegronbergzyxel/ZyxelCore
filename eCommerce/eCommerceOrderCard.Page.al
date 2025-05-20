@@ -132,12 +132,13 @@ page 50239 "eCommerce Order Card"
                     field("VAT Registration No. Zyxel"; Rec."VAT Registration No. Zyxel")
                     {
                         ApplicationArea = Basic, Suite;
-                        Editable = false;
+                        Editable = ForceUser; //20-05-2025 BK #503059
                     }
                     field("Alt. VAT Reg. No. Zyxel"; Rec."Alt. VAT Reg. No. Zyxel")
                     {
                         ApplicationArea = Basic, Suite;
                     }
+
                     field("Invoice Download"; Rec."Invoice Download")
                     {
                         ApplicationArea = Basic, Suite;
