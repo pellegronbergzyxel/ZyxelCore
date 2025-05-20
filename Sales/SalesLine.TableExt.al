@@ -360,6 +360,24 @@ tableextension 50117 SalesLineZX extends "Sales Line"
         {
             Description = 'Unused';
         }
+        // amazon
+        field(55016; AmazonpurchaseOrderState; text[20])
+        {
+            Caption = 'Amazon purchaseOrderState';
+            DataClassification = ToBeClassified;
+        }
+
+        field(55019; AmazconfirmationStatus; text[20])
+        {
+            Caption = 'Amazon confirmation Status';
+            DataClassification = ToBeClassified;
+        }
+        field(55020; AmazconUnitprice; Decimal)
+        {
+            Caption = 'Amazon Unit price';
+            DataClassification = ToBeClassified;
+        }
+
         field(62000; "Picking List No."; Code[20])
         {
             Caption = 'Picking List No';
