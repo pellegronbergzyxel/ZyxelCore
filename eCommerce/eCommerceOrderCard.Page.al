@@ -311,6 +311,8 @@ page 50239 "eCommerce Order Card"
         GiveAwayVisible: Boolean;
         MarkGiveAwayVisible: Boolean;
         UnmarkGiveAwayVisible: Boolean;
+        UserSetup: Record "User Setup"; //20-05-2025 BK #503059
+        ForceUser: Boolean; //20-05-2025 BK #503059
 
     local procedure SetActions()
     begin
@@ -319,6 +321,13 @@ page 50239 "eCommerce Order Card"
         GiveAwayVisible := Rec."Amount Including VAT" = 0;
         MarkGiveAwayVisible := (Rec."Amount Including VAT" = 0) and (not Rec."Give Away Order");
         UnmarkGiveAwayVisible := (Rec."Amount Including VAT" = 0) and Rec."Give Away Order";
+
+        //20-05-2025 BK #503059
+        ForceUser := False;
+        IF UserSetup.get(UserId) then
+            If UserSetup."Allow Force Validation" then
+                ForceUser := true;
+
         //<< 24-05-23 ZY-LD 001
     end;
 }
