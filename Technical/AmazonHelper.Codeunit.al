@@ -26,6 +26,7 @@ codeunit 50055 AmazonHelper
         jsonObjectorders: Jsontoken;
         AmazonOrder: code[35];
         buyingParty: Code[10];
+        sellingParty: Code[10];
         custno: code[20];
         orderDetails: Jsontoken;
         temptoken: JsonToken;
@@ -39,11 +40,14 @@ codeunit 50055 AmazonHelper
         purchaseOrderState: text;
         Amazonsetup: record "Amazon Setup";
         shiptoadd: record "Ship-to Address";
+        item: record Item;
         DD: integer;
         MM: integer;
         YYYY: integer;
         Shipdate: Date;
         amt: Decimal;
+        itemblocked: Boolean;
+        itemSalesblocked: Boolean;
     begin
         Amazonsetup.setrange(ActiveClient, true);
         if Amazcode <> '' then
@@ -66,10 +70,17 @@ codeunit 50055 AmazonHelper
                                     if orderDetails.SelectToken('buyingParty', temptoken) then
                                         if temptoken.SelectToken('partyId', TokenValue) then
                                             EVALUATE(buyingParty, TokenValue.AsValue().AsText());
-                                custno := AmazonID2CustNo(buyingParty, Amazonsetup.code);
+
+                                if TokenOrder.SelectToken('orderDetails', orderDetails) then
+                                    if orderDetails.SelectToken('sellingParty', temptoken) then
+                                        if temptoken.SelectToken('partyId', TokenValue) then
+                                            EVALUATE(sellingParty, TokenValue.AsValue().AsText());
+
+
+                                custno := AmazonID2CustNo(buyingParty, sellingParty);
 
                                 if (custno <> '') and (AmazonORder <> '') then begin
-                                    if createorClearAmazonorder(custno, AmazonORder, Salesheader, Amazonsetup.ZyxelPartyid) then begin
+                                    if createorClearAmazonorder(custno, AmazonORder, Salesheader, sellingParty) then begin
                                         lineno := 1000;
                                         Salesheader.AmazonpurchaseOrderState := purchaseOrderState;
                                         if orderDetails.SelectToken('purchaseOrderDate', TokenValue) then begin
@@ -80,7 +91,7 @@ codeunit 50055 AmazonHelper
                                             Salesheader.modify(true);
 
                                         end;
-                                        shipno := AmazonID2CustNoShipto(buyingParty, Amazonsetup.code);
+                                        shipno := AmazonID2CustNoShipto(buyingParty, sellingParty);
                                         if shiptoadd.get(shipno) then
                                             salesheader.SetShipToCustomerAddressFieldsFromShipToAddr(shiptoadd);
                                         Salesheader.Validate("Ship-to Code", shipno);
@@ -114,7 +125,6 @@ codeunit 50055 AmazonHelper
                                                         if (DD <> 0) and (mm <> 0) and (yyyy <> 0) then
                                                             shipdate := DMY2Date(DD, MM, YYYY);
 
-
                                             if Shipdate <> 0D then begin
                                                 Salesheader.Validate("Shipment Date", Shipdate);
                                                 salesheader.Validate("Requested Delivery Date", Shipdate);
@@ -128,8 +138,6 @@ codeunit 50055 AmazonHelper
 
                                                 Salesheader.Modify(true);
                                             end;
-
-
                                         end;
 
 
@@ -202,10 +210,17 @@ codeunit 50055 AmazonHelper
                                         if orderDetails.SelectToken('buyingParty', temptoken) then
                                             if temptoken.SelectToken('partyId', TokenValue) then
                                                 EVALUATE(buyingParty, TokenValue.AsValue().AsText());
-                                    custno := AmazonID2CustNo(buyingParty, Amazonsetup.code);
+
+                                    if TokenOrder.SelectToken('orderDetails', orderDetails) then
+                                        if orderDetails.SelectToken('sellingParty', temptoken) then
+                                            if temptoken.SelectToken('partyId', TokenValue) then
+                                                EVALUATE(sellingParty, TokenValue.AsValue().AsText());
+
+
+                                    custno := AmazonID2CustNo(buyingParty, sellingParty);
 
                                     if (custno <> '') and (AmazonORder <> '') then begin
-                                        if createorClearAmazonorder(custno, AmazonORder, Salesheader, Amazonsetup.ZyxelPartyid) then begin
+                                        if createorClearAmazonorder(custno, AmazonORder, Salesheader, sellingParty) then begin
                                             lineno := 1000;
                                             Salesheader.AmazonpurchaseOrderState := purchaseOrderState;
                                             if orderDetails.SelectToken('purchaseOrderDate', TokenValue) then begin
@@ -216,7 +231,7 @@ codeunit 50055 AmazonHelper
 
                                             end;
 
-                                            shipno := AmazonID2CustNoShipto(buyingParty, Amazonsetup.code);
+                                            shipno := AmazonID2CustNoShipto(buyingParty, sellingParty);
                                             if shiptoadd.get(shipno) then
                                                 salesheader.SetShipToCustomerAddressFieldsFromShipToAddr(shiptoadd);
                                             Salesheader.Validate("Ship-to Code", shipno);
@@ -249,8 +264,6 @@ codeunit 50055 AmazonHelper
                                                         if Evaluate(DD, CopyStr(deliveryWindow, 9, 2)) then
                                                             if (DD <> 0) and (mm <> 0) and (yyyy <> 0) then
                                                                 shipdate := DMY2Date(DD, MM, YYYY);
-
-
                                                 if Shipdate <> 0D then begin
                                                     Salesheader.Validate("Shipment Date", Shipdate);
                                                     salesheader.Validate("Requested Delivery Date", Shipdate);
@@ -263,10 +276,7 @@ codeunit 50055 AmazonHelper
                                                     salesheader."Shipment Date" := Shipdate;
                                                     Salesheader.Modify(true);
                                                 end;
-
-
                                             end;
-
 
                                             // items (arrays)
                                             if orderDetails.SelectToken('items', TokenValue) then begin
@@ -278,8 +288,24 @@ codeunit 50055 AmazonHelper
                                                         TokenValue.SelectToken('vendorProductIdentifier', TokenValue2);
                                                         itemno := GLN2ItemNo(TokenValue2.AsValue().asText());
                                                     end;
+                                                    itemblocked := false;
+                                                    itemSalesblocked := false;
+
                                                     if itemno <> '' then begin
                                                         saleslineinit(Salesline, Salesheader, lineno);
+                                                        item.get(itemno);
+                                                        if item."Block on Sales Order" then begin
+                                                            itemsalesblocked := true;
+                                                            item."Block on Sales Order" := false;
+                                                            item.modify(false);
+                                                        end;
+
+                                                        if item.blocked then begin
+                                                            itemblocked := true;
+                                                            item.blocked := false;
+                                                            item.modify(false);
+                                                        end;
+                                                        Salesline.SetHideValidationDialog(false);
                                                         Salesline.Type := Salesline.Type::"item";
                                                         Salesline.Validate("No.", itemno);
                                                         Salesline.Modify(true);
@@ -288,11 +314,7 @@ codeunit 50055 AmazonHelper
                                                             Salesline."Item Reference Type" := Salesline."Item Reference Type"::Customer;
                                                             Salesline."Item Reference Type No." := Salesheader."Sell-to Customer No.";
                                                             Salesline.Modify(true);
-
                                                         end;
-                                                        //TokenValue.SelectToken('vendorProductIdentifier', TokenValue2);
-                                                        //netCost  > amount 
-
                                                         amt := 0;
                                                         if TokenValue.SelectToken('netCost', TokenValue2) then
                                                             if TokenValue2.SelectToken('amount', TokenValue3) then begin
@@ -315,6 +337,24 @@ codeunit 50055 AmazonHelper
                                                             Salesline.Modify(true);
                                                         end;
 
+                                                        if itemblocked then begin
+                                                            Salesline."Description 2" := 'Item blocked';
+                                                            if (item."End of Life Date" <> 0D) and (item."End of Life Date" < Salesheader."Document Date") then
+                                                                Salesline."Description 2" := Salesline."Description 2" + ', EOL';
+                                                            Salesline.Modify(true);
+                                                            item.get(itemno);
+                                                            item.blocked := true;
+                                                            item.modify(false);
+                                                        end;
+                                                        if itemsalesblocked then begin
+                                                            Salesline."Description 2" := 'Item sales blocked';
+                                                            if (item."End of Life Date" <> 0D) and (item."End of Life Date" < Salesheader."Document Date") then
+                                                                Salesline."Description 2" := Salesline."Description 2" + ', EOL';
+                                                            Salesline.Modify(true);
+                                                            item.get(itemno);
+                                                            item."Block on Sales Order" := true;
+                                                            item.modify(false);
+                                                        end;
                                                     end else begin
                                                         // amazonitem missing
                                                         saleslineinit(Salesline, Salesheader, lineno);
@@ -656,7 +696,7 @@ codeunit 50055 AmazonHelper
             end;
 
             if not (responseMessage.IsSuccessStatusCode()) then begin
-                Message('Status code: %1\Description: %2, (%3)', responseMessage.HttpStatusCode(), responseMessage.ReasonPhrase());
+                Message('Status code: %1\Description: %2, (%3)', responseMessage.HttpStatusCode(), responseMessage.ReasonPhrase(), NordiskPartyid);
                 exit(false);
             end;
 
@@ -973,12 +1013,18 @@ codeunit 50055 AmazonHelper
         end;
 
         if not (responseMessage.IsSuccessStatusCode()) then begin
-
-            Message('fejl \' +
-                  'Status code: %1\' +
-                'Description: %2',
-                responseMessage.HttpStatusCode(),
-                responseMessage.ReasonPhrase(), url);
+            if Amazsetup.testmode then begin
+                error('http error:\' +
+                               'Status code: %1\' +
+                             'Description: %2 (%4) %3',
+                             responseMessage.HttpStatusCode(),
+                             responseMessage.ReasonPhrase(), url, NordiskPartyid);
+            end else
+                Message('http error:\' +
+                      'Status code: %1\' +
+                    'Description: %2 (%4) %3',
+                    responseMessage.HttpStatusCode(),
+                    responseMessage.ReasonPhrase(), url, NordiskPartyid);
             exit(false);
         end else begin
             if responseMessage.HttpStatusCode() = 200 Then begin
