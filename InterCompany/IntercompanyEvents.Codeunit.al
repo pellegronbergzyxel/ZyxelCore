@@ -1,7 +1,5 @@
 codeunit 50048 "Intercompany Events"
 {
-    // 001. 02-05-24 - ZY-LD 000 - Events has been moved from General Ledger Envents.
-    // 050. 29-05-24 ZY-LD 000 - Validating sample item no., because we have seen that the no. end up blank on the purchase invoice.
 
     #region ICSalesInvoice
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"ICInboxOutboxMgt", 'OnCreateOutboxSalesInvTransOnBeforeOutboxTransactionInsert', '', false, false)]
@@ -23,22 +21,12 @@ codeunit 50048 "Intercompany Events"
         lCust.Get(SalesHeader."Sell-to Customer No.");
         BillToCustomer.Get(SalesHeader."Bill-to Customer No.");
         if BillToCustomer."Sub company" and
-           not lCust."Avoid Creation of SI in SUB"  // 09-11-17 ZY-LD 003  // 13-11-18 ZY-LD 012
+           not lCust."Avoid Creation of SI in SUB"
         then
             ICOutBoxSalesHeader."End Customer" := SalesHeader."Sell-to Customer No.";
-        // 001: <<
 
-        //>> 07-11-17 ZY-LD 003
-        // //RD CZ 1.0
-        // IF ICLocation.GET(SalesHeader."Bill-to Country/Region Code") THEN
-        //   IF ICLocation."Intern Customer" = SalesHeader."Sell-to Customer No." THEN
-        //      ICOutBoxSalesHeader."End Customer" := '';
-        // //RD CZ 1.0
-        //<< 07-11-17 ZY-LD 003
-
-        // 003: >>
         ICOutBoxSalesHeader."Sales Order Type" := SalesHeader."Sales Order Type";
-        // 003: <<
+
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"ICInboxOutboxMgt", 'OnCreateOutboxSalesInvTransOnAfterTransferFieldsFromSalesInvHeader', '', false, false)]
@@ -47,26 +35,15 @@ codeunit 50048 "Intercompany Events"
         lCust: Record Customer;
         BillToCustomer: Record Customer;
     begin
-        // 001: >>
+
         lCust.Get(SalesInvHdr."Sell-to Customer No.");
         BillToCustomer.Get(SalesInvHdr."Bill-to Customer No.");
         if BillToCustomer."Sub company" and
-           not lCust."Avoid Creation of SI in SUB"  // 09-11-17 ZY-LD 003
+           not lCust."Avoid Creation of SI in SUB"
         then
             ICOutBoxSalesHeader."End Customer" := SalesInvHdr."Sell-to Customer No.";
 
-        //>> 07-11-17 ZY-LD 003
-        // //RD CZ 1.0
-        // IF ICLocation.GET(SalesInvHdr."Bill-to Country/Region Code") THEN
-        //   IF ICLocation."Intern Customer" = SalesInvHdr."Sell-to Customer No." THEN
-        //      ICOutBoxSalesHeader."End Customer" := '';
-        // //RD CZ 1.0
-        // 001: <<
-        //ICOutBoxSalesHeader."Location Code":=SalesInvHdr."Location Code";  //ZL111006B
-        //ICOutBoxSalesHeader."Location Code":= GetLocationCode(SalesInvHdr."Bill-to Country/Region Code",SalesInvHdr."Location Code",SalesInvHdr."Sell-to Customer No.");  // 21-01-21 ZY-LD 021  
-        ICOutBoxSalesHeader."Location Code" := GetLocationCode(SalesInvHdr."Ship-to Country/Region Code", SalesInvHdr."Location Code", SalesInvHdr."Sell-to Customer No.");  // 21-01-21 ZY-LD 021
-                                                                                                                                                                             //<< 07-11-17 ZY-LD 003
-                                                                                                                                                                             // 003: >>
+        ICOutBoxSalesHeader."Location Code" := GetLocationCode(SalesInvHdr."Ship-to Country/Region Code", SalesInvHdr."Location Code", SalesInvHdr."Sell-to Customer No.");
 
         ICOutBoxSalesHeader."Sales Order Type" := SalesInvHdr."Sales Order Type";
         ICOutBoxSalesHeader."Ship-to Name 2" := SalesInvHdr."Ship-to Name 2";
@@ -80,13 +57,13 @@ codeunit 50048 "Intercompany Events"
         ICOutBoxSalesHeader."eCommerce Order" := SalesInvHdr."eCommerce Order";
         ICOutBoxSalesHeader."Your Reference 2" := SalesInvHdr."Reference 2";
 
-        ICOutBoxSalesHeader."Salesperson Code" := SalesInvHdr."Salesperson Code";  // 20-03-18 ZY-LD 008
-        ICOutBoxSalesHeader."Ship-to Code" := SalesInvHdr."Ship-to Code";  // 09-10-18 ZY-LD 011
-        ICOutBoxSalesHeader."Order Date" := SalesInvHdr."Order Date";  // 18-12-18 ZY-LD 014
-        ICOutBoxSalesHeader."E-Invoice Comment" := SalesInvHdr."E-Invoice Comment";  // 01-02-19 ZY-LD 015
-        ICOutBoxSalesHeader."Currency Code Sales Doc SUB" := SalesInvHdr."Currency Code Sales Doc SUB";  // 09-12-19 ZY-LD 018
-        ICOutBoxSalesHeader."Shipment Method Code" := SalesInvHdr."Shipment Method Code";  // 10-07-20 ZY-LD 019
-        ICOutBoxSalesHeader."VAT Registration No." := SalesInvHdr."Company VAT Registration Code";  // 21-01-21 ZY-LD 021
+        ICOutBoxSalesHeader."Salesperson Code" := SalesInvHdr."Salesperson Code";
+        ICOutBoxSalesHeader."Ship-to Code" := SalesInvHdr."Ship-to Code";
+        ICOutBoxSalesHeader."Order Date" := SalesInvHdr."Order Date";
+        ICOutBoxSalesHeader."E-Invoice Comment" := SalesInvHdr."E-Invoice Comment";
+        ICOutBoxSalesHeader."Currency Code Sales Doc SUB" := SalesInvHdr."Currency Code Sales Doc SUB";
+        ICOutBoxSalesHeader."Shipment Method Code" := SalesInvHdr."Shipment Method Code";
+        ICOutBoxSalesHeader."VAT Registration No." := SalesInvHdr."Company VAT Registration Code";
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"ICInboxOutboxMgt", 'OnCreateOutboxSalesInvTransOnBeforeICOutBoxSalesLineInsert', '', false, false)]
@@ -104,17 +81,13 @@ codeunit 50048 "Intercompany Events"
         ICInboxOutboxMgt: Codeunit ICInboxOutboxMgt;
         lText001: Label 'Problem with creation of "%1" on sales invoice "%2". Please raise a ticket to navsupport with the error.';
     begin
-        //>> 07-11-17 ZY-LD 003
-        //"Location Code":=SalesInvLine."Location Code";//ZL111006B+
 
         SalesInvHdr.Get(SalesInvLine."Document No.");
         if SalesInvLine."Location Code" <> '' then
             ICOutboxSalesLine."Location Code" := GetLocationCode(SalesInvHdr."Ship-to Country/Region Code", SalesInvHdr."Location Code", SalesInvHdr."Sell-to Customer No.");
-        //<< 07-11-17 ZY-LD 003
 
-        ICOutBoxSalesLine."Return Reason Code" := SalesInvLine."Return Reason Code"; //PAB 31/01/13
+        ICOutBoxSalesLine."Return Reason Code" := SalesInvLine."Return Reason Code";
 
-        //>> 04-02-21 ZY-LD 021
         Customer.Get(SalesInvHdr."Bill-to Customer No.");
         ICPartner.Get(Customer."IC Partner Code");
 
@@ -122,12 +95,10 @@ codeunit 50048 "Intercompany Events"
             (SalesInvLine.Type = SalesInvLine.Type::Item)
         then begin
             if ICPartner."Outbound Sales Item No. Type" = ICPartner."Outbound Sales Item No. Type"::"Internal No." then begin
-                //>> 04-02-21 ZY-LD 021
                 recGenBusPostGrp.Get(SalesInvLine."Gen. Bus. Posting Group");
-                if (SalesInvHdr."Ship-to Country/Region Code" <> 'TR') and  // 14-02-23 ZY-LD 031
+                if (SalesInvHdr."Ship-to Country/Region Code" <> 'TR') and
                    (recGenBusPostGrp."Sample / Test Equipment" > recGenBusPostGrp."Sample / Test Equipment"::" ")
                 then begin
-                    //recGenBusPostGrp.TestField("Sample G/L Account No."); 
                     if recGenBusPostGrp."Sample G/L Account No." <> '' then begin
                         ICOutboxSalesLine."IC Partner Ref. Type" := ICOutboxSalesLine."IC Partner Ref. Type"::"G/L Account";
                         ICOutboxSalesLine."IC Partner Reference" := recGenBusPostGrp."Sample G/L Account No.";
@@ -137,62 +108,53 @@ codeunit 50048 "Intercompany Events"
                 Item.Get(SalesInvLine."No.");
                 if SalesInvLine."VAT Prod. Posting Group" <> Item."VAT Prod. Posting Group" then
                     ICOutBoxSalesLine."VAT Prod. Posting Group" := SalesInvLine."VAT Prod. Posting Group";
-                //<< 30-11-21 ZY-LD 028
             end;
         end else begin
             case SalesInvLine.Type of
                 SalesInvLine.Type::Item:
                     begin
-                        //>> 04-02-21 ZY-LD 021
                         recGenBusPostGrp.Get(SalesInvLine."Gen. Bus. Posting Group");
                         if (recGenBusPostGrp."Sample / Test Equipment" > recGenBusPostGrp."Sample / Test Equipment"::" ") and
-                           (recGenBusPostGrp."Sample G/L Account No." <> '')  // 12-06-24 ZY-LD 050
+                           (recGenBusPostGrp."Sample G/L Account No." <> '')
                         then begin
-                            //recGenBusPostGrp.TestField("Sample G/L Account No.");  // 12-06-24 ZY-LD 050
+
                             ICOutBoxSalesLine."IC Partner Ref. Type" := ICOutBoxSalesLine."IC Partner Ref. Type"::"G/L Account";
                             ICOutBoxSalesLine."IC Partner Reference" := recGenBusPostGrp."Sample G/L Account No.";
-                        end else begin  //<< 04-02-21 ZY-LD 021
+                        end else begin
                             ICOutBoxSalesLine."IC Partner Ref. Type" := ICOutBoxSalesLine."IC Partner Ref. Type"::Item;
                             ICOutBoxSalesLine."IC Partner Reference" := SalesInvLine."No.";
-                            //>> 30-11-21 ZY-LD 028
+
                             Item.Get(SalesInvLine."No.");
                             if SalesInvLine."VAT Prod. Posting Group" <> Item."VAT Prod. Posting Group" then
                                 ICOutBoxSalesLine."VAT Prod. Posting Group" := SalesInvLine."VAT Prod. Posting Group";
-                            //<< 30-11-21 ZY-LD 028
                         end;
                     end;
-                //>> 19-11-21 ZY-LD 027
+
                 SalesInvLine.Type::"G/L Account":
                     begin
                         ICOutBoxSalesLine."IC Partner Ref. Type" := ICOutBoxSalesLine."IC Partner Ref. Type"::"G/L Account";
                         ICOutBoxSalesLine."IC Partner Reference" := SalesInvLine."No.";
-                        //>> 30-11-21 ZY-LD 028
+
                         recGLAcc.Get(SalesInvLine."No.");
                         if SalesInvLine."VAT Prod. Posting Group" <> recGLAcc."VAT Prod. Posting Group" then
                             ICOutBoxSalesLine."VAT Prod. Posting Group" := SalesInvLine."VAT Prod. Posting Group";
-                        //<< 30-11-21 ZY-LD 028
                     end;
-            //<< 19-11-21 ZY-LD 027
             end;
-            //<< 21-08-19 ZY-LD 017
         end;
 
         ICOutBoxSalesLine."Gen. Prod. Posting Group" := SalesInvLine."Gen. Prod. Posting Group";
-        ICOutboxSalesLine."IC Payment Terms" := SalesInvLine."IC Payment Terms";  // 20-09-18 ZY-LD 010
-        recGenBusPostGrp.Get(SalesInvHdr."Gen. Bus. Posting Group");  // 04-02-21 ZY-LD 021
-        if recGenBusPostGrp."Sample / Test Equipment" = recGenBusPostGrp."Sample / Test Equipment"::" " then  // 04-02-21 ZY-LD 021
-            //>> 09-08-19 ZY-LD 016
+        ICOutboxSalesLine."IC Payment Terms" := SalesInvLine."IC Payment Terms";
+        recGenBusPostGrp.Get(SalesInvHdr."Gen. Bus. Posting Group");
+        if recGenBusPostGrp."Sample / Test Equipment" = recGenBusPostGrp."Sample / Test Equipment"::" " then
             if (SalesInvLine.Type = SalesInvLine.Type::Item) and
              (SalesInvLine.Type <> ICOutboxSalesLine."IC Partner Ref. Type")
           then
                 Error(lText001, ICOutboxSalesLine.TableCaption(), SalesInvHdr."No.");
-        //<< 09-08-19 ZY-LD 016
 
         ICOutBoxSalesLine."External Document Position No." := SalesInvLine."External Document Position No.";
 
-        //>> 04-02-21 ZY-LD 021
         if (recGenBusPostGrp."Sample / Test Equipment" = recGenBusPostGrp."Sample / Test Equipment"::"Test Equipment") and
-           (ICOutBoxSalesLine."IC Partner Ref. Type" = ICOutboxSalesLine."IC Partner Ref. Type"::"G/L Account")  // 03-09-21 ZY-LD 021 - We don´t want to copy text lines.
+           (ICOutBoxSalesLine."IC Partner Ref. Type" = ICOutboxSalesLine."IC Partner Ref. Type"::"G/L Account")
         then
             if ICPartner."Outbound Sales Item No. Type" = ICPartner."Outbound Sales Item No. Type"::"Internal No." then begin
                 ICOutBoxSalesLine2 := ICOutBoxSalesLine;
@@ -211,7 +173,6 @@ codeunit 50048 "Intercompany Events"
 
                 ICInboxOutboxMgt.CreateICDocDimFromPostedDocDim(ICDocDim, SalesInvLine."Dimension Set ID", Database::"IC Outbox Sales Line");
             end;
-        //<< 04-02-21 ZY-LD 021
     end;
     //     #endregion
 
@@ -231,31 +192,19 @@ codeunit 50048 "Intercompany Events"
         lCust: Record Customer;
         BillToCustomer: Record Customer;
     begin
-        // 001: >>
         lCust.Get(SalesCrMemoHdr."Sell-to Customer No.");
         BillToCustomer.Get(SalesCrMemoHdr."Bill-to Customer No.");
         if BillToCustomer."Sub company" and
-           not lCust."Avoid Creation of SI in SUB"  // 09-11-17 ZY-LD 003
+           not lCust."Avoid Creation of SI in SUB"
         then
             ICOutBoxSalesHeader."End Customer" := SalesCrMemoHdr."Sell-to Customer No.";
+        ICOutBoxSalesHeader."Location Code" := GetLocationCode(SalesCrMemoHdr."Ship-to Country/Region Code", SalesCrMemoHdr."Location Code", SalesCrMemoHdr."Sell-to Customer No.");
 
-        //>> 07-11-17 ZY-LD 003
-        // //RD CZ 1.0
-        // IF ICLocation.GET(SalesCrMemoHdr."Bill-to Country/Region Code") THEN
-        //   IF ICLocation."Intern Customer" = SalesCrMemoHdr."Sell-to Customer No." THEN
-        //      ICOutBoxSalesHeader."End Customer" := '';
-        // //RD CZ 1.0
-        // 001: <<
-        //ICOutBoxSalesHeader."Location Code":=SalesCrMemoHdr."Location Code";  //ZL111006B
-        //ICOutBoxSalesHeader."Location Code":= GetLocationCode(SalesCrMemoHdr."Bill-to Country/Region Code",SalesCrMemoHdr."Location Code",SalesCrMemoHdr."Sell-to Customer No.");  // 21-01-21 ZY-LD 021  
-        ICOutBoxSalesHeader."Location Code" := GetLocationCode(SalesCrMemoHdr."Ship-to Country/Region Code", SalesCrMemoHdr."Location Code", SalesCrMemoHdr."Sell-to Customer No.");  // 21-01-21 ZY-LD 021
-                                                                                                                                                                                      //<< 07-11-17 ZY-LD 003
-                                                                                                                                                                                      // 003: >>
-        ICOutBoxSalesHeader."eCommerce Order" := SalesCrMemoHdr."eCommerce Order";  // 27-12-17 ZY-LD 004
-        ICOutBoxSalesHeader."Your Reference 2" := SalesCrMemoHdr."Reference 2";  // 27-12-17 ZY-LD 004
-        ICOutBoxSalesHeader."Salesperson Code" := SalesCrMemoHdr."Salesperson Code";  // 20-03-18 ZY-LD 008
-        ICOutBoxSalesHeader."Ship-to Code" := SalesCrMemoHdr."Ship-to Code";  // 13-11-18 ZY-LD 013
-        ICOutBoxSalesHeader."E-Invoice Comment" := SalesCrMemoHdr."E-Invoice Comment";  // 01-02-19 ZY-LD 015
+        ICOutBoxSalesHeader."eCommerce Order" := SalesCrMemoHdr."eCommerce Order";
+        ICOutBoxSalesHeader."Your Reference 2" := SalesCrMemoHdr."Reference 2";
+        ICOutBoxSalesHeader."Salesperson Code" := SalesCrMemoHdr."Salesperson Code";
+        ICOutBoxSalesHeader."Ship-to Code" := SalesCrMemoHdr."Ship-to Code";
+        ICOutBoxSalesHeader."E-Invoice Comment" := SalesCrMemoHdr."E-Invoice Comment";
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"ICInboxOutboxMgt", 'OnCreateOutboxSalesCrMemoTransOnBeforeICOutBoxSalesLineInsert', '', false, false)]
@@ -273,49 +222,37 @@ codeunit 50048 "Intercompany Events"
         ICInboxOutboxMgt: Codeunit ICInboxOutboxMgt;
         lText001: Label 'Problem with creation of "%1" on sales CrMemooice "%2". Please raise a ticket to navsupport with the error.';
     begin
-        //>> 21-08-18 ZY-LD 009
         if (SalesCrMemoLine."No." <> '') AND (ICOutBoxSalesLine."IC Partner Reference" = '') then begin
             ICOutBoxSalesLine."IC Partner Ref. Type" := SalesCrMemoLine.Type;
             ICOutBoxSalesLine."IC Partner Reference" := SalesCrMemoLine."No.";
         end;
-        //<< 21-08-18 ZY-LD 009
 
-        ICOutBoxSalesLine."Return Reason Code" := SalesCrMemoLine."Return Reason Code"; // PAB 31/01/13
-        ICOutBoxSalesLine."Gen. Prod. Posting Group" := SalesCrMemoLine."Gen. Prod. Posting Group"; // RD 3.0
-
-        //>> 07-11-17 ZY-LD 003
-        //"Location Code":=SalesCrMemoLine."Location Code";//ZL111006B+
+        ICOutBoxSalesLine."Return Reason Code" := SalesCrMemoLine."Return Reason Code";
+        ICOutBoxSalesLine."Gen. Prod. Posting Group" := SalesCrMemoLine."Gen. Prod. Posting Group";
 
         SalesCrMemoHdr.Get(SalesCrMemoLine."Document No.");
         if SalesCrMemoLine."Location Code" <> '' then
             ICOutboxSalesLine."Location Code" := GetLocationCode(SalesCrMemoHdr."Ship-to Country/Region Code", SalesCrMemoHdr."Location Code", SalesCrMemoHdr."Sell-to Customer No.");
-        //<< 07-11-17 ZY-LD 003
 
-        //>> 04-02-21 ZY-LD 021
         Customer.Get(SalesCrMemoHdr."Bill-to Customer No.");
         ICPartner.Get(Customer."IC Partner Code");
 
-        //>> 04-02-21 ZY-LD 021
         if ICOutBoxSalesLine."IC Partner Ref. Type" = ICOutBoxSalesLine."IC Partner Ref. Type"::Item then begin
             recGenBusPostGrp.Get(SalesCrMemoLine."Gen. Bus. Posting Group");
             if recGenBusPostGrp."Sample / Test Equipment" > recGenBusPostGrp."Sample / Test Equipment"::" " then begin
-                //recGenBusPostGrp.TestField("Sample G/L Account No.");
                 if recGenBusPostGrp."Sample G/L Account No." <> '' then begin
                     ICOutBoxSalesLine."IC Partner Ref. Type" := ICOutBoxSalesLine."IC Partner Ref. Type"::"G/L Account";
                     ICOutBoxSalesLine."IC Partner Reference" := recGenBusPostGrp."Sample G/L Account No.";
                 end;
             end;
         end;
-        //<< 04-02-21 ZY-LD 021
 
         case SalesCrMemoLine.Type of
             SalesCrMemoLine.Type::"G/L Account":
                 begin
-                    //>> 30-11-21 ZY-LD 028
                     recGLAcc.Get(SalesCrMemoLine."No.");
                     if SalesCrMemoLine."VAT Prod. Posting Group" <> recGLAcc."VAT Prod. Posting Group" then
                         ICOutboxSalesLine."VAT Prod. Posting Group" := SalesCrMemoLine."VAT Prod. Posting Group";
-                    //<< 30-11-21 ZY-LD 028
                 end;
             SalesCrMemoLine.Type::Item:
                 begin
@@ -325,7 +262,6 @@ codeunit 50048 "Intercompany Events"
                 end;
         end;
 
-        //>> 04-02-21 ZY-LD 021
         if recGenBusPostGrp."Sample / Test Equipment" = recGenBusPostGrp."Sample / Test Equipment"::"Test Equipment" then begin
             ICOutBoxSalesLine2 := ICOutBoxSalesLine;
             ICOutBoxSalesLine2."Line No." += 1;
@@ -343,7 +279,6 @@ codeunit 50048 "Intercompany Events"
 
             ICInboxOutboxMgt.CreateICDocDimFromPostedDocDim(ICDocDim, SalesCrMemoLine."Dimension Set ID", Database::"IC Outbox Sales Line");
         end;
-        //<< 04-02-21 ZY-LD 021
     end;
     #endregion
 
@@ -360,8 +295,8 @@ codeunit 50048 "Intercompany Events"
     var
         ICpartner: Record "IC Partner";
     begin
-        //PurchHeader."Ship-to Country/Region Code" := "Ship-to Country/Region Code";  // 19-02-21 ZY-LD 021
-        PurchHeader.Validate("Ship-to Country/Region Code", ICInboxPurchHeader."Ship-to Country/Region Code");  // 19-02-21 ZY-LD 021
+
+        PurchHeader.Validate("Ship-to Country/Region Code", ICInboxPurchHeader."Ship-to Country/Region Code");
 
         PurchHeader."Ship-to Contact" := ICInboxPurchHeader."Ship-to Contact";
         PurchHeader."Ship-to County" := ICInboxPurchHeader."Ship-to County";
@@ -369,99 +304,25 @@ codeunit 50048 "Intercompany Events"
         PurchHeader."Ship-to VAT" := ICInboxPurchHeader."Ship-to VAT";
         PurchHeader."eCommerce Order" := ICInboxPurchHeader."eCommerce Order";
         PurchHeader."Reference 2" := ICInboxPurchHeader."Your Reference 2";
-
-        // 001: >>
-        // 
-        // #490743 >>
         if ICpartner.get(ICInboxPurchHeader."IC Partner Code") then;
         if not ICpartner.Skip_sellCustomer then begin
-            // #490743 <<
+
             PurchHeader."End Customer" := ICInboxPurchHeader."End Customer";
-            PurchHeader.Validate("Sell-to Customer No.", ICInboxPurchHeader."End Customer");  // 19-02-21 ZY-LD 021
-                                                                                              // #490743 >>
+            PurchHeader.Validate("Sell-to Customer No.", ICInboxPurchHeader."End Customer");
         end;
-        // #490743 <<
-        // 001: <<
-        //ZL111006B+
+
         if (PurchHeader."Document Type" in [PurchHeader."Document Type"::Invoice, PurchHeader."Document Type"::"Credit Memo"]) and
            (ICInboxPurchHeader."Location Code" <> '')
         then begin
-            //PurchHeader."Location Code":=ICInboxPurchHeader."Location Code";  // 19-02-21 ZY-LD 021
-            PurchHeader.Validate("Location Code", ICInboxPurchHeader."Location Code");  // 19-02-21 ZY-LD 021
+            PurchHeader.Validate("Location Code", ICInboxPurchHeader."Location Code");
         end;
-        //ZL111006B_
-        //RD CZ 1.0
-        //>> 24-10-17 ZY-LD 002
-        //  ICLocation.SETFILTER("IC Company Name",CompanyName());
-        //  IF ICLocation.FINDFIRST THEN BEGIN
-
-        //     ICCompanyName:= ICLocation."IC Company Name";
-        //     ICVendor1 := ICLocation."IC Vendor 1";
-        //     ICVendor2 := ICLocation."IC Vendor 2";
-        //     ICVendor3 := ICLocation."IC Vendor 3";
-        //     ICVendor4 := ICLocation."IC Vendor 4";
-        //     ICVendor5 := ICLocation."IC Vendor 5";
-        //     ICVendor6 := ICLocation."IC Vendor 6";
-        //     ICLocation1 := ICLocation."IC Location 1";
-        //     ICLocation2 := ICLocation."IC Location 2";
-        //     ICLocation3 := ICLocation."IC Location 3";
-        //     ICLocation4 := ICLocation."IC Location 4";
-        //     ICLocation5 := ICLocation."IC Location 5";
-        //     ICLocation6 := ICLocation."IC Location 6";
-        // 
-        //     IF CompanyName() = ICCompanyName THEN BEGIN
-        //       PurchHeader.SetHideValidationDialog(TRUE);
-        //       IF PurchHeader."Location Code" = ICLocation1 THEN BEGIN
-        //          PurchHeader.VALIDATE("Buy-from Vendor No.",ICVendor1);
-        //       END;
-        //       IF PurchHeader."Location Code" = ICLocation2 THEN BEGIN
-        //          PurchHeader.VALIDATE("Buy-from Vendor No.",ICVendor2);
-        //       END;
-        //       IF  PurchHeader."Location Code" = ICLocation3 THEN BEGIN
-        //           PurchHeader.VALIDATE("Buy-from Vendor No.",ICVendor3);
-        //       END;
-        //       IF  PurchHeader."Location Code" = ICLocation4 THEN BEGIN
-        //           PurchHeader.VALIDATE("Buy-from Vendor No.",ICVendor4);
-        //       END;
-        //       IF  PurchHeader."Location Code" = ICLocation5 THEN BEGIN
-        //           PurchHeader.VALIDATE("Buy-from Vendor No.",ICVendor5);
-        //       END;
-        // //       IF  PurchHeader."Location Code" = ICLocation6 THEN BEGIN
-        // //           PurchHeader.VALIDATE("Buy-from Vendor No.",ICVendor6);
-        // //       END;
-        // //       PurchHeader.VALIDATE("Currency Code","Currency Code");  // 08-09-17 ZY-LD
-        // 
-        //       PurchHeader."Your Reference" := "Your Reference";
-        //      
-        // 
-        //       PurchHeader."Location Code":=ICInboxPurchHeader."Location Code";
-        // 
-        //      
-        //       PurchHeader."Ship-to VAT" := "Ship-to VAT";
-        //       //PAB
-        //       PurchHeader."eCommerce Order" := "eCommerce Order";
-        //       PurchHeader."Reference 2" := "Your Reference 2";
-        //     END;
-        //  END;  
-        //<< 24-10-17 ZY-LD 002
-        //RD CZ 1.0
-        //RD 4.0
-        //>> 24-10-17 ZY-LD 002
         PurchHeader."Your Reference" := ICInboxPurchHeader."Your Reference";
         PurchHeader."Location Code" := ICInboxPurchHeader."Location Code";
         PurchHeader."Ship-to VAT" := ICInboxPurchHeader."Ship-to VAT";
         PurchHeader."eCommerce Order" := ICInboxPurchHeader."eCommerce Order";
         PurchHeader."Reference 2" := ICInboxPurchHeader."Your Reference 2";
-        //<< 24-10-17 ZY-LD 002
-        //>> 13-11-18 ZY-LD 013
         PurchHeader."Purchaser Code" := ICInboxPurchHeader."Salesperson Code";
-        //>> 21-01-21 ZY-LD 021
-        // IF ICInboxPurchHeader."End Customer" = '' THEN
-        //     PurchHeader."On Hold" := COPYSTR(ICInboxPurchHeader."Salesperson Code", 1, MAXSTRLEN(PurchHeader."On Hold"));
-        //<< 21-01-21 ZY-LD 021
-        //<< 13-11-18 ZY-LD 013
         PurchHeader."VAT Bus. Posting Group" := ZyxelProof(ICInboxPurchHeader, PurchHeader);
-        //RD 4.0
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"ICInboxOutboxMgt", 'OnCreatePurchDocumentOnBeforeSetICDocDimFilters', '', false, false)]
@@ -492,11 +353,9 @@ codeunit 50048 "Intercompany Events"
         PurchHeader."Dimension Set ID" :=
             DimMgt.GetCombinedDimensionSetID(DimensionSetIDArr, PurchHeader."Shortcut Dimension 1 Code", PurchHeader."Shortcut Dimension 2 Code");
 
-        //>> 12-02-18 ZY-LD 006
         CountryDimCode := GetCountryDimension(PurchHeader."Buy-from Vendor No.", PurchHeader."Location Code", PurchHeader."Sell-to Customer No.");
         if CountryDimCode <> '' then
             PurchHeader.ValidateShortcutDimCode(3, CountryDimCode);
-        //<< 12-02-18 ZY-LD 006
 
         PurchHeader."Shipment Method Code" := ICInboxPurchHeader."Shipment Method Code";  // 10-07-20 ZY-LD 019
         PurchHeader."VAT Registration No." := ICInboxPurchHeader."VAT Registration No.";  // 21-01-21 ZY-LD 021
@@ -510,7 +369,6 @@ codeunit 50048 "Intercompany Events"
         PurchLine: Record "Purchase Line";
 
     begin
-        //>> 29-05-24 ZY-LD 050
         if Vend.get(PurchaseHeader."Buy-from Vendor No.") and Vend."Sample Vendor" then begin
             ICSetup.get;
             ICSetup.TestField("Sample Item");
@@ -523,21 +381,13 @@ codeunit 50048 "Intercompany Events"
                     PurchLine.TestField(PurchLine."Original No.");
                 until PurchLine.Next() = 0;
         end;
-        //<< 29-05-24 ZY-LD 050
-
-        // 001: >>
-        // 003: >>
-
-        //fnSync.CreateSale(PurchHeader);
-
-        PurchaseHeader."Ship-to Code" := ICInboxPurchaseHeader."Ship-to Code";  // 11-03-24 ZY-LD 013
+        PurchaseHeader."Ship-to Code" := ICInboxPurchaseHeader."Ship-to Code";
         CreateSale(
           PurchaseHeader,
           ICInboxPurchaseHeader."Sales Order Type",
-          ICInboxPurchaseHeader."Salesperson Code",  // 20-03-18 ZY-LD 008
-          ICInboxPurchaseHeader."Currency Code Sales Doc SUB");  // 09-12-19 ZY-LD 018
-                                                                 // 003: <<
-                                                                 // 001: <<
+          ICInboxPurchaseHeader."Salesperson Code",
+          ICInboxPurchaseHeader."Currency Code Sales Doc SUB");
+
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"ICInboxOutboxMgt", 'OnBeforeOutboxSalesHdrToInbox', '', false, false)]
@@ -556,11 +406,8 @@ codeunit 50048 "Intercompany Events"
             ICPartner.Get(ICInboxTrans."IC Partner Code")
         else begin
             ICPartner.Get(ICOutboxSalesHeader."IC Partner Code");
-            //>> 19-06-18
-            //ICPartner.TESTFIELD("Inbox Type",ICPartner."Inbox Type"::Database);
             if (ICPartner."Inbox Type" <> ICPartner."Inbox Type"::Database) and (ICPartner."Inbox Type" <> ICPartner."Inbox Type"::"Web Service") then
                 Error(ICPartnerErr, ICPartner.FieldCaption("Inbox Type"), ICPartner."Inbox Type"::Database, ICPartner."Inbox Type"::"Web Service");
-            //<< 19-06-18
             ICPartner.TestField("Inbox Details");
             if ICPartner."Inbox Type" = ICPartner."Inbox Type"::"Web Service" then begin
                 VendorNoSub := ZyWsReq.ICPartnerExistsInSub(ICPartner."Inbox Details", ICInboxTrans."IC Partner Code");
@@ -606,16 +453,11 @@ codeunit 50048 "Intercompany Events"
         ICInboxPurchHeader."Requested Receipt Date" := ICOutboxSalesHeader."Requested Delivery Date";
         ICInboxPurchHeader."Promised Receipt Date" := ICOutboxSalesHeader."Promised Delivery Date";
         ICInboxPurchHeader."Prices Including VAT" := ICOutboxSalesHeader."Prices Including VAT";
-        // 001: >>
         ICInboxPurchHeader."End Customer" := ICOutboxSalesHeader."End Customer";
-        // 001: <<
-        // 004: >>
         ICInboxPurchHeader."Sales Order Type" := ICOutboxSalesHeader."Sales Order Type";
-        // 004: <<
-        //ZL111006B+
         if (ICOutboxSalesHeader."Document Type" in [ICOutboxSalesHeader."Document Type"::Invoice, ICOutboxSalesHeader."Document Type"::"Credit Memo"]) then
             ICInboxPurchHeader."Location Code" := ICOutboxSalesHeader."Location Code";
-        //ZL111006B-
+
         ICInboxPurchHeader."Ship-to Name 2" := ICOutboxSalesHeader."Ship-to Name 2";
         ICInboxPurchHeader."Ship-to Address 2" := ICOutboxSalesHeader."Ship-to Address 2";
         ICInboxPurchHeader."Ship-to Post Code" := ICOutboxSalesHeader."Ship-to Post Code";
@@ -627,19 +469,12 @@ codeunit 50048 "Intercompany Events"
         ICInboxPurchHeader."eCommerce Order" := ICOutboxSalesHeader."eCommerce Order";
         ICInboxPurchHeader."Your Reference 2" := ICOutboxSalesHeader."Your Reference 2";
         ICInboxPurchHeader."Salesperson Code" := ICOutboxSalesHeader."Salesperson Code";
-        // 20-03-18 ZY-LD 008
         ICInboxPurchHeader."Ship-to Code" := ICOutboxSalesHeader."Ship-to Code";
-        // 09-10-18 ZY-LD 011 
         ICInboxPurchHeader."Order Date" := ICOutboxSalesHeader."Order Date";
-        // 18-12-18 ZY-LD 014
         ICInboxPurchHeader."E-Invoice Comment" := ICOutboxSalesHeader."E-Invoice Comment";
-        // 01-02-19 ZY-LD 015
         ICInboxPurchHeader."Currency Code Sales Doc SUB" := ICOutboxSalesHeader."Currency Code Sales Doc SUB";
-        // 09-12-19 ZY-LD 
         ICInboxPurchHeader."Shipment Method Code" := ICOutboxSalesHeader."Shipment Method Code";
-        // 10-07-20 ZY-LD 019
         ICInboxPurchHeader."VAT Registration No." := ICOutboxSalesHeader."VAT Registration No.";
-        // 21-02-21 ZY-LD 021
         ICInboxPurchHeader.Insert();
 
         IsHandled := true;
@@ -651,34 +486,20 @@ codeunit 50048 "Intercompany Events"
         ICOutboxSalesHeader: Record "IC Outbox Sales Header";
         ICPartner: Record "IC Partner";
     begin
-        //>> 18-06-18
         ICOutboxSalesHeader.Get(ICOutboxSalesLine."IC Transaction No.", ICOutboxSalesLine."IC Partner Code", ICOutboxSalesLine."Transaction Source");
         ICPartner.Get(ICOutboxSalesHeader."IC Partner Code");
-        //<< 18-06-18
-
-        // 002: >>
         ICInboxPurchaseLine."External Document No." := ICOutboxSalesLine."External Document No.";
-        // 002: <<
-        //Modified By Craig on 20110812+
         ICInboxPurchaseLine."Picking List No." := ICOutboxSalesLine."Picking List No.";
         ICInboxPurchaseLine."Packing List No." := ICOutboxSalesLine."Packing List No.";
-        //Modified By Craig on 20110812-
-        //ZL111005C+
         ICInboxPurchaseLine."Hide Line" := ICOutboxSalesLine."Hide Line";
-        //ZL111005C-
-        //ZL111006B+
         if (ICOutboxSalesLine."Document Type" in [ICOutboxSalesLine."Document Type"::Invoice, ICOutboxSalesLine."Document Type"::"Credit Memo"]) then begin
             ICInboxPurchaseLine."Location Code" := ICOutboxSalesLine."Location Code";
-            //RD 31/01/13
             ICInboxPurchaseLine."Return Reason Code" := ICOutboxSalesLine."Return Reason Code";
-            // RD 3.0
             ICInboxPurchaseLine."Gen. Prod. Posting Group" := ICOutboxSalesLine."Gen. Prod. Posting Group";
-            // RD 3.0
         end;
-        //ZL111006B-
-        ICInboxPurchaseLine."IC Payment Terms" := ICOutboxSalesLine."IC Payment Terms";  // 20-09-18 ZY-LD 010
-        ICInboxPurchaseLine."External Document Position No." := ICOutboxSalesLine."External Document Position No.";  // 04-08-21 ZY-LD 022
-        ICInboxPurchaseLine."VAT Prod. Posting Group" := ICOutboxSalesLine."VAT Prod. Posting Group";  // 30-11-21 ZY-LD 028
+        ICInboxPurchaseLine."IC Payment Terms" := ICOutboxSalesLine."IC Payment Terms";
+        ICInboxPurchaseLine."External Document Position No." := ICOutboxSalesLine."External Document Position No.";
+        ICInboxPurchaseLine."VAT Prod. Posting Group" := ICOutboxSalesLine."VAT Prod. Posting Group";
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"ICInboxOutboxMgt", 'OnBeforeICInboxSalesHeaderInsert', '', false, false)]
@@ -710,20 +531,13 @@ codeunit 50048 "Intercompany Events"
             end;
         end;
 
-        //ZL111006B+
         if (PurchaseLine."Document Type" in [PurchaseLine."Document Type"::Invoice, PurchaseLine."Document Type"::"Credit Memo"]) then begin
             PurchaseLine.Validate("Location Code", ICInboxPurchaseLine."Location Code");
-            //RD 31/01/13
             PurchaseLine."Return Reason Code" := ICInboxPurchaseLine."Return Reason Code";
-            // RD 3.0
             PurchaseLine."Gen. Prod. Posting Group" := ICInboxPurchaseLine."Gen. Prod. Posting Group";
-            // RD 3.0
-            //>> 30-11-21 ZY-LD 028
             if ICInboxPurchaseLine."VAT Prod. Posting Group" <> '' then
                 PurchaseLine.Validate("VAT Prod. Posting Group", ICInboxPurchaseLine."VAT Prod. Posting Group");
-            //<< 30-11-21 ZY-LD 028
         end;
-        //ZL111006B-
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"ICInboxOutboxMgt", 'OnCreatePurchLinesOnAfterAssignPurchLineFields', '', false, false)]
@@ -731,16 +545,11 @@ codeunit 50048 "Intercompany Events"
     begin
         // 002: >>
         PurchaseLine."External Document No." := ICInboxPurchLine."External Document No.";
-        // 002: <<
-        //Modified By Craig on 20110812+
         PurchaseLine."Picking List No." := ICInboxPurchLine."Picking List No.";
         PurchaseLine."Packing List No." := ICInboxPurchLine."Packing List No.";
-        //Modified By Craig on 20110812-
-        //ZL111005C+
         PurchaseLine."Hide Line" := ICInboxPurchLine."Hide Line";
-        //ZL111005C-
-        PurchaseLine.Description := ICInboxPurchLine.Description;  // 17-01-18 ZY-LD 005   
-        PurchaseLine."External Document Position No." := ICInboxPurchLine."External Document Position No.";  // 04-08-21 ZY-LD 022
+        PurchaseLine.Description := ICInboxPurchLine.Description;
+        PurchaseLine."External Document Position No." := ICInboxPurchLine."External Document Position No.";
         if PurchaseLine.Insert(true) then;
     end;
 
@@ -762,7 +571,7 @@ codeunit 50048 "Intercompany Events"
         GlDimCode: Code[20];
     begin
         if (pPurch."End Customer" = '') or
-           (not recCust.Get(pPurch."End Customer"))  // 10-12-20 ZY-LD 010
+           (not recCust.Get(pPurch."End Customer"))
         then
             exit;
 
@@ -770,7 +579,7 @@ codeunit 50048 "Intercompany Events"
         SalesHeader.Init();
         SalesHeader.SetHideValidationDialog(true);
         SalesHeader."Document Type" := pPurch."Document Type";
-        //PAB
+
         if SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice then
             if SalesHeader."Currency Factor" = 0 then SalesHeader."Currency Factor" := 1;
         eCommerceInvoiceNo := pPurch."Your Reference";
@@ -780,14 +589,7 @@ codeunit 50048 "Intercompany Events"
         eCommerceInvoiceNo := ReplaceString(eCommerceInvoiceNo, 'CN-GB-', '');
         eCommerceInvoiceNo := ReplaceString(eCommerceInvoiceNo, 'CN-DE-', '');
         eCommerceInvoiceNo := ReplaceString(eCommerceInvoiceNo, 'CN-IT-', '');
-        //>> 19-12-17 ZY-LD 002
-        // {
-        // IF pPurch."eCommerce Order" THEN
-        //             SalesHeader."No." := eCommerceInvoiceNo;
-        //         IF NOT pPurch."eCommerce Order" THEN
-        //             SalesHeader."No." := '';
-        // }
-        //<< 19-12-17 ZY-LD 002
+
         SalesHeader."No." := '';
         if pPurch."eCommerce Order" then SalesHeader."Your Reference" := pPurch."Reference 2";
         SalesHeader."eCommerce Order" := pPurch."eCommerce Order";
@@ -800,52 +602,22 @@ codeunit 50048 "Intercompany Events"
             SalesHeader."Skip Posting Group Validation" := true;  // 11-01-21 ZY-LD 025
         end else
             SalesHeader."External Document No." := pPurch."Vendor Invoice No.";
-        //RD 1.0
 
-        // 006: >>
         if SalesHeader."Document Type" in [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice] then
             SalesHeader.Validate("Sales Order Type", pOrderType);
-        // 006: <<
 
-        // 007: >>
         SalesHeader.Validate(SalesHeader."Location Code", pPurch."Location Code");
-        // 007: <<
-
-        //>> 09-04-24 ZY-LD 016
-        /*SalesHeader."Ship-to Code" := pPurch."Ship-to Code";
-        SalesHeader."Ship-to Name" := pPurch."Ship-to Name";
-        SalesHeader."Ship-to Name 2" := pPurch."Ship-to Name 2";
-        SalesHeader."Ship-to Address" := pPurch."Ship-to Address";
-        SalesHeader."Ship-to Address 2" := pPurch."Ship-to Address 2";
-        SalesHeader."Ship-to City" := pPurch."Ship-to City";
-        SalesHeader."Ship-to Contact" := pPurch."Ship-to Contact";
-        SalesHeader."Ship-to Post Code" := pPurch."Ship-to Post Code";
-        SalesHeader."Ship-to County" := pPurch."Ship-to County";
-        //SalesHeader."Ship-to Country/Region Code" := pPurch."Ship-to Country/Region Code";
-        SalesHeader.Validate("Ship-to Country/Region Code", pPurch."Ship-to Country/Region Code");
-        SalesHeader."Ship-to E-Mail" := pPurch."Ship-to E-Mail";
-        //>> 18-08-21 ZY-LD 023
-        //SalesHeader."Ship-to VAT" := pPurch."Ship-to VAT";
-        if pPurch."Ship-to VAT" <> '' then
-            SalesHeader.Validate("VAT Registration No.", pPurch."Ship-to VAT");
-        //<< 18-08-21 ZY-LD 023
-        SalesHeader."Ship-to Contact" := pPurch."Ship-to Contact";
-        SalesHeader."Ship-to Code" := pPurch."Ship-to Code";  // 13-11-18 ZY-LD 005*/
-
         SalesHeader.Validate("Ship-to Code", pPurch."Ship-to Code");
         SalesHeader.Validate("Shipment Date", pPurch."Expected Receipt Date");
         if pPurch."Ship-to VAT" <> '' then
             SalesHeader.Validate("VAT Registration No.", pPurch."Ship-to VAT");
-        //<< 09-04-24 ZY-LD 016
 
-        SalesHeader."Shipment Method Code" := pPurch."Shipment Method Code";  // 10-07-20 ZY-LD 008
-                                                                              //Modified By Craig on 20110819+
+        SalesHeader."Shipment Method Code" := pPurch."Shipment Method Code";
+
         SalesHeader."RHQ Invoice No" := pPurch."Vendor Invoice No.";
-        //Modified By Craig on 20110819-
-        SalesHeader."RHQ Credit Memo No" := pPurch."Vendor Cr. Memo No.";  // 006:
-        SalesHeader."Your Reference" := pPurch."Your Reference";  // 15-09-21 ZY-LD 024
+        SalesHeader."RHQ Credit Memo No" := pPurch."Vendor Cr. Memo No.";
+        SalesHeader."Your Reference" := pPurch."Your Reference";
 
-        //RD 4.0
         if (SalesHeader."Location Code" = 'EICARD') and (SalesHeader."Gen. Bus. Posting Group" = 'EU') then begin
             if ICLocation.FindFirst() then begin
 
@@ -863,13 +635,9 @@ codeunit 50048 "Intercompany Events"
             end;
         end;
 
-        //RD 4.0
-
-        //SalesHeader.VALIDATE("Currency Code",pPurch."Currency Code");  // 12-09-17 ZY-LD 001  // 26-09-19 ZY-LD 006
-        //>> 09-12-19 ZY-LD 
         if pCurrencyCode <> '' then
             SalesHeader.Validate("Currency Code", pCurrencyCode);
-        SalesHeader."Salesperson Code" := pSalesPersonCode;  // 20-03-18 ZY-LD 004 
+        SalesHeader."Salesperson Code" := pSalesPersonCode;
         SalesHeader.Modify();
         SI.SetKeepLocationCode(true);
 
@@ -887,8 +655,8 @@ codeunit 50048 "Intercompany Events"
                 SalesLine.Type := PurchLine.Type;
                 if PurchLine.Type <> PurchLine.Type::" " then begin
                     SalesLine.Validate(SalesLine."No.", PurchLine."No.");
-                    if PurchLine."Return Reason Code" <> '' then  // 02-09-20 ZY-LD 009
-                        SalesLine.Validate("Gen. Prod. Posting Group", PurchLine."Gen. Prod. Posting Group");  // 02-09-20 ZY-LD 009
+                    if PurchLine."Return Reason Code" <> '' then
+                        SalesLine.Validate("Gen. Prod. Posting Group", PurchLine."Gen. Prod. Posting Group");
                     SalesLine.Validate(SalesLine.Quantity, PurchLine.Quantity);
                     SalesLine.Validate(SalesLine."Unit of Measure Code", PurchLine."Unit of Measure Code");
                     if SalesHeader."Order Date" = 0D then
@@ -896,25 +664,18 @@ codeunit 50048 "Intercompany Events"
                     SalesLine.Validate(SalesLine."Unit Price", CurrExchRates.ExchangeAmtFCYToFCY(SalesHeader."Order Date",
                                                                PurchLine."Currency Code", SalesLine."Currency Code",
                                                                PurchLine."Direct Unit Cost"));
-                    SalesLine.Description := PurchLine.Description;  // 17-01-18 ZY-LD 003
+                    SalesLine.Description := PurchLine.Description;
                 end else begin
                     SalesLine.Description := PurchLine.Description;
                     SalesLine."Description 2" := PurchLine."Description 2";
                 end;
-                //ZL111006B+
-                if (SalesLine."Document Type" in [SalesLine."Document Type"::Invoice,
-                                                  SalesLine."Document Type"::"Credit Memo"]) then begin
+                if (SalesLine."Document Type" in [SalesLine."Document Type"::Invoice, SalesLine."Document Type"::"Credit Memo"]) then begin
                     SalesLine.Validate("Location Code", PurchLine."Location Code");
-
-                    //RD 31.01.13
-
                     SalesLine."Return Reason Code" := PurchLine."Return Reason Code";
-                    // RD 3.0
                     SalesLine."Gen. Prod. Posting Group" := PurchLine."Gen. Prod. Posting Group";
-                    // RD 3.0
+
                 end;
-                //ZL111006B-
-                //RD 1.0
+
                 if SalesLine.Type <> SalesLine.Type::"G/L Account" then begin
 
                     SalesLine."Special Order" := true;
@@ -922,32 +683,21 @@ codeunit 50048 "Intercompany Events"
                     SalesLine."Special Order Purch. Line No." := PurchLine."Line No.";
                     SalesLine."External Document No." := PurchLine."External Document No.";
                 end else begin
-                    //>> 13-01-21 ZY-LD 029
                     DimMgt.GetShortcutDimensions(PurchLine."Dimension Set ID", ShortcutDimCode);
-                    //if ShortcutDimCode[5] <> '' then
-                    //    SalesLine.ValidateShortcutDimCode(5, ShortcutDimCode[5]); //20-05-2025 BK #480077
-                    //<< 13-01-21 ZY-LD 029
-
-                    //>> 01-12-22 ZY-LD 031
                     if SalesHeader."eCommerce Order" then begin
                         GlDimCode := GetGlAccDimension(2, SalesLine."No.");
                         if GlDimCode <> '' then
                             SalesLine.ValidateShortcutDimCode(2, GlDimCode);
                     end;
-                    //<< 01-12-22 ZY-LD 031
 
-                    SalesLine."External Document No." := PurchLine."External Document No.";  // 04-10-22 ZY-LD 030
+                    SalesLine."External Document No." := PurchLine."External Document No.";
                 end;
-                //RD 1.0
-                //Modified By Craig on 20110812+
+
                 SalesLine."Picking List No." := PurchLine."Picking List No.";
                 SalesLine."Packing List No." := PurchLine."Packing List No.";
-                //Modified By Craig on 20110812-
-                //ZL111005C+
                 SalesLine."Hide Line" := PurchLine."Hide Line";
-                //ZL111005C-
-                SalesLine."External Document Position No." := PurchLine."External Document Position No.";  // 04-08-21 ZY-LD 022
-                SalesLine."Skip Posting Group Validation" := SalesHeader."Skip Posting Group Validation";  // 11-01-21 ZY-LD 025
+                SalesLine."External Document Position No." := PurchLine."External Document Position No.";
+                SalesLine."Skip Posting Group Validation" := SalesHeader."Skip Posting Group Validation";
                 SalesLine.Modify();
 
                 PurchLine."Special Order" := true;
@@ -961,14 +711,7 @@ codeunit 50048 "Intercompany Events"
     var
         recCustPostGrpSetup: Record "Add. Cust. Posting Grp. Setup";
     begin
-        //>> 21-01-21 ZY-LD 021
         rValue := pLocationCode;
-        //>> 29-10-21 ZY-LD 026
-        // recCustPostGrpSetup.SETRANGE("Country/Region Code", pCountryRegionCode);
-        //         recCustPostGrpSetup.SETRANGE("Location Code", pLocationCode);
-        //         recCustPostGrpSetup.SETFILTER("Customer No.", '%1|%2', pCustomerNo, '');
-        //         IF recCustPostGrpSetup.FINDLAST AND (recCustPostGrpSetup."Location Code in SUB" <> '') THEN
-        //             rValue := recCustPostGrpSetup."Location Code in SUB";
 
         recCustPostGrpSetup.SetFilter("Country/Region Code", '%1|%2', pCountryRegionCode, '');
         recCustPostGrpSetup.SetRange("Location Code", pLocationCode);
@@ -976,18 +719,6 @@ codeunit 50048 "Intercompany Events"
         recCustPostGrpSetup.SetFilter("Location Code in SUB", '<>%1', '');
         if recCustPostGrpSetup.FindLast() then
             rValue := recCustPostGrpSetup."Location Code in SUB";
-        //<< 29-10-21 ZY-LD 026
-
-        //>> 07-11-17 ZY-LD 002
-        // lBilltoCustprLocation.SETRANGE("Bill-to Country/Region Code", pCountryRegionCode);
-        // lBilltoCustprLocation.SETRANGE("Location Code", pLocationCode);
-        // lBilltoCustprLocation.SETRANGE("Customer No.", pCustomerNo);
-        // IF lBilltoCustprLocation.FINDFIRST AND (lBilltoCustprLocation."Location Code in SUB" <> '') THEN
-        //     EXIT(lBilltoCustprLocation."Location Code in SUB")
-        // ELSE
-        //     EXIT(pLocationCode);
-        //<< 07-11-17 ZY-LD 002
-        //<< 21-01-21 ZY-LD 021
     end;
 
     local procedure ReplaceString(String: Text[250]; FindWhat: Text[250]; ReplaceWith: Text[250]) NewString: Text[250]
@@ -1037,18 +768,9 @@ codeunit 50048 "Intercompany Events"
     var
         recLocation: Record Location;
     begin
-        //>> 25-02-21 ZY-LD 021
         recLocation.Get(pLocationCode);
         exit(recLocation."Dimension Country Code");
 
-        //>> 12-02-18 ZY-LD 006
-        // recVendprLocSetup.SETRANGE("Ship-to Country/Region Code", pByFromVendorNo);
-        // recVendprLocSetup.SETRANGE("Location Code", pLocationCode);
-        // recVendprLocSetup.SETFILTER("Sell-to Customer No.", '%1|%2', pSellToCustNo, '');
-        // IF recVendprLocSetup.FINDLAST AND (recVendprLocSetup."Country Code" <> '') THEN
-        //     EXIT(recVendprLocSetup."Country Code");
-        //<< 12-02-18 ZY-LD 006
-        //<< 25-02-21 ZY-LD 021
     end;
 
     local procedure GetGlAccDimension(pDimCodeNo: Integer; pGlAcc: Code[20]) rValue: Code[20]
@@ -1128,10 +850,8 @@ codeunit 50048 "Intercompany Events"
         if GenJnlPostPreview.IsActive() then
             exit;
 
-        //>> 19-06-18 ZY-LD 001
         //ICPartner.SETFILTER("Inbox Type",'<>%1',ICPartner."Inbox Type"::Database);  
         ICPartner.SetFilter("Inbox Type", '<>%1&<>%2', ICPartner."Inbox Type"::Database, ICPartner."Inbox Type"::"Web Service");
-        //<< 19-06-18 ZY-LD 001
 
         ICPartnerFilter := ICOutboxTransaction.GetFilter("IC Partner Code");
         if ICPartnerFilter <> '' then
@@ -1243,7 +963,6 @@ codeunit 50048 "Intercompany Events"
         ZyWsMgt: Codeunit "Zyxel Web Service Management";
         ItemNoFilter: Text;
     begin
-        //>> 31-08-18 ZY-LD 002
         if ICOutboxTrans.FindSet() then begin
             recICPartner.Get(ICOutboxTrans."IC Partner Code");
             repeat
@@ -1265,11 +984,10 @@ codeunit 50048 "Intercompany Events"
                         end;
                     until recICOutboxSalesLine.Next() = 0;
 
-                    ZyWsMgt.ReplicateItems(recICPartner."Inbox Details", ItemNoFilter, false, true);  // 15-05-19 ZY-LD 003
+                    ZyWsMgt.ReplicateItems(recICPartner."Inbox Details", ItemNoFilter, false, true);
                 end;
             until ICOutboxTrans.Next() = 0;
         end;
-        //<< 31-08-18 ZY-LD 002
     end;
 
     local procedure IsWebClient(): Boolean

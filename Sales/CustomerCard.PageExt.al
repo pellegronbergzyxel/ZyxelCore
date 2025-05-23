@@ -65,11 +65,11 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
         {
             Importance = Standard;
         }
-        modify("Credit Limit (LCY)")  // 01-03-24 ZY-LD 000
+        modify("Credit Limit (LCY)")
         {
             Editable = SelectedFieldsEditable;
         }
-        modify("VAT Registration No.")  // 01-03-24 ZY-LD 000
+        modify("VAT Registration No.")
         {
             Editable = SelectedFieldsEditable;
         }
@@ -78,6 +78,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             field("Forecast Territory"; Rec."Forecast Territory")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the Forcast Territory';
             }
         }
         addafter("E-Mail")
@@ -95,6 +96,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             field("Territory Code"; Rec."Territory Code")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the Territory Code';
             }
         }
         addafter("Salesperson Code")
@@ -103,6 +105,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             {
                 ApplicationArea = Basic, Suite;
                 Importance = Additional;
+                ToolTip = 'Specifies the Order Desk Resposible Code';
             }
         }
         addafter(Blocked)
@@ -121,12 +124,14 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 field(DivisionDimension; DivisionDimension)
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Division Dimension';
                     Caption = 'Division';
                     Enabled = false;
                 }
                 field(CountryDimension; CountryDimension)
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Country Dimension';
                     Caption = 'Country';
                     Editable = false;
                 }
@@ -140,36 +145,41 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 field("E-Mail Statement"; Rec."E-Mail Statement")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the E-Mail Statement';
                 }
                 field("Statement Type"; Rec."Statement Type")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Statement Type';
                 }
                 field(StatementEmailAdd2; StatementEmailAdd)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Statement E-mail Address';
+                    ToolTip = 'Specifies the Statement EmailAdd2';
 
                     trigger OnValidate()
                     begin
-                        CustReptMgt.UpdateEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::"C.Statement", StatementEmailAdd);  // 16-10-18 ZY-LD 007
-                        ChangeHasBeenMade := true;  // 17-10-18 ZY-LD
+                        CustReptMgt.UpdateEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::"C.Statement", StatementEmailAdd);
+                        ChangeHasBeenMade := true;
                     end;
                 }
                 field("E-Mail Reminder"; Rec."E-Mail Reminder")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the E-Mail Reminder';
                     AssistEdit = true;
                 }
                 field(ReminderEmailAdd; ReminderEmailAdd)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Reminder E-mail Address';
+                    ToolTip = 'Specifies the ReminderEmailAdd';
 
                     trigger OnValidate()
                     begin
-                        CustReptMgt.UpdateEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::Reminder, ReminderEmailAdd);  // 27-09-18 ZY-LD 006
-                        ChangeHasBeenMade := true;  // 17-10-18 ZY-LD
+                        CustReptMgt.UpdateEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::Reminder, ReminderEmailAdd);
+                        ChangeHasBeenMade := true;
                     end;
                 }
             }
@@ -179,11 +189,13 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 field("E-mail for Order Scanning"; Rec."E-mail for Order Scanning")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the E-mail for Order Scanning';
                 }
                 field(OrderEmailAdd; OrderEmailAdd)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Order E-mail Address';
+                    ToolTip = 'Specifies the Order Email Add';
 
                     trigger OnValidate()
                     begin
@@ -214,23 +226,24 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 field("E-mail Sales Documents"; Rec."E-mail Sales Documents")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the E-mail Sales Documents';
                 }
                 field("Delay Btw. Post and Send Email"; Rec."Delay Btw. Post and Send Email")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Delay Btw. Post and Send Email';
                 }
                 field(InvoiceEmailAdd; InvoiceEmailAdd)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Invoice & Cr.Memo E-mail Address';
+                    ToolTip = 'Specifies the InvoiceEmailAdd';
 
                     trigger OnValidate()
                     begin
-                        //>> 26-11-18 ZY-LD 014
                         CustReptMgt.UpdateEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::"S.Invoice", InvoiceEmailAdd);
                         CustReptMgt.UpdateEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::"S.Cr.Memo", InvoiceEmailAdd);
                         ChangeHasBeenMade := true;
-                        //<< 26-11-18 ZY-LD 014
                     end;
                 }
             }
@@ -246,32 +259,39 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Distributor E-mail';
+                    ToolTip = 'Specifies the EiCard Email Address"';
                 }
                 field("End User Email Expected"; Rec."End User Email Expected")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the End User Email Expected';
                 }
                 field("EiCard Email Address1"; Rec."EiCard Email Address1")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'End User E-mail';
+                    ToolTip = 'Specifies the EiCard Email Address1';
                     Visible = false;
                 }
                 field("EiCard Email Address2"; Rec."EiCard Email Address2")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the EiCard Email Address2';
                 }
                 field("EiCard Email Address3"; Rec."EiCard Email Address3")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the EiCard Email Address3';
                 }
                 field("EiCard Email Address4"; Rec."EiCard Email Address4")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the EiCard Email Address4';
                 }
                 field("Supervisor Password eShop"; Rec."Supervisor Password eShop")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Supervisor Password eShop';
                 }
                 field("Download and Attach Eicards"; Rec."Download and Attach Eicards")
                 {
@@ -285,10 +305,12 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 field("E-mail Chemical Report"; Rec."E-mail Chemical Report")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the E-mail Chemical Report';
                 }
                 field("E-mail for Chemical Report"; Rec."E-mail for Chemical Report")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'E-mail for Chemical Report';
                 }
             }
         }
@@ -319,6 +341,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             field("Intercompany Purchase"; Rec."Intercompany Purchase")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the value of Intercompany Purchase.';
             }
         }
         addafter("Copy Sell-to Addr. to Qte From")
@@ -329,6 +352,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 field("Automatic Invoice Handling"; Rec."Automatic Invoice Handling")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Automatic Invoice Handling';
                 }
                 field("Run Auto. Inv. Hand. on WaitFI"; Rec."Run Auto. Inv. Hand. on WaitFI")
                 {
@@ -338,14 +362,17 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 field("Post EiCard Invoice Automatic"; Rec."Post EiCard Invoice Automatic")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Post EiCard Invoice Automatic';
                 }
                 field("Mark Inv. and Cr.M as Printed"; Rec."Mark Inv. and Cr.M as Printed")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Mark Inv. and Cr.M as Printed';
                 }
                 field("Create Invoice pr. Order"; Rec."Create Invoice pr. Order")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Create Invoice pr. Order';
                 }
             }
             group(Control197)
@@ -354,20 +381,24 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 field("Sub company"; Rec."Sub company")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Sub company';
                 }
                 field("Avoid Creation of SI in SUB"; Rec."Avoid Creation of SI in SUB")
                 {
                     ApplicationArea = Basic, Suite;
                     Enabled = AvoidCreationofSIinSUBEnable;
+                    ToolTip = 'Specifies the CAvoid Creation of SI in SUB';
                 }
                 field("Skip Posting Group Validation"; Rec."Skip Posting Group Validation")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Skip Posting Group Validation';
                 }
             }
             field(Priority; Rec.Priority)
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the Priority';
             }
         }
         addafter("Prepayment %")
@@ -375,6 +406,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             field("Your Reference Translation"; Rec."Your Reference Translation")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the Your Reference Translation';
                 Importance = Additional;
             }
             group("Italian Invoice")
@@ -383,21 +415,25 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 field("Customer Tipology"; Rec."Customer Tipology")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Customer Tipology';
                     Importance = Additional;
                 }
                 field("Recipient Code"; Rec."Recipient Code")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Recipient Code';
                     Importance = Additional;
                 }
                 field("Recipient PEC E-Mail"; Rec."Recipient PEC E-Mail")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Recipient PEC E-Mail';
                     Importance = Additional;
                 }
                 field("Administration Reference"; Rec."Administration Reference")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Administration Reference';
                     Importance = Additional;
                 }
             }
@@ -407,16 +443,19 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 field("VAT Registration Code"; Rec."VAT Registration Code")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the VAT Registration Code';
                     Importance = Additional;
                 }
                 field("Registration No."; Rec."Registration No.")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Registration No.';
                     Importance = Additional;
                 }
                 field("Tax Office Code"; Rec."Tax Office Code")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Tax Office Code';
                     Importance = Additional;
                 }
             }
@@ -426,14 +465,17 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             field("Additional Items"; Rec."Additional Items")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the Additional Items';
             }
             field("Unblock Pick.Date Restriction"; Rec."Unblock Pick.Date Restriction")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the Unblock Pick.Date Restriction';
             }
             field("Customs Broker"; Rec."Customs Broker")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the Customs Broker';
             }
             field("Create Delivery Doc. pr. Order"; Rec."Create Delivery Doc. pr. Order")
             {
@@ -443,6 +485,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             field("Attach Pallet No. to Serial No"; Rec."Attach Pallet No. to Serial No")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the Attach Pallet No. to Serial No';
                 Importance = Additional;
             }
         }
@@ -472,32 +515,39 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                     field("Related Company"; Rec."Related Company")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies the Related Company';
                     }
                     field("Exclude Wee Report"; Rec."Exclude Wee Report")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies the Exclude Wee Report';
                     }
                     field("Exclude from Intrastat"; Rec."Exclude from Intrastat")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies the Exclude from Intrastat';
                     }
                 }
                 field("Exclude from Forecast"; Rec."Exclude from Forecast")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Exclude from Forecast';
                 }
                 field("Sample Account"; Rec."Sample Account")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Sample Account';
                     Visible = SampleAccountVisible;
                 }
                 field("KYC Last Checked"; Rec."KYC Last Checked")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the KYC Last Checked';
                 }
                 field(Category; Rec.Category)
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Category';
                 }
 
             }
@@ -508,10 +558,12 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 field("Turkish Customer No."; Rec."Turkish Customer No.")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Turkish Customer No.';
                 }
                 field(AMAZONID; Rec.AMAZONID)
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the AMAZONID';
 
                 }
             }
@@ -528,10 +580,12 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 field("Minimum Order Value Enabled"; Rec."Minimum Order Value Enabled")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Minimum Order Value Enabled';
                 }
                 field("Minimum Order Value (LCY)"; Rec."Minimum Order Value (LCY)")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Minimum Order Value (LCY)';
                 }
                 field("Full Pallet Ordering Enabled"; Rec."Full Pallet Ordering Enabled")
                 {
@@ -545,7 +599,6 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 }
             }
         }
-        // 463541 >>
         addlast(Invoicing)
         {
             field("Warning on Not-delivery"; Rec."Warning on Not-delivery")
@@ -555,7 +608,6 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             }
 
         }
-        // 463541 <<
     }
 
     actions
@@ -570,6 +622,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Action Codes';
+                ToolTip = 'Enter Action Codes';
                 Image = "Action";
 
                 trigger OnAction()
@@ -580,6 +633,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             action(Overshipment)
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the customer Overshipments';
                 Caption = 'Overshipment';
                 Image = CalculateShipment;
                 RunObject = Page "Customer/Item Overshipments";
@@ -592,6 +646,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Block Item';
+                ToolTip = 'Specifies the blocked Customer Items relations';
                 Image = Stop;
                 RunObject = Page "Customer/Item Relation";
                 RunPageLink = "Customer No." = field("No.");
@@ -601,6 +656,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Create Del. Doc pr. Item';
+                ToolTip = 'Customer Item relation where Seperate Delivery Document';
                 Image = CreateDocuments;
                 RunObject = Page "Customer/Item Relation";
                 RunPageLink = "Customer No." = field("No.");
@@ -613,6 +669,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Ledger Entries (Bill-to)';
+                ToolTip = 'Customer Ledger Entries';
                 Image = LedgerEntries;
                 RunObject = Page "Customer Ledger Entries";
                 RunPageLink = "Sell-to Customer No." = field("No.");
@@ -623,6 +680,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Item Forecast Entries';
+                ToolTip = 'Item Budget Entries';
                 Image = Forecast;
                 RunObject = Page "Item Budget Entries";
                 RunPageLink = "Source Type" = const(Customer),
@@ -635,6 +693,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Change Log';
+                ToolTip = 'Lookup to the Change log';
                 Image = ChangeLog;
                 Promoted = true;
                 PromotedCategory = Process;
@@ -651,6 +710,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             {
                 ApplicationArea = all;
                 Caption = 'Customer report selection';
+                ToolTip = 'Select the Custom Report';
                 Image = MailSetup;
                 RunObject = page "Custom Report Selection";
                 RunPageLink = "Source Type" = const(18), "Source No." = field("No.");
@@ -662,6 +722,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Setup pr. Location Code';
+                ToolTip = 'eCommerce order Archive FactBox';
                 Image = VATPostingSetup;
                 RunObject = Page "eComm. Order Archive FactBox";
                 RunPageLink = "eCommerce Order Id" = field("No.");
@@ -670,6 +731,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sell-to Customer from Location';
+                ToolTip = 'eCommerce Ship Details FactBox';
                 Image = Loaner;
                 RunObject = Page "eCommerce Ship Details FactBox";
                 RunPageLink = "eCommerce Order Id" = field("No.");
@@ -678,6 +740,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Post Grp. Setup pr. Country / Location';
+                ToolTip = 'Customer Posting Group Setup pr. Country / Location';
                 Image = ChangeCustomer;
 
                 trigger OnAction()
@@ -695,6 +758,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Delivery Documents';
+                ToolTip = 'VCK Delivery Document List with status open';
                 Image = Delivery;
                 RunObject = Page "VCK Delivery Document List";
                 RunPageLink = "Sell-to Customer No." = field("No.");
@@ -707,6 +771,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Delivery Documents';
+                ToolTip = 'VCK Delivery Document List with status open and released';
                 Image = Delivery;
                 RunObject = Page "VCK Delivery Document List";
                 RunPageLink = "Sell-to Customer No." = field("No.");
@@ -715,6 +780,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             action("Inbound Orders")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Warehouse Inbound List where completely received is no';
                 Caption = 'Inbound Orders';
                 Image = Return;
                 RunObject = Page "Warehouse Inbound List";
@@ -736,6 +802,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Pr. Customer';
+                        ToolTip = 'Data for replication list where table no. equals customer';
                         Image = Relationship;
                         RunObject = Page "Data for Replication List";
                         RunPageLink = "Table No." = const(18),
@@ -745,17 +812,19 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Pr. Company';
+                        ToolTip = 'Set Replication Pr. Company';
                         Image = Relationship;
 
                         trigger OnAction()
                         begin
-                            CustEvent.SetReplicationPrCompany(Rec);  // 02-11-18 ZY-LD 007
+                            CustEvent.SetReplicationPrCompany(Rec);
                         end;
                     }
                 }
                 action(CustBillToCustSetup)
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Add. Bill-to Setup';
                     Caption = 'Add. Bill-to Setup';
                     Image = SuggestCustomerBill;
                     Visible = AddPostSetupMainVisible;
@@ -769,6 +838,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Additional Posting Setup - Main Company';
+                        ToolTip = 'Additional Posting Setup - Main Company';
                         Image = Company;
                         Visible = AddPostSetupMainVisible;
 
@@ -781,6 +851,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Additional Posting Setup - Subsidary';
+                        ToolTip = 'Additional Posting Setup - Subsidary';
                         Image = Intercompany;
                         Visible = AddPostSetupSubVisible;
 
@@ -794,6 +865,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'VAT Reg. No. Setup';
+                    ToolTip = 'VAT Reg. No. Setup';
                     Image = VATPostingSetup;
 
                     trigger OnAction()
@@ -819,26 +891,21 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
     trigger OnOpenPage()
     begin
         SetActions();
-        SI.SetRejectChangeLog(false);  // 25-04-18 ZY-LD 004
+        SI.SetRejectChangeLog(false);
     end;
 
     trigger OnClosePage()
     begin
-        SI.SetRejectChangeLog(false);  // 25-04-18 ZY-LD 004
+        SI.SetRejectChangeLog(false);
 
-        //>> 18-10-18 ZY-LD 009
         if CurrPage.Editable(Rec."VAT Registration No." = '') then
             if recCountry.Get(Rec."Country/Region Code") and recCountry."VAT Reg. No. Must be Filled" then
                 Error(Text035, Rec.FieldCaption("VAT Registration No."));
-        //<< 18-10-18 ZY-LD 009
 
-        //>> 17-10-18 ZY-LD 008
         if ChangeHasBeenMade then
             ZyWebSrvMgt.ReplicateCustomers('', Rec."No.", false);
-        //<< 17-10-18 ZY-LD 008
 
-        //>> 14-03-19 ZY-LD 017
-        if ZGT.IsRhq then begin
+        if ZGT.IsRhq() then begin
             if Rec."Global Dimension 1 Code" = '' then
                 Error(ZyText001, Rec.FieldCaption("Global Dimension 1 Code"));
         end;
@@ -848,7 +915,6 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
     var
         recDefaultDimension: Record "Default Dimension";
     begin
-        //15-51643 -
         DivisionDimension := '';
         CountryDimension := '';
         recDefaultDimension.SetFilter("Table ID", '18');
@@ -859,9 +925,8 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
         recDefaultDimension.SetFilter("No.", Rec."No.");
         recDefaultDimension.SetFilter("Dimension Code", 'COUNTRY');
         if recDefaultDimension.FindFirst() then CountryDimension := recDefaultDimension."Dimension Value Code";
-        //15-51643 +
 
-        SetEmailAddress();  // 27-09-18 ZY-LD 006
+        SetEmailAddress();
         SetActions();
     end;
 
@@ -879,7 +944,6 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
         AddPostSetupEnable: Boolean;
         AddSubSetupEnable: Boolean;
         IsBillToCustomer: Boolean;
-        IsSellToCustomer: Boolean;
         AvoidCreationofSIinSUBEnable: Boolean;
         UseCurrencyFromSelltoCustEnable: Boolean;
         ChangeHasBeenMade: Boolean;
@@ -889,16 +953,10 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
         SampleAccountVisible: Boolean;
         DivisionDimension: Code[20];
         CountryDimension: Code[20];
-        DeliveryDays: Integer;
-        SuggestedZone: Text[30];
         ReminderEmailAdd: Text;
         StatementEmailAdd: Text;
         InvoiceEmailAdd: Text;
         OrderEmailAdd: Text;
-        TextLabel1: Label 'These are pre-defined post codes for the selected delivery zone. Please note that other post codes may be covered by this zone.';
-        Text004: Label 'You are not allowed to make change to UK customers. Please contact system administrator.';
-        Text033: Label 'The customer must be a service provider before you can update customer items.';
-        Text034: Label 'You must select a customer before you can update customer items.';
         Text035: Label '"%1" must be filled.';
         ZyText001: Label '"%1" must not be blank.';
 
@@ -907,7 +965,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
         lCust: Record Customer;
         lCustRHQ: Record Customer;
         lCustSister: Record Customer;
-        UserSetup: Record "User Setup";  // 01-03-24 ZY-LD 000
+        UserSetup: Record "User Setup";
         RHQCustFound: Boolean;
         SisterCustFound: Boolean;
     begin
@@ -920,49 +978,44 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             AvoidCreationofSIinSUBEnable := true;
         end;
 
-        //>> 23-10-18 ZY-LD 010
         // Customer is only editable in RHQ, unless if it's a local customer.
-        if ZGT.IsRhq or
-          (CompanyName() = ZGT.GetCompanyName(7))  // 31-01-19 ZY-LD 016
+        if ZGT.IsRhq() or
+          (CompanyName() = ZGT.GetCompanyName(7))
         then
             PageEditable := true
         else begin
             if lCustRHQ.ChangeCompany(ZGT.GetCompanyName(1)) then  // RHQ
                 RHQCustFound := lCustRHQ.Get(Rec."No.");
-            if lCustSister.ChangeCompany(ZGT.GetSistersCompanyName(1)) then  // ZNet RHQ  // 06-08-19 ZY-LD 019
+            if lCustSister.ChangeCompany(ZGT.GetSistersCompanyName(1)) then  // ZNet RHQ  
                 SisterCustFound := lCustSister.Get(Rec."No.");
             PageEditable := (not RHQCustFound) and (not SisterCustFound);
         end;
-        //<< 23-10-18 ZY-LD 010
 
-        //>> 01-03-24 ZY-LD 000
         if UserSetup.get(UserId) then
             SelectedFieldsEditable := UserSetup."User Type" = UserSetup."User Type"::"Accounting Manager";
-        //<< 01-03-24 ZY-LD 000
 
-        IsZNet := ZGT.IsZNetCompany;  // PAB
-        IsZNet := false;  // 16-06-20 ZY-LD 000
 
-        //>> 22-02-21 ZY-LD 021
-        AddPostSetupMainVisible := ZGT.IsRhq;
-        AddPostSetupSubVisible := ZGT.IsZComCompany and
-                                  (ZGT.IsRhq and (Rec."No." <> Rec."Bill-to Customer No.") and (Rec."Bill-to Customer No." <> '')) or
-                                  (not ZGT.IsRhq);
-        AddPostSetupEnable := (ZGT.IsRhq and ZGT.IsZComCompany and (((Rec."No." <> Rec."Bill-to Customer No.") and (Rec."Bill-to Customer No." <> '')) or (Rec."IC Partner Code" <> ''))) or
-                              (ZGT.IsRhq and ZGT.IsZNetCompany) or
-                              (not ZGT.IsRhq);
-        AddSubSetupEnable := ZGT.IsRhq;
-        //<< 22-02-21 ZY-LD 021
+        IsZNet := ZGT.IsZNetCompany;
+        IsZNet := false;
+
+        AddPostSetupMainVisible := ZGT.IsRhq();
+        AddPostSetupSubVisible := ZGT.IsZComCompany() and
+                                  (ZGT.IsRhq() and (Rec."No." <> Rec."Bill-to Customer No.") and (Rec."Bill-to Customer No." <> '')) or
+                                  (not ZGT.IsRhq());
+        AddPostSetupEnable := (ZGT.IsRhq() and ZGT.IsZComCompany() and (((Rec."No." <> Rec."Bill-to Customer No.") and (Rec."Bill-to Customer No." <> '')) or (Rec."IC Partner Code" <> ''))) or
+                              (ZGT.IsRhq() and ZGT.IsZNetCompany()) or
+                              (not ZGT.IsRhq());
+        AddSubSetupEnable := ZGT.IsRhq();
 
         IsBillToCustomer := Rec."Bill-to Customer No." = Rec."No.";
-        SampleAccountVisible := ZGT.IsRhq and ZGT.IsZComCompany;
+        SampleAccountVisible := ZGT.IsRhq() and ZGT.IsZComCompany();
     end;
 
     local procedure SetEmailAddress()
     begin
-        ReminderEmailAdd := CustReptMgt.GetEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::Reminder, Rec."E-Mail");  // 27-09-18 ZY-LD 006
-        StatementEmailAdd := CustReptMgt.GetEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::"C.Statement", Rec."E-Mail");  // 16-10-18 ZY-LD 007
-        InvoiceEmailAdd := CustReptMgt.GetEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::"S.Invoice", Rec."E-Mail");  // 26-11-18 ZY-LD 014
-        OrderEmailAdd := CustReptMgt.GetEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::"S.Order", Rec."E-Mail");  // 26-11-18 ZY-LD 014
+        ReminderEmailAdd := CustReptMgt.GetEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::Reminder, Rec."E-Mail");
+        StatementEmailAdd := CustReptMgt.GetEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::"C.Statement", Rec."E-Mail");
+        InvoiceEmailAdd := CustReptMgt.GetEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::"S.Invoice", Rec."E-Mail");
+        OrderEmailAdd := CustReptMgt.GetEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::"S.Order", Rec."E-Mail");
     end;
 }

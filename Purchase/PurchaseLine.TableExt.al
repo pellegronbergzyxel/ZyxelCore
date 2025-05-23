@@ -1,6 +1,6 @@
 tableextension 50119 PurchaseLineZX extends "Purchase Line"
 {
-    // 001. 03-11-23 ZY-LD 000 "Sales Order Line ID" contain a unique number from the sales order in HQ.
+
     fields
     {
         field(50001; "Requested Date From Factory"; Date)
@@ -12,16 +12,13 @@ tableextension 50119 PurchaseLineZX extends "Purchase Line"
             var
                 PurchHeader: Record "Purchase Header";
             begin
-                //003. Added by CraigKu on 20120301+
-                PurchHeader := Rec.GetPurchHeader;
-                if (PurchHeader.IsEICard = true) then begin
+                PurchHeader := Rec.GetPurchHeader();
+                if (PurchHeader.IsEICard = true) then
                     if (Format(Rec."Requested Date From Factory") <> '') then begin
                         Rec."ETD Date" := Rec."Requested Date From Factory";
                         Rec.ETA := Rec."Requested Date From Factory";
                         Rec."Actual shipment date" := Rec."Requested Date From Factory";
                     end;
-                end;
-                //003. Added by CraigKu on 20120301-
             end;
         }
         field(50002; "ETD Date"; Date)
@@ -34,11 +31,10 @@ tableextension 50119 PurchaseLineZX extends "Purchase Line"
                 lrShipmentMethod: Record "Shipment Method";
                 PurchHeader: Record "Purchase Header";
             begin
-                PurchHeader := Rec.GetPurchHeader;
+                PurchHeader := Rec.GetPurchHeader();
                 if not lrShipmentMethod.Get(PurchHeader."Shipment Method Code") then
                     lrShipmentMethod.Init();
 
-                //ETA := CALCDATE(lrShipmentMethod."Delivery Time", "ETD Date"); //the ETD will be updated from R12 ERP and ETA will be ETD+49D
             end;
         }
         field(50003; ETA; Date)
@@ -56,11 +52,10 @@ tableextension 50119 PurchaseLineZX extends "Purchase Line"
                 lrShipmentMethod: Record "Shipment Method";
                 PurchHeader: Record "Purchase Header";
             begin
-                PurchHeader := Rec.GetPurchHeader;
+                PurchHeader := Rec.GetPurchHeader();
                 if not lrShipmentMethod.Get(PurchHeader."Shipment Method Code") then
                     lrShipmentMethod.Init();
 
-                //ETA := CALCDATE(lrShipmentMethod."Delivery Time", "ETD Date"); //will update by HQ app, Enzo
             end;
         }
         field(50005; "Vendor Invoice No"; Text[250])
@@ -70,9 +65,7 @@ tableextension 50119 PurchaseLineZX extends "Purchase Line"
 
             trigger OnValidate()
             begin
-                //Add by Andrew 20100802(+)
-                Rec.TestStatusOpen;
-                //Add by Andrew 20100802(-)
+                Rec.TestStatusOpen();
             end;
         }
         field(50006; "Cost Split Type"; Code[20])
@@ -217,7 +210,7 @@ tableextension 50119 PurchaseLineZX extends "Purchase Line"
             FieldClass = FlowField;
             Editable = false;
         }
-        field(50036; "Original No."; Code[20])  // 01-05-24 ZY-LD 000
+        field(50036; "Original No."; Code[20])
         {
             Caption = 'Original No.';
             Description = 'In case of samples we need to store the original item no. so we can use it in intrastat reporting.';
@@ -226,12 +219,12 @@ tableextension 50119 PurchaseLineZX extends "Purchase Line"
         {
             Caption = 'Hide Line';
         }
-        field(50102; "EMS Machine Code"; Code[35])
+        field(50102; "EMS Machine Code"; Text[64]) //22-05-2025 BK #505159
         {
             Caption = 'EMS Machine Code';
             Description = 'PAB 1.0';
         }
-        field(50103; "Sales Order Line ID"; Code[30])  // 03-11-23 ZY-LD 001
+        field(50103; "Sales Order Line ID"; Code[30])
         {
             Caption = 'Sales Order Line ID';
             Description = 'Unique identification of the sales order line in HQ.';
@@ -248,20 +241,19 @@ tableextension 50119 PurchaseLineZX extends "Purchase Line"
 
             trigger OnValidate()
             var
-                "Count": Integer;
                 SalesOrderLine: Record "Sales Line";
+                "Count": Integer;
             begin
                 SalesOrderLine.Reset();
                 SalesOrderLine.SetRange(SalesOrderLine."Document No.", Rec."Sales Order Number");
                 SalesOrderLine.SetRange(SalesOrderLine."No.", Rec."No.");
-                //SalesOrderLine.SETRANGE(SalesOrderLine.Quantity,Quantity);
 
                 "Count" := 0;
                 if SalesOrderLine.Find('-') then begin
                     repeat
                         "Count" := "Count" + 1;
                         Rec."Sales Line Number" := SalesOrderLine."Line No.";
-                    until SalesOrderLine.Next <= 0;
+                    until SalesOrderLine.Next() <= 0;
 
                     if "Count" > 1 then
                         Message('The Sales Order has more than one Sales_Line_No.');

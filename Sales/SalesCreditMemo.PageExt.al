@@ -15,6 +15,12 @@ pageextension 50128 SalesCreditMemoZX extends "Sales Credit Memo"
                 ApplicationArea = Basic, Suite;
                 Importance = Additional;
             }
+
+            field("Sales Order Type"; Rec."Sales Order Type") //21-05-2025 BK #
+            {
+                ApplicationArea = Basic, Suite;
+                Importance = Additional;
+            }
         }
         addafter("Prices Including VAT")
         {
