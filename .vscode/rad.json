@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 ﻿{"Added":[],"Modified":[{"Id":50119,"Kind":17,"Name":"PurchaseLineZX","Namespace":""},{"Id":50117,"Kind":17,"Name":"SalesLineZX","Namespace":""},{"Id":50048,"Kind":11,"Name":"Intercompany Events","Namespace":""},{"Id":50001,"Kind":11,"Name":"ZyXEL EiCards","Namespace":""},{"Id":50113,"Kind":16,"Name":"CustomerCardZX","Namespace":""},{"Id":50035,"Kind":10,"Name":"Add. Eicard Order Info","Namespace":""}],"Removed":[]}
+=======
+﻿{"Added":[],"Modified":[{"Id":50129,"Kind":16,"Name":"SalesOrderSubformZX","Namespace":""},{"Id":50117,"Kind":17,"Name":"SalesLineZX","Namespace":""}],"Removed":[]}
+>>>>>>> 4f7edb5df10331a512c375319530309cddc76db7

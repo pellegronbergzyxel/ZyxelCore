@@ -623,6 +623,25 @@ tableextension 50117 SalesLineZX extends "Sales Line"
             exit(10000);
     End;
 
+    procedure compareAmazonprices(): Boolean
+    var
+        PriceCalculation: Interface "Price Calculation";
+        PriceType: Enum "Price Type";
+        Salesheader: Record "Sales Header";
+        vLine: Variant;
+        Line: record "Sales Line";
+    begin
+        GetPriceCalculationHandler(PriceType::Sale, SalesHeader, PriceCalculation);
+        PriceCalculation.ApplyPrice(line.FieldNo(Quantity));
+        PriceCalculation.GetLine(vLine);
+        line := vline;
+        exit(line."Unit Price" <> rec.AmazconUnitprice);
+
+
+
+    end;
+
+
     var
         recSalesHeader: Record "Sales Header";
         SRSetup: Record "Sales & Receivables Setup";

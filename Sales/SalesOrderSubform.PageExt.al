@@ -91,6 +91,7 @@ pageextension 50129 SalesOrderSubformZX extends "Sales Order Subform"
                 ApplicationArea = Basic, Suite;
                 Visible = false;
                 Editable = false;
+                StyleExpr = amazStyle;
             }
             field(AmazconfirmationStatus; Rec.AmazconfirmationStatus)
             {
@@ -375,6 +376,7 @@ pageextension 50129 SalesOrderSubformZX extends "Sales Order Subform"
     trigger OnAfterGetRecord()
     begin
         SetActions();  // 26-10-17 ZY-LD 001
+        makestyleAmazonPrice(); // amazon
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -592,7 +594,10 @@ pageextension 50129 SalesOrderSubformZX extends "Sales Order Subform"
     var
 
     begin
-
+        if rec.compareAmazonprices then
+            amazStyle := 'Unfavorable'
+        else
+            amazStyle := 'Favorable';
 
 
     end;
