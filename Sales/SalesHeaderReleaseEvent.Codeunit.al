@@ -1,7 +1,5 @@
 codeunit 50052 SalesHeaderReleaseEvent
 {
-    // Many comments in the code is comming from "CU 50067".
-    // x001. 23-08-24 ZY-LD 000 - The country code must be mentioned in the dimensions on the customer.
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Release Sales Document", 'OnBeforeReleaseSalesDoc', '', false, false)]
     local procedure OnBeforeReleaseSalesDoc(var SalesHeader: Record "Sales Header")
@@ -20,7 +18,7 @@ codeunit 50052 SalesHeaderReleaseEvent
         recGenProdPostGrp: Record "Gen. Product Posting Group";
         recCountry: Record "Country/Region";
         recAddEicardOrderInfo: Record "Add. Eicard Order Info";
-        SalOrdTypeRel: Record "Sales Order Type Relation";  // 16-07-24 ZY-LD 000
+        SalOrdTypeRel: Record "Sales Order Type Relation";
         AddItemMgt: Codeunit "ZyXEL Additional Items Mgt";
         ZyXELVCK: Codeunit "ZyXEL VCK";
         ReleaseOrder: Codeunit "Customer Credit Limit Check";
@@ -40,8 +38,7 @@ codeunit 50052 SalesHeaderReleaseEvent
         lText003: Label 'If "%1" is blank. Delivery Document will not be created.';
         lText005: Label 'Please enter "%1" on item no. %2. (Line %3).';
         lText006: Label '"%1" has been reached.\%4.\\ "%1": %2\"Order Balance": %3';
-        //lText007: Label 'Lines with zero "%1" exists.\\You can tick off the field "%2" on the sales line to confirm that zero "%1" is correct, and to avoid this message again.\\Do you want to continue?';  // 30-04-24 ZY-LD 143
-        lText007: Label 'Unaccepted lines with zero "%1" exists (%3).\\You need to tick off the field "%2" on the sales line to confirm that zero "%1" is correct.';  // 30-04-24 ZY-LD 143
+        lText007: Label 'Unaccepted lines with zero "%1" exists (%3).\\You need to tick off the field "%2" on the sales line to confirm that zero "%1" is correct.';
         lText008: Label 'Release is cancled.';
         lText009: Label 'External document number can not be blank!';
         lText011: Label '"%1" %2 and "%3" %4 must not be different on "%5" %6 %7. Re-enter "%1".';
@@ -75,7 +72,6 @@ codeunit 50052 SalesHeaderReleaseEvent
         lText041: Label '"%1" %2 is not a valid date.';
         lText042: Label '"%1" on %2 "Line No." %3 is a non returnable item.';
     begin
-        //>> 23-09-22 ZY-LD 126
         if SalesHeader."Document Type" in [SalesHeader."document type"::Order, SalesHeader."document type"::"Return Order"] then begin
             if (not SI.GetHideSalesDialog) and GuiAllowed() then begin
                 recSalesLine.SetRange("Document Type", SalesHeader."Document Type");
@@ -86,11 +82,8 @@ codeunit 50052 SalesHeaderReleaseEvent
                 recSalesLine.SetRange("Hide Line", false);
                 recSalesLine.SetRange("Bom Line No.", 0);
                 if recSalesLine.FindFirst() then
-                    Error(lText007, recSalesLine.FieldCaption("Line Amount"), recSalesLine.FieldCaption("Zero Unit Price Accepted"), recSalesLine."Line No.");  // 30-04-24 ZY-LD 143 
-                //if not Confirm(lText007, false, recSalesLine.FieldCaption("Line Amount"), recSalesLine.FieldCaption("Zero Unit Price Accepted")) then
-                //    Error(lText008);
+                    Error(lText007, recSalesLine.FieldCaption("Line Amount"), recSalesLine.FieldCaption("Zero Unit Price Accepted"), recSalesLine."Line No.");
             end;
-            //>> 16-09-24 ZY-LD x002
             recSalesLine.Reset();
             recSalesLine.SetRange("Document Type", SalesHeader."Document Type");
             recSalesLine.SetRange("Document No.", SalesHeader."No.");
@@ -99,44 +92,33 @@ codeunit 50052 SalesHeaderReleaseEvent
             recSalesLine.SetRange("Not Returnable", true);
             if recSalesLine.FindFirst() then
                 Error(lText042, recSalesLine."No.", SalesHeader."No.", recSalesLine."Line No.");
-            //<< 16-09-24 ZY-LD x002
         end;
-        //<< 23-09-22 ZY-LD 126
 
-        //>> 07-12-23 ZY-LD 134
         IF SalesHeader."Document Type" IN [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::"Credit Memo"] THEN BEGIN
             recSalesLine.RESET;
             recSalesLine.SETRANGE("Document Type", SalesHeader."Document Type");
             recSalesLine.SETRANGE("Document No.", SalesHeader."No.");
             recSalesLine.SETRANGE(Type, recSalesLine.Type::Item);
             recSalesLine.setrange("Unit Cost (LCY)", 0);
-            IF recSalesLine.FINDSET THEN
+            IF recSalesLine.FINDSET() THEN
                 REPEAT
                     recItem.GET(recSalesLine."No.");
 
                     IF recItem."Unit Cost" <> 0 THEN begin
                         recSalesLine.VALIDATE("Unit Cost (LCY)", recItem."Unit Cost");
-                        recSalesLine.MODIFY;
+                        recSalesLine.MODIFY();
                     end else
                         if recItem."Last Direct Cost" <> 0 then begin
                             recSalesLine.VALIDATE("Unit Cost (LCY)", recItem."Last Direct Cost");
-                            recSalesLine.MODIFY;
+                            recSalesLine.MODIFY();
                         end;
                 UNTIL recSalesLine.NEXT = 0;
 
-            ValidateDimensionsOnRelease2(SalesHeader);  // 23-08-24 ZY-LD x001
+            ValidateDimensionsOnRelease2(SalesHeader);
         END;
-        //<< 07-12-23 ZY-LD 134
 
-        //>> 01-03-19 ZY-LD 023
-        if SalesHeader."Document Type" = SalesHeader."document type"::Order then begin  // 01-03-19 ZY-LD 023
-            SI.SetManualChange(false);  // 19-01-18 ZY-LD 017
-
-            //OrderingPolicy.MinimumCartonOrdering("No.");  // 28-05-21 ZY-LD 085 - The code has been moved search for 085 to find it.
-            //ReleaseOrder.ReleaseWithCreditCheck(SalesHeader);
-            //>> 16-01-23 ZY-LD 128
-            //IF NOT ReleaseOrder.CheckCreditLimit("Bill-to Customer No.",TRUE,Balance,BalanceDue,Credit) THEN
-            //  ERROR(lText006);
+        if SalesHeader."Document Type" = SalesHeader."document type"::Order then begin
+            SI.SetManualChange(false);
             OutstandingAmount := SalesHeader.TotalOutstandingamount() + ReleaseOrder.CalculateReleaseAmountOtherSO(SalesHeader);
             if not ReleaseOrder.CheckCreditLimit(SalesHeader."Bill-to Customer No.", true, Balance, BalanceDue, Credit, OutstandingAmount) then begin
                 recCust.Get(SalesHeader."Bill-to Customer No.");
@@ -146,44 +128,23 @@ codeunit 50052 SalesHeaderReleaseEvent
                 end else
                     Error(lText006, recCust.FieldCaption("Credit Limit (LCY)"), recCust."Credit Limit (LCY)", Balance, lText033);
             end;
-            //<< 16-01-23 ZY-LD 128
 
-            //>> 23-09-22 ZY-LD 126 - Code has been moved.
-            //ZY2.3 >>
-            /*IF (NOT SI.GetHideSalesDialog) AND GUIALLOWED THEN BEGIN
-              recSalesLine.SETRANGE("Document Type","Document Type");
-              recSalesLine.SETRANGE("Document No.","No.");
-              recSalesLine.SETFILTER(Type,'>0');
-              recSalesLine.SETFILTER("Line Amount",'=0');
-              IF recSalesLine.FINDFIRST THEN
-               IF NOT CONFIRM(lText007) THEN
-                 ERROR(lText008);
-            END;*/
-            //ZY2.3 <<
-            //<< 23-09-22 ZY-LD 126
-
-            //15-51643 -
             if SalesHeader."External Document No." = '' then
                 Error(lText009);
-            //15-51643 +
 
-            SalesHeader.TestField(SalesHeader."Ship-to Country/Region Code");  // 12-09-18 ZY-LD 018
+            SalesHeader.TestField(SalesHeader."Ship-to Country/Region Code");
 
-            //>> 17-09-18 ZY-LD 019
             recSalesSetup.Get();
-            if SalesHeader."Sales Order Type" <> SalesHeader."Sales Order Type"::eCommerce then  // 16-07-24 ZY-LD 150
+            if SalesHeader."Sales Order Type" <> SalesHeader."Sales Order Type"::eCommerce then
                 if SalesHeader."Location Code" = recSalesSetup."All-In Logistics Location" then begin
                     if SalesHeader."Ship-to Code" = '' then
                         if not Confirm(lText002, false, SalesHeader.FieldCaption(SalesHeader."Ship-to Code")) then
                             Message(lText003, SalesHeader.FieldCaption(SalesHeader."Ship-to Code"));
 
-                    //>> 10-07-20 ZY-LD 060
                     if (SalesHeader."Shipment Method Code" = '') and GuiAllowed() then
                         if not Confirm(lText002, false, SalesHeader.FieldCaption(SalesHeader."Shipment Method Code")) then
                             Message(lText003, SalesHeader.FieldCaption(SalesHeader."Shipment Method Code"));
-                    //<< 10-07-20 ZY-LD 060
 
-                    //>> 05-08-19 ZY-LD 032
                     if SalesHeader."Sell-to Customer No." = recSalesSetup."Customer No. on Sister Company" then begin
                         recSalesLine3.SetRange("Document Type", SalesHeader."Document Type");
                         recSalesLine3.SetRange("Document No.", SalesHeader."No.");
@@ -199,11 +160,8 @@ codeunit 50052 SalesHeaderReleaseEvent
                                       recSalesLine3."Line No.");
                             until recSalesLine3.Next() = 0;
                     end;
-                    //<< 05-08-19 ZY-LD 032
                 end;
-            //<< 17-09-18 ZY-LD 019
 
-            //>> 18-02-20 ZY-LD 051
             case SalesHeader."Sales Order Type" of
                 SalesHeader."sales order type"::EICard:
                     begin
@@ -212,14 +170,6 @@ codeunit 50052 SalesHeaderReleaseEvent
                             Error(lText019, SalesHeader.FieldCaption(SalesHeader."Eicard Type"));
                     end;
             end;
-            //<< 18-02-20 ZY-LD 051
-
-            //>> 16-07-24 ZY-LD 150
-            // recLocation.Get(SalesHeader."Location Code");
-            // if (SalesHeader."Sales Order Type" <> recLocation."Sales Order Type") and
-            //    (SalesHeader."Sales Order Type" <> recLocation."Sales Order Type 2")
-            // then
-            //     Error(lText025, SalesHeader.FieldCaption(SalesHeader."Location Code"), SalesHeader."Location Code", SalesHeader.FieldCaption(SalesHeader."Sales Order Type"), SalesHeader."Sales Order Type");
 
             if ((SalesHeader."Sales Order Type" = SalesHeader."Sales Order Type"::eCommerce) and
                 (not SalOrdTypeRel.get(SalesHeader."Location Code", SalesHeader."Sales Order Type"))) or
@@ -229,9 +179,8 @@ codeunit 50052 SalesHeaderReleaseEvent
                 (SalesHeader."Sales Order Type" <> recLocation."Sales Order Type 2"))
             then
                 Error(lText025, SalesHeader.FieldCaption(SalesHeader."Location Code"), SalesHeader."Location Code", SalesHeader.FieldCaption(SalesHeader."Sales Order Type"), SalesHeader."Sales Order Type");
-            //<< 16-07-24 ZY-LD 150
 
-            ValidateDimensionsOnRelease(SalesHeader."No.", SalesHeader."Dimension Set ID");  // 04-02-21 ZY-LD 079
+            ValidateDimensionsOnRelease(SalesHeader."No.", SalesHeader."Dimension Set ID");
 
             // Sales Lines
             recSalesLine.Reset();
@@ -246,43 +195,11 @@ codeunit 50052 SalesHeaderReleaseEvent
                         Error(lText026, SalesHeader.FieldCaption(SalesHeader."Sales Order Type"), recSalesLine."Sales Order Type", recSalesLine.TableCaption(), SalesHeader."Sales Order Type", SalesHeader.TableCaption());
                     if recSalesLine."Location Code" <> SalesHeader."Location Code" then
                         Error(lText026, SalesHeader.FieldCaption(SalesHeader."Location Code"), recSalesLine."Location Code", recSalesLine.TableCaption(), SalesHeader."Location Code", SalesHeader.TableCaption());
-                    if not SI.GetWarehouseManagement then  // 08-07-24 ZY-LD 147
+                    if not SI.GetWarehouseManagement then
                         if recItem."Block on Sales Order" and ((recSalesLine."Qty. to Ship" <> 0) or (recSalesLine."Qty. to Invoice" <> 0)) then
                             Error(lText037, recItem."No.");
 
-                    //>> 24-11-20 ZY-LD 070
-                    /*IF recSelltoCustfromLoc.GET(recSalesLine."Sell-to Customer No.",recSalesLine."No.") AND
-                      (recSelltoCustfromLoc."Location Code" <> recSalesLine."Location Code")
-                    THEN
-                      ERROR(lText021,recSalesLine."Sell-to Customer No.",recSalesLine."No.",recSelltoCustfromLoc."Location Code",recSelltoCustfromLoc.TABLECAPTION);*/
-                    //<< 24-11-20 ZY-LD 070
-
-                    //>> 12-12-17 ZY-LD 016
                     if SalesHeader."Sales Order Type" = SalesHeader."sales order type"::EICard then begin
-                        //>> 23-02-23 ZY-LD 129
-                        //IF recItem."EMS License" AND (recSalesLine."EMS Machine Code" = '') THEN
-                        //  ERROR(lText005,recSalesLine.FieldCaption("EMS Machine Code"),recSalesLine."No.",recSalesLine."Line No.");
-
-                        //>> 23-05-23 ZY-LD 129
-                        /*CASE recItem."Enter Security for Eicard on" OF
-                          recItem."Enter Security for Eicard on"::"EMS License" :
-                            BEGIN
-                              IF recSalesLine."EMS Machine Code" = '' THEN
-                                ERROR(lText005,recSalesLine.FieldCaption("EMS Machine Code"),recSalesLine."No.",recSalesLine."Line No.");
-                            END;
-                          recItem."Enter Security for Eicard on"::"GLC License" :
-                            BEGIN
-                              IF recSalesLine.Quantity > 1 THEN
-                                ERROR(lText035);
-                              IF (recSalesLine."GLC Serial No." = '') OR (recSalesLine."GLC Mac Address" = '') THEN BEGIN
-                                IF recSalesLine."GLC Serial No." = '' THEN
-                                  ERROR(lText005,recSalesLine.FieldCaption("GLC Serial No."),recSalesLine."No.",recSalesLine."Line No.");
-                                IF recSalesLine."GLC Mac Address" = '' THEN
-                                  ERROR(lText005,recSalesLine.FieldCaption("GLC Mac Address"),recSalesLine."No.",recSalesLine."Line No.");
-                              END;
-
-                            END;
-                        END;  */
 
                         if recItem."Enter Security for Eicard on" <> recItem."enter security for eicard on"::" " then begin
                             recAddEicardOrderInfo.SetRange("Document Type", recSalesLine."Document Type");
@@ -292,56 +209,43 @@ codeunit 50052 SalesHeaderReleaseEvent
                             if recSalesLine.Quantity <> recAddEicardOrderInfo.Count() then
                                 Error(lText036, recSalesLine.Quantity, Format(recItem."Enter Security for Eicard on"), recAddEicardOrderInfo.Count());
                         end;
-                        //<< 23-05-23 ZY-LD 129
 
-                        //<< 23-02-23 ZY-LD 129
-
-                        //>> 05-11-19 ZY-LD 044
                         if not recItem.IsEICard then
                             Error(lText016, recItem."No.");
                         if recItem."Non ZyXEL License" then
                             Error(lText017, recItem."No.");
-                        //>> 14-01-22 ZY-LD 111
+
                         if recItem."SBU Company" = recItem."sbu company"::" " then
                             Error(lText030, recItem.FieldCaption("SBU Company"));
-                        //<< 14-01-22 ZY-LD 111
+
                         if (recItem."SBU Company" <> PrevSBUCompany) and (PrevSBUCompany > Prevsbucompany::" ") then
                             Error(lText018);
                         PrevSBUCompany := recItem."SBU Company";
-                        //<< 05-11-19 ZY-LD 044
                     end;
-                    //<< 12-12-17 ZY-LD 016
 
-                    //>> 15-11-21 ZY-LD 106
                     if GuiAllowed() then
                         if (recSalesLine."No." = '') and (recSalesLine.Type.AsInteger() > recSalesLine.Type::" ".AsInteger()) then
                             Error(lText028, recSalesLine.FieldCaption("No."), recSalesLine.FieldCaption(Type), recSalesLine.FieldCaption("Line No."), recSalesLine."Line No.");
-                    //<< 15-11-21 ZY-LD 106
 
-                    //>> 12-03-19 ZY-LD 024
                     if (recSalesLine.Type = recSalesLine.Type::Item) and
-                       (recSalesLine."No." <> '') and
-                       (not recSalesLine."Hide Line") and
-                       (recSalesLine.Quantity <> recSalesLine."Quantity (Base)")
-                    then
+                      (recSalesLine."No." <> '') and
+                      (not recSalesLine."Hide Line") and
+                      (recSalesLine.Quantity <> recSalesLine."Quantity (Base)")
+                   then
                         Error(
                           lText011,
                           recSalesLine.FieldCaption(Quantity), recSalesLine.Quantity, recSalesLine.FieldCaption("Quantity (Base)"), recSalesLine."Quantity (Base)",
                           SalesHeader.TableCaption(), recSalesLine."Document No.", recSalesLine."Line No.");
-                    //<< 12-03-19 ZY-LD 024
 
-                    //>> 12-09-18 ZY-LD 018
-                    if (recSalesLine."No." <> '') and  // 07-12-18 ZY-LD 022
+                    if (recSalesLine."No." <> '') and
                        (not recSalesLine."Hide Line") and
-                       (recSalesLine."Warehouse Status" < recSalesLine."warehouse status"::Delivered) and  // 11-10-18 ZY-LD 020
-                       (not SalesHeader."Disable Additional Items") and  // 11-10-18 ZY-LD 020
-                       (recSalesLine."Sales Order Type" <> recSalesLine."sales order type"::"Drop Shipment")  // 08-01-20 ZY-LD 049
+                       (recSalesLine."Warehouse Status" < recSalesLine."warehouse status"::Delivered) and
+                       (not SalesHeader."Disable Additional Items") and
+                       (recSalesLine."Sales Order Type" <> recSalesLine."sales order type"::"Drop Shipment")
                     then begin
                         recAddItem.SetRange("Item No.", recSalesLine."No.");
-                        //>> 20-11-18 ZY-LD 021
                         recCust.Get(recSalesLine."Sell-to Customer No.");
                         recCust.TestField("Forecast Territory");
-                        //recAddItem.SETRANGE("Ship-to Country/Region","Ship-to Country/Region Code");
                         recAddItem.SetFilter("Ship-to Country/Region", '%1|%2', '', SalesHeader."Ship-to Country/Region Code");
                         recAddItem.SetFilter("Forecast Territory", '%1|%2', '', recCust."Forecast Territory");
                         if recCust."Additional Items" then
@@ -349,7 +253,6 @@ codeunit 50052 SalesHeaderReleaseEvent
                         else
                             recAddItem.SetFilter("Customer No.", '%1', '');
 
-                        //<< 20-11-18 ZY-LD 021
                         if recAddItem.FindFirst() then
                             repeat
                                 recSalesLine2.SetRange("Document Type", recSalesLine."Document Type");
@@ -361,18 +264,16 @@ codeunit 50052 SalesHeaderReleaseEvent
                                     recDelDocLine.SetRange("Sales Order No.", recSalesLine."Document No.");
                                     recDelDocLine.SetRange("Sales Order Line No.", recSalesLine."Line No.");
                                     recDelDocLine.SetRange("Item No.", recAddItem."Additional Item No.");
-                                    if not recDelDocLine.FindFirst() then  //<< 16-08-19 ZY-LD 034
-                                                                           //>> 14-10-20 ZY-LD 067
+                                    if not recDelDocLine.FindFirst() then
                                         if recAddItem."Edit Additional Sales Line" then begin
                                             if not Confirm(lText020, true, recSalesLine."No.", recSalesLine."Document No.", recSalesLine."Line No.", recAddItem.TableCaption(), recAddItem."Additional Item No.") then
-                                                Error('');  //<< 14-10-20 ZY-LD 067
+                                                Error('');
                                         end else
                                             Error(lText001, recSalesLine."No.", recSalesLine."Document No.", recSalesLine."Line No.", recAddItem.TableCaption(), recAddItem."Additional Item No.")
 
                                 end;
                             until recAddItem.Next() = 0;
 
-                        //>> 20-08-19 ZY-LD 035
                         recGenBusPostGrp.Get(recSalesLine."Gen. Bus. Posting Group");
                         if recGenBusPostGrp."Sample / Test Equipment" > recGenBusPostGrp."sample / test equipment"::" " then
                             if (recSalesLine.Type = recSalesLine.Type::Item) and (recSalesLine."No." <> '') and (recSalesLine.Quantity <> 0) then begin
@@ -382,39 +283,31 @@ codeunit 50052 SalesHeaderReleaseEvent
                                         Error(lText014, recSalesLine.FieldCaption("Unit Cost"), SalesHeader."No.", recSalesLine."Line No.", LowerCase(recSalesLine."Gen. Bus. Posting Group"));
                                 end;
 
-                                //>> 19-01-21 ZY-LD 078
                                 if recGenBusPostGrp."Sample / Test Equipment" = recGenBusPostGrp."sample / test equipment"::"Sample (Unit Price = Zero)" then begin
                                     if recSalesLine."Unit Price" <> 0 then
                                         Error(lText015, recSalesLine.FieldCaption("Unit Price"), SalesHeader."No.", recSalesLine."Line No.", LowerCase(recSalesLine."Gen. Bus. Posting Group"));
                                 end else
                                     if recSalesLine."Unit Price" <> recSalesLine."Unit Cost" then
                                         Error(lText022, recSalesLine.FieldCaption("Unit Price"), SalesHeader."No.", recSalesLine."Line No.", LowerCase(recSalesLine."Gen. Bus. Posting Group"), recSalesLine.FieldCaption("Unit Cost"));
-                                //<< 19-01-21 ZY-LD 078
+
                             end;
-                        //<< 20-08-19 ZY-LD 035
 
                     end;
-                    //<< 12-09-18 ZY-LD 018
 
-                    //>> 13-08-19 ZY-LD 033
                     if (recSalesLine."Ship-to Code" <> SalesHeader."Ship-to Code") and
-                       (recSalesLine."Ship-to Code" <> SalesHeader."Ship-to Code Del. Doc")  //20-05-24 ZY-LD 145
+                       (recSalesLine."Ship-to Code" <> SalesHeader."Ship-to Code Del. Doc")
                     then
                         Error(lText013, SalesHeader.FieldCaption(SalesHeader."Ship-to Code"), recSalesLine."Ship-to Code", recSalesLine."Document No.", recSalesLine."Line No.", SalesHeader."Ship-to Code");
-                    //<< 13-08-19 ZY-LD 033
 
-                    //>> 30-08-19 ZY-LD 036
                     if recSalesLine."Shipment Date" = 99990101D then
                         Error(lText041, recSalesLine.FieldCaption("Shipment Date"), recSalesLine."Shipment Date");
                     if recSalesLine."Planned Delivery Date" = 99990101D then
                         Error(lText041, recSalesLine.FieldCaption("Planned Delivery Date"), recSalesLine."Planned Delivery Date");
                     if recSalesLine."Planned Shipment Date" = 99990101D then
                         Error(lText041, recSalesLine.FieldCaption("Planned Shipment Date"), recSalesLine."Planned Shipment Date");
-                    //<< 30-08-19 ZY-LD 036
 
                     ValidateDimensionsOnRelease(recSalesLine."Document No.", recSalesLine."Dimension Set ID");  // 04-02-21 ZY-LD 079
 
-                    //>> 09-03-21 ZY-LD 080
                     if (ItemLogisticEvents.MainWarehouseLocation(recSalesLine."Location Code")) and
                        (((recSalesLine."Document Type" = recSalesLine."document type"::Invoice) and
                          (recSalesLine."Shipment No." = '')) or
@@ -423,9 +316,7 @@ codeunit 50052 SalesHeaderReleaseEvent
                     then
                         if not Confirm(lText023, false, recSalesLine."Document Type", recSalesLine."Location Code") then
                             Error('');
-                    //<< 09-03-21 ZY-LD 080
 
-                    //>> 18-10-21 ZY-LD 101
                     if GuiAllowed() then
                         if (not recSalesLine."Completely Shipped") and
                            (recSalesLine."Overshipment Line No." = 0)
@@ -439,27 +330,21 @@ codeunit 50052 SalesHeaderReleaseEvent
                                         Error('');
                             end;
                         end;
-                    //<< 18-10-21 ZY-LD 101
 
-                    //>> 06-07-22 ZY-LD 122
                     if not SI.GetWarehouseManagement then
                         if recItem."Freight Cost Item" and
                            (recSalesLine."Outstanding Quantity" <> 0) and
                            (recSalesLine."Freight Cost Related Line No." = 0)
                         then
-                            if not confirm(lText038, false, recItem."No.", recSalesLine.FieldCaption("Freight Cost Related Line No.")) then  // 17-07-24 ZY-LD 151
+                            if not confirm(lText038, false, recItem."No.", recSalesLine.FieldCaption("Freight Cost Related Line No.")) then
                                 error('');
-                    //Error(lText031, recItem."No.", recSalesLine.FieldCaption("Freight Cost Related Line No."));  // 17-07-24 ZY-LD 151
-                    //<< 06-07-22 ZY-LD 122
 
                     recSalesLine.Status := recSalesLine.Status::Released;
                     recSalesLine.Modify();
                 until recSalesLine.Next() = 0;
-            //<< 01-03-19 ZY-LD 023
 
-            // 001: >>
             CreateBOMLines(SalesHeader);
-            // 001: <<
+
         end;
 
         if GuiAllowed() then
@@ -475,15 +360,13 @@ codeunit 50052 SalesHeaderReleaseEvent
                         Error('');
             end;
 
-        if not SalesHeader."eCommerce Order" then begin  // 15-06-22 ZY-LD 121
-                                                         /*IF "Ship-to Country/Region Code" <> COPYSTR("Ship-to VAT",1,2) THEN
-                                                           ERROR(lText032,FieldCaption("Ship-to Country/Region Code"),"Ship-to Country/Region Code",FieldCaption("Ship-to VAT"),COPYSTR("Ship-to VAT",1,2));*/
+        if not SalesHeader."eCommerce Order" then begin
 
             if SalesHeader."VAT Registration No. Zyxel" = '' then
                 SalesHeadEvent.SetZyxelVATRegistrationNo(SalesHeader, SalesHeader, 0);
             SalesHeader.TestField(SalesHeader."VAT Registration No. Zyxel");
         end;
-        //<< 06-07-21 ZY-LD 090
+
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Release Sales Document", 'OnAfterReleaseSalesDoc', '', false, false)]
@@ -526,7 +409,7 @@ codeunit 50052 SalesHeaderReleaseEvent
             end;
         end;
 
-        SI.SetManualChange(true);  // 19-01-18 ZY-LD 017
+        SI.SetManualChange(true);
     end;
 
     #region Local Procedure
@@ -577,12 +460,12 @@ codeunit 50052 SalesHeaderReleaseEvent
                     end;
                 end;
             until SalesLine.Next() = 0;
-        //<< 01-03-19 ZY-LD 023
+
     end;
 
     local procedure NewSalesLine(LineNo: Integer; BOMLineNo: Integer; Qty: Decimal; ItemNo: Code[20]; SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line")
     begin
-        //>> 01-03-19 ZY-LD 023
+
         SalesLine.Reset();
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
@@ -609,7 +492,6 @@ codeunit 50052 SalesHeaderReleaseEvent
         i: Integer;
         lText001: Label 'Dimension "%1" is missing on Sales Order %2.\Please contact the Finance Department to have the Dimension updated on the sales order and on the customer card.';
     begin
-        //>> 04-02-21 ZY-LD 079
         recGenLedgerSetup.Get();
         recDimSetEntry.SetRange("Dimension Set ID", pDimSetID);
         for i := 1 to 3 do begin
@@ -625,7 +507,6 @@ codeunit 50052 SalesHeaderReleaseEvent
             if not recDimSetEntry.FindFirst() or (recDimSetEntry."Dimension Value Code" = '') then
                 Error(lText001, DimensionCode, pNo);
         end;
-        //<< 04-02-21 ZY-LD 079
     end;
 
     local procedure ValidateDimensionsOnRelease2(SalesHeader: Record "Sales Header")
@@ -640,7 +521,6 @@ codeunit 50052 SalesHeaderReleaseEvent
         lText002: Label 'Dimension "%1" "%2" on the "Sales %4" %5 is not a valid dimension for customer %3.\\Please contact the accounting manager to setup the dimension on the customer, or change the dimension value on the "Sales %4".';
 
     begin
-        //>> 23-08-24 ZY-LD x001
         Cust.get(SalesHeader."Sell-to Customer No.");
         if Cust."Sample Account" then begin
             GenLedgSetup.get;
@@ -668,7 +548,7 @@ codeunit 50052 SalesHeaderReleaseEvent
                     Error(lText002, GenLedgSetup."Shortcut Dimension 3 Code", DimSetEntry."Dimension Value Code", Cust."No.", Format(SalesHeader."Document Type"), SalesHeader."No.");
             end;
         end;
-        //<< 23-08-24 ZY-LD x001
+
     end;
     #endregion
 }

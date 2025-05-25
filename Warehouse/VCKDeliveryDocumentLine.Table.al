@@ -432,6 +432,7 @@ Table 50042 "VCK Delivery Document Line"
             Editable = false;
             FieldClass = FlowField;
         }
+
         field(64; "Document Type"; Option)
         {
             CalcFormula = lookup("VCK Delivery Document Header"."Document Type" where("No." = field("Document No.")));
@@ -478,6 +479,20 @@ Table 50042 "VCK Delivery Document Line"
             Caption = 'Sell-to Customer Name';
             FieldClass = FlowField;
             CalcFormula = lookup("VCK Delivery Document Header"."Sell-to Customer Name" where("No." = field("Document No.")));
+        }
+        field(52; "External Document Position No."; Code[10]) //23-05-2025 BK #508124
+        {
+            CalcFormula = lookup("Sales Line"."External Document Position No." where("Document Type" = const(Order),
+                                                                             "Document No." = field("Sales Order No."),
+                                                                             "Line No." = field("Sales Order Line No.")));
+            Caption = 'External Document Position No.';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(53; "Customer Order Position No."; Code[10]) //23-05-2025 BK #508124
+        {
+            Caption = 'Customer Order Position No.';
+            Description = 'PAB 1.0';
         }
     }
 

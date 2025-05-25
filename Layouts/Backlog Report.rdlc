@@ -1,5 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:am="http://schemas.microsoft.com/sqlserver/reporting/authoringmetadata">
+  <am:AuthoringMetadata>
+    <am:CreatedBy>
+      <am:Name>MSRB</am:Name>
+      <am:Version>15.0.20283.0</am:Version>
+    </am:CreatedBy>
+    <am:UpdatedBy>
+      <am:Name>MSRB</am:Name>
+      <am:Version>15.0.20283.0</am:Version>
+    </am:UpdatedBy>
+    <am:LastModifiedTimestamp>2025-05-23T15:35:07.9834077Z</am:LastModifiedTimestamp>
+  </am:AuthoringMetadata>
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
     <DataSource Name="DataSource">
@@ -47,6 +58,9 @@
                 </TablixColumn>
                 <TablixColumn>
                   <Width>2.61458in</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>0.98425in</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>0.76042in</Width>
@@ -395,7 +409,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Parameters!ExternalDocumentNo_SalesLineCaption.Value</Value>
+                                  <Value>=Parameters!CustPONo.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>8pt</FontSize>
@@ -407,6 +421,38 @@
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox31</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>5pt</PaddingLeft>
+                            <PaddingRight>5pt</PaddingRight>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox59">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Parameters!CustPOPosNo.Value</Value>
+                                  <Style>
+                                    <FontFamily>Segoe UI</FontFamily>
+                                    <FontSize>8pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox59</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -672,7 +718,6 @@
                             <PaddingRight>5pt</PaddingRight>
                           </Style>
                         </Textbox>
-                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -1198,14 +1243,14 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="ExternalDocumentNo_SalesLine">
+                        <Textbox Name="Customer_PO_No">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!ExternalDocumentNo_SalesLine.Value</Value>
+                                  <Value>=Fields!Customer_PO_No.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>8pt</FontSize>
@@ -1215,7 +1260,39 @@
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>ExternalDocumentNo_SalesLine</rd:DefaultName>
+                          <rd:DefaultName>Customer_PO_No</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>=Iif(RowNumber(Nothing) Mod 2, "LightGrey", "White")</BackgroundColor>
+                            <PaddingLeft>5pt</PaddingLeft>
+                            <PaddingRight>5pt</PaddingRight>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Customer_PO_Position_NO">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!Customer_PO_Position_NO.Value</Value>
+                                  <Style>
+                                    <FontFamily>Segoe UI</FontFamily>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Customer_PO_Position_NO</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -2031,6 +2108,37 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="Textbox62">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value />
+                                  <Style>
+                                    <FontFamily>Segoe UI</FontFamily>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox62</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>5pt</PaddingLeft>
+                            <PaddingRight>5pt</PaddingRight>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="Textbox46">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -2500,6 +2608,7 @@
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
+                <TablixMember />
                 <TablixMember>
                   <Visibility>
                     <Hidden>=Fields!ShowPrevShipDate.Value = FALSE</Hidden>
@@ -2535,7 +2644,7 @@
             </TablixRowHierarchy>
             <DataSetName>DataSet_Result</DataSetName>
             <Height>0.41667in</Height>
-            <Width>36.79456in</Width>
+            <Width>37.77881in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -2548,7 +2657,7 @@
         <Height>1.32166cm</Height>
         <Style />
       </Body>
-      <Width>93.45818cm</Width>
+      <Width>95.95818cm</Width>
       <Page>
         <PageHeader>
           <Height>1.82562cm</Height>
@@ -2800,6 +2909,24 @@
       </DefaultValue>
       <Prompt>RptShipToAdd</Prompt>
     </ReportParameter>
+    <ReportParameter Name="CustPONo">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>CustPONo</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>CustPONo</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="CustPOPosNo">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>CustPOPosNo</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>CustPOPosNo</Prompt>
+    </ReportParameter>
     <ReportParameter Name="No_CustomerCaption">
       <DataType>String</DataType>
       <DefaultValue>
@@ -2872,14 +2999,23 @@
       </DefaultValue>
       <Prompt>CurrencyCode_SalesLineCaption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="ExternalDocumentNo_SalesLineCaption">
+    <ReportParameter Name="Customer_PO_NoCaption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>ExternalDocumentNo_SalesLineCaption</Value>
+          <Value>Customer_PO_NoCaption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>ExternalDocumentNo_SalesLineCaption</Prompt>
+      <Prompt>Customer_PO_NoCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Customer_PO_Position_NOCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Customer_PO_Position_NOCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Customer_PO_Position_NOCaption</Prompt>
     </ReportParameter>
     <ReportParameter Name="DeliveryDocumentNo_SalesLineCaption">
       <DataType>String</DataType>
@@ -2948,7 +3084,7 @@
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>22</NumberOfRows>
+      <NumberOfRows>25</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -2983,81 +3119,96 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>6</RowIndex>
-          <ParameterName>No_CustomerCaption</ParameterName>
+          <ParameterName>CustPONo</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>7</RowIndex>
-          <ParameterName>Name_CustomerCaption</ParameterName>
+          <ParameterName>CustPOPosNo</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>8</RowIndex>
-          <ParameterName>DocumentNo_SalesLineCaption</ParameterName>
+          <ParameterName>No_CustomerCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>9</RowIndex>
-          <ParameterName>No_SalesLineCaption</ParameterName>
+          <ParameterName>Name_CustomerCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>10</RowIndex>
-          <ParameterName>Description_SalesLineCaption</ParameterName>
+          <ParameterName>DocumentNo_SalesLineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>11</RowIndex>
-          <ParameterName>Quantity_SalesLineCaption</ParameterName>
+          <ParameterName>No_SalesLineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>12</RowIndex>
-          <ParameterName>UnitPrice_SalesLineCaption</ParameterName>
+          <ParameterName>Description_SalesLineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>13</RowIndex>
-          <ParameterName>CurrencyCode_SalesLineCaption</ParameterName>
+          <ParameterName>Quantity_SalesLineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>14</RowIndex>
-          <ParameterName>ExternalDocumentNo_SalesLineCaption</ParameterName>
+          <ParameterName>UnitPrice_SalesLineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>15</RowIndex>
-          <ParameterName>DeliveryDocumentNo_SalesLineCaption</ParameterName>
+          <ParameterName>CurrencyCode_SalesLineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>16</RowIndex>
-          <ParameterName>WarehouseStatus_SalesLineCaption</ParameterName>
+          <ParameterName>Customer_PO_NoCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>17</RowIndex>
-          <ParameterName>ShipmentDateConfirmed_SalesLineCaption</ParameterName>
+          <ParameterName>Customer_PO_Position_NOCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>18</RowIndex>
-          <ParameterName>ShipToCodeCaption</ParameterName>
+          <ParameterName>DeliveryDocumentNo_SalesLineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>19</RowIndex>
-          <ParameterName>Dimension1Caption</ParameterName>
+          <ParameterName>WarehouseStatus_SalesLineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>20</RowIndex>
-          <ParameterName>Dimension2Caption</ParameterName>
+          <ParameterName>ShipmentDateConfirmed_SalesLineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>21</RowIndex>
+          <ParameterName>ShipToCodeCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>22</RowIndex>
+          <ParameterName>Dimension1Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>23</RowIndex>
+          <ParameterName>Dimension2Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>24</RowIndex>
           <ParameterName>ShipmentDateCaption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
@@ -3168,8 +3319,11 @@ End Function
         <Field Name="CurrencyCode_SalesLine">
           <DataField>CurrencyCode_SalesLine</DataField>
         </Field>
-        <Field Name="ExternalDocumentNo_SalesLine">
-          <DataField>ExternalDocumentNo_SalesLine</DataField>
+        <Field Name="Customer_PO_No">
+          <DataField>Customer_PO_No</DataField>
+        </Field>
+        <Field Name="Customer_PO_Position_NO">
+          <DataField>Customer_PO_Position_NO</DataField>
         </Field>
         <Field Name="DeliveryDocumentNo_SalesLine">
           <DataField>DeliveryDocumentNo_SalesLine</DataField>

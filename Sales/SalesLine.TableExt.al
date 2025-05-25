@@ -146,7 +146,7 @@ tableextension 50117 SalesLineZX extends "Sales Line"
             Caption = 'Additional Item Line No.';
             Description = 'LD1.0';
         }
-        field(50019; "EMS Machine Code"; Text[64])
+        field(50019; "EMS Machine Code"; Text[64]) //22-05-2025 BK #505159
         {
             Description = 'PAB 1.0';
         }
@@ -161,7 +161,7 @@ tableextension 50117 SalesLineZX extends "Sales Line"
             Caption = 'Warehouse Inbound No.';
             Description = '23-03-20 ZY-LD 032';
         }
-        field(50022; "External Document Position No."; Code[10])
+        field(50022; "External Document Position No."; Code[10]) 
         {
             Caption = 'External Document Position No.';
             Description = '04-08-21 ZY-LD 044';

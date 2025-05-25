@@ -63,6 +63,10 @@ page 50090 "Backlog Orders"
                 {
                     ApplicationArea = Basic, Suite;
                 }
+                field("External Document Position No."; Rec."External Document Position No.") //23-05-2025 BK #508124
+                {
+
+                }
                 field("Shipment Date"; Rec."Shipment Date")
                 {
                     ApplicationArea = Basic, Suite;

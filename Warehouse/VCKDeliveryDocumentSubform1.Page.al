@@ -117,6 +117,12 @@ Page 50088 "VCK Delivery Document Subform1"
                     Editable = false;
                     Visible = false;
                 }
+                field("Customer Order Position No."; Rec."Customer Order Position No.") //23-05-2025 BK #508124
+                {
+                    ApplicationArea = Basic, Suite;
+                    Editable = false;
+                    Visible = false;
+                }
                 field("Warehouse Status"; Rec."Warehouse Status")
                 {
                     ApplicationArea = Basic, Suite;
