@@ -75,7 +75,7 @@ tableextension 50125 UserSetupZX extends "User Setup"
             OptionCaption = 'Raw Data,Merged';
             OptionMembers = "Raw Data",Merged;
         }
-        field(50014; "User Type"; Option)  // 01-03-24 ZY-LD Used to prevent access to certan fields in the customer card.
+        field(50014; "User Type"; Option)  // Used to prevent access to certan fields in the customer card.
         {
             Caption = 'User Type';
             OptionCaption = ' ,Accounting Manager,Accounting Service Center,Human Resource';

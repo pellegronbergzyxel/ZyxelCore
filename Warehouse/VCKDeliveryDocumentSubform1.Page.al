@@ -1,8 +1,5 @@
 Page 50088 "VCK Delivery Document Subform1"
 {
-    // 001. 06-10-17 ZY-LD 000 - Edit Quantity
-    // 002. 09-08-19 ZY-LD 000 - View sales invoice.
-    // 003. 18-05-22 ZY-LD 2022011110000088 - We don´t want to see "Freight Cost Items" on the DD.
 
     Caption = 'Delivery Document Lines';
     DeleteAllowed = true;
@@ -211,7 +208,7 @@ Page 50088 "VCK Delivery Document Subform1"
 
                     trigger OnAction()
                     begin
-                        ViewSalesInvoice;  // 09-08-19 ZY-LD 002
+                        ViewSalesInvoice;
                     end;
                 }
             }
@@ -240,7 +237,7 @@ Page 50088 "VCK Delivery Document Subform1"
 
                     trigger OnAction()
                     begin
-                        ZyXELVCKEditDeliveryDoc.EditQuantity(Rec);  // 06-10-17 ZY-LD 001
+                        ZyXELVCKEditDeliveryDoc.EditQuantity(Rec);
                     end;
                 }
                 action("Edit Unit Price")
@@ -251,7 +248,7 @@ Page 50088 "VCK Delivery Document Subform1"
 
                     trigger OnAction()
                     begin
-                        ZyXELVCKEditDeliveryDoc.EditUnitPriceExclVAT(Rec);  // 27-11-23 ZY-LD 001
+                        ZyXELVCKEditDeliveryDoc.EditUnitPriceExclVAT(Rec);
                     end;
 
                 }
@@ -284,8 +281,7 @@ Page 50088 "VCK Delivery Document Subform1"
                 var
                     frmSerials: Page "VCK Delivery Document SNos";
                 begin
-                    //frmSerials.FilterByDeliveryDocument(Rec."No.");
-                    //frmSerials.RUNMODAL;
+
                 end;
             }
             action("Export Excel")
@@ -343,7 +339,7 @@ Page 50088 "VCK Delivery Document Subform1"
     trigger OnOpenPage()
     begin
         SetActions;
-        Rec.SetRange(Rec."Freight Cost Item", false);  // 18-05-22 ZY-LD 001
+        Rec.SetRange(Rec."Freight Cost Item", false);
     end;
 
     var
@@ -419,7 +415,6 @@ Page 50088 "VCK Delivery Document Subform1"
         if not Rec."Has Serial No" then
             Error('The selected line does not have any serial numbers.');
 
-        //frmSerials.FilterByDeliveryDocumentAndLin(Rec."Document No.",Rec."Line No.");
         frmSerials.RunModal;
     end;
 
@@ -447,7 +442,7 @@ Page 50088 "VCK Delivery Document Subform1"
         recSalesInvLine: Record "Sales Invoice Line";
         recSalesInvHead: Record "Sales Invoice Header";
     begin
-        //>> 09-08-19 ZY-LD 002
+
         recSalesShipLine.SetRange("Order No.", Rec."Sales Order No.");
         recSalesShipLine.SetRange("Order Line No.", Rec."Sales Order Line No.");
         if recSalesShipLine.FindFirst then begin
@@ -458,7 +453,6 @@ Page 50088 "VCK Delivery Document Subform1"
                 Page.RunModal(Page::"Posted Sales Invoice", recSalesInvHead);
             end;
         end;
-        //>> 09-08-19 ZY-LD 002
     end;
 
 

@@ -16,7 +16,7 @@ pageextension 50128 SalesCreditMemoZX extends "Sales Credit Memo"
                 Importance = Additional;
             }
 
-            field("Sales Order Type"; Rec."Sales Order Type") //21-05-2025 BK #
+            field("Sales Order Type"; Rec."Sales Order Type") //21-05-2025 BK #Maria
             {
                 ApplicationArea = Basic, Suite;
                 Importance = Additional;

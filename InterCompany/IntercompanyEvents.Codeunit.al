@@ -682,6 +682,7 @@ codeunit 50048 "Intercompany Events"
                     SalesLine."Special Order Purchase No." := pPurch."No.";
                     SalesLine."Special Order Purch. Line No." := PurchLine."Line No.";
                     SalesLine."External Document No." := PurchLine."External Document No.";
+                    SalesLine."Dimension Set ID" := PurchLine."Dimension Set ID"; //27-05-2025 BK #480077
                 end else begin
                     DimMgt.GetShortcutDimensions(PurchLine."Dimension Set ID", ShortcutDimCode);
                     if SalesHeader."eCommerce Order" then begin

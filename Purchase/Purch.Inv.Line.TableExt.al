@@ -49,12 +49,12 @@ tableextension 50136 PurchInvLineZX extends "Purch. Inv. Line"
             Caption = 'GLC Mac Address';
             Description = '23-02-23 ZY-LD 009';
         }
-        field(50036; "Original No."; Code[20])  // 01-05-24 ZY-LD 000
+        field(50036; "Original No."; Code[20])
         {
             Caption = 'Original No.';
             Description = 'In case of samples we need to store the original item no. so we can use it in intrastat reporting.';
         }
-        field(50102; "EMS Machine Code"; Code[35])
+        field(50102; "EMS Machine Code"; Text[64])  //26-05-2025 BK #505159
         {
             Caption = 'EMS Machine Code';
             Description = 'PAB 1.0';
