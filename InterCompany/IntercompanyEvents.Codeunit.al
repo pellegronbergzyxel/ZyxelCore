@@ -385,11 +385,9 @@ codeunit 50048 "Intercompany Events"
         CreateSale(
           PurchaseHeader,
           ICInboxPurchaseHeader."Sales Order Type",
-<<<<<<< HEAD
-          ICInboxPurchaseHeader."Salesperson Code",  // 20-03-18 ZY-LD 008
-          ICInboxPurchaseHeader."Currency Code Sales Doc SUB");  // 09-12-19 ZY-LD 018
-                                                                 // 003: <<
-                                                                 // 001: <<
+          ICInboxPurchaseHeader."Salesperson Code",
+          ICInboxPurchaseHeader."Currency Code Sales Doc SUB");
+
 
 
         // CreateContainie, if vendor+automatis >>
@@ -398,12 +396,6 @@ codeunit 50048 "Intercompany Events"
             PurchaseHeader.CreatecontainerfromPurchaseInv(PurchaseHeader);
         end;
         // CreateContainie, if vendor+automatis <<
-
-
-=======
-          ICInboxPurchaseHeader."Salesperson Code",
-          ICInboxPurchaseHeader."Currency Code Sales Doc SUB");
->>>>>>> 256df856d584545d6658294a0d525b3a3c7bba98
 
     end;
 
