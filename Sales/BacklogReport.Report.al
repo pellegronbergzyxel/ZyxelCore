@@ -1,14 +1,6 @@
 Report 50045 "Backlog Report"
 {
-    // 001. 27-12-17 ZY-LD Warehouse Status added.
-    // 002. 18-05-18 ZY-LD 2018051410000332 - Country Dimension from Customer.
-    // 003. 25-05-18 ZY-LD 2018052510000081 - Location Code is addes as filter.
-    // 004. 19-09-18 ZY-LD 2018091810000149 - New filter "Additional Item Line No." = 0; We don't need to see QSG's on the backlog.
-    // 005. 19-03-19 ZY-LD 2019031910000031 - Skipping UK items on the backlog report.
-    // 006. 21-08-19 ZY-LD 2019082110000115 - Unblock customer.
-    // 007. 14-01-21 ZY-LD P0499 - Filter on Quantity is changed to filter on "Outstanding Quantity".
-    // 008. 09-08-22 ZY-LD 000 - Transfer Orders.
-    // 009. 19-08-22 ZY-LD 2022020110000032 - "Ship to Addres" is added.
+
     DefaultLayout = RDLC;
     RDLCLayout = './Layouts/Backlog Report.rdlc';
 
@@ -206,7 +198,11 @@ Report 50045 "Backlog Report"
             {
                 IncludeCaption = true;
             }
-            column(ExternalDocumentNo_SalesLine; SalesLineTmp."External Document No.")
+            column(Customer_PO_No; SalesLineTmp."External Document No.") //23-05-2025 BK #508124
+            {
+                IncludeCaption = true;
+            }
+            column(Customer_PO_Position_NO; saleslineTmp."External Document Position No.") //23-05-2025 BK #508124
             {
                 IncludeCaption = true;
             }
@@ -284,12 +280,12 @@ Report 50045 "Backlog Report"
                 if SalesLineTmp."Document Type" = SalesLineTmp."document type"::Order then begin
                     if recShipToAdd.Get(SalesLineTmp."Sell-to Customer No.", SalesLineTmp."Ship-to Code") then begin
                         ShipToName := recShipToAdd.Name;
-                        ShipToAdd := recShipToAdd.Address;  // 19-08-22 ZY-LD 009
+                        ShipToAdd := recShipToAdd.Address;
                     end;
                 end else begin
                     if recTranstoAdd.Get(SalesLineTmp."Shipment No.", SalesLineTmp."Ship-to Code") then begin
                         ShipToName := recTranstoAdd.Name;
-                        ShipToAdd := recTranstoAdd.Address;  // 19-08-22 ZY-LD 009
+                        ShipToAdd := recTranstoAdd.Address;
                     end;
                 end;
 
@@ -349,13 +345,15 @@ Report 50045 "Backlog Report"
         RptOrderDate = 'Order Date';
         RptPrevShipmentDate = 'Previous Picking Date';
         RptShipToAdd = 'Ship to Address';
+        CustPONo = 'Customer PO. No.';
+        CustPOPosNo = 'Customer PO. Pos. No.';
     }
 
     trigger OnPreReport()
     begin
-        CustFilter := Customer.GetFilters;
+        CustFilter := Customer.GetFilters();
         CustDateFilter := Customer.GetFilter("Date Filter");
-        recGenLedgSetup.Get;
+        recGenLedgSetup.Get();
     end;
 
     var

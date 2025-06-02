@@ -26,7 +26,7 @@ Table 50035 "Add. Eicard Order Info"
         field(5; Validated; Boolean)
         {
         }
-        field(11; "EMS Machine Code"; Code[35])
+        field(11; "EMS Machine Code"; Text[64]) //22-05-2025 BK #505159
         {
 
             trigger OnValidate()

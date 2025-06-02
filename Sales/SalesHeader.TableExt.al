@@ -468,64 +468,7 @@ tableextension 50116 SalesHeaderZX extends "Sales Header"
                 LEMSG004: Label 'Item %1 is not match %2!';
                 LEMSG005: Label 'Document Type should be Order or Invoice!';
             begin
-                //Tectura Taiwan ZL100526A+
-                /*
-                IF (xRec."Sales Order Type"<>0) THEN ERROR(LEMSG000);
-                TESTFIELD(Status,Status::Open);
-                IF ("Document Type"<>"Document Type"::Order) AND
-                   ("Document Type"<>"Document Type"::Invoice) AND
-                   ("Document Type"<>"Document Type"::Quote)  // 25-09-20 ZY-LD 036
-                THEN
-                   ERROR(LEMSG005);
-                //TESTFIELD("Document Type","Document Type"::Order);
-                CLEAR(LocationRec);
-                LocationRec.RESET;
-                LocationRec.SETFILTER("Default Order Type Location",'%1',TRUE);
-                LocationRec.SETFILTER("Sales Order Type",'%1',"Sales Order Type");
-                LocationRec.SETRANGE("In Use",TRUE);  // 09-08-21 ZY-LD 046
-                IF LocationRec.FINDFIRST THEN BEGIN
-                   IF ("Location Code" = '') THEN BEGIN
-                      VALIDATE("Location Code",LocationRec.Code);
-                   END ELSE BEGIN
-                      CLEAR(LocationRec);
-                      LocationRec.RESET;
-                      IF LocationRec.GET("Location Code") THEN BEGIN
-                         IF NOT (LocationRec."Sales Order Type" = "Sales Order Type") AND
-                            NOT (LocationRec."Sales Order Type 2" = "Sales Order Type")  // 06-08-21 ZY-LD 044
-                         THEN
-                          ERROR(LEMSG001,"Sales Order Type",LocationRec."Sales Order Type");
-                      END ELSE
-                        ERROR(LEMSG002,"Location Code");
-                   END;
-                END ELSE BEGIN
-                  // PAB
-                  // ERROR(LEMSG003,"Sales Order Type");
-                END;
-                IF ("Sales Order Type"<>0) AND ("Location Code"<>'') THEN BEGIN
-                   CLEAR(SOLine);
-                   SOLine.RESET;
-                   SOLine.SETFILTER("Document Type",'%1',"Document Type");
-                   SOLine.SETFILTER("Document No.",'%1',"No.");
-                   IF SOLine.FINDSET THEN BEGIN
-                      REPEAT
-                         IF (SOLine.Type=SOLine.Type::Item) THEN BEGIN
-                            CLEAR(Item);
-                            Item.RESET;
-                            Item.GET(SOLine."No.");
-                            IF (Item.IsEICard AND ("Sales Order Type"<>"Sales Order Type"::EICard)) OR
-                               ((NOT Item.IsEICard) AND ("Sales Order Type"="Sales Order Type"::EICard)) THEN BEGIN
-                               ERROR(LEMSG004,SOLine."No.","Sales Order Type");
-                            END;
-                         END;
-                         SOLine.ValidateLocation;
-                         SOLine."Sales Order Type":="Sales Order Type";
-                         SOLine.MODIFY;
-                      UNTIL (SOLine.NEXT=0);
-                   END;
-                END;
-                
-                //Tectura Taiwan ZL100526A-
-                */
+
             end;
         }
         field(62022; "Completely Invoiced"; Boolean)

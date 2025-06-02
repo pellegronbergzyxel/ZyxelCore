@@ -146,7 +146,7 @@ tableextension 50117 SalesLineZX extends "Sales Line"
             Caption = 'Additional Item Line No.';
             Description = 'LD1.0';
         }
-        field(50019; "EMS Machine Code"; Text[64])
+        field(50019; "EMS Machine Code"; Text[64]) //22-05-2025 BK #505159
         {
             Description = 'PAB 1.0';
         }
@@ -161,7 +161,7 @@ tableextension 50117 SalesLineZX extends "Sales Line"
             Caption = 'Warehouse Inbound No.';
             Description = '23-03-20 ZY-LD 032';
         }
-        field(50022; "External Document Position No."; Code[10])
+        field(50022; "External Document Position No."; Code[10]) 
         {
             Caption = 'External Document Position No.';
             Description = '04-08-21 ZY-LD 044';
@@ -305,7 +305,7 @@ tableextension 50117 SalesLineZX extends "Sales Line"
             Caption = 'Zero Unit Price Approved';
             Description = '24-05-22 ZY-LD 047';
         }
-        field(50047; "Order Desk Responsible Code"; Code[20])  // 12-02-24 ZY-LD 000
+        field(50047; "Order Desk Responsible Code"; Code[20])
         {
             CalcFormula = lookup("Sales Header"."Order Desk Resposible Code" where("Document Type" = field("Document Type"),
                                                                                          "No." = field("Document No.")));
@@ -314,13 +314,13 @@ tableextension 50117 SalesLineZX extends "Sales Line"
             FieldClass = FlowField;
             TableRelation = "Country/Region";
         }
-        field(50048; "Item Type"; Enum "Item Type")  // 25-04-24 ZY-LD 000
+        field(50048; "Item Type"; Enum "Item Type")
         {
             Caption = 'Item Type';
             CalcFormula = lookup(Item.Type where("No." = field("No.")));
             FieldClass = FlowField;
         }
-        field(50049; "Margin Approved"; Boolean)  // 12-07-24 ZY-LD 000
+        field(50049; "Margin Approved"; Boolean)
         {
             Caption = 'Margin Approved';
             CalcFormula = exist("Margin Approval" where("Source Type" = const(Sales),
@@ -420,7 +420,7 @@ tableextension 50117 SalesLineZX extends "Sales Line"
             Caption = 'Sales Order Type';
             Description = 'Tectura Taiwan';
             Editable = false;
-            OptionCaption = ' ,Normal,EICard,Drop Shipment,Other,Spec. Order,G/L Account,HaaS,eCommerce';  // 15-07-24 ZY-LD 000 - eCommerce is added.';
+            OptionCaption = ' ,Normal,EICard,Drop Shipment,Other,Spec. Order,G/L Account,HaaS,eCommerce';  //  - eCommerce is added.';
             OptionMembers = " ",Normal,EICard,"Drop Shipment",Other,"Spec. Order","G/L Account",HaaS,eCommerce;
         }
         field(62018; "Ship-to Code"; Code[10])
@@ -444,100 +444,6 @@ tableextension 50117 SalesLineZX extends "Sales Line"
             Caption = 'Picking Date Confirmed';
             Description = 'HQ';
 
-            trigger OnValidate()
-            begin
-                //>> 30-12-20 ZY-LD 040
-                /*TestStatusOpen;
-                IF (Type=Type::Item) AND (xRec."Shipment Date Confirmed"<>"Shipment Date Confirmed") THEN BEGIN
-                   IF "Shipment Date Confirmed" THEN BEGIN
-                      UpdateConsumeFlag(TRUE,TRUE,TRUE);
-                   END ELSE BEGIN
-                      UpdateConsumeFlag(TRUE,FALSE,FALSE);
-                   END;
-                END;
-                
-                
-                IF "Shipment Date Confirmed" = TRUE THEN BEGIN
-                  IF Type <> Type::Item THEN
-                    ERROR(Text0053);
-                  IF "Document No." = '' THEN
-                    ERROR(Text0054);
-                  //>> 15-12-20 ZY-LD 039
-                  {IF "Warehouse Status" <> "Warehouse Status"::New THEN
-                    ERROR(Text0055,"Warehouse Status");  // 27-08-19 ZY-LD 028}
-                  //<< 15-12-20 ZY-LD 039
-                
-                  //>> 29-10-18 ZY-LD 015
-                  IF NOT ConfirmDate THEN BEGIN
-                    IF CONFIRM(Text0064,FALSE,FieldCaption("Shipment Date")) THEN BEGIN
-                      GetSalesHeader;
-                      "Shipment Date" :=
-                        AllInDates.CalcShipmentDate(
-                          "Sell-to Customer No.",  // 21-08-19 ZY-LD 027
-                          "No.",  // 19-03-19 ZY-LD 024
-                          SalesHeader."Ship-to Country/Region Code",
-                          "Shortcut Dimension 1 Code",
-                          "Shipment Date",
-                          TRUE);  // 14-11-18 ZY-LD 020
-                    END;
-                  END ELSE
-                    IF NOT DontUpdateDeliveryDates THEN BEGIN
-                      GetSalesHeader;
-                      "Shipment Date" :=
-                        AllInDates.CalcShipmentDate(
-                          "Sell-to Customer No.",  // 21-08-19 ZY-LD 027
-                          "No.",  // 19-03-19 ZY-LD 024
-                          SalesHeader."Ship-to Country/Region Code",
-                          "Shortcut Dimension 1 Code",
-                          "Shipment Date",
-                          TRUE);  // 14-11-18 ZY-LD 020
-                    END;
-                
-                  //  IF NOT ConfirmDate THEN BEGIN
-                  //    IF CONFIRM(Text0064,FALSE,FieldCaption("Shipment Date")) THEN BEGIN
-                  //      IF "Shipment Date" <> 0D THEN
-                  //        recSalesHeader.SETFILTER("No.","Document No.");
-                  //      IF recSalesHeader.FINDFIRST THEN BEGIN
-                  //        IF recSalesHeader."Ship-to Country/Region Code" = 'GB' THEN
-                  //          ShipTime := '12';
-                  //        IF recSalesHeader."Ship-to Country/Region Code" <> 'GB' THEN
-                  //          ShipTime := '13';
-                  //        NewShipmentDate := AllInDates.xCalcShipmentDate(recSalesHeader."Ship-to Country/Region Code","Shipment Date") ;
-                  //        Now := FORMAT(TIME);
-                  //        IF (COPYSTR(Now, 1,2) >= ShipTime) AND (NewShipmentDate <= CALCDATE('<+1D>', TODAY)) THEN BEGIN
-                  //          NewShipmentDate := AllInDates.xCalcShipmentDate(recSalesHeader."Ship-to Country/Region Code",
-                  //          CALCDATE('<+1D>', NewShipmentDate)) ;
-                  //        END;
-                  //        "Shipment Date" := NewShipmentDate;
-                  //      END;
-                  //    END;
-                  //  END;
-                  //
-                  //  IF ConfirmDate THEN BEGIN
-                  //    IF NOT DontUpdateDeliveryDates THEN BEGIN
-                  //      IF "Shipment Date" <> 0D THEN
-                  //        recSalesHeader.SETFILTER("No.","Document No.");
-                  //      IF  recSalesHeader.FINDFIRST THEN BEGIN
-                  //        IF recSalesHeader."Ship-to Country/Region Code" = 'GB' THEN
-                  //          ShipTime := '12';
-                  //        IF recSalesHeader."Ship-to Country/Region Code" <> 'GB' THEN
-                  //          ShipTime := '13';
-                  //        NewShipmentDate := AllInDates.xCalcShipmentDate(recSalesHeader."Ship-to Country/Region Code","Shipment Date") ;
-                  //        Now := FORMAT(TIME);
-                  //        IF (COPYSTR(Now, 1,2) >= ShipTime) AND (NewShipmentDate <= CALCDATE('<+1D>', TODAY)) THEN BEGIN
-                  //          NewShipmentDate := AllInDates.xCalcShipmentDate(recSalesHeader."Ship-to Country/Region Code",
-                  //          CALCDATE('<+1D>', NewShipmentDate)) ;
-                  //        END;
-                  //        "Shipment Date" := NewShipmentDate;
-                  //        "Shipment Date" := AllInDates.CalcShipmentDate(recSalesHeader."Ship-to Country/Region Code","Shipment Date",TRUE);
-                  //      END;
-                  //    END;
-                  //  END;
-                  //<< 29-10-18 ZY-LD 015
-                END ELSE
-                  "Shipment Date" := 0D;  // 19-03-19 024*/
-                //<< 30-12-20 ZY-LD 040
-            end;
         }
         field(62024; "Lock by Ref Document"; Boolean)
         {
@@ -621,7 +527,7 @@ tableextension 50117 SalesLineZX extends "Sales Line"
                 Location.Get(Rec."Location Code");
 
                 if (Location."Sales Order Type" <> SalesHeader."Sales Order Type") and
-                   (Location."Sales Order Type 2" <> SalesHeader."Sales Order Type")  // 21-02-20 ZY-LD 031
+                   (Location."Sales Order Type 2" <> SalesHeader."Sales Order Type")
                 then
                     Error(LMSG000);
             end;
@@ -636,7 +542,6 @@ tableextension 50117 SalesLineZX extends "Sales Line"
         Item: Record Item;
         LEMSG000: Label 'Item %1 is not match Sales Order Type %2!';
     begin
-        //Tectura Taiwan ZL100526A+
         SalesSetup.Get();
         if (Rec."Document Type" = Rec."document type"::Order) and
            (SalesSetup."Sales Order Type Mandatory") then begin
@@ -655,148 +560,33 @@ tableextension 50117 SalesLineZX extends "Sales Line"
                        ((Rec."Sales Order Type" <> Rec."sales order type"::EICard) and
                        (Item.IsEICard)) then
                         Error(LEMSG000, Item."No.", Rec."Sales Order Type");
-                    //Tectura Taiwan ZL100528A+
-                    //         IF ("Location Code"<>SOHeader."Location Code") THEN VALIDATE("Location Code",SOHeader."Location Code");
-                    //         IF (SOHeader."Sales Order Type"<>0) THEN VALIDATE("Sales Order Type",SOHeader."Sales Order Type");
-                    //Tectura Taiwan ZL100528A-
                 end;
             end;
         end;
 
-        //Tectura Taiwan ZL100526A-
     end;
 
     procedure UpdateQtytoPick()
     begin
-        //Tectura Taiwan ZL100526A+
-        //ZL110527A+
         if (Rec.Type <> Rec.Type::Item) then exit;
         if (Rec.Quantity <= 0) then exit;
-        //ZL110527A-
-
-        //CALCFIELDS("Qty in Picking (Released)","Qty in Picking (Open)");
-        //"Qty to Picking":=Quantity-"Qty in Picking (Released)"-"Qty in Picking (Open)";
-        //ZL111006A+
-        //ZL110527A+
-        //IF (Quantity>0) AND ("Qty to Picking"<0) THEN ERROR(LEMSG000,"Qty in Picking (Released)"+"Qty in Picking (Open)");
-        //ZL110527A-
-        //ZL111006A-
-        //Tectura Taiwan ZL100526A-
     end;
 
     procedure CheckPicking()
     begin
-        //Tectura Taiwan ZL100526A+
-        //ZL110527A+
         if (Rec.Type <> Rec.Type::Item) then exit;
         if (Rec.Quantity <= 0) then exit;
-        //ZL110527A-
-        /*
-        CALCFIELDS("Qty in Picking (Released)","Qty in Picking (Open)");
-        IF (("No."<>xRec."No.") OR ("Location Code"<>xRec."Location Code")) AND
-           (("Qty in Picking (Released)">0) OR ("Qty in Picking (Open)">0)) THEN ERROR(LEMSG000);
-        //Tectura Taiwan ZL100526A-
-        */
 
     end;
 
     procedure UpdateConsumeFlag(RollBack: Boolean; Recalc: Boolean; ForceSon: Boolean)
     begin
-        //>> 01-11-18 ZY-LD 018
-        //IF ISTEMPORARY THEN
-        //  EXIT;
-        //<< 01-11-18 ZY-LD 018
-        //ZL110426A+
-        //"FCST Rollback":=RollBack;
-        //"FCST Recalculate":=Recalc;
-        //"FCST Force Consume":=ForceSon;
-        //CLEAR(SOLine);
-        //IF SOLine.GET("Document Type","Document No.","Line No.") THEN MODIFY;
-        //ZL110426A-
+
     end;
 
     procedure UpdateActionCode()
     begin
 
-        // lrSalesAction.SETRANGE(lrSalesAction."Sales No", "Document No.");
-        // lrSalesAction.SETRANGE(lrSalesAction."Sales Line", "Line No.");
-        // lrSalesAction.DELETEALL;
-        //
-        // IF "Line No." = 0 THEN
-        //  EXIT;
-        // IF Type <> Type::Item THEN
-        //  EXIT;
-        //
-        // UseShipToActionCodes := FALSE;
-        // recCustomer.SETFILTER("No.","Sell-to Customer No.");
-        // IF recCustomer.FINDFIRST THEN
-        //  IF recCustomer."Action Code Source" = recCustomer."Action Code Source"::"Ship-to Customer" THEN
-        //       UseShipToActionCodes := TRUE;
-        //
-        // // Sell To
-        // IF NOT UseShipToActionCodes THEN BEGIN
-        //    lrDefaultAction.RESET;
-        //    lrDefaultAction.SETRANGE(lrDefaultAction.Table, lrDefaultAction.Table::Customer);
-        //    lrDefaultAction.SETRANGE(lrDefaultAction.Number, "Sell-to Customer No.");
-        //    IF lrDefaultAction.FINDFIRST THEN BEGIN
-        //        REPEAT
-        //          //PAB
-        //          lrSalesAction1.SETRANGE("Sales Type","Document Type");
-        //          lrSalesAction1.SETRANGE("Sales No","Document No.");
-        //          lrSalesAction1.SETRANGE("Sales Line","Line No.");
-        //          lrSalesAction1.SETRANGE("Action Code",lrDefaultAction."Action Code");
-        //          IF NOT lrSalesAction1.FINDFIRST THEN BEGIN
-        //            lrSalesAction.INIT;
-        //            lrSalesAction."Sales Type" := "Document Type";
-        //            lrSalesAction."Sales No" := "Document No.";
-        //            lrSalesAction."Sales Line" := "Line No.";
-        //            lrSalesAction."Action Code" := lrDefaultAction."Action Code";
-        //            lrSalesAction.INSERT;
-        //          END;
-        //        UNTIL lrDefaultAction.Next() = 0;
-        //    END;
-        // END;
-        //
-        // // Ship To
-        // IF UseShipToActionCodes THEN BEGIN
-        //      recSalesHeader.SETFILTER("No.","Document No.");
-        //      IF recSalesHeader.FINDFIRST THEN
-        //        Shipto := recSalesHeader."Ship-to Code";
-        //
-        //      lrDefaultAction.RESET;
-        //         lrDefaultAction.SETRANGE(lrDefaultAction.Table, lrDefaultAction.Table::"Ship-to Address");
-        //      lrDefaultAction.SETRANGE(lrDefaultAction."Customer No.", "Sell-to Customer No.");
-        //
-        //
-        //      lrDefaultAction.SETRANGE(lrDefaultAction.Number,Shipto);
-        //     IF lrDefaultAction.FINDFIRST THEN BEGIN
-        //        REPEAT
-        //          lrSalesAction.INIT;
-        //          lrSalesAction."Sales Type" := "Document Type";
-        //          lrSalesAction."Sales No" := "Document No.";
-        //          lrSalesAction."Sales Line" := "Line No.";
-        //          lrSalesAction."Action Code" := lrDefaultAction."Action Code";
-        //          lrSalesAction.INSERT
-        //        UNTIL lrDefaultAction.Next() = 0;
-        //      END;
-        //
-        // END;
-        //
-        // // Item
-        //
-        //    lrDefaultAction.RESET;
-        //    lrDefaultAction.SETRANGE(lrDefaultAction.Table, lrDefaultAction.Table::Item);
-        //    lrDefaultAction.SETRANGE(lrDefaultAction.Number, "No.");
-        //    IF lrDefaultAction.FINDFIRST THEN BEGIN
-        //      REPEAT
-        //        lrSalesAction.INIT;
-        //        lrSalesAction."Sales Type" := "Document Type";
-        //        lrSalesAction."Sales No" := "Document No.";
-        //        lrSalesAction."Sales Line" := "Line No.";
-        //        lrSalesAction."Action Code" := lrDefaultAction."Action Code";
-        //        lrSalesAction.INSERT
-        //      UNTIL lrDefaultAction.Next() = 0;
-        //    END;
     end;
 
     procedure DeliveryDocument()

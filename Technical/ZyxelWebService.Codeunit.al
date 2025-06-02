@@ -142,14 +142,6 @@ codeunit 50082 "Zyxel Web Service"
     end;
 
 
-    // procedure SendPermissions(Permission: XmlPort "WS Replicate Permissions"): Boolean
-    // begin
-    //     Permission.Import;
-    //     Permission.ReplicateData;
-    //     exit(true);
-    // end;
-
-
     procedure SendUserSetups(UserSetup: XmlPort "WS Replicate User Setup"): Boolean
     begin
         UserSetup.Import;
@@ -237,11 +229,9 @@ codeunit 50082 "Zyxel Web Service"
 
     procedure SendUseOfReport(UseOfReports: XmlPort "WS Use of Report"): Boolean
     begin
-        //>> 16-10-20 ZY-LD 006
         UseOfReports.Import;
         UseOfReports.InsertData;
         exit(true);
-        //<< 16-10-20 ZY-LD 006
     end;
 
 
@@ -259,18 +249,7 @@ codeunit 50082 "Zyxel Web Service"
     var
         recCust: Record Customer;
     begin
-        //>> 11-07-24 ZY-LD 000
-        // //>> 19-08-19 ZY-LD 003
-        // if ZNetCompany then begin
-        //     if ZGT.CompanyNameIs(11) or ZGT.TurkishServer then  // ZyND DE |ZyND TR
-        //         recCust.SetRange("No.", '200000', '299999')
-        // end else
-        //     recCust.SetFilter("No.", '<%1|>%2', '200000', '299999');
-        // //<< 19-08-19 ZY-LD 003
-        // recCust.SetFilter("Balance Due (LCY)", '<>0');
-        // recCust.SetRange("Related Company", false);  // 27-08-19 ZY-LD 004
-        // Customers.SetTableView(recCust);
-        Customers.SetData();  //<< 11-07-24 ZY-LD 000
+        Customers.SetData();
         Customers.Export;
     end;
 
@@ -341,13 +320,6 @@ codeunit 50082 "Zyxel Web Service"
     end;
 
 
-    // procedure GetConcurVendor(VendorNo: Code[20];var Vendors: XmlPort "WS Concur Vendors")
-    // begin
-    //     Vendors.SetData_WebService(VendorNo);
-    //     Vendors.Export;
-    // end;
-
-
     procedure GetConcurValidation(SourceTable: Integer; SourceFieldNo: Integer; SourceCode: Code[20]) rValue: Boolean
     var
         recGLAcc: Record "G/L Account";
@@ -376,21 +348,6 @@ codeunit 50082 "Zyxel Web Service"
         //<< 18-02-22 ZY-LD 006
         end;
     end;
-
-
-    // procedure SendConcurVendor(var Vendors: XmlPort "WS Concur Vendors") rValue: Code[20]
-    // begin
-    //     Vendors.Import;
-    //     rValue := Vendors.ReplicateVendor;
-    // end;
-
-
-    // procedure SendConcurPurchaseDocument(PurchaseDocuments: XmlPort "WS Concur Purchase Document"): Boolean
-    // begin
-    //     PurchaseDocuments.Import;
-    //     PurchaseDocuments.InsertData;
-    //     exit(true);
-    // end;
 
 
     procedure ProcessHQSalesDocument(): Boolean
@@ -446,18 +403,6 @@ codeunit 50082 "Zyxel Web Service"
         Codeunit.Run(Codeunit::"Process SII Spain");
         exit(true);
     end;
-
-
-    // procedure VendorCreatedInConcur(CompanyName: Text[30]; VendorNo: Code[20]) rValue: Boolean
-    // var
-    //     recConcVendComp: Record "Concur Vendor Company";
-    // begin
-    //     recConcVendComp.SetCurrentkey("Company Name", "Vendor No.");
-    //     recConcVendComp.SetRange("Company Name", CompanyName);
-    //     recConcVendComp.SetRange("Vendor No.", VendorNo);
-    //     rValue := recConcVendComp.FindFirst;
-    // end;
-
 
     procedure SendSalesInvoiceNo(pRHQSalesInvNo: Code[20]; pSubSalesInvNo: Code[20]): Boolean
     var

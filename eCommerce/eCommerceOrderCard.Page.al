@@ -1,7 +1,5 @@
 page 50239 "eCommerce Order Card"
 {
-    // 001. 24-05-23 ZY-LD 000 - Give Away orders.
-    // 002. 08-08-23 ZY-LD 000 - "Tax Address Role" is set to editable.
 
     Caption = 'eCommerce Order Card';
     InsertAllowed = false;
@@ -19,37 +17,44 @@ page 50239 "eCommerce Order Card"
                     field("Transaction Type"; Rec."Transaction Type")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies Transaction Type';
                         Editable = false;
                     }
                     field("eCommerce Order Id"; Rec."eCommerce Order Id")
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Order ID';
+                        ToolTip = 'Specifies Order ID';
                         Editable = false;
                     }
                     field("Invoice No."; Rec."Invoice No.")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies Invoice No.';
                         Editable = false;
                     }
                     field("Give Away Order"; Rec."Give Away Order")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies Give Away Order';
                     }
                 }
                 field("Marketplace ID"; Rec."Marketplace ID")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies MarketPlace ID';
                     Editable = false;
                 }
                 field("Order Date"; Rec."Order Date")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Order Date';
                     Editable = false;
                 }
                 field("Requested Delivery Date"; Rec."Requested Delivery Date")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Requested Delivery Date';
                     Editable = false;
                 }
             }
@@ -66,57 +71,69 @@ page 50239 "eCommerce Order Card"
                 field("VAT Bus. Posting Group"; Rec."VAT Bus. Posting Group")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies VAT Bus. Posting Group';
                     Importance = Promoted;
                 }
                 Field("Alt. VAT Bus. Posting Group"; Rec."Alt. VAT Bus. Posting Group")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Alt. VAT Bus. Posting Group';
                     Importance = Additional;
                 }
                 Field("Prices Including VAT"; Rec."Prices Including VAT")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Prices Including VAT';
                     Importance = Additional;
                 }
                 field("Country Dimension"; Rec."Country Dimension")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Country Dimension';
                 }
                 field("Sell-to Type"; Rec."Sell-to Type")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Sell-To Type';
                     Importance = Promoted;
                 }
                 field("Tax Type"; Rec."Tax Type")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Tax Type';
                 }
                 field("Tax Calculation Reason Code"; Rec."Tax Calculation Reason Code")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Tax Calculation Reason Code';
                 }
                 field("Tax Reporting Scheme"; Rec."Tax Reporting Scheme")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Tax Reporting Scheme';
                     Importance = Additional;
                 }
                 field("Tax Collection Respons."; Rec."Tax Collection Respons.")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Tax Collection Respons';
                 }
                 field("Tax Address Role"; Rec."Tax Address Role")
                 {
                     ApplicationArea = Basic, Suite;
-                    Editable = true;  // 08-08-23 ZY-LD 002
+                    ToolTip = 'Specifies Tax Address Role';
+                    Editable = true;
                 }
                 field("Tax Rate"; Rec."Tax Rate")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Tax Rate';
                     Editable = Rec."Tax Rate" = 0;
                 }
                 field("Alt. Tax Rate"; Rec."Alt. Tax Rate")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Alt. Tax Rate';
                     Importance = Additional;
                 }
                 group(Control37)
@@ -124,36 +141,43 @@ page 50239 "eCommerce Order Card"
                     field("Buyer Tax Reg. Type"; Rec."Buyer Tax Reg. Type")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies Buyer Tax Reg. Type';
                     }
                     field("Purchaser VAT No."; Rec."Purchaser VAT No.")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies Purchase VAT No.';
                     }
                     field("VAT Registration No. Zyxel"; Rec."VAT Registration No. Zyxel")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies VAT Registation No. Zyxel';
                         Editable = ForceUser; //20-05-2025 BK #503059
                     }
                     field("Alt. VAT Reg. No. Zyxel"; Rec."Alt. VAT Reg. No. Zyxel")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies Alt. VAT Reg. No. Zyxel';
                     }
 
                     field("Invoice Download"; Rec."Invoice Download")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies Invoice Download';
                         ExtendedDatatype = URL;
                         Importance = Additional;
                     }
                     field("Sales Document Type"; Rec."Sales Document Type")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies Sales Document Type';
                     }
                 }
             }
             group(Shipping)
             {
                 Caption = 'Shipping';
+
                 group("Ship From")
                 {
                     Caption = 'Ship-from';
@@ -161,23 +185,28 @@ page 50239 "eCommerce Order Card"
                     field("Ship From City"; Rec."Ship From City")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies Ship From City';
                     }
                     field("Ship From State"; Rec."Ship From State")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies Shi From State';
                     }
                     field("Ship From Country"; Rec."Ship From Country")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies Ship From Country';
                         Importance = Promoted;
                     }
                     field("Ship From Postal Code"; Rec."Ship From Postal Code")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies Ship From Postal Code';
                     }
                     field("Ship From Tax Location Code"; Rec."Ship From Tax Location Code")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies ';
                     }
                 }
                 group("Ship To")
@@ -187,23 +216,28 @@ page 50239 "eCommerce Order Card"
                     field("Ship To City"; Rec."Ship To City")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies Ship To City';
                     }
                     field("Ship To State"; Rec."Ship To State")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies Ship To State';
                     }
                     field("Ship To Country"; Rec."Ship To Country")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies Ship To Country';
                         Importance = Promoted;
                     }
                     field("Ship To Postal Code"; Rec."Ship To Postal Code")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies Ship To Postal Code';
                     }
                     field(PurchaserVATNo2; Rec."Purchaser VAT No.")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies Purchase VAT No. 2';
                     }
                 }
             }
@@ -213,6 +247,7 @@ page 50239 "eCommerce Order Card"
                 field("Currency Code"; Rec."Currency Code")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Currency Code';
                     Importance = Promoted;
                 }
             }
@@ -222,14 +257,17 @@ page 50239 "eCommerce Order Card"
                 field("Applies-to Doc. Type"; Rec."Applies-to Doc. Type")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Applies To Doc. Type';
                 }
                 field("Applies-to Doc. No."; Rec."Applies-to Doc. No.")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Applies To Doc. No.';
                 }
                 field("Applies-to ID"; Rec."Applies-to ID")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Applies To ID';
                 }
             }
         }
@@ -259,10 +297,11 @@ page 50239 "eCommerce Order Card"
     {
         area(processing)
         {
-            action("Mark the Order as ""Give Away""")
+            action("Mark the Order as Give Away")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Mark Order as "Give Away"';
+                ToolTip = 'Please mark if the order is a Give Away order.';
                 Image = Apply;
                 Visible = MarkGiveAwayVisible;
 
@@ -270,27 +309,25 @@ page 50239 "eCommerce Order Card"
                 begin
                     //>> 24-05-23 ZY-LD 001
                     if Confirm(Text001) then begin
-                        Rec.UpdateGiveAwayOrder;
-                        SetActions;
+                        Rec.UpdateGiveAwayOrder();
+                        SetActions();
                     end;
-                    //<< 24-05-23 ZY-LD 001
                 end;
             }
-            action("Unmark the Order as ""Give Away""")
+            action("Unmark the Order as Give Away")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Unmark Order as "Give Away"';
+                ToolTip = 'Undo marking the Order as Give away';
                 Image = Apply;
                 Visible = UnmarkGiveAwayVisible;
 
                 trigger OnAction()
                 begin
-                    //>> 24-05-23 ZY-LD 001
                     if Confirm(Text001) then begin
-                        Rec.UpdateGiveAwayOrder;
-                        SetActions;
+                        Rec.UpdateGiveAwayOrder();
+                        SetActions();
                     end;
-                    //<< 24-05-23 ZY-LD 001
                 end;
             }
         }
@@ -307,12 +344,12 @@ page 50239 "eCommerce Order Card"
     end;
 
     var
-        Text001: Label 'Do you want to update "Give Away Order"?';
+        UserSetup: Record "User Setup"; //20-05-2025 BK #503059
         GiveAwayVisible: Boolean;
         MarkGiveAwayVisible: Boolean;
         UnmarkGiveAwayVisible: Boolean;
-        UserSetup: Record "User Setup"; //20-05-2025 BK #503059
         ForceUser: Boolean; //20-05-2025 BK #503059
+        Text001: Label 'Do you want to update "Give Away Order"?';
 
     local procedure SetActions()
     begin
