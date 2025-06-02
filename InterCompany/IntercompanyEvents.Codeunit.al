@@ -50,7 +50,7 @@ codeunit 50048 "Intercompany Events"
         ICOutBoxSalesHeader."Ship-to Address 2" := SalesInvHdr."Ship-to Address 2";
         ICOutBoxSalesHeader."Ship-to Post Code" := SalesInvHdr."Ship-to Post Code";
         ICOutBoxSalesHeader."Ship-to Country/Region Code" := SalesInvHdr."Ship-to Country/Region Code";
-        ICOutBoxSalesHeader."Ship-to Contact" := SalesInvHdr."Ship-to Contact";
+        ICOutBoxSalesHeader."Ship-to Contact" := copystr(SalesInvHdr."Ship-to Contact", 1, 50);
         ICOutBoxSalesHeader."Ship-to County" := SalesInvHdr."Ship-to County";
         ICOutBoxSalesHeader."Ship-to E-Mail" := SalesInvHdr."Ship-to E-Mail";
         ICOutBoxSalesHeader."Ship-to VAT" := SalesInvHdr."Ship-to VAT";
@@ -301,9 +301,9 @@ codeunit 50048 "Intercompany Events"
         PurchHeader."Ship-to Contact" := ICInboxPurchHeader."Ship-to Contact";
         PurchHeader."Ship-to County" := ICInboxPurchHeader."Ship-to County";
         PurchHeader."Ship-to E-Mail" := ICInboxPurchHeader."Ship-to E-Mail";
-        PurchHeader."Ship-to VAT" := ICInboxPurchHeader."Ship-to VAT";
+        PurchHeader."Ship-to VAT" := copystr(ICInboxPurchHeader."Ship-to VAT", 1, 40);
         PurchHeader."eCommerce Order" := ICInboxPurchHeader."eCommerce Order";
-        PurchHeader."Reference 2" := ICInboxPurchHeader."Your Reference 2";
+        PurchHeader."Reference 2" := copystr(ICInboxPurchHeader."Your Reference 2", 1, 30);
         if ICpartner.get(ICInboxPurchHeader."IC Partner Code") then;
         if not ICpartner.Skip_sellCustomer then begin
 
@@ -313,14 +313,13 @@ codeunit 50048 "Intercompany Events"
 
         if (PurchHeader."Document Type" in [PurchHeader."Document Type"::Invoice, PurchHeader."Document Type"::"Credit Memo"]) and
            (ICInboxPurchHeader."Location Code" <> '')
-        then begin
+        then
             PurchHeader.Validate("Location Code", ICInboxPurchHeader."Location Code");
-        end;
         PurchHeader."Your Reference" := ICInboxPurchHeader."Your Reference";
         PurchHeader."Location Code" := ICInboxPurchHeader."Location Code";
-        PurchHeader."Ship-to VAT" := ICInboxPurchHeader."Ship-to VAT";
+        PurchHeader."Ship-to VAT" := Copystr(ICInboxPurchHeader."Ship-to VAT", 1, 40);
         PurchHeader."eCommerce Order" := ICInboxPurchHeader."eCommerce Order";
-        PurchHeader."Reference 2" := ICInboxPurchHeader."Your Reference 2";
+        PurchHeader."Reference 2" := copystr(ICInboxPurchHeader."Your Reference 2", 1, 30);
         PurchHeader."Purchaser Code" := ICInboxPurchHeader."Salesperson Code";
         PurchHeader."VAT Bus. Posting Group" := ZyxelProof(ICInboxPurchHeader, PurchHeader);
     end;
@@ -370,7 +369,7 @@ codeunit 50048 "Intercompany Events"
 
     begin
         if Vend.get(PurchaseHeader."Buy-from Vendor No.") and Vend."Sample Vendor" then begin
-            ICSetup.get;
+            ICSetup.get();
             ICSetup.TestField("Sample Item");
             PurchLine.SetRange("Document Type", PurchaseHeader."Document Type");
             PurchLine.SetRange("Document No.", PurchaseHeader."No.");
@@ -505,7 +504,7 @@ codeunit 50048 "Intercompany Events"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"ICInboxOutboxMgt", 'OnBeforeICInboxSalesHeaderInsert', '', false, false)]
     local procedure OnBeforeICInboxSalesHeaderInsert(var ICInboxSalesHeader: Record "IC Inbox Sales Header"; ICOutboxPurchaseHeader: Record "IC Outbox Purchase Header")
     begin
-        ICInboxSalesHeader."Ship-to Contact" := ICOutboxPurchaseHeader."Ship-to Contact";
+        ICInboxSalesHeader."Ship-to Contact" := Copystr(ICOutboxPurchaseHeader."Ship-to Contact", 1, 30);
         ICInboxSalesHeader."Ship-to County" := ICOutboxPurchaseHeader."Ship-to County";
         ICInboxSalesHeader."Ship-to E-Mail" := ICOutboxPurchaseHeader."Ship-to E-Mail";
         ICInboxSalesHeader."Ship-to VAT" := ICOutboxPurchaseHeader."Ship-to VAT";
@@ -523,7 +522,7 @@ codeunit 50048 "Intercompany Events"
         if PurchaseLine.Type = PurchaseLine.Type::Item then begin
             Vend.get(PurchaseHeader."Buy-from Vendor No.");
             if Vend."Sample Vendor" then begin
-                ICSetup.get;
+                ICSetup.get();
                 ICSetup.TestField("Sample Item");
                 SaveItemNo := PurchaseLine."No.";
                 PurchaseLine.Validate("No.", ICSetup."Sample Item");

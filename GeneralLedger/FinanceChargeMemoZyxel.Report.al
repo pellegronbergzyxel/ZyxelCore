@@ -3,11 +3,13 @@ report 50089 "Finance Charge Memo Zyxel"
     //25-04-2025 BK #500760  
     //   Created, based on R118.
 
-
     DefaultLayout = RDLC;
-    RDLCLayout = './Layouts/FinanceChargeMemo Zyxel.rdlc';
 
+    RDLCLayout = './Layouts/FinanceChargeMemo Zyxel.rdlc';
+    ApplicationArea = Basic, Suite;
+    UsageCategory = ReportsAndAnalysis;
     Caption = 'Finance Charge Memo';
+    PreviewMode = PrintLayout;
 
     dataset
     {
@@ -238,14 +240,14 @@ report 50089 "Finance Charge Memo Zyxel"
                         Clear(DimText);
                         Continue := false;
                         repeat
-                            OldDimText := DimText;
+                            OldDimText := copystr(DimText, 1, 75);
                             if DimText = '' then
                                 DimText := StrSubstNo('%1 - %2', DimSetEntry."Dimension Code", DimSetEntry."Dimension Value Code")
                             else
                                 DimText :=
-                                  StrSubstNo(
+                                  copystr(StrSubstNo(
                                     '%1; %2 - %3', DimText,
-                                    DimSetEntry."Dimension Code", DimSetEntry."Dimension Value Code");
+                                    DimSetEntry."Dimension Code", DimSetEntry."Dimension Value Code"), 1, 120);
                             if StrLen(DimText) > MaxStrLen(OldDimText) then begin
                                 DimText := OldDimText;
                                 Continue := true;
@@ -577,11 +579,11 @@ report 50089 "Finance Charge Memo Zyxel"
                 if "Your Reference" = '' then
                     ReferenceText := ''
                 else
-                    ReferenceText := FieldCaption("Your Reference");
+                    ReferenceText := Copystr(FieldCaption("Your Reference"), 1, 35);
                 if "Issued Fin. Charge Memo Header".GetCustomerVATRegistrationNumber() = '' then
                     VATNoText := ''
                 else
-                    VATNoText := "Issued Fin. Charge Memo Header".GetCustomerVATRegistrationNumberLbl();
+                    VATNoText := copystr("Issued Fin. Charge Memo Header".GetCustomerVATRegistrationNumberLbl(), 1, 30);
 
                 Customer.GetPrimaryContact("Customer No.", PrimaryContact);
                 if "Currency Code" = '' then begin

@@ -227,8 +227,6 @@ table 50103 "eCommerce Order Header"
             var
                 recAmzCtryMapTo: Record "eCommerce Country Mapping";
                 recAmzCtryMapFrom: Record "eCommerce Country Mapping";
-                recVatPostSetup: Record "VAT Posting Setup";
-                recVatBusPostGrp: Record "VAT Business Posting Group";
                 recCountry: Record "Country/Region";
                 recAmzOrderLine: Record "eCommerce Order Line";
             begin
@@ -249,9 +247,9 @@ table 50103 "eCommerce Order Header"
                         if "Sell-to Type" = "sell-to type"::Consumer then begin
                             case "Tax Address Role" of
                                 "tax address role"::"Ship-from":
-                                    "VAT Bus. Posting Group" := recAmzCtryMapFrom."VAT Bus. Posting Group";
+                                    "VAT Bus. Posting Group" := Copystr(recAmzCtryMapFrom."VAT Bus. Posting Group", 1, 10);
                                 "tax address role"::"Ship-to":
-                                    "VAT Bus. Posting Group" := recAmzCtryMapTo."VAT Bus. Posting Group";
+                                    "VAT Bus. Posting Group" := Copystr(recAmzCtryMapTo."VAT Bus. Posting Group", 1, 10);
                             end;
 
                             if "Tax Calculation Reason Code" = "tax calculation reason code"::"Not Taxable" then begin
@@ -264,38 +262,32 @@ table 50103 "eCommerce Order Header"
                                         recAmzOrderLine.Modify(true);
                                     until recAmzOrderLine.Next() = 0;
                             end;
-                        end else begin  // Business
-                            if (recAmzCtryMapFrom."Ship-to Country Code" = recAmzCtryMapFrom."Ship-to Country Code") and
-                               (recAmzCtryMapFrom."Domestic Reverse Charge")
-                            then
-                                "VAT Bus. Posting Group" := recAmzMktPlace."VAT Bus Posting Group (EU)"
-                            else begin
+                        end else // Business
+                            if (recAmzCtryMapFrom."Ship-to Country Code" = recAmzCtryMapFrom."Ship-to Country Code") and (recAmzCtryMapFrom."Domestic Reverse Charge") then
+                                "VAT Bus. Posting Group" := Copystr(recAmzMktPlace."VAT Bus Posting Group (EU)", 1, 10)
+                            else
                                 if "Ship To Country" = "Ship From Country" then begin
                                     case "Tax Address Role" of
                                         "tax address role"::"Ship-from":
-                                            "VAT Bus. Posting Group" := recAmzCtryMapFrom."VAT Bus. Posting Group";
+                                            "VAT Bus. Posting Group" := Copystr(recAmzCtryMapFrom."VAT Bus. Posting Group", 1, 10);
                                         "tax address role"::"Ship-to":
-                                            "VAT Bus. Posting Group" := recAmzCtryMapTo."VAT Bus. Posting Group";
+                                            "VAT Bus. Posting Group" := Copystr(recAmzCtryMapTo."VAT Bus. Posting Group", 1, 10);
                                     end;
                                 end else
                                     if "Tax Rate" = 0 then
-                                        "VAT Bus. Posting Group" := recAmzMktPlace."VAT Bus Posting Group (EU)"
+                                        "VAT Bus. Posting Group" := copystr(recAmzMktPlace."VAT Bus Posting Group (EU)", 1, 10)
                                     else
                                         case "Tax Address Role" of
                                             "tax address role"::"Ship-from":
-                                                "VAT Bus. Posting Group" := recAmzCtryMapFrom."VAT Bus. Posting Group";
+                                                "VAT Bus. Posting Group" := Copystr(recAmzCtryMapFrom."VAT Bus. Posting Group", 1, 10);
                                             "tax address role"::"Ship-to":
-                                                "VAT Bus. Posting Group" := recAmzCtryMapTo."VAT Bus. Posting Group";
+                                                "VAT Bus. Posting Group" := Copystr(recAmzCtryMapTo."VAT Bus. Posting Group", 1, 10);
                                         end;
-                            end;
-                        end;
-                    end else begin  // Export outside of EU
-
+                    end else // Export outside of EU
                         if recAmzCtryMapTo."Use Country VAT Bus. Post Grp." then
-                            "VAT Bus. Posting Group" := recAmzCtryMapTo."VAT Bus. Posting Group"
+                            "VAT Bus. Posting Group" := Copystr(recAmzCtryMapTo."VAT Bus. Posting Group", 1, 10)
                         else
-                            "VAT Bus. Posting Group" := recAmzMktPlace."VAT Bus Posting Group (No VAT)";
-                    end;
+                            "VAT Bus. Posting Group" := Copystr(recAmzMktPlace."VAT Bus Posting Group (No VAT)", 1, 10);
                 end;
             end;
         }
@@ -573,7 +565,7 @@ table 50103 "eCommerce Order Header"
                 recEcomOrderLine.SETRANGE("Transaction Type", "Transaction Type");
                 recEcomOrderLine.SETRANGE("eCommerce Order Id", "eCommerce Order Id");
                 recEcomOrderLine.SETRANGE("Invoice No.", "Invoice No.");
-                IF recEcomOrderLine.FINDFIRST THEN BEGIN
+                IF recEcomOrderLine.FINDFIRST() THEN BEGIN
                     IF recVatPosingSetup.GET("Alt. VAT Bus. Posting Group", recEcomOrderLine."VAT Prod. Posting Group") THEN
                         VALIDATE("Alt. Tax Rate", recVatPosingSetup."VAT %")
                     ELSE
@@ -581,14 +573,14 @@ table 50103 "eCommerce Order Header"
 
                     recAmzMktPlace.GET("Marketplace ID");
                     REPEAT
-                        recEcomOrderLine."VAT Prod. Posting Group" := recAmzMktPlace."VAT Prod. Posting Group";
+                        recEcomOrderLine."VAT Prod. Posting Group" := Copystr(recAmzMktPlace."VAT Prod. Posting Group", 1, 10);
                         recEcomOrderLine.MODIFY(TRUE);
-                    UNTIL recEcomOrderLine.NEXT = 0;
+                    UNTIL recEcomOrderLine.NEXT() = 0;
                 END;
                 VALIDATE("Prices Including VAT", "Alt. VAT Bus. Posting Group" <> '');
                 IF "Alt. VAT Bus. Posting Group" <> '' THEN BEGIN
                     recAmzCountryMap.GET(recAmzMktPlace."Customer No.", "Ship From Country");
-                    VALIDATE("Alt. VAT Reg. No. Zyxel", recAmzCountryMap."Ship-to VAT No.");
+                    VALIDATE("Alt. VAT Reg. No. Zyxel", copystr(recAmzCountryMap."Ship-to VAT No.", 1, 20));
                 END ELSE
                     VALIDATE("Alt. VAT Reg. No. Zyxel", '');
             end;
@@ -647,11 +639,10 @@ table 50103 "eCommerce Order Header"
         receCommerceSalesLineBuffer.SetRange("Transaction Type", "Transaction Type");
         receCommerceSalesLineBuffer.SetRange("eCommerce Order Id", "eCommerce Order Id");
         receCommerceSalesLineBuffer.SetRange("Invoice No.", "Invoice No.");
-        if receCommerceSalesLineBuffer.FindSet then begin
+        if receCommerceSalesLineBuffer.FindSet() then
             repeat
                 receCommerceSalesLineBuffer.Delete(true);
             until receCommerceSalesLineBuffer.Next() = 0;
-        end;
     end;
 
     trigger OnInsert()
@@ -668,20 +659,15 @@ table 50103 "eCommerce Order Header"
         recAmzMktPlace: Record "eCommerce Market Place";
         recAmzLocation: Record "eCommerce Location Code";
         recAmzLine: Record "eCommerce Order Line";
-        recVatBusPostGrp: Record "VAT Business Posting Group";
         recAmzCountryMap: Record "eCommerce Country Mapping";
-        gVATProdPostingGroup: Code[10];
         Text001: Label '"%1" %2 does not exist.';
-        Text003: Label 'New eCommerce Grp.';
 
     procedure ValidateDocument()
     var
         recAmzOrderHead: Record "eCommerce Order Header";
         recAmzOrderLine: Record "eCommerce Order Line";
-        recAmzOrderLine2: Record "eCommerce Order Line";
         prevAmzOrderLine: Record "eCommerce Order Line";
         recAmzArchHead: Record "eCommerce Order Archive";
-        recAmzOrderLineArch: Record "eCommerce Order Line Archive";
         recItem: Record Item;
         recItemIdent: Record "Item Identifier";
         recVatPostSetup: Record "VAT Posting Setup";
@@ -698,7 +684,6 @@ table 50103 "eCommerce Order Header"
         NAPeriod: Integer;
         lText001: Label '"%1" must not be blank.';
         lText002: Label '"%1" %2 (ASIN: %3) should be created as "Item Identifier".\Please contact the eCommerce Team.';
-        lText003: Label '"%1" %2 was not found.';
         lText004: Label 'Unknown Transaction Type on Order ID: %1.';
         lText005: Label 'Marketplace "%1" is inactive.';
         lText006: Label '"%1" has been posted as %2 %3.';
@@ -719,8 +704,6 @@ table 50103 "eCommerce Order Header"
         lText021: Label '"%1" is inactive on the Market Place.';
         lText022: Label 'The order is not completely imported.';
         lText023: Label '"%1" %2 must not be negative.';
-        lText024: Label 'Possibility of duplicate lines.';
-        lText025: Label 'Blank "%1" with a date before 26-05-23 must be posted in %2.';
         lText026: Label 'The order has been posted in "%1".';
         lText027: Label 'The order has previous been posted as %3 "%1" %2. Posting date %4 with same invoice no.';
         lText028: Label 'Identical order has been located as "%1" %2.';
@@ -739,20 +722,20 @@ table 50103 "eCommerce Order Header"
             IF STRPOS("Marketplace ID", 'MAGENTO') <> 0 THEN BEGIN
                 recAmzArchHead.SETRANGE("Transaction Type", "Transaction Type");
                 recAmzArchHead.SETRANGE("ecommerce Order Id", "ecommerce Order Id");
-                IF recAmzArchHead.FINDSET THEN
+                IF recAmzArchHead.FINDSET() THEN
                     REPEAT
                         IF STRPOS(recAmzArchHead."Invoice No.", "Invoice No.") <> 0 THEN
                             "Error Description" := STRSUBSTNO(lText027, FIELDCAPTION("Invoice No."), recAmzArchHead."Invoice No.", "Transaction Type", recAmzArchHead."Posting Date");
-                    UNTIL recAmzArchHead.NEXT = 0;
+                    UNTIL recAmzArchHead.NEXT() = 0;
 
                 recAmzOrderHead.SETRANGE("Transaction Type", "Transaction Type");
                 recAmzOrderHead.SETRANGE("ecommerce Order Id", "ecommerce Order Id");
                 recAmzOrderHead.SETFILTER("Invoice No.", '<>%1', "Invoice No.");
-                IF recAmzOrderHead.FINDSET THEN
+                IF recAmzOrderHead.FINDSET() THEN
                     REPEAT
                         IF STRPOS(recAmzOrderHead."Invoice No.", "Invoice No.") <> 0 THEN
                             "Error Description" := STRSUBSTNO(lText028, FIELDCAPTION("Invoice No."), recAmzOrderHead."Invoice No.");
-                    UNTIL recAmzOrderHead.NEXT = 0;
+                    UNTIL recAmzOrderHead.NEXT() = 0;
             END;
 
         if "Error Description" = '' then
@@ -761,11 +744,10 @@ table 50103 "eCommerce Order Header"
 
         if "Error Description" = '' then
             if not recAmzMktPlace."Settle eCommerce Documents" then
-                "Error Description" := StrSubstNo(lText021, recAmzMktPlace.FieldCaption("Settle eCommerce Documents"), "Marketplace ID");
+                "Error Description" := StrSubstNo(lText021, recAmzMktPlace.FieldCaption("Settle eCommerce Documents"));
 
         if "Error Description" = '' then
-            IF ("VAT Registration No. Zyxel" = '') AND ("Tax Collection Respons." = "Tax Collection Respons."::Seller) THEN BEGIN
-
+            IF ("VAT Registration No. Zyxel" = '') AND ("Tax Collection Respons." = "Tax Collection Respons."::Seller) THEN
                 IF "Tax Amount" <> 0 THEN
                     "Error Description" := STRSUBSTNO(lText001, FIELDCAPTION("VAT Registration No. Zyxel"))
                 ELSE BEGIN
@@ -775,16 +757,15 @@ table 50103 "eCommerce Order Header"
                     IF NOT recAmzCtryMapTo."Post Without Zyxel VAT Reg. No" THEN
                         "Error Description" := STRSUBSTNO(lText001, FIELDCAPTION("VAT Registration No. Zyxel"))
                 END;
-            END;
 
         IF "Error Description" = '' THEN
             IF ((recAmzMktPlace."Tax Exception Start Date" = 0D) OR (recAmzMktPlace."Tax Exception End Date" = 0D)) OR
-               ((WORKDATE < recAmzMktPlace."Tax Exception Start Date") OR (WORKDATE > recAmzMktPlace."Tax Exception End Date"))
+               ((WORKDATE() < recAmzMktPlace."Tax Exception Start Date") OR (WORKDATE() > recAmzMktPlace."Tax Exception End Date"))
             THEN
                 IF "Sell-to Type" = "Sell-to Type"::Consumer THEN BEGIN
                     IF ("Tax Amount" = 0) AND (NOT "Prices Including VAT") THEN
                         "Error Description" := STRSUBSTNO(lText029, FIELDCAPTION("Tax Amount"));
-                END ELSE BEGIN
+                END ELSE
                     IF ("Ship From Country" = "Ship To Country") AND ("Tax Amount" = 0) AND (NOT "Prices Including VAT") THEN BEGIN
                         IF "Tax Address Role" = "Tax Address Role"::"Ship-from" THEN
                             recAmzCtryMap.GET("Customer No.", "Ship From Country")
@@ -793,14 +774,13 @@ table 50103 "eCommerce Order Header"
                         IF NOT recAmzCtryMap."Domestic Reverse Charge" THEN
                             "Error Description" := STRSUBSTNO(lText029, FIELDCAPTION("Tax Amount"));
                     END;
-                END;
 
         IF "Error Description" = '' THEN  // This is not in NAV. Not sure if it´s relevant.
             if ("VAT Registration No. Zyxel" = '') and ("Tax Collection Respons." = "tax collection respons."::Seller) then
                 "Error Description" := StrSubstNo(lText001, FieldCaption("VAT Registration No. Zyxel"));
 
         if "Error Description" = '' then
-            if ZGT.IsZNetCompany then begin
+            if ZGT.IsZNetCompany() then begin
                 if "VAT Registration No. Zyxel" in ['686640822', 'ATU76537534', 'ATU86640822', 'BE0691804097', 'CZ684340226', 'DE812743356', 'ESN2764659E', 'FR43834569063', 'IT00203809991', 'NL825611349B01', 'PL5263207801'] then
                     "German VAT Reg. No." := true;
 
@@ -844,7 +824,7 @@ table 50103 "eCommerce Order Header"
 
         if "Error Description" = '' then begin
             if not recAmzCtryMapTo.Get("Customer No.", "Ship To Country") then
-                recAmzCtryMapTo.InsertCountryMapping("Marketplace ID", "Ship To Country");
+                recAmzCtryMapTo.InsertCountryMapping(Copystr("Marketplace ID", 1, 10), "Ship To Country");
 
             if recAmzCtryMapTo."Country Dimension" = '' then
                 "Error Description" := StrSubstNo(lText014, recAmzCtryMapTo.TableCaption(), recAmzCtryMapTo.FieldCaption("Country Dimension"));
@@ -910,7 +890,7 @@ table 50103 "eCommerce Order Header"
             if ("Amount Including VAT" = 0) and (not "Give Away Order") then
                 "Error Description" := StrSubstNo(lText012, FieldCaption("Amount Including VAT"));
 
-        if "Error Description" = '' then begin
+        if "Error Description" = '' then
             if "Invoice No." = 'N/A' then begin
                 recAmzArchHead.SetAutoCalcFields("Amount Including VAT");
                 recAmzArchHead.SetRange("Transaction Type", "Transaction Type");
@@ -930,19 +910,17 @@ table 50103 "eCommerce Order Header"
                         Commit();
                         "Error Description" := lText031;
                     end else begin
-                        recEcomSetup.get;
+                        recEcomSetup.get();
                         recEcomSetup.testfield("N/A Retention Period");
                         NAPeriod := CalcDate(recEcomSetup."N/A Retention Period", today) - today;
-                        if (today - "RHQ Creation Date" <= NAPeriod) or (today - "Order Date" <= NAPeriod) then begin
+                        if (today - "RHQ Creation Date" <= NAPeriod) or (today - "Order Date" <= NAPeriod) then
                             if (today - "RHQ Creation Date") < (today - "Order Date") then
                                 "Error Description" := StrSubstNo(lText030, "RHQ Creation Date" + NAPeriod)
                             else
                                 "Error Description" := StrSubstNo(lText030, "Order Date" + NAPeriod);
-                        end;
                     end;
                 end;
-            end
-        end;
+            end;
 
         // Line
         if "Error Description" = '' then begin
@@ -988,15 +966,14 @@ table 50103 "eCommerce Order Header"
                                     recVatPostSetup.TableCaption(),
                                     FieldCaption("VAT Bus. Posting Group"), VatBusPostGrp,
                                     recAmzOrderLine.FieldCaption("VAT Prod. Posting Group"), recAmzOrderLine."VAT Prod. Posting Group");
-                            end else begin
+                            end else
                                 if recVatPostSetup."Sales VAT Account" = '' then
                                     "Error Description" := StrSubstNo(lText020, recVatPostSetup.TableCaption(), recVatPostSetup.FieldCaption("Sales VAT Account"));
-                            end;
                         end;
 
                     if "Error Description" = '' then
                         if ("Transaction Type" = "transaction type"::Order) and (recItem."No." <> '') then
-                            if (recItem.PreventNegativeInventory or ItemLogisticEvent.PreventNegativeInventory(recItem."No.", "Location Code", true)) and
+                            if (recItem.PreventNegativeInventory() or ItemLogisticEvent.PreventNegativeInventory(recItem."No.", "Location Code", true)) and
                                (recItem.Inventory - recAmzOrderLine.Quantity < 0)
                             then
                                 "Error Description" := StrSubstNo(lText016, recItem."No.");
@@ -1113,7 +1090,7 @@ table 50103 "eCommerce Order Header"
 
     procedure SetVatProdPostingGroup(pVatProdPostingGroup: Code[10])
     begin
-        gVATProdPostingGroup := pVatProdPostingGroup;
+
     end;
 
     procedure ArchiveDocumentManually()

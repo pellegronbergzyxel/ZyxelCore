@@ -20,37 +20,45 @@ page 50238 "eCommerce Orders"
                 field("RHQ Creation Date"; Rec."RHQ Creation Date")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies RHQ Creation Date';
                 }
                 field("Marketplace ID"; Rec."Marketplace ID")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies MarketPlace ID';
                 }
                 field("Transaction Type"; Rec."Transaction Type")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Transaction Type';
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Customer No.';
                     Visible = false;
                 }
                 field("Order Date"; Rec."Order Date")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Order Date';
                 }
                 field("eCommerce Order Id"; Rec."eCommerce Order Id")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies eCommerce Order ID';
                 }
                 field("Invoice No."; Rec."Invoice No.")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Invoice No.';
                     Visible = false;
                 }
                 field("Invoice Download"; Rec."Invoice Download")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Invoice Download';
+                    ToolTip = 'Specifies Invoice Download';
                     Editable = false;
                     ExtendedDatatype = URL;
                     Visible = false;
@@ -58,90 +66,109 @@ page 50238 "eCommerce Orders"
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Location Code';
                 }
                 field("Ship From Country"; Rec."Ship From Country")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Ship From Country';
                     Visible = false;
                 }
                 field("Ship To Country"; Rec."Ship To Country")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Ship To Country';
                     Visible = false;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Currency Code';
                 }
                 field("VAT Bus. Posting Group"; Rec."VAT Bus. Posting Group")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies VAT Bus. Posting Group';
                 }
                 field("Country Dimension"; Rec."Country Dimension")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Country Dimension';
                 }
                 field(Open; Rec.Open)
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Open';
                 }
                 field("Unexpected Item"; Rec."Unexpected Item")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Unexpected Item';
                     Visible = false;
                 }
                 field("Error Description"; Rec."Error Description")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Error Description';
                 }
                 field("Sell-to Type"; Rec."Sell-to Type")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Sell-to Type';
                     Visible = false;
                 }
                 field("Export Outside EU"; Rec."Export Outside EU")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Export Outside EU';
                     Visible = false;
                 }
                 field(Amount; Rec.Amount)
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Amount';
                     Visible = false;
                 }
                 field("Tax Amount"; Rec."Tax Amount")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Tax Amount';
                     Visible = false;
                 }
                 field("Amount Including VAT"; Rec."Amount Including VAT")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Amount Including VAT';
                     Visible = false;
                 }
                 field("Total (Exc. Tax)"; Rec."Total (Exc. Tax)")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Total (Exc. Tax)';
                     Visible = false;
                 }
                 field("Total Tax Amount"; Rec."Total Tax Amount")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Total Tax Amount';
                     Visible = false;
                 }
                 field("Total (Inc. Tax)"; Rec."Total (Inc. Tax)")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Total (inc. Tax)';
                     Visible = false;
                 }
                 field("VAT Registration No. Zyxel"; Rec."VAT Registration No. Zyxel")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies VAT Registration No. Zyxel';
                     Visible = false;
                 }
                 field("Give Away Order"; Rec."Give Away Order")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Give Away Order';
                     Visible = false;
                 }
             }
@@ -173,6 +200,7 @@ page 50238 "eCommerce Orders"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Post &Batch';
+                ToolTip = 'Post and Batch eCommerce Orders ';
                 Ellipsis = true;
                 Image = PostBatch;
                 Promoted = true;
@@ -189,36 +217,39 @@ page 50238 "eCommerce Orders"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Delete Batch';
+                ToolTip = 'Delete Batch Lines';
                 Image = Delete;
 
                 trigger OnAction()
                 begin
-                    DeleteLines;
+                    DeleteLines();
                 end;
             }
             action("Open Line")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Open Line';
+                ToolTip = 'Open Lines ';
                 Image = OpenJournal;
                 Visible = false;
 
                 trigger OnAction()
                 begin
-                    OpenEntry;
+                    OpenEntry();
                 end;
             }
             action("Validate Document")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Validate Document';
+                ToolTip = 'Validate Document';
                 Image = ValidateEmailLoggingSetup;
                 Promoted = true;
                 PromotedCategory = Process;
 
                 trigger OnAction()
                 begin
-                    Rec.ValidateDocument;
+                    Rec.ValidateDocument();
                     IF Rec.Modify() then;
                 end;
             }
@@ -226,13 +257,14 @@ page 50238 "eCommerce Orders"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Force Validate';
+                ToolTip = 'Blank the Error Description';
                 Image = ValidateEmailLoggingSetup;
                 Promoted = true;
                 PromotedCategory = Process;
 
                 trigger OnAction() //05-05-2025 BK #485255
                 begin
-                    Rec.ForceValidationDocument;
+                    Rec.ForceValidationDocument();
                     IF Rec.Modify() then;
                 end;
             }
@@ -240,18 +272,20 @@ page 50238 "eCommerce Orders"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Archive Manually';
+                ToolTip = 'Archive Manually';
                 Image = Archive;
                 Visible = DeveloperVisible;
 
                 trigger OnAction()
                 begin
-                    Rec.ArchiveDocumentManually;
+                    Rec.ArchiveDocumentManually();
                 end;
             }
             action("Count")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Count';
+                ToolTip = 'Count No. of eCommerce Orders';
                 Image = Calculate;
 
                 trigger OnAction()
@@ -265,11 +299,13 @@ page 50238 "eCommerce Orders"
                 group("Tax Library Document")
                 {
                     Caption = 'Tax Library Document';
+                    ToolTip = 'Specifies Tax Library Document';
                     Image = Import;
                     action("Import Tax Library Doc.")
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Import Tax Library Doc.';
+                        ToolTip = 'Specifies Import Tax Library Document';
                         Image = Import;
                         RunObject = XmlPort "eCommerce Tax Doc. Import";
                     }
@@ -277,6 +313,7 @@ page 50238 "eCommerce Orders"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Import Batch';
+                        ToolTip = 'Import Batch';
                         Image = Import;
                         Promoted = true;
                         PromotedCategory = Process;
@@ -286,19 +323,20 @@ page 50238 "eCommerce Orders"
                         var
                             APIMgt: Codeunit "API Management";
                         begin
-                            //CODEUNIT.RUN(CODEUNIT::"API Management");
-                            APIMgt.ImportTaxLibDocument;
+                            APIMgt.ImportTaxLibDocument();
                         end;
                     }
                 }
                 group("eCommerce Fulfilled Shipment")
                 {
                     Caption = 'eCommerce Fulfilled Shipment';
+                    ToolTip = 'eCommerce Fulfilled Shipment';
                     Image = Import;
                     action("Import Fulfilled by eCommerce")
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Import Fulfilled by eCommerce';
+                        ToolTip = 'Import Fulfilled by eCommerce';
                         Image = Import;
                         RunObject = XmlPort "eComm. Fulfilled Ship. Import";
                     }
@@ -306,36 +344,42 @@ page 50238 "eCommerce Orders"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Import Fulfilled Batch';
+                        Image = ImportLog;
+                        ToolTip = 'Import Fulfilled Batch';
 
                         trigger OnAction()
                         var
                             APIMgt: Codeunit "API Management";
                         begin
-                            APIMgt.ImportFulfilledOrders;
+                            APIMgt.ImportFulfilledOrders();
                         end;
                     }
                 }
                 group("eCommerce FBA Customer Returns")
                 {
                     Caption = 'eCommerce FBA Customer Returns';
+                    ToolTip = 'eCommerce FBA Customer Returns';
                     Image = Import;
                     action("Import FBA Cust. Return eCommerce")
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Import FBA Cust. Return eCommerce';
+                        ToolTip = 'Import FBA Cust. Return eCommerce';
                         Image = Import;
                         RunObject = XmlPort "eComm. Fulfilled Return Imp.";
                     }
                     action("Import FBA Cust. Return Batch")
                     {
                         ApplicationArea = Basic, Suite;
+                        Image = ImportLog;
                         Caption = 'Import FBA Cust. Return Batch';
+                        ToolTip = 'Import FBA Cust. Return Batch';
 
                         trigger OnAction()
                         var
                             APIMgt: Codeunit "API Management";
                         begin
-                            APIMgt.ImportFbaCustReturns;
+                            APIMgt.ImportFbaCustReturns();
                         end;
                     }
                 }
@@ -348,6 +392,7 @@ page 50238 "eCommerce Orders"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Process eCommerce (Test Purpose)';
+                    ToolTip = 'Process eCommerce (Test Purpose)';
                     Image = Process;
                     RunObject = Codeunit "Process eCommerce";
                 }
@@ -358,7 +403,9 @@ page 50238 "eCommerce Orders"
             action(ShowNotCompletedImport)
             {
                 Caption = 'Show not Completed Import';
+                ToolTip = 'Show not Completed Import';
                 Visible = DeveloperVisible;
+                Image = ImportDatabase;
                 trigger OnAction()
                 begin
                     Rec.SetRange(Open, false);
@@ -368,7 +415,9 @@ page 50238 "eCommerce Orders"
             action(ShowOpenOrders)
             {
                 Caption = 'Show Open Orders';
+                ToolTip = 'Show not Completed Import';
                 Visible = DeveloperVisible;
+                Image = OrderList;
                 trigger OnAction()
                 begin
                     Rec.SetRange(Open, true);
@@ -381,7 +430,7 @@ page 50238 "eCommerce Orders"
     trigger OnOpenPage()
     begin
         if not Rec.FindFirst() then;
-        DeveloperVisible := ZGT.UserIsDeveloper;
+        DeveloperVisible := ZGT.UserIsDeveloper();
     end;
 
     var
@@ -394,7 +443,7 @@ page 50238 "eCommerce Orders"
         lText001: Label 'Do you want to create eCommerce sales invoices and credit memos?';
     begin
         if Confirm(lText001) then
-            CreateeCommerceInvoices.RunWithConfirm;
+            CreateeCommerceInvoices.RunWithConfirm();
     end;
 
     local procedure CreateSingle(pCreateWithError: Boolean)
@@ -458,19 +507,18 @@ page 50238 "eCommerce Orders"
     var
         recAznSaleHead: Record "eCommerce Order Header";
         lText001: Label 'Do you want to delete %1 eCommerce Sales Order(s)?';
-        xxx: page "Customer List";
+
     begin
         CurrPage.SetSelectionFilter(recAznSaleHead);
         recAznSaleHead.SetRange(Open, true);
-        if recAznSaleHead.FindSet(true) then begin
+        if recAznSaleHead.FindSet(true) then
             if Confirm(lText001, false, recAznSaleHead.Count()) then begin
                 ZGT.OpenProgressWindow('', recAznSaleHead.Count());
                 repeat
                     ZGT.UpdateProgressWindow(recAznSaleHead."eCommerce Order Id", 0, true);
                     recAznSaleHead.Delete(true);
                 until recAznSaleHead.Next() = 0;
-                ZGT.CloseProgressWindow;
+                ZGT.CloseProgressWindow();
             end;
-        end;
     end;
 }

@@ -41,7 +41,6 @@ Codeunit 50081 "Delete Change Log entries"
         recCngLogEntry.SetCurrentkey("Table No.", "Date and Time");
         recCngLogEntry.SetRange("Table No.", Database::"VCK Delivery Document Line");
         recCngLogEntry.SetRange("Type of Change", recCngLogEntry."type of change"::Insertion);
-        //recCngLogEntry.SetFilter("Field No.", '1|2');
         recCngLogEntry.SetFilter("Date and Time", '..%1', CreateDatetime(Today - 1, 235900T));
         recCngLogEntry.DeleteAll();
 

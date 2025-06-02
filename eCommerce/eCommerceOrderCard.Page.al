@@ -297,10 +297,11 @@ page 50239 "eCommerce Order Card"
     {
         area(processing)
         {
-            action("Mark the Order as ""Give Away""")
+            action("Mark the Order as Give Away")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Mark Order as "Give Away"';
+                ToolTip = 'Please mark if the order is a Give Away order.';
                 Image = Apply;
                 Visible = MarkGiveAwayVisible;
 
@@ -308,23 +309,24 @@ page 50239 "eCommerce Order Card"
                 begin
                     //>> 24-05-23 ZY-LD 001
                     if Confirm(Text001) then begin
-                        Rec.UpdateGiveAwayOrder;
-                        SetActions;
+                        Rec.UpdateGiveAwayOrder();
+                        SetActions();
                     end;
                 end;
             }
-            action("Unmark the Order as ""Give Away""")
+            action("Unmark the Order as Give Away")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Unmark Order as "Give Away"';
+                ToolTip = 'Undo marking the Order as Give away';
                 Image = Apply;
                 Visible = UnmarkGiveAwayVisible;
 
                 trigger OnAction()
                 begin
                     if Confirm(Text001) then begin
-                        Rec.UpdateGiveAwayOrder;
-                        SetActions;
+                        Rec.UpdateGiveAwayOrder();
+                        SetActions();
                     end;
                 end;
             }
@@ -342,12 +344,12 @@ page 50239 "eCommerce Order Card"
     end;
 
     var
-        Text001: Label 'Do you want to update "Give Away Order"?';
+        UserSetup: Record "User Setup"; //20-05-2025 BK #503059
         GiveAwayVisible: Boolean;
         MarkGiveAwayVisible: Boolean;
         UnmarkGiveAwayVisible: Boolean;
-        UserSetup: Record "User Setup"; //20-05-2025 BK #503059
         ForceUser: Boolean; //20-05-2025 BK #503059
+        Text001: Label 'Do you want to update "Give Away Order"?';
 
     local procedure SetActions()
     begin
