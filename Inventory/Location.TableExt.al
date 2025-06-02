@@ -205,5 +205,10 @@ tableextension 50107 LocationZX extends Location
             OptionCaption = 'Zone 1,Zone 2,Zone 3,Zone 4,Zone 5,Zone 6,Zone 7,Zone 8,Zone 9,Zone 10';
             OptionMembers = "Zone 1","Zone 2","Zone 3","Zone 4","Zone 5","Zone 6","Zone 7","Zone 8","Zone 9","Zone 10";
         }
+        field(67006; zNetZComcode; code[10])
+        {
+            Caption = 'zNet / zCom location translate';
+            Description = 'translate between zNet and zCom location code between znet <> zCom';
+        }
     }
 }

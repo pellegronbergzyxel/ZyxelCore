@@ -46,7 +46,7 @@ Table 50024 "Warehouse Inbound Header"
             begin
                 if "Sender No." <> '' then begin
                     case "Order Type" of
-                        "order type"::"Purchase Order":
+                        "order type"::"Purchase Order", "order type"::"Purchase INvoice":
                             begin
                                 recVend.Get("Sender No.");
                                 "Sender Name" := recVend.Name;
@@ -367,8 +367,8 @@ Table 50024 "Warehouse Inbound Header"
         {
             Caption = 'Order Type';
             Editable = false;
-            OptionCaption = 'Purchase Order,Sales Return Order,Transfer Order';
-            OptionMembers = "Purchase Order","Sales Return Order","Transfer Order";
+            OptionCaption = 'Purchase Order,Sales Return Order,Transfer Order,Purchase Invoice';
+            OptionMembers = "Purchase Order","Sales Return Order","Transfer Order","Purchase Invoice";
         }
         field(104; "Sent To Warehouse"; Boolean)
         {

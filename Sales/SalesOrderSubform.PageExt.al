@@ -594,11 +594,11 @@ pageextension 50129 SalesOrderSubformZX extends "Sales Order Subform"
     var
 
     begin
+        if rec.Type <> rec.Type::Item then
+            amazStyle := 'Standard';
         if rec.compareAmazonprices then
             amazStyle := 'Unfavorable'
         else
             amazStyle := 'Favorable';
-
-
     end;
 }

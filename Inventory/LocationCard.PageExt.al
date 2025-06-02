@@ -129,6 +129,11 @@ pageextension 50240 LocationCardZX extends "Location Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the location the warehouse is using as RMA Location.';
                 }
+                field(zNetZComcode; Rec.zNetZComcode)
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Location transalte(mapping) between zNet an zCom, when Item are move between the two entities';
+                }
             }
         }
         addafter("Bin Policies")

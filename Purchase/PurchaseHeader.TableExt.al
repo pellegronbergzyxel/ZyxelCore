@@ -282,4 +282,72 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
 
     var
         AllIn: Codeunit "ZyXEL VCK";
+
+
+
+
+    // 494391
+    procedure CreatecontainerfromPurchaseInv(PurchaseHeader: Record "Purchase Header")
+    var
+        WhseInbLine: Record "VCK Shipping Detail";
+        WhseInbHead: Record "Warehouse Inbound Header";
+        POL: Record "Purchase Line";
+        CreateWIO: Report "Create Whse. Inbound Order";
+
+    begin
+        WhseInbHead.SetCurrentkey("Shipper Reference");
+        WhseInbHead.SetRange("Shipper Reference", 'INV' + PurchaseHeader."No.");
+        WhseInbHead.SetRange("Location Code", PurchaseHeader."Location Code");  // 03-08-20 ZY-LD 001
+        if not WhseInbHead.FindSET() then begin
+            POL.Setrange("Document Type", PurchaseHeader."Document Type");
+            POL.setrange("Document No.", PurchaseHeader."No.");
+            Pol.Setrange(Type, Pol.Type::item);
+            Pol.setfilter(Quantity, '<>%1', 0);
+            if Pol.findset() then begin
+                WhseInbHead.init;
+                WhseInbHead.insert(true);
+                IF PurchaseHeader."Expected Receipt Date" = 0D THEN
+                    PurchaseHeader."Expected Receipt Date" := PurchaseHeader."Document Date";
+                WhseInbHead."Shipper Reference" := 'INV' + PurchaseHeader."No.";
+                WhseInbHead."Location Code" := PurchaseHeader."Location Code";
+                WhseInbHead."Sender No." := PurchaseHeader."Buy-from Vendor No.";
+                WhseInbHead."Sender Name" := PurchaseHeader."Buy-from Vendor Name";
+                WhseInbHead."Sender Name 2" := PurchaseHeader."Buy-from Vendor Name 2";
+                WhseInbHead."Sender Address" := PurchaseHeader."Buy-from Address";
+                WhseInbHead."Sender Address 2" := PurchaseHeader."Buy-from Address 2";
+                WhseInbHead."Sender Post Code" := PurchaseHeader."Buy-from Post Code";
+                WhseInbHead."Sender City" := PurchaseHeader."Buy-from City";
+                WhseInbHead."Sender Country/Region Code" := PurchaseHeader."Buy-from Country/Region Code";
+                WhseInbHead."Sender County" := PurchaseHeader."Buy-from County";
+                WhseInbHead."Sender Contact" := PurchaseHeader."Buy-from Contact";
+                WhseInbHead."Estimated Date of Departure" := PurchaseHeader."Expected Receipt Date";
+                WhseInbHead."Estimated Date of Arrival" := PurchaseHeader."Expected Receipt Date";
+                WhseInbHead."Expected Receipt Date" := PurchaseHeader."Expected Receipt Date";
+                WhseInbHead."Shipment No." := PurchaseHeader."No.";
+                WhseInbHead."Creation Date" := CurrentDatetime;
+                WhseInbHead."Order Type" := WhseInbHead."Order Type"::"Purchase Invoice";
+                WhseInbHead."Automatic Created" := true;
+                WhseInbHead.Modify(true);
+                repeat
+                    WhseInbLine.init();
+                    WhseInbLine."Order Type" := WhseInbLine."Order Type"::"Purchase Invoice";
+                    WhseInbLine."Purchase Order No." := Pol."Document No.";
+                    WhseInbLine."Purchase Order Line No." := Pol."Line No.";
+                    WhseInbLine.insert(true);
+                    WhseInbLine.Location := PurchaseHeader."Location Code";
+                    WhseInbLine."Item No." := Pol."No.";
+                    WhseInbLine.Quantity := Pol.Quantity;
+                    WhseInbLine.ETA := Pol."Expected Receipt Date";
+                    WhseInbLine."Expected Receipt Date" := Pol."Expected Receipt Date";
+                    //WhseInbLine."Shipping Method" := 'internal';
+                    WhseInbLine."Order No." := WhseInbHead."No.";
+                    WhseInbLine."Document No." := WhseInbHead."No.";
+                    WhseInbLine.modify(false);
+
+
+
+                until Pol.next = 0;
+            end;
+        end;
+    end;
 }

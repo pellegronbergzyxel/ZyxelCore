@@ -508,6 +508,7 @@ codeunit 50048 "Intercompany Events"
         Vend: Record Vendor;
         ICSetup: Record "IC Setup";
         PurchLine: Record "Purchase Line";
+        autosetup: Record "Automation Setup";
 
     begin
         //>> 29-05-24 ZY-LD 050
@@ -538,6 +539,17 @@ codeunit 50048 "Intercompany Events"
           ICInboxPurchaseHeader."Currency Code Sales Doc SUB");  // 09-12-19 ZY-LD 018
                                                                  // 003: <<
                                                                  // 001: <<
+
+
+        // CreateContainie, if vendor+automatis >>
+        autosetup.get();
+        if vend.CreateContanieInternal and autosetup.CreateContanieInternal and (PurchaseHeader."Document Type" = PurchaseHeader."Document Type"::Invoice) then begin
+            PurchaseHeader.CreatecontainerfromPurchaseInv(PurchaseHeader);
+        end;
+        // CreateContainie, if vendor+automatis <<
+
+
+
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"ICInboxOutboxMgt", 'OnBeforeOutboxSalesHdrToInbox', '', false, false)]
@@ -1400,5 +1412,10 @@ codeunit 50048 "Intercompany Events"
         IsHandled := true;
     end;
     #endregion
+
+
+
+
+
 
 }

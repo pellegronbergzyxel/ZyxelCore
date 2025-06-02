@@ -439,9 +439,13 @@ Page 50322 "Automation Setup"
                     ApplicationArea = Basic, Suite;
                 }
 
-
+                field(CreateContanieInternal; Rec.CreateContanieInternal)
+                {
+                    ApplicationArea = Basic, Suite;
+                }
             }
             // #490711 <<
+
         }
         area(factboxes)
         {

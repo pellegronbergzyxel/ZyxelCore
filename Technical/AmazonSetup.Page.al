@@ -189,7 +189,46 @@ page 50133 "Amazon setup list"
 
                 end;
             }
+            action(delelte11maj)
+            {
+                caption = 'slet test ordre';
+                Image = GetSourceDoc;
+                ApplicationArea = all;
 
+                trigger OnAction()
+                var
+
+                begin
+                    if rec.testmode then
+                        rec.cleanSO
+                    //if amazonunput.RunModal() = Action::OK then begin
+                    //    order := amazonunput.getvalue();
+                    //    amazhelper.MainProcessOrders(rec.Code, false, order);
+                    //end;
+
+
+                end;
+            }
+            action(CleanSA)
+            {
+                caption = 'slet test ship addresser';
+                Image = GetSourceDoc;
+                ApplicationArea = all;
+
+                trigger OnAction()
+                var
+
+                begin
+                    if rec.testmode then
+                        rec.deleteshiptoaddress();
+                    //if amazonunput.RunModal() = Action::OK then begin
+                    //    order := amazonunput.getvalue();
+                    //    amazhelper.MainProcessOrders(rec.Code, false, order);
+                    //end;
+
+
+                end;
+            }
 
 
             // action(Onetime1)

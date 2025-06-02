@@ -391,6 +391,10 @@ Table 50086 "Automation Setup"
 
         }
         // Main warehouse = 0 from TW <<
+        field(210; CreateContanieInternal; Boolean)  //494391
+        {
+            Caption = 'Create Contanier on internal sales';
+        }
     }
 
     keys

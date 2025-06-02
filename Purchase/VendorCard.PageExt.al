@@ -45,6 +45,10 @@ pageextension 50116 VendorCardZX extends "Vendor Card"
             {
                 ApplicationArea = Basic, Suite;
             }
+            field(CreateContanieInternal; Rec.CreateContanieInternal)  //494391
+            {
+                ApplicationArea = Basic, Suite;
+            }
         }
         addafter("VAT Registration No.")
         {

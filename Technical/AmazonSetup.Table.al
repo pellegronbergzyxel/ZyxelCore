@@ -105,4 +105,50 @@ table 50090 "Amazon Setup"
     }
 
 
+    procedure cleanSO()
+    var
+        so: record "Sales Header";
+    begin
+        SO.setrange("Document Type", SO."Document Type"::Order);
+        So.Setrange("Document Date", 0D, 20250511D);
+        So.setfilter(AmazonePoNo, '<>%1', '');
+        if SO.findset then
+            repeat
+                SO.Delete(true);
+            until SO.next = 0;
+
+    end;
+
+    //
+
+    Procedure deleteshiptoaddress()
+    var
+        so: record "Sales Header";
+        amaz: record "Amazon Setup";
+        customer: record Customer;
+        sa: record "Ship-to Address";
+    begin
+        amaz.setrange(ActiveClient, true);
+        if amaz.findset then
+            repeat
+                customer.setrange(AMAZONID, amaz.ZyxelPartyid);
+                if customer.findset then
+                    repeat
+                        sa.setrange("Customer No.", customer."No.");
+                        sa.setfilter(Name, '<>%1', '');
+                        if sa.findset then
+                            repeat
+
+                                so.SetRange("Sell-to Customer No.", customer."No.");
+                                so.setrange("Ship-to Code", sa.Code);
+                                if so.isempty then
+                                    sa.delete(true);
+                            until sa.next = 0;
+                    until customer.next = 0;
+
+
+            until amaz.next = 0;
+    end;
+
+
 }

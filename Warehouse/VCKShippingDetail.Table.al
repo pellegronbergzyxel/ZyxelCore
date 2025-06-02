@@ -41,7 +41,9 @@ Table 50046 "VCK Shipping Detail"
             else
             if ("Order Type" = const("Sales Return Order")) "Sales Header"."No." where("Document Type" = const("Return Order"))
             else
-            if ("Order Type" = const("Transfer Order")) "Transfer Header";
+            if ("Order Type" = const("Transfer Order")) "Transfer Header"
+            else
+            if ("Order Type" = const("Purchase Invoice")) "Purchase Header"."No." where("Document Type" = const(Invoice));
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
@@ -323,8 +325,8 @@ Table 50046 "VCK Shipping Detail"
             Caption = 'Order Type';
             Description = '06-02-20 ZY-LD 007';
             Editable = false;
-            OptionCaption = 'Purchase Order,Sales Return Order,Transfer Order';
-            OptionMembers = "Purchase Order","Sales Return Order","Transfer Order";
+            OptionCaption = 'Purchase Order,Sales Return Order,Transfer Order,Purchase Invoice';
+            OptionMembers = "Purchase Order","Sales Return Order","Transfer Order","Purchase Invoice";
         }
         field(104; "Outstanding Quantity"; Decimal)
         {

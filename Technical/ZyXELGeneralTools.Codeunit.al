@@ -65,6 +65,11 @@ Codeunit 50000 "ZyXEL General Tools"
         rValue := StrPos(UpperCase(CompanyName()), 'ZNET') <> 0;
     end;
 
+    procedure IsZNetCompanyv2(Compname: text[30]) rValue: Boolean
+    begin
+        rValue := UpperCase(Compname).Contains('ZNET');
+    end;
+
 
     procedure GetRHQCompanyName(): Text
     begin

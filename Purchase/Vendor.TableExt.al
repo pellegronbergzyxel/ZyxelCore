@@ -86,5 +86,10 @@ tableextension 50112 VendorZX extends Vendor
             Caption = 'Active';
             InitValue = true;
         }
+        field(50054; CreateContanieInternal; Boolean)  //494391
+        {
+            Caption = 'Create Contanier on internal sales';
+        }
+
     }
 }

@@ -62,6 +62,11 @@ pageextension 50227 ICInboxPurchaseDocZX extends "IC Inbox Purchase Doc."
             {
                 ApplicationArea = Basic, Suite;
             }
+            field("Location Code"; Rec."Location Code")
+            {
+                ApplicationArea = Basic, Suite;
+                Editable = true;
+            }
         }
     }
 
