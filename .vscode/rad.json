@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-﻿{"Added":[],"Modified":[],"Removed":[]}
-=======
-﻿{"Added":[],"Modified":[{"Kind":106,"Name":"RequestOptionsPage","Namespace":""},{"Id":50238,"Kind":12,"Name":"eCommerce Orders","Namespace":""},{"Id":50103,"Kind":10,"Name":"eCommerce Order Header","Namespace":""},{"Id":50091,"Kind":13,"Name":"GL Entries To Excel","Namespace":""},{"Id":50048,"Kind":11,"Name":"Intercompany Events","Namespace":""},{"Id":50089,"Kind":13,"Name":"Finance Charge Memo Zyxel","Namespace":""},{"Id":50240,"Kind":12,"Name":"eCommerce Order Subform","Namespace":""}],"Removed":[]}
->>>>>>> 256df856d584545d6658294a0d525b3a3c7bba98
+﻿{"Added":[],"Modified":[{"Id":50048,"Kind":11,"Name":"Intercompany Events","Namespace":""}],"Removed":[]}
