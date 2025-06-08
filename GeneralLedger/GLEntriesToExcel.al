@@ -17,6 +17,7 @@ Report 50091 "GL Entries To Excel"
                 TempDimSetEntry: Record "Dimension Set Entry" temporary;
                 DimMgt: Codeunit DimensionManagement;
             begin
+                "G/L Entry".CalcFields("G/L Account Name");
                 clear(TempDimSetEntry);
                 Clear(Dim3Value);
                 clear(Dim4Value);
@@ -82,6 +83,7 @@ Report 50091 "GL Entries To Excel"
         TempExcelBuf.AddColumn("G/L Entry".FieldCaption("Posting Date"), false, '', true, false, false, '', TempExcelBuf."cell type"::Text);
         TempExcelBuf.AddColumn("G/L Entry".FieldCaption("Document No."), false, '', true, false, false, '', TempExcelBuf."cell type"::Text);
         TempExcelBuf.AddColumn("G/L Entry".FieldCaption("G/L Account No."), false, '', true, false, false, '', TempExcelBuf."cell type"::Text);
+        TempExcelBuf.AddColumn("G/L Entry".FieldCaption("G/L Account Name"), false, '', true, false, false, '', TempExcelBuf."cell type"::Text);
         TempExcelBuf.AddColumn("G/L Entry".FieldCaption(Description), false, '', true, false, false, '', TempExcelBuf."cell type"::Text);
         TempExcelBuf.AddColumn("G/L Entry".FieldCaption("External Document No."), false, '', true, false, false, '', TempExcelBuf."cell type"::Text);
         TempExcelBuf.AddColumn("G/L Entry".FieldCaption(Amount), false, '', true, false, false, '', TempExcelBuf."cell type"::Text);
@@ -104,6 +106,7 @@ Report 50091 "GL Entries To Excel"
         TempExcelBuf.AddColumn("G/L Entry"."Posting Date", false, '', false, false, false, '', TempExcelBuf."cell type"::Date);
         TempExcelBuf.AddColumn("G/L Entry"."Document No.", false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
         TempExcelBuf.AddColumn("G/L Entry"."G/L Account No.", false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
+        tempExcelBuf.AddColumn("G/L Entry"."G/L Account Name", false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
         TempExcelBuf.AddColumn("G/L Entry".Description, false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
         TempExcelBuf.AddColumn("G/L Entry"."External Document No.", false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
         TempExcelBuf.AddColumn("G/L Entry".Amount, false, '', false, false, false, '', TempExcelBuf."cell type"::Number);

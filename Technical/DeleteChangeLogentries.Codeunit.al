@@ -176,7 +176,7 @@ Codeunit 50081 "Delete Change Log entries"
         recCngLogEntry.Reset();
         recCngLogEntry.SetCurrentkey("User ID", "Date and Time");
         recCngLogEntry.SetRange("User ID", 'ZYEU\BCSERVICE');
-        recCngLogEntry.SetFilter("Date and Time", '..%1', CreateDatetime(CalcDate('<-14D>'), 235900T));
+        recCngLogEntry.SetFilter("Date and Time", '..%1', CreateDatetime(CalcDate('<-1Y>'), 235900T));
         recCngLogEntry.DeleteAll();
 
         recCngLogEntry.Reset();
