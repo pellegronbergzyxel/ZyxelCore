@@ -27,7 +27,8 @@ codeunit 50055 AmazonHelper
         AmazonOrder: code[35];
         buyingParty: Code[10];
         sellingParty: Code[10];
-        custno: code[20];
+        Custbill: code[20];
+        CustSell: code[20];
         orderDetails: Jsontoken;
         temptoken: JsonToken;
         Salesheader: record "Sales Header";
@@ -37,6 +38,7 @@ codeunit 50055 AmazonHelper
         lineno: integer;
         itemno: code[20];
         shipno: code[10];
+
         purchaseOrderState: text;
         Amazonsetup: record "Amazon Setup";
         shiptoadd: record "Ship-to Address";
@@ -77,10 +79,13 @@ codeunit 50055 AmazonHelper
                                             EVALUATE(sellingParty, TokenValue.AsValue().AsText());
 
 
-                                custno := AmazonID2CustNo(buyingParty, sellingParty);
 
-                                if (custno <> '') and (AmazonORder <> '') then begin
-                                    if createorClearAmazonorder(custno, AmazonORder, Salesheader, sellingParty) then begin
+                                Custbill := AmazonID2CustNo(buyingParty, sellingParty);
+                                CustSell := AmazonID2CustNoShipto(buyingParty, sellingParty);
+                                shipno := sellingParty;
+
+                                if (Custbill <> '') and (AmazonORder <> '') then begin
+                                    if createorClearAmazonorder(Custbill, CustSell, AmazonORder, Salesheader, sellingParty) then begin
                                         lineno := 1000;
                                         Salesheader.AmazonpurchaseOrderState := purchaseOrderState;
                                         if orderDetails.SelectToken('purchaseOrderDate', TokenValue) then begin
@@ -216,11 +221,12 @@ codeunit 50055 AmazonHelper
                                             if temptoken.SelectToken('partyId', TokenValue) then
                                                 EVALUATE(sellingParty, TokenValue.AsValue().AsText());
 
+                                    Custbill := AmazonID2CustNo(sellingParty, buyingParty);
+                                    CustSell := AmazonID2CustNoShipto(sellingParty, buyingParty);
+                                    shipno := buyingParty;
 
-                                    custno := AmazonID2CustNo(buyingParty, sellingParty);
-
-                                    if (custno <> '') and (AmazonORder <> '') then begin
-                                        if createorClearAmazonorder(custno, AmazonORder, Salesheader, sellingParty) then begin
+                                    if (Custbill <> '') and (AmazonORder <> '') then begin
+                                        if createorClearAmazonorder(Custbill, CustSell, AmazonORder, Salesheader, sellingParty) then begin
                                             lineno := 1000;
                                             Salesheader.AmazonpurchaseOrderState := purchaseOrderState;
                                             if orderDetails.SelectToken('purchaseOrderDate', TokenValue) then begin
@@ -228,10 +234,8 @@ codeunit 50055 AmazonHelper
                                                 Salesheader.validate("Document Date", orderdate);
                                                 Salesheader.validate("Order Date", orderdate);
                                                 Salesheader.modify(true);
-
                                             end;
 
-                                            shipno := AmazonID2CustNoShipto(buyingParty, sellingParty);
                                             if shiptoadd.get(shipno) then
                                                 salesheader.SetShipToCustomerAddressFieldsFromShipToAddr(shiptoadd);
                                             Salesheader.Validate("Ship-to Code", shipno);
@@ -325,12 +329,13 @@ codeunit 50055 AmazonHelper
                                                         if TokenValue.SelectToken('orderedQuantity', TokenValue2) then
                                                             if TokenValue2.SelectToken('amount', TokenValue3) then begin
                                                                 EVALUATE(Salesline.Quantity, TokenValue3.AsValue().AsText());
+                                                                Salesline.AmazorderedQuantity := Salesline.Quantity;
                                                                 Salesline.validate(Quantity);
                                                                 salesline.AmazconUnitprice := amt;
                                                                 Salesline.validate("Unit Price", amt);
-
                                                                 Salesline.Modify(true);
                                                             end;
+
                                                         if Shipdate <> 0D then begin
                                                             Salesline.Validate("Shipment Date", Shipdate);
                                                             Salesline.Validate("Requested Delivery Date", Shipdate);
@@ -432,13 +437,25 @@ codeunit 50055 AmazonHelper
         jsonarrayMain: JsonArray;
         TokenOrder: JsonToken;
         purchaseOrderStatus: text[30];
+        amazonsetup: record "Amazon Setup";
+        Shipto: record "Ship-to Address";
         AmazonORder: text[35];
         TokenValue: JsonToken;
         TokenValue2: JsonToken;
         TokenValue3: JsonToken;
+        TokenValue4: JsonToken;
+        temptoken: JsonToken;
         tokenarray: JsonArray;
         orderDetails: Jsontoken;
         confirmationStatus: text[30];
+        customer: Record customer;
+        itemno: code[20];
+        Salesline: Record "Sales Line";
+        buyingParty: code[20];
+        sellingParty: code[20];
+        Custbill: code[20];
+        CustSell: code[20];
+        ShipCode: code[20];
     begin
         if Salesheader.AmazonePoNo <> '' then
             if GETAmazonOrderStatus(ResponseString, Salesheader.AmazonSellpartyid, Salesheader) then begin
@@ -455,17 +472,114 @@ codeunit 50055 AmazonHelper
                             if TokenOrder.SelectToken('purchaseOrderStatus', TokenValue) then
                                 EVALUATE(purchaseOrderStatus, TokenValue.AsValue().AsText());
 
+                            // >>
+
+                            if TokenOrder.SelectToken('sellingParty', temptoken) then
+                                if temptoken.SelectToken('partyId', TokenValue) then
+                                    EVALUATE(buyingParty, TokenValue.AsValue().AsText());
+
+
+                            if TokenOrder.SelectToken('shipToParty', temptoken) then
+                                if temptoken.SelectToken('partyId', TokenValue) then
+                                    EVALUATE(sellingParty, TokenValue.AsValue().AsText());
+
+
+                            Custbill := AmazonID2CustNo(buyingParty, sellingParty);
+                            CustSell := AmazonID2CustNoShipto(buyingParty, sellingParty);
+                            ShipCode := sellingParty;
+
+                            IF amazonsetup.get(Salesheader.AmazonSellpartyid) then
+                                if amazonsetup.UpdateCustOnStatus then begin
+                                    Salesheader."Bill-to Customer No." := Custbill;
+                                    customer.get(Custbill);
+                                    Salesheader."Bill-to VAT Registration Code" := customer."VAT Registration No.";
+                                    Salesheader."Bill-to Address" := customer.Address;
+                                    Salesheader."Bill-to Address 2" := customer."Address 2";
+                                    Salesheader."Bill-to City" := customer.City;
+                                    Salesheader."Bill-to Country/Region Code" := customer."Country/Region Code";
+                                    Salesheader."Bill-to Name" := customer.Name;
+                                    Salesheader."Bill-to Name 2" := customer."Name 2";
+                                    Salesheader."Bill-to Post Code" := customer."Post Code";
+                                    Salesheader."Sell-to Customer No." := CustSell;
+                                    customer.get(CustSell);
+                                    Salesheader."VAT Registration No." := customer."VAT Registration No.";
+                                    Salesheader."Sell-to Address" := customer.Address;
+                                    Salesheader."Sell-to Address 2" := customer."Address 2";
+                                    Salesheader."Sell-to City" := customer.City;
+                                    Salesheader."Sell-to Country/Region Code" := customer."Country/Region Code";
+                                    Salesheader."Sell-to Customer Name" := customer.Name;
+                                    Salesheader."Sell-to Customer Name 2" := customer."Name 2";
+                                    Salesheader."Sell-to Post Code" := customer."Post Code";
+                                    Shipto.Get(CustSell, ShipCode);
+                                    Salesheader."Ship-to VAT" := customer."VAT Registration No.";
+                                    Salesheader."Ship-to Address" := Shipto.Address;
+                                    Salesheader."Ship-to Address 2" := Shipto."Address 2";
+                                    Salesheader."Ship-to City" := Shipto.City;
+                                    Salesheader."Ship-to Country/Region Code" := Shipto."Country/Region Code";
+                                    Salesheader."Ship-to Post Code" := Shipto."Post Code";
+                                    Salesheader.modify(false)
+                                end;
+                            //<<
+
+
+
+
                             if Salesheader.AmazonePoNo = AmazonORder then begin
                                 Salesheader.AmazonpurchaseOrderState := purchaseOrderStatus;
                                 Salesheader.modify(false);
                                 if TokenOrder.SelectToken('itemStatus', TokenValue) then begin
                                     tokenarray := TokenValue.AsArray();
                                     foreach TokenValue in tokenarray do begin
-                                        if TokenValue.SelectToken('acknowledgementStatus', TokenValue2) then begin
-                                            if TokenValue2.SelectToken('confirmationStatus', TokenValue3) then begin
-                                                confirmationStatus := TokenValue3.AsValue().asText();
-                                                Salesheader.AmazconfirmationStatus := confirmationStatus;
-                                                Salesheader.modify(false);
+
+
+                                        TokenValue.SelectToken('buyerProductIdentifier', TokenValue2);
+                                        itemno := AmazASIN2ItemNo(TokenValue2.AsValue().asText());
+                                        if itemno = '' then begin
+                                            TokenValue.SelectToken('vendorProductIdentifier', TokenValue2);
+                                            itemno := GLN2ItemNo(TokenValue2.AsValue().asText());
+                                        end;
+
+
+                                        if itemno <> '' then begin
+                                            Salesline.setrange("Document No.", Salesheader."No.");
+                                            Salesline.setrange("Document Type", Salesheader."Document type");
+                                            Salesline.setrange(type, Salesline.Type::Item);
+                                            Salesline.Setrange("No.", itemno);
+                                            if Salesline.findset() then begin
+                                                if TokenValue.SelectToken('acknowledgementStatus', TokenValue2) then begin
+                                                    if TokenValue2.SelectToken('confirmationStatus', TokenValue3) then begin
+                                                        confirmationStatus := TokenValue3.AsValue().asText();
+                                                        Salesline.AmazconfirmationStatus := confirmationStatus;
+                                                        Salesline.Modify(false);
+                                                        Salesheader.AmazconfirmationStatus := confirmationStatus;
+                                                        Salesheader.modify(false);
+                                                    end;
+                                                    if TokenValue2.SelectToken('acceptedQuantity', TokenValue3) then begin
+                                                        if TokenValue3.SelectToken('amount', TokenValue4) then begin
+                                                            Salesline.AmazacceptedQuantity := TokenValue4.AsValue().AsDecimal();
+                                                            Salesline.Modify(false);
+
+                                                        end
+                                                    end;
+                                                    if TokenValue2.SelectToken('rejectedQuantity', TokenValue3) then begin
+                                                        if TokenValue3.SelectToken('amount', TokenValue4) then begin
+                                                            Salesline.AmazrejectedQuantity := TokenValue4.AsValue().AsDecimal();
+                                                            Salesline.Modify(false);
+
+                                                        end
+                                                    end
+
+                                                END;
+                                                if TokenValue.SelectToken('orderedQuantity', TokenValue2) then begin
+                                                    if TokenValue2.SelectToken('orderedQuantity', TokenValue3) then begin
+                                                        if TokenValue3.SelectToken('amount', TokenValue4) then begin
+                                                            Salesline.AmazorderedQuantity := TokenValue4.AsValue().AsDecimal();
+                                                            Salesline.Modify(false);
+
+                                                        end
+                                                    end;
+                                                end
+
                                             end;
                                         end
                                     end;
@@ -526,7 +640,7 @@ codeunit 50055 AmazonHelper
         exit(today);
     end;
 
-    procedure createorClearAmazonorder(customerno: code[20]; Amazonorder: code[35]; var SalesRecord: record "Sales Header"; Partyid: code[10]): Boolean
+    procedure createorClearAmazonorder(billcustomerno: code[20]; sellcustomerno: code[20]; Amazonorder: code[35]; var SalesRecord: record "Sales Header"; Partyid: code[10]): Boolean
     var
         salesline: record "Sales Line";
         NoSeriesMgt: Codeunit NoSeriesManagement;
@@ -535,7 +649,7 @@ codeunit 50055 AmazonHelper
         SalesRecord.setrange("Document Type", SalesRecord."Document Type"::Order);
         SalesRecord.setrange(AmazonePoNo, Amazonorder);
         SalesRecord.setrange(AmazonSellpartyid, Partyid);
-        SalesRecord.setrange("Sell-to Customer No.", customerno);
+        //SalesRecord.setrange("Sell-to Customer No.", customerno);
         if SalesRecord.findset then begin
             if SalesRecord.status = SalesRecord.status::Released Then begin
                 exit(false); // NOT UPDATES
@@ -556,18 +670,14 @@ codeunit 50055 AmazonHelper
             SalesRecord.validate("External Document No.", Amazonorder);
             SalesRecord.insert(false);
             // Flyt til setup >>
-            SalesRecord."VAT Registration No. Zyxel" := vatBilltocustomer(customerno);
+
             salesrecord."Sales Order Type" := salesrecord."Sales Order Type"::Normal;
             SalesRecord."Location Code" := 'VCK ZNET';
             // Flyt til setup <<
             //SalesRecord."eCommerce Order" := true;
-
-
-            SalesRecord.validate("Sell-to Customer No.", customerno);
-            SalesRecord."VAT Registration No. Zyxel" := vatBilltocustomer(customerno);
+            SalesRecord.validate("Sell-to Customer No.", sellcustomerno);
+            SalesRecord.validate("Bill-to Customer No.", billcustomerno);
             SalesRecord.Validate(AmazonSellpartyid, Partyid);
-
-
             SalesRecord.Validate("Your Reference", Amazonorder);
             SalesRecord."Posting Date" := Today;
 
@@ -611,8 +721,11 @@ codeunit 50055 AmazonHelper
         Amazonsetup: Record "Amazon Setup";
 
     begin
-        Amazonsetup.get(partyid);
-        customer.setrange(AMAZONID, Amazonsetup.ZyxelPartyid);
+        Amazonsetup.get(Amazonid);
+        if Amazonsetup.Bill2Customer <> '' then
+            exit(Amazonsetup.Bill2Customer);
+
+        customer.setrange(AMAZONID, Amazonid);
         if customer.findset then begin
             exit(customer."No.")
         end else begin
@@ -629,23 +742,28 @@ codeunit 50055 AmazonHelper
         Amazonsetup: Record "Amazon Setup";
 
     begin
-        Amazonsetup.get(partyid);
-        customer.setrange(AMAZONID, Amazonsetup.ZyxelPartyid);
+        customer.SETFILTER(AMAZONID, '<>%1', '');
+        if customer.findset then
+            repeat
+                ShiptoAddress.setrange("Customer No.", customer."No.");
+                ShiptoAddress.setrange(Code, partyid);
+                ShiptoAddress.setfilter(Address, '<>%1', '');
+                IF ShiptoAddress.findset then
+                    exit(customer."No.");
+            until customer.next = 0;
+        Amazonsetup.get(Amazonid);
+        customer.SETRANGE(AMAZONID, Amazonid);
         if customer.findset then begin
-
-            ShiptoAddress.setrange("Customer No.", customer."No.");
-            ShiptoAddress.setrange(Code, Amazonid);
-            IF ShiptoAddress.findset then
-                exit(ShiptoAddress.code);
             if Amazonsetup.testmode then begin
                 ShiptoAddress.init;
                 ShiptoAddress."Customer No." := customer."No.";
-                ShiptoAddress.code := Amazonid;
+                ShiptoAddress.code := partyid;
                 ShiptoAddress.insert;
-                exit(ShiptoAddress.code);
+                exit(customer."No.");
             end;
         end;
         error('%1 is missing, ship %2', Amazonsetup.ZyxelPartyid, Amazonid);
+
     end;
 
 
@@ -916,49 +1034,48 @@ codeunit 50055 AmazonHelper
             exit;
         Amazsetup.get(NordiskPartyid);
         temptext := makeJsonPayloadAcknowledgement(SO, NordiskPartyid);
-        IF GetnewToken(newtoken, NordiskPartyid) then begin
-            httpcontent.writefrom(temptext);
-            httpcontent.GetHeaders(contentHeaders);
-            contentHeaders.Clear();
-            request.GetHeaders(contentHeaders);
-            contentHeaders.Add('x-amz-access-token', newtoken);
-            contentHeaders.Add('Accept', 'application/json');
+        if not Amazsetup.NoSendfilonPost then
+            IF GetnewToken(newtoken, NordiskPartyid) then begin
+                httpcontent.writefrom(temptext);
+                httpcontent.GetHeaders(contentHeaders);
+                contentHeaders.Clear();
+                request.GetHeaders(contentHeaders);
+                contentHeaders.Add('x-amz-access-token', newtoken);
+                contentHeaders.Add('Accept', 'application/json');
+                //  request.SetRequestUri(StrSubstNo(Amazsetup.URL_PO_GET, Amazsetup.URL_PO_GET_status));
+                // request.Method := 'GET';
+                HttpContent.GetHeaders(contentHeaders);
+                contentHeaders.Remove('Content-Type');
+                contentHeaders.Add('Content-Type', 'application/json');
+                contentHeaders.Add('Content-Length', format(StrLen(temptext)));
 
-            //  request.SetRequestUri(StrSubstNo(Amazsetup.URL_PO_GET, Amazsetup.URL_PO_GET_status));
-            // request.Method := 'GET';
-            HttpContent.GetHeaders(contentHeaders);
-            contentHeaders.Remove('Content-Type');
-            contentHeaders.Add('Content-Type', 'application/json');
-            contentHeaders.Add('Content-Length', format(StrLen(temptext)));
+                if not (client.post(Amazsetup.URL_Set_AKN, HttpContent, httpResponse)) then begin
+                    Message('Url virker ikke : ' + Amazsetup.URL_Set_AKN);
+                    //  exit(false);
+                end;
 
 
-            if not (client.post(Amazsetup.URL_Set_AKN, HttpContent, httpResponse)) then begin
-                Message('Url virker ikke : ' + Amazsetup.URL_Set_AKN);
-                //  exit(false);
+
+
+                if not (responseMessage.IsSuccessStatusCode()) then begin
+                    Message('Status code: %1\Description: %2, (%3)', responseMessage.HttpStatusCode(), responseMessage.ReasonPhrase());
+                    exit(false);
+                end;
+
+                responseMessage.Content().ReadAs(content);
+
+                // Save the data of the InStream as a file.
+                if (userid in ['PGR 1', 'PGR']) and GuiAllowed then begin
+                    TempBlob.CreateOutStream(outStr, TextEncoding::UTF8);
+                    outStr.WriteText(content);
+                    TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
+                    fileName := StrSubstNo('Amazon__%1_.txt', format(responseMessage.HttpStatusCode()));
+                    File.DownloadFromStream(inStr, 'Export', '', '', fileName);
+                end;
+                // ResponseString := content;
+                exit(true);
+
             end;
-
-
-
-
-            if not (responseMessage.IsSuccessStatusCode()) then begin
-                Message('Status code: %1\Description: %2, (%3)', responseMessage.HttpStatusCode(), responseMessage.ReasonPhrase());
-                exit(false);
-            end;
-
-            responseMessage.Content().ReadAs(content);
-
-            // Save the data of the InStream as a file.
-            if (userid in ['PGR 1', 'PGR']) and GuiAllowed then begin
-                TempBlob.CreateOutStream(outStr, TextEncoding::UTF8);
-                outStr.WriteText(content);
-                TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
-                fileName := StrSubstNo('Amazon__%1_.txt', format(responseMessage.HttpStatusCode()));
-                File.DownloadFromStream(inStr, 'Export', '', '', fileName);
-            end;
-            // ResponseString := content;
-            exit(true);
-
-        end;
 
 
     end;
@@ -1070,6 +1187,7 @@ codeunit 50055 AmazonHelper
         fileName: Text;
         totextvar: text;
         itemrec: record item;
+        Counter: integer;
     begin
 
         Amazsetup.get(NordiskPartyid);
@@ -1081,23 +1199,64 @@ codeunit 50055 AmazonHelper
 
         // MANGLER RESTEN
         salesline.setrange("Document No.", so."No.");
-
+        salesline.setrange("Document Type", so."Document Type");
         salesline.SetRange(type, salesline.type::Item);
         if salesline.findset Then
             repeat
                 itemrec.get(salesline."No.");
+                Counter := Counter + 1;
+                item.add('itemSequenceNumber', Counter);
                 item.add('amazonProductIdentifier', Salesline."Item Reference No.");
                 item.add('vendorProductIdentifier', itemrec.GTIN);
-                item.add('orderedQuantity', format(salesline.Quantity));
-                itemAcknowledgements.add('acknowledgementCode', 'REJECTED');
-                ItemQuantity.add('amount', 0);
-                itemAcknowledgements.add('acknowledgedQuantity', ItemQuantity);
-                itemAcknowledgementsarray.add(itemAcknowledgements);
+                ItemQuantity.add('amount', salesline.AmazorderedQuantity);
+                ItemQuantity.add('unitOfMeasure', 'Eaches');
+                item.add('orderedQuantity', ItemQuantity);
+                Clear(ItemQuantity);
+                if (salesline.AmazorderedQuantity - salesline.Quantity) > 0 then begin
+
+                    //               {
+                    //                 "acknowledgementCode": "Rejected",
+                    //                 "acknowledgedQuantity": {
+                    //                   "amount": 10,
+                    //                   "unitOfMeasure": "Cases",
+                    //                   "unitSize": "5"
+                    //                 },
+                    //                 "rejectionReason": "TemporarilyUnavailable"
+                    //               }
+
+
+                    itemAcknowledgements.add('acknowledgementCode', 'Rejected');
+                    ItemQuantity.add('amount', (salesline.AmazorderedQuantity - salesline.Quantity));
+                    itemAcknowledgements.add('acknowledgedQuantity', ItemQuantity);
+                    itemAcknowledgements.add('rejectionReason', 'TemporarilyUnavailable');
+                    itemAcknowledgementsarray.add(itemAcknowledgements);
+                    Clear(ItemQuantity);
+                    clear(itemAcknowledgements);
+                end;
+                if (salesline.Quantity) > 0 then begin
+                    //  {
+                    //               "acknowledgementCode": "Accepted",
+                    //               "acknowledgedQuantity": {
+                    //                 "amount": 6
+                    //               },
+                    //               "scheduledShipDate": "2019-07-17T19:17:34.304Z"
+                    //             },
+                    itemAcknowledgements.add('acknowledgementCode', 'Accepted');
+                    ItemQuantity.add('amount', SalesLine.Quantity);
+                    itemAcknowledgements.add('acknowledgedQuantity', ItemQuantity);
+                    itemAcknowledgements.add('scheduledShipDate', format(CreateDateTime(SalesLine."Shipment Date", 000000T), 0, 9));  //picking date
+                    itemAcknowledgementsarray.add(itemAcknowledgements);
+                    Clear(ItemQuantity);
+                end;
+
+
+                //  "itemAcknowledgements": [
                 item.add('itemAcknowledgements', itemAcknowledgementsarray);
                 itemarray.Add(item);
                 clear(item);
                 clear(ItemQuantity);
                 clear(itemAcknowledgements);
+                Clear(ItemQuantity);
             until salesline.Next() = 0;
 
         OrderAcknowledgement.Add('items', itemarray);
@@ -1114,7 +1273,7 @@ codeunit 50055 AmazonHelper
         TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
 
         // Save the data of the InStream as a file.
-        if (userid in ['PGR 1', 'PGR']) and GuiAllowed then begin
+        if (UPPERCASE(userid).Contains('PELLE')) and GuiAllowed then begin
             fileName := 'Amaz_Acknowledge_message.txt';
             File.DownloadFromStream(inStr, 'Export', '', '', fileName);
         end;
@@ -1332,138 +1491,6 @@ codeunit 50055 AmazonHelper
         exit(Partytoken);
     end;
 
-    // procedure makeJSONpayloadtoken(): text
-    // var
-    //     eixsetup: record "EIX Setup";
-    //     JObject: JsonObject;
-    //     Messagestring: text;
-    // begin
-    //     eixsetup.get();
-    //     // {
-    //     // "grant_type":"authorization_code"
-    //     // "client_id":"92802577-bd3a-4121-9482-9409429276d6"
-    //     // "client_secret":"<client_secret>"
-    //     // "redirect_uri":"https://businesscentral.dynamics.com/OAuthLanding.htm"
-    //     // "code":"<authorization_code>"
-    //     // }
-
-    //     JObject.add('grant_type', eixsetup.Grant_type);
-    //     JObject.add('client_id', eixsetup.client_id);
-    //     JObject.add('client_secret', eixsetup.client_secret);
-    //     JObject.add('redirect_uri', eixsetup.redirect_uri);
-    //     JObject.add('code', eixsetup."Authorization Code");
-
-
-
-    //     JObject.WriteTo(Messagestring);
-    //     EXIT(Messagestring);
-    // end;
-
-    // procedure makeJSONRefreshtoken(): text
-    // var
-    //     eixsetup: record "EIX Setup";
-    //     JObject: JsonObject;
-    //     Messagestring: text;
-    // begin
-    //     eixsetup.get();
-    //     // {
-    //     // "grant_type":"authorization_code"
-    //     // "client_id":"92802577-bd3a-4121-9482-9409429276d6"
-    //     // "client_secret":"<client_secret>"
-    //     // "redirect_uri":"https://businesscentral.dynamics.com/OAuthLanding.htm"
-    //     // "code":"<authorization_code>"
-    //     // }
-
-    //     JObject.add('grant_type', 'refresh_token');
-    //     JObject.add('client_id', eixsetup.client_id);
-    //     JObject.add('client_secret', eixsetup.client_secret);
-    //     JObject.add('refresh_token', eixsetup.refresh_token);
-
-
-
-
-    //     JObject.WriteTo(Messagestring);
-    //     EXIT(Messagestring);
-    // end;
-
-
-
-    // local procedure MakeMessageeixStock(): text
-    // var
-
-    //     Sku: JsonObject;
-    //     skuarray: JsonArray;
-    //     Stock: JsonObject;
-
-    //     TempBlob: Codeunit "Temp Blob";
-
-    //     outStr: OutStream;
-    //     inStr: InStream;
-    //     TempFile: File;
-    //     fileName: Text;
-    //     totextvar: text;
-    //     Item: record item;
-    //     SCBInformationEntry: record "SCB Information Entry";
-
-    //     Navkfunction: codeunit "NAVK-function";
-    // begin
-
-
-    //   "stock": [
-    //     {
-    //       "sku": "string",
-    //       "parent_sku": "string",
-    //       "stock_remaining": "float",
-    //       "stock_change": "float",
-    //       "ean": "string",
-    //       "cost_price": "float"
-    //       }
-    //          ]
-    //       }
-
-
-
-    // SCBInformationEntry.setrange(Table, 27);
-    // SCBInformationEntry.setrange("Information Code", 'EIX ITEM');
-    // SCBInformationEntry.setrange("Information Value", 'YES');
-    // if SCBInformationEntry.findset Then
-    //     repeat
-    //         if item.get(SCBInformationEntry."No.") then begin
-    //             sku.add('sku', item."No.");
-    //             sku.add('parent_sku', item."No.");
-    //             //sku.add('stock_remaining', TBsync.GetAvailable(item, false, false, false));
-    //             sku.add('stock_remaining', Navkfunction.NordicStocklevelUpdateMain('AMAZ', Item."No.", false));
-    //             sku.add('stock_change', 0);
-    //             sku.add('ean', item.GTIN);
-    //             sku.add('cost_price', Item."Unit Cost");
-    //             skuarray.Add(sku);
-    //             clear(sku);
-    //         end;
-    //     until SCBInformationEntry.next = 0;
-    // Stock.add('stock', skuarray.AsToken());
-    // Stock.WriteTo(totextvar);
-
-    // // Create an outStream from the Blob, notice the encoding.
-    // TempBlob.CreateOutStream(outStr, TextEncoding::UTF8);
-
-
-    // // From the same Blob, that now contains the XML document, create an inStr
-    // Stock.WriteTo(outStr);
-    // TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
-
-    // // Save the data of the InStream as a file.
-    // if userid = 'PGR 1' then begin
-    //     fileName := 'EIX_stock_mmessage.txt';
-    //     File.DownloadFromStream(inStr, 'Export', '', '', fileName);
-    // end;
-
-
-    // exit(totextvar);
-
-
-
-
-    // end;
 
     procedure Refresh_LWA_Token(Partyid: code[10]): Text
 
