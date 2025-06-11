@@ -755,10 +755,12 @@ codeunit 50055 AmazonHelper
         customer.SETRANGE(AMAZONID, Amazonid);
         if customer.findset then begin
             if Amazonsetup.testmode then begin
-                ShiptoAddress.init;
-                ShiptoAddress."Customer No." := customer."No.";
-                ShiptoAddress.code := partyid;
-                ShiptoAddress.insert;
+                if not ShiptoAddress.get(customer."No.", partyid) then begin
+                    ShiptoAddress.init;
+                    ShiptoAddress."Customer No." := customer."No.";
+                    ShiptoAddress.code := partyid;
+                    ShiptoAddress.insert;
+                end;
                 exit(customer."No.");
             end;
         end;
