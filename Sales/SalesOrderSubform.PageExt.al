@@ -105,6 +105,24 @@ pageextension 50129 SalesOrderSubformZX extends "Sales Order Subform"
                 Visible = false;
                 Editable = false;
             }
+            field(AmazorderedQuantity; Rec.AmazorderedQuantity)
+            {
+                ApplicationArea = Basic, Suite;
+                Visible = false;
+                Editable = false;
+            }
+            field(AmazacceptedQuantity; Rec.AmazacceptedQuantity)
+            {
+                ApplicationArea = Basic, Suite;
+                Visible = false;
+                Editable = false;
+            }
+            field(AmazrejectedQuantity; Rec.AmazrejectedQuantity)
+            {
+                ApplicationArea = Basic, Suite;
+                Visible = false;
+                Editable = false;
+            }
         }
         addafter("No.")
         {
