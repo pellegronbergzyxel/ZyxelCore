@@ -510,6 +510,37 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
             {
                 Caption = 'Amazon';
                 Image = Documents;
+                Action(updateStatus)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Update status';
+                    Image = UpdateXML;
+
+                    trigger OnAction()
+                    var
+                        AmazonHelper: Codeunit AmazonHelper;
+                        texttemp: text;
+                    begin
+                        AmazonHelper.UpdateAmazonstatus(rec);
+
+                    end;
+                }
+                Action(SendAcknowledge)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Send order acknowledgement to Anazon';
+                    Image = UpdateXML;
+
+                    trigger OnAction()
+                    var
+                        AmazonHelper: Codeunit AmazonHelper;
+                        Confirmtext: Label 'have you updated quantities on all lines? ';
+                    begin
+                        if confirm(Confirmtext, true) then
+                            AmazonHelper.SetAmazonOrderRejected(rec, rec.AmazonSellpartyid);
+
+                    end;
+                }
                 action(packingSlips)
                 {
                     ApplicationArea = Basic, Suite;

@@ -27,6 +27,14 @@ page 50133 "Amazon setup list"
                     ApplicationArea = All;
                     Editable = false;
                 }
+                field(Bill2Customer; Rec.Bill2Customer)
+                {
+                    ApplicationArea = All;
+                }
+                field(UpdateCustOnStatus; Rec.UpdateCustOnStatus)
+                {
+                    ApplicationArea = All;
+                }
                 field(lastimport; rec.lastimport)
                 {
                     ApplicationArea = All;
@@ -84,6 +92,10 @@ page 50133 "Amazon setup list"
                     ApplicationArea = All;
                 }
                 field(testmode; Rec.testmode)
+                {
+                    ApplicationArea = All;
+                }
+                field(NoSendfilonPost; Rec.NoSendfilonPost)
                 {
                     ApplicationArea = All;
                 }

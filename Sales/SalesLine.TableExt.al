@@ -161,7 +161,7 @@ tableextension 50117 SalesLineZX extends "Sales Line"
             Caption = 'Warehouse Inbound No.';
             Description = '23-03-20 ZY-LD 032';
         }
-        field(50022; "External Document Position No."; Code[10]) 
+        field(50022; "External Document Position No."; Code[10])
         {
             Caption = 'External Document Position No.';
             Description = '04-08-21 ZY-LD 044';
@@ -377,6 +377,22 @@ tableextension 50117 SalesLineZX extends "Sales Line"
             Caption = 'Amazon Unit price';
             DataClassification = ToBeClassified;
         }
+        field(55021; AmazorderedQuantity; Decimal)
+        {
+            Caption = 'Amazon orderedQuantity';
+            DataClassification = ToBeClassified;
+        }
+        field(55022; AmazacceptedQuantity; Decimal)
+        {
+            Caption = 'Amazon acceptedQuantity';
+            DataClassification = ToBeClassified;
+        }
+        field(55023; AmazrejectedQuantity; Decimal)
+        {
+            Caption = 'Amazon rejectedQuantity';
+            DataClassification = ToBeClassified;
+        }
+
 
         field(62000; "Picking List No."; Code[20])
         {

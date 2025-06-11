@@ -94,6 +94,20 @@ table 50090 "Amazon Setup"
             FieldClass = FlowField;
 
         }
+        field(23; NoSendfilonPost; Boolean)
+        {
+            Caption = 'Skip sending on POST';
+        }
+        field(24; Bill2Customer; Code[20])
+        {
+            Caption = 'Bill to customer';
+            TableRelation = customer;
+        }
+        field(25; UpdateCustOnStatus; Boolean)
+        {
+            Caption = 'Update customer on status';
+
+        }
 
     }
     keys
