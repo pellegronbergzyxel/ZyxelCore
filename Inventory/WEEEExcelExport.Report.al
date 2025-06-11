@@ -1,9 +1,5 @@
 Report 50026 "WEEE Excel Export"
 {
-    // 001. 17-10-18 ZY-LD 000 - Product Length (cm) is added.
-    // 002. 16-01-19 ZY-LD 2019011610000085 - B2B and B2C.
-    // 003. 14-08-19 ZY-LD 2019081410000021 - ZyXEL General Tools is changed from CU50016 to CU50000.
-    // 004. 07-10-20 ZY-LD 000 - B2B and B2C is replaced with "Business to".
 
     Caption = 'WEEE Excel Export';
     ProcessingOnly = true;

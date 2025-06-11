@@ -17,7 +17,6 @@ codeunit 50048 "Intercompany Events"
         lCust: Record Customer;
         BillToCustomer: Record Customer;
     begin
-        // 001: >>
         lCust.Get(SalesHeader."Sell-to Customer No.");
         BillToCustomer.Get(SalesHeader."Bill-to Customer No.");
         if BillToCustomer."Sub company" and
@@ -98,12 +97,11 @@ codeunit 50048 "Intercompany Events"
                 recGenBusPostGrp.Get(SalesInvLine."Gen. Bus. Posting Group");
                 if (SalesInvHdr."Ship-to Country/Region Code" <> 'TR') and
                    (recGenBusPostGrp."Sample / Test Equipment" > recGenBusPostGrp."Sample / Test Equipment"::" ")
-                then begin
+                then
                     if recGenBusPostGrp."Sample G/L Account No." <> '' then begin
                         ICOutboxSalesLine."IC Partner Ref. Type" := ICOutboxSalesLine."IC Partner Ref. Type"::"G/L Account";
                         ICOutboxSalesLine."IC Partner Reference" := recGenBusPostGrp."Sample G/L Account No.";
                     end;
-                end;
             end else begin
                 Item.Get(SalesInvLine."No.");
                 if SalesInvLine."VAT Prod. Posting Group" <> Item."VAT Prod. Posting Group" then
@@ -220,7 +218,7 @@ codeunit 50048 "Intercompany Events"
         ICOutboxSalesLine2: Record "IC Outbox Sales Line";
         ICOutBoxSalesHeader: Record "IC Outbox Sales Header";
         ICInboxOutboxMgt: Codeunit ICInboxOutboxMgt;
-        lText001: Label 'Problem with creation of "%1" on sales CrMemooice "%2". Please raise a ticket to navsupport with the error.';
+
     begin
         if (SalesCrMemoLine."No." <> '') AND (ICOutBoxSalesLine."IC Partner Reference" = '') then begin
             ICOutBoxSalesLine."IC Partner Ref. Type" := SalesCrMemoLine.Type;
@@ -285,7 +283,7 @@ codeunit 50048 "Intercompany Events"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"ICInboxOutboxMgt", 'OnCreateSalesDocumentOnBeforeSalesHeaderModify', '', false, false)]
     local procedure ICInboxOutboxMgt_OnCreateSalesDocumentOnBeforeSalesHeaderModify(var SalesHeader: Record "Sales Header"; ICInboxSalesHeader: Record "IC Inbox Sales Header")
     begin
-        SalesHeader."Ship-to Code" := ICInboxSalesHeader."Ship-to Code";  // 13-11-18 ZY-LD 013
+        SalesHeader."Ship-to Code" := ICInboxSalesHeader."Ship-to Code";
         SalesHeader."eCommerce Order" := ICInboxSalesHeader."eCommerce Order";
         SalesHeader."Reference 2" := ICInboxSalesHeader."Your Reference 2";
     end;
@@ -306,7 +304,6 @@ codeunit 50048 "Intercompany Events"
         PurchHeader."Reference 2" := copystr(ICInboxPurchHeader."Your Reference 2", 1, 30);
         if ICpartner.get(ICInboxPurchHeader."IC Partner Code") then;
         if not ICpartner.Skip_sellCustomer then begin
-
             PurchHeader."End Customer" := ICInboxPurchHeader."End Customer";
             PurchHeader.Validate("Sell-to Customer No.", ICInboxPurchHeader."End Customer");
         end;
@@ -356,8 +353,8 @@ codeunit 50048 "Intercompany Events"
         if CountryDimCode <> '' then
             PurchHeader.ValidateShortcutDimCode(3, CountryDimCode);
 
-        PurchHeader."Shipment Method Code" := ICInboxPurchHeader."Shipment Method Code";  // 10-07-20 ZY-LD 019
-        PurchHeader."VAT Registration No." := ICInboxPurchHeader."VAT Registration No.";  // 21-01-21 ZY-LD 021
+        PurchHeader."Shipment Method Code" := ICInboxPurchHeader."Shipment Method Code";
+        PurchHeader."VAT Registration No." := ICInboxPurchHeader."VAT Registration No.";
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"ICInboxOutboxMgt", 'OnAfterCreatePurchDocument', '', false, false)]
@@ -392,9 +389,8 @@ codeunit 50048 "Intercompany Events"
 
         // CreateContainie, if vendor+automatis >>
         autosetup.get();
-        if vend.CreateContanieInternal and autosetup.CreateContanieInternal and (PurchaseHeader."Document Type" = PurchaseHeader."Document Type"::Invoice) then begin
+        if vend.CreateContanieInternal and autosetup.CreateContanieInternal and (PurchaseHeader."Document Type" = PurchaseHeader."Document Type"::Invoice) then
             PurchaseHeader.CreatecontainerfromPurchaseInv(PurchaseHeader);
-        end;
         // CreateContainie, if vendor+automatis <<
 
     end;
@@ -740,16 +736,19 @@ codeunit 50048 "Intercompany Events"
 
     local procedure ZyxelProof(ICInboxPurchHeader: Record "IC Inbox Purchase Header"; var recPurchaseHeader: Record "Purchase Header") VATCode: Code[10]
     var
+        ICLocation: Record "IC Vendors";
+        recCustomer: Record Customer;
         ICVATGenBusCode: Code[10];
         ICVATCode3P: Code[10];
         ICVATCodeReverse: Code[10];
-        ICLocation: Record "IC Vendors";
         ICCompanyName: Text[30];
-        recCustomer: Record Customer;
+        LocationLbl: Label 'SELLDE';
+        LocationLbl2: Label 'EU2';
+
     begin
-        VATCode := recPurchaseHeader."VAT Bus. Posting Group";
+        VATCode := Copystr(recPurchaseHeader."VAT Bus. Posting Group", 1, 10);
         if recCustomer.Get(ICInboxPurchHeader."End Customer") then begin
-            if (recPurchaseHeader."Location Code" = 'EU2') or (recPurchaseHeader."Location Code" = 'SELLDE') then begin
+            if (recPurchaseHeader."Location Code" = LocationLbl2) or (recPurchaseHeader."Location Code" = LocationLbl) then begin
                 if ICLocation.FindFirst() then begin
                     ICCompanyName := ICLocation."IC Company Name";
                     ICVATGenBusCode := ICLocation."Gen.Bus.Posting Group";
@@ -807,8 +806,9 @@ codeunit 50048 "Intercompany Events"
     var
         Company: Record Company;
         ICPartner: Record "IC Partner";
-        ICInboxOutboxMgt: Codeunit ICInboxOutboxMgt;
         MoveICTransToPartnerCompany: Report "Move IC Trans. to Pa. Comp ZX";
+        ICInboxOutboxMgt: Codeunit ICInboxOutboxMgt;
+
     begin
         if ICOutboxTransaction.Find('-') then
             repeat
@@ -834,33 +834,34 @@ codeunit 50048 "Intercompany Events"
         ICSetup: Record "IC Setup";
         ICPartner: Record "IC Partner";
         EmailItem: Record "Email Item";
+        CompanyInfo: Record "Company Information";
+        FileMgt: Codeunit "File Management";
+        ICInboxOutboxMgt: Codeunit ICInboxOutboxMgt;
         MailHandler: Codeunit Mail;
+        ICOutboxExport: Codeunit "IC Outbox Export";
         DocumentMailing: Codeunit "Document-Mailing";
         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
         InStream: InStream;
         OFile: File;
         FileName: Text;
         ICPartnerFilter: Text[1024];
-        i: Integer;
         ToName: Text[100];
         CcName: Text[100];
         OutFileName: Text;
         SourceTableIDs, SourceRelationTypes : List of [Integer];
+        i: Integer;
         SourceIDs: List of [Guid];
-        ICOutboxExport: Codeunit "IC Outbox Export";
+
         FolderPathMissingErr: Label 'Folder Path must have a value in IC Partner: Code=%1. It cannot be zero or empty.', Comment = '%1=Intercompany Code';
         EmailAddressMissingErr: Label 'Email Address must have a value in IC Partner: Code=%1. It cannot be zero or empty.', Comment = '%1=Intercompany Code';
         Text001: Label 'Intercompany transactions from %1.';
         Text002: Label 'Attached to this mail is an xml file containing one or more intercompany transactions from %1 (%2 %3).';
-        FileMgt: Codeunit "File Management";
-        CompanyInfo: Record "Company Information";
-        ICInboxOutboxMgt: Codeunit ICInboxOutboxMgt;
+
     begin
         //Copy of SendToExternalPartner from Codeunit IC Outbox Export
         if GenJnlPostPreview.IsActive() then
             exit;
 
-        //ICPartner.SETFILTER("Inbox Type",'<>%1',ICPartner."Inbox Type"::Database);  
         ICPartner.SetFilter("Inbox Type", '<>%1&<>%2', ICPartner."Inbox Type"::Database, ICPartner."Inbox Type"::"Web Service");
 
         ICPartnerFilter := ICOutboxTransaction.GetFilter("IC Partner Code");
@@ -1074,12 +1075,11 @@ codeunit 50048 "Intercompany Events"
                         end;
                     until recICOutboxSalesLine.Next() = 0;
 
-                    ZyWsMgt.ReplicateItems(recICPartner."Inbox Details", ItemNoFilter, false, true);  // 15-05-19 ZY-LD 003
+                    ZyWsMgt.ReplicateItems(recICPartner."Inbox Details", ItemNoFilter, false, true);
                 end;
             until ICOutboxTransaction.Next() = 0;
         end;
     end;
-    //<< 31-08-18 ZY-LD 002
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"IC Outbox Export", 'OnBeforeExportOutboxTransaction', '', false, false)]
     local procedure ICOutboxExport_OnBeforeExportOutboxTransaction(var ICOutboxTransaction: Record "IC Outbox Transaction"; OutStr: OutStream; var IsHandled: Boolean)
