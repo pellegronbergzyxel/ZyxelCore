@@ -24,7 +24,7 @@
               </TablixColumns>
               <TablixRows>
                 <TablixRow>
-                  <Height>8.85006cm</Height>
+                  <Height>9.51152cm</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -94,7 +94,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!LineText1.Value</Value>
+                                                    <Value EvaluationMode="Auto">=First(Fields!LineText1.Value, "DataSet_Result")</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -158,7 +158,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!LineText2.Value</Value>
+                                                    <Value EvaluationMode="Auto">=First(Fields!LineText2.Value, "DataSet_Result")</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -222,7 +222,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!LineText3.Value</Value>
+                                                    <Value EvaluationMode="Auto">=First(Fields!LineText3.Value, "DataSet_Result")</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -286,7 +286,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!LineText4.Value</Value>
+                                                    <Value EvaluationMode="Auto">=First(Fields!LineText4.Value, "DataSet_Result")</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -350,7 +350,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!LineText5.Value</Value>
+                                                    <Value EvaluationMode="Auto">=First(Fields!LineText5.Value, "DataSet_Result")</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -414,7 +414,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!LineText6.Value</Value>
+                                                    <Value EvaluationMode="Auto">=First(Fields!LineText6.Value, "DataSet_Result")</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -478,7 +478,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!LineText7.Value</Value>
+                                                    <Value EvaluationMode="Auto">=First(Fields!LineText7.Value, "DataSet_Result")</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -542,7 +542,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!LineText8.Value</Value>
+                                                    <Value EvaluationMode="Auto">=First(Fields!LineText8.Value, "DataSet_Result")</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -1836,7 +1836,7 @@
                                     <Width>1.47839in</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>3.1061in</Width>
+                                    <Width>2.37717in</Width>
                                   </TablixColumn>
                                   <TablixColumn>
                                     <Width>0.67in</Width>
@@ -1846,6 +1846,9 @@
                                   </TablixColumn>
                                   <TablixColumn>
                                     <Width>0.74901in</Width>
+                                  </TablixColumn>
+                                  <TablixColumn>
+                                    <Width>0.72893in</Width>
                                   </TablixColumn>
                                   <TablixColumn>
                                     <Width>0.72301in</Width>
@@ -2001,6 +2004,38 @@
                                             </Paragraphs>
                                             <rd:DefaultName>UnitPriceCaption</rd:DefaultName>
                                             <ZIndex>147</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>5pt</PaddingLeft>
+                                              <PaddingRight>5pt</PaddingRight>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="SalesInvLineDiscCaption">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value EvaluationMode="Auto">=First(Fields!SalesInvLineDiscCaption.Value)</Value>
+                                                    <Style>
+                                                      <FontFamily>Segoe UI</FontFamily>
+                                                      <FontSize>8pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <rd:DefaultName>SalesInvLineDiscCaption</rd:DefaultName>
+                                            <ZIndex>146</ZIndex>
                                             <Style>
                                               <VerticalAlign>Bottom</VerticalAlign>
                                               <PaddingLeft>5pt</PaddingLeft>
@@ -2217,6 +2252,41 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
+                                          <Textbox Name="textbox156">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value EvaluationMode="Auto" />
+                                                    <Style>
+                                                      <FontFamily>Segoe UI</FontFamily>
+                                                      <FontSize>8pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>Center</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <rd:DefaultName>textbox156</rd:DefaultName>
+                                            <Style>
+                                              <BottomBorder>
+                                                <Color>Black</Color>
+                                                <Style>Solid</Style>
+                                                <Width>1pt</Width>
+                                              </BottomBorder>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingRight>0.0625in</PaddingRight>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
                                           <Textbox Name="textbox158">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
@@ -2284,9 +2354,10 @@
                                               <VerticalAlign>Bottom</VerticalAlign>
                                             </Style>
                                           </Textbox>
-                                          <ColSpan>6</ColSpan>
+                                          <ColSpan>7</ColSpan>
                                         </CellContents>
                                       </TablixCell>
+                                      <TablixCell />
                                       <TablixCell />
                                       <TablixCell />
                                       <TablixCell />
@@ -2349,9 +2420,10 @@
                                               <PaddingRight>5pt</PaddingRight>
                                             </Style>
                                           </Textbox>
-                                          <ColSpan>5</ColSpan>
+                                          <ColSpan>6</ColSpan>
                                         </CellContents>
                                       </TablixCell>
+                                      <TablixCell />
                                       <TablixCell />
                                       <TablixCell />
                                       <TablixCell />
@@ -2502,6 +2574,37 @@
                                             </Paragraphs>
                                             <rd:DefaultName>SalesInvLineUnitPrice</rd:DefaultName>
                                             <ZIndex>132</ZIndex>
+                                            <Style>
+                                              <PaddingLeft>5pt</PaddingLeft>
+                                              <PaddingRight>5pt</PaddingRight>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="SalesInvLineDiscount">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value EvaluationMode="Auto">=Code.BlankZero(Fields!Discount_SalesInvLine.Value)</Value>
+                                                    <Style>
+                                                      <FontFamily>Segoe UI</FontFamily>
+                                                      <FontSize>8pt</FontSize>
+                                                      <Format>=Fields!Discount_SalesInvLineFormat.Value</Format>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <rd:DefaultName>SalesInvLineDiscount</rd:DefaultName>
+                                            <ZIndex>131</ZIndex>
                                             <Style>
                                               <PaddingLeft>5pt</PaddingLeft>
                                               <PaddingRight>5pt</PaddingRight>
@@ -2683,6 +2786,32 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
+                                          <Textbox Name="textbox47">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value EvaluationMode="Auto" />
+                                                    <Style>
+                                                      <FontFamily>Segoe UI</FontFamily>
+                                                      <FontSize>8pt</FontSize>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <rd:DefaultName>textbox47</rd:DefaultName>
+                                            <ZIndex>120</ZIndex>
+                                            <Style>
+                                              <PaddingRight>0.0625in</PaddingRight>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
                                           <Textbox Name="textbox49">
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -2848,6 +2977,32 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
+                                          <Textbox Name="Textbox59">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value EvaluationMode="Auto" />
+                                                    <Style>
+                                                      <FontFamily>Segoe UI</FontFamily>
+                                                      <FontSize>8pt</FontSize>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <rd:DefaultName>Textbox59</rd:DefaultName>
+                                            <Style>
+                                              <PaddingRight>0.0625in</PaddingRight>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
                                           <Textbox Name="Textbox60">
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
@@ -2931,9 +3086,10 @@
                                               <PaddingRight>0.0625in</PaddingRight>
                                             </Style>
                                           </Textbox>
-                                          <ColSpan>5</ColSpan>
+                                          <ColSpan>6</ColSpan>
                                         </CellContents>
                                       </TablixCell>
+                                      <TablixCell />
                                       <TablixCell />
                                       <TablixCell />
                                       <TablixCell />
@@ -2944,6 +3100,7 @@
                               </TablixBody>
                               <TablixColumnHierarchy>
                                 <TablixMembers>
+                                  <TablixMember />
                                   <TablixMember />
                                   <TablixMember />
                                   <TablixMember />
@@ -3196,7 +3353,8 @@ Cstr(Fields!ShipToAddr6.Value) + Chr(177) +
 Cstr(Fields!ShipToAddr7.Value) + Chr(177) + 
 Cstr(Fields!ShipToAddr8.Value) + Chr(177) +
 Cstr(Fields!ShippingAgentCode.Value) + Chr(177) +
-Cstr(Fields!SellVATID.Value), 2)</Hidden>
+Cstr(Fields!SellVATID.Value) + Chr(177) +
+Cstr(Fields!NOK_VAT.Value), 2)</Hidden>
                                             </Visibility>
                                             <Style>
                                               <Border />
@@ -3273,7 +3431,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
               </TablixMembers>
             </TablixRowHierarchy>
             <DataSetName>DataSet_Result</DataSetName>
-            <Height>8.85006cm</Height>
+            <Height>9.51152cm</Height>
             <Width>18.89576cm</Width>
             <Style>
               <FontFamily>Segoe UI</FontFamily>
@@ -3281,13 +3439,13 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
             </Style>
           </Tablix>
         </ReportItems>
-        <Height>8.85006cm</Height>
+        <Height>9.64381cm</Height>
         <Style />
       </Body>
       <Width>18.89577cm</Width>
       <Page>
         <PageHeader>
-          <Height>10.51172cm</Height>
+          <Height>10.88416cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
@@ -3313,10 +3471,74 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>ShipToAddr11</rd:DefaultName>
-                  <Top>0.68805cm</Top>
-                  <Left>0.18877cm</Left>
+                  <Top>0.65299cm</Top>
+                  <Left>0.13548cm</Left>
                   <Height>0.3cm</Height>
-                  <Width>8.85162cm</Width>
+                  <Width>4.977cm</Width>
+                  <Style>
+                    <Border>
+                      <Style>None</Style>
+                    </Border>
+                    <VerticalAlign>Top</VerticalAlign>
+                  </Style>
+                </Textbox>
+                <Textbox Name="CompanyInfoVATRegNo1">
+                  <CanGrow>true</CanGrow>
+                  <KeepTogether>true</KeepTogether>
+                  <Paragraphs>
+                    <Paragraph>
+                      <TextRuns>
+                        <TextRun>
+                          <Value EvaluationMode="Auto">=Code.GetData(43,1)</Value>
+                          <Style>
+                            <FontFamily>Segoe UI</FontFamily>
+                            <FontSize>8pt</FontSize>
+                          </Style>
+                        </TextRun>
+                      </TextRuns>
+                      <Style>
+                        <TextAlign>Left</TextAlign>
+                      </Style>
+                    </Paragraph>
+                  </Paragraphs>
+                  <rd:DefaultName>CompanyInfoVATRegNo1</rd:DefaultName>
+                  <Top>2.45299cm</Top>
+                  <Left>0.13548cm</Left>
+                  <Height>10pt</Height>
+                  <Width>1.91792cm</Width>
+                  <ZIndex>1</ZIndex>
+                  <Style>
+                    <Border>
+                      <Style>None</Style>
+                    </Border>
+                    <VerticalAlign>Top</VerticalAlign>
+                  </Style>
+                </Textbox>
+                <Textbox Name="SellVATID">
+                  <CanGrow>true</CanGrow>
+                  <KeepTogether>true</KeepTogether>
+                  <Paragraphs>
+                    <Paragraph>
+                      <TextRuns>
+                        <TextRun>
+                          <Value EvaluationMode="Auto">=Code.GetData(10,2)</Value>
+                          <Style>
+                            <FontFamily>Segoe UI</FontFamily>
+                            <FontSize>8pt</FontSize>
+                          </Style>
+                        </TextRun>
+                      </TextRuns>
+                      <Style>
+                        <TextAlign>Left</TextAlign>
+                      </Style>
+                    </Paragraph>
+                  </Paragraphs>
+                  <rd:DefaultName>SellVATID</rd:DefaultName>
+                  <Top>2.45299cm</Top>
+                  <Left>2.20369cm</Left>
+                  <Height>10pt</Height>
+                  <Width>2.93524cm</Width>
+                  <ZIndex>2</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -3344,11 +3566,11 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>ShipToAddr21</rd:DefaultName>
-                  <Top>0.98805cm</Top>
-                  <Left>0.18877cm</Left>
+                  <Top>0.95299cm</Top>
+                  <Left>0.13548cm</Left>
                   <Height>0.3cm</Height>
-                  <Width>8.85162cm</Width>
-                  <ZIndex>1</ZIndex>
+                  <Width>4.977cm</Width>
+                  <ZIndex>3</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -3376,11 +3598,11 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>ShipToAddr31</rd:DefaultName>
-                  <Top>1.28805cm</Top>
-                  <Left>0.18877cm</Left>
+                  <Top>1.25299cm</Top>
+                  <Left>0.13548cm</Left>
                   <Height>0.3cm</Height>
-                  <Width>8.85162cm</Width>
-                  <ZIndex>2</ZIndex>
+                  <Width>4.977cm</Width>
+                  <ZIndex>4</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -3408,11 +3630,11 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>ShipToAddr41</rd:DefaultName>
-                  <Top>1.58805cm</Top>
-                  <Left>0.18877cm</Left>
+                  <Top>1.55299cm</Top>
+                  <Left>0.13548cm</Left>
                   <Height>0.3cm</Height>
-                  <Width>8.85162cm</Width>
-                  <ZIndex>3</ZIndex>
+                  <Width>4.977cm</Width>
+                  <ZIndex>5</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -3440,11 +3662,11 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>ShipToAddr51</rd:DefaultName>
-                  <Top>1.88805cm</Top>
-                  <Left>0.18877cm</Left>
+                  <Top>1.85299cm</Top>
+                  <Left>0.13548cm</Left>
                   <Height>0.3cm</Height>
-                  <Width>8.85162cm</Width>
-                  <ZIndex>4</ZIndex>
+                  <Width>4.977cm</Width>
+                  <ZIndex>6</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -3472,44 +3694,11 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>ShipToAddr61</rd:DefaultName>
-                  <Top>2.18805cm</Top>
-                  <Left>0.18877cm</Left>
+                  <Top>2.15299cm</Top>
+                  <Left>0.13548cm</Left>
                   <Height>0.3cm</Height>
-                  <Width>8.85162cm</Width>
-                  <ZIndex>5</ZIndex>
-                  <Style>
-                    <Border>
-                      <Style>None</Style>
-                    </Border>
-                    <VerticalAlign>Top</VerticalAlign>
-                  </Style>
-                </Textbox>
-                <Textbox Name="Textbox3">
-                  <CanGrow>true</CanGrow>
-                  <KeepTogether>true</KeepTogether>
-                  <Paragraphs>
-                    <Paragraph>
-                      <TextRuns>
-                        <TextRun>
-                          <Value EvaluationMode="Auto">Shipped to:</Value>
-                          <Style>
-                            <FontFamily>Segoe UI</FontFamily>
-                            <FontSize>9pt</FontSize>
-                            <FontWeight>SemiBold</FontWeight>
-                          </Style>
-                        </TextRun>
-                      </TextRuns>
-                      <Style>
-                        <TextAlign>Left</TextAlign>
-                      </Style>
-                    </Paragraph>
-                  </Paragraphs>
-                  <rd:DefaultName>Textbox2</rd:DefaultName>
-                  <Top>0.12677cm</Top>
-                  <Left>0.18877cm</Left>
-                  <Height>0.45545cm</Height>
-                  <Width>4.95017cm</Width>
-                  <ZIndex>6</ZIndex>
+                  <Width>4.977cm</Width>
+                  <ZIndex>7</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -3519,10 +3708,10 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 </Textbox>
               </ReportItems>
               <KeepTogether>true</KeepTogether>
-              <Top>7.30864cm</Top>
+              <Top>6.32037cm</Top>
               <Left>0.10266cm</Left>
-              <Height>2.66724cm</Height>
-              <Width>11.97755cm</Width>
+              <Height>3.32024cm</Height>
+              <Width>5.42007cm</Width>
               <Style>
                 <Border>
                   <Style>Solid</Style>
@@ -3779,75 +3968,11 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                     <VerticalAlign>Top</VerticalAlign>
                   </Style>
                 </Textbox>
-                <Textbox Name="SellVATID">
-                  <CanGrow>true</CanGrow>
-                  <KeepTogether>true</KeepTogether>
-                  <Paragraphs>
-                    <Paragraph>
-                      <TextRuns>
-                        <TextRun>
-                          <Value EvaluationMode="Auto">=Code.GetData(10,2)</Value>
-                          <Style>
-                            <FontFamily>Segoe UI</FontFamily>
-                            <FontSize>8pt</FontSize>
-                          </Style>
-                        </TextRun>
-                      </TextRuns>
-                      <Style>
-                        <TextAlign>Left</TextAlign>
-                      </Style>
-                    </Paragraph>
-                  </Paragraphs>
-                  <rd:DefaultName>SellVATID</rd:DefaultName>
-                  <Top>3.759cm</Top>
-                  <Left>2.25698cm</Left>
-                  <Height>10pt</Height>
-                  <Width>2.93524cm</Width>
-                  <ZIndex>9</ZIndex>
-                  <Style>
-                    <Border>
-                      <Style>None</Style>
-                    </Border>
-                    <VerticalAlign>Top</VerticalAlign>
-                  </Style>
-                </Textbox>
-                <Textbox Name="CompanyInfoVATRegNo1">
-                  <CanGrow>true</CanGrow>
-                  <KeepTogether>true</KeepTogether>
-                  <Paragraphs>
-                    <Paragraph>
-                      <TextRuns>
-                        <TextRun>
-                          <Value EvaluationMode="Auto">=Code.GetData(43,1)</Value>
-                          <Style>
-                            <FontFamily>Segoe UI</FontFamily>
-                            <FontSize>8pt</FontSize>
-                          </Style>
-                        </TextRun>
-                      </TextRuns>
-                      <Style>
-                        <TextAlign>Left</TextAlign>
-                      </Style>
-                    </Paragraph>
-                  </Paragraphs>
-                  <rd:DefaultName>CompanyInfoVATRegNo1</rd:DefaultName>
-                  <Top>3.759cm</Top>
-                  <Left>0.18877cm</Left>
-                  <Height>10pt</Height>
-                  <Width>1.91792cm</Width>
-                  <ZIndex>10</ZIndex>
-                  <Style>
-                    <Border>
-                      <Style>None</Style>
-                    </Border>
-                    <VerticalAlign>Top</VerticalAlign>
-                  </Style>
-                </Textbox>
               </ReportItems>
               <KeepTogether>true</KeepTogether>
               <Top>2.40453cm</Top>
               <Left>0.10266cm</Left>
-              <Height>4.3039cm</Height>
+              <Height>3.79237cm</Height>
               <Width>5.42007cm</Width>
               <ZIndex>1</ZIndex>
               <Style>
@@ -3867,21 +3992,23 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
             <Rectangle Name="Rectangle3">
               <KeepTogether>true</KeepTogether>
               <Left>6cm</Left>
-              <Height>1.54389cm</Height>
+              <Height>1.51694cm</Height>
               <Width>6.07056cm</Width>
               <ZIndex>3</ZIndex>
               <Style />
             </Rectangle>
             <Rectangle Name="Rectangle4">
               <ReportItems>
-                <Image Name="Image1">
-                  <Source>Embedded</Source>
-                  <Value>logo</Value>
+                <Image Name="CompanyInfo2Picture">
+                  <Source>Database</Source>
+                  <Value>=Convert.ToBase64String(Fields!CompanyInfo2Picture.Value)</Value>
+                  <MIMEType>image/bmp</MIMEType>
                   <Sizing>FitProportional</Sizing>
-                  <Top>0.04639cm</Top>
-                  <Left>1.74236cm</Left>
-                  <Height>1.22956cm</Height>
-                  <Width>4.08331cm</Width>
+                  <Top>0.02824cm</Top>
+                  <Left>0.54623cm</Left>
+                  <Height>40pt</Height>
+                  <Width>5.11199cm</Width>
+                  <DataElementOutput>NoOutput</DataElementOutput>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -3902,7 +4029,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">Sales Invoice</Value>
+                      <Value EvaluationMode="Auto">=Code.GetData(19,1)</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>14pt</FontSize>
@@ -4026,7 +4153,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 </Paragraph>
               </Paragraphs>
               <Top>2.54452cm</Top>
-              <Left>8.87145cm</Left>
+              <Left>9.0302cm</Left>
               <Height>11pt</Height>
               <Width>3.03887cm</Width>
               <ZIndex>9</ZIndex>
@@ -4053,7 +4180,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 </Paragraph>
               </Paragraphs>
               <Top>2.97667cm</Top>
-              <Left>8.87145cm</Left>
+              <Left>9.0302cm</Left>
               <Height>11pt</Height>
               <Width>3.03887cm</Width>
               <ZIndex>10</ZIndex>
@@ -4078,7 +4205,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 </Paragraph>
               </Paragraphs>
               <Top>4.11754cm</Top>
-              <Left>8.87145cm</Left>
+              <Left>9.0302cm</Left>
               <Height>11pt</Height>
               <Width>3.03235cm</Width>
               <ZIndex>11</ZIndex>
@@ -4131,7 +4258,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 </Paragraph>
               </Paragraphs>
               <Top>3.69421cm</Top>
-              <Left>8.87145cm</Left>
+              <Left>9.0302cm</Left>
               <Height>11pt</Height>
               <Width>3.03234cm</Width>
               <ZIndex>13</ZIndex>
@@ -4186,7 +4313,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 </Paragraph>
               </Paragraphs>
               <Top>2.055in</Top>
-              <Left>8.87145cm</Left>
+              <Left>9.0302cm</Left>
               <Height>11pt</Height>
               <Width>3.03887cm</Width>
               <ZIndex>15</ZIndex>
@@ -4242,7 +4369,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 </Paragraph>
               </Paragraphs>
               <Top>1.90002in</Top>
-              <Left>8.87145cm</Left>
+              <Left>9.0302cm</Left>
               <Height>11pt</Height>
               <Width>3.03234cm</Width>
               <ZIndex>17</ZIndex>
@@ -4297,12 +4424,39 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 </Paragraph>
               </Paragraphs>
               <Top>5.89704cm</Top>
-              <Left>8.87145cm</Left>
+              <Left>9.0302cm</Left>
               <Height>11pt</Height>
               <Width>1.19641in</Width>
               <ZIndex>19</ZIndex>
               <Style>
                 <Border />
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CompanyInfoVATRegNoCaption">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=Code.GetData(43,1)</Value>
+                      <Style>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>7.37317cm</Top>
+              <Left>12.51663cm</Left>
+              <Height>11pt</Height>
+              <Width>1.95626cm</Width>
+              <ZIndex>20</ZIndex>
+              <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
@@ -4324,11 +4478,11 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>6.19725cm</Top>
-              <Left>12.56558cm</Left>
+              <Top>6.2143cm</Top>
+              <Left>12.51663cm</Left>
               <Height>11pt</Height>
               <Width>1.95626cm</Width>
-              <ZIndex>20</ZIndex>
+              <ZIndex>21</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -4355,7 +4509,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
               <Left>12.54623cm</Left>
               <Height>11pt</Height>
               <Width>5.27947cm</Width>
-              <ZIndex>21</ZIndex>
+              <ZIndex>22</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -4382,7 +4536,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
               <Left>12.51663cm</Left>
               <Height>11pt</Height>
               <Width>5.30907cm</Width>
-              <ZIndex>22</ZIndex>
+              <ZIndex>23</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -4409,7 +4563,34 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
               <Left>12.50835cm</Left>
               <Height>11pt</Height>
               <Width>5.31734cm</Width>
-              <ZIndex>23</ZIndex>
+              <ZIndex>24</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CompanyInfoVATRegNo">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=Code.GetData(32,1)</Value>
+                      <Style>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>7.37317cm</Top>
+              <Left>14.69823cm</Left>
+              <Height>11pt</Height>
+              <Width>3.12745cm</Width>
+              <ZIndex>25</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -4432,11 +4613,11 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>6.19725cm</Top>
+              <Top>6.20901cm</Top>
               <Left>14.69823cm</Left>
               <Height>11pt</Height>
               <Width>3.12745cm</Width>
-              <ZIndex>24</ZIndex>
+              <ZIndex>26</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -4463,7 +4644,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
               <Left>12.50835cm</Left>
               <Height>11pt</Height>
               <Width>5.31735cm</Width>
-              <ZIndex>25</ZIndex>
+              <ZIndex>27</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -4490,7 +4671,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
               <Left>12.50835cm</Left>
               <Height>11pt</Height>
               <Width>5.31735cm</Width>
-              <ZIndex>26</ZIndex>
+              <ZIndex>28</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -4505,7 +4686,6 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -4518,7 +4698,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
               <Left>12.51663cm</Left>
               <Height>11pt</Height>
               <Width>5.30906cm</Width>
-              <ZIndex>27</ZIndex>
+              <ZIndex>29</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -4546,7 +4726,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
               <Left>12.51663cm</Left>
               <Height>11pt</Height>
               <Width>5.30906cm</Width>
-              <ZIndex>28</ZIndex>
+              <ZIndex>30</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -4568,11 +4748,11 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <Top>2.59264in</Top>
-              <Left>12.56558cm</Left>
+              <Top>2.59729in</Top>
+              <Left>12.51663cm</Left>
               <Height>11pt</Height>
               <Width>1.95626cm</Width>
-              <ZIndex>29</ZIndex>
+              <ZIndex>31</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -4599,11 +4779,11 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>2.59264in</Top>
+              <Top>2.59729in</Top>
               <Left>5.7867in</Left>
               <Height>11pt</Height>
               <Width>3.12746cm</Width>
-              <ZIndex>30</ZIndex>
+              <ZIndex>32</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -4628,11 +4808,11 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <Top>2.74542in</Top>
-              <Left>12.56558cm</Left>
+              <Top>2.75631in</Top>
+              <Left>12.51663cm</Left>
               <Height>11pt</Height>
               <Width>1.95626cm</Width>
-              <ZIndex>31</ZIndex>
+              <ZIndex>33</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -4659,11 +4839,44 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>2.74542in</Top>
+              <Top>2.75631in</Top>
               <Left>5.7867in</Left>
               <Height>11pt</Height>
               <Width>3.12746cm</Width>
-              <ZIndex>32</ZIndex>
+              <ZIndex>34</ZIndex>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="Textbox3">
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">Shipped to:</Value>
+                      <Style>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>9pt</FontSize>
+                        <FontWeight>SemiBold</FontWeight>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <rd:DefaultName>Textbox2</rd:DefaultName>
+              <Top>6.41208cm</Top>
+              <Left>0.29142cm</Left>
+              <Height>0.45545cm</Height>
+              <Width>4.95017cm</Width>
+              <ZIndex>35</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -4672,11 +4885,11 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
               </Style>
             </Textbox>
             <Line Name="Line2">
-              <Top>2.40453cm</Top>
+              <Top>2.57235cm</Top>
               <Left>12.2566cm</Left>
-              <Height>7.57135cm</Height>
+              <Height>7.06826cm</Height>
               <Width>0cm</Width>
-              <ZIndex>33</ZIndex>
+              <ZIndex>36</ZIndex>
               <Style>
                 <Border>
                   <Style>Solid</Style>
@@ -4708,7 +4921,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
               <Left>6.22644cm</Left>
               <Height>0.38806cm</Height>
               <Width>2.39773cm</Width>
-              <ZIndex>34</ZIndex>
+              <ZIndex>37</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -4737,10 +4950,10 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
               </Paragraphs>
               <rd:DefaultName>PostedShipmentDate</rd:DefaultName>
               <Top>6.32037cm</Top>
-              <Left>8.87145cm</Left>
+              <Left>9.0302cm</Left>
               <Height>0.38806cm</Height>
               <Width>3.03888cm</Width>
-              <ZIndex>35</ZIndex>
+              <ZIndex>38</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -4773,7 +4986,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
               <Left>6.22642cm</Left>
               <Height>0.38806cm</Height>
               <Width>2.39773cm</Width>
-              <ZIndex>36</ZIndex>
+              <ZIndex>39</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -4802,77 +5015,24 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
               </Paragraphs>
               <rd:DefaultName>ShippingAgentCode</rd:DefaultName>
               <Top>6.7437cm</Top>
-              <Left>8.87145cm</Left>
+              <Left>9.0302cm</Left>
               <Height>0.38806cm</Height>
               <Width>3.03888cm</Width>
-              <ZIndex>37</ZIndex>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Rectangle Name="Rectangle6">
-              <KeepTogether>true</KeepTogether>
-              <Top>2.40453cm</Top>
-              <Left>5.94995cm</Left>
-              <Height>4.86883cm</Height>
-              <Width>6.20082cm</Width>
-              <ZIndex>38</ZIndex>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-              </Style>
-            </Rectangle>
-            <Rectangle Name="Rectangle8">
-              <KeepTogether>true</KeepTogether>
-              <Top>2.37808cm</Top>
-              <Left>12.40578cm</Left>
-              <Height>3.4925cm</Height>
-              <Width>5.82083cm</Width>
-              <ZIndex>39</ZIndex>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-              </Style>
-            </Rectangle>
-            <Textbox Name="CompanyInfoVATRegNoCaption">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value EvaluationMode="Auto">=Code.GetData(43,1)</Value>
-                      <Style>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>7.57336cm</Top>
-              <Left>12.56558cm</Left>
-              <Height>11pt</Height>
-              <Width>1.95626cm</Width>
               <ZIndex>40</ZIndex>
               <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="CompanyInfoVATRegNo">
+            <Textbox Name="CompanyInfoVATRegNoCaption2">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Code.GetData(32,1)</Value>
+                      <Value EvaluationMode="Auto">=Fields!HeaderExternalNo.Value</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
@@ -4884,11 +5044,95 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>7.57336cm</Top>
-              <Left>14.74718cm</Left>
+              <Top>7.87336cm</Top>
+              <Left>9.0302cm</Left>
               <Height>11pt</Height>
-              <Width>3.12745cm</Width>
+              <Width>3.03888cm</Width>
               <ZIndex>41</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="ShippingAgent2">
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">External Doc. No.</Value>
+                      <Style>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <rd:DefaultName>ShippingAgent</rd:DefaultName>
+              <Top>7.87336cm</Top>
+              <Left>6.23527cm</Left>
+              <Height>0.38806cm</Height>
+              <Width>2.3889cm</Width>
+              <ZIndex>42</ZIndex>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="SalesInvYourReference">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=Code.GetData(11,1)</Value>
+                      <Style>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style />
+                </Paragraph>
+              </Paragraphs>
+              <Top>8.33197cm</Top>
+              <Left>9.0302cm</Left>
+              <Height>11pt</Height>
+              <Width>3.03888cm</Width>
+              <ZIndex>43</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="ReferenceText1">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=Code.GetData(46,1)</Value>
+                      <Style>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style />
+                </Paragraph>
+              </Paragraphs>
+              <Top>8.33197cm</Top>
+              <Left>6.22642cm</Left>
+              <Height>11pt</Height>
+              <Width>2.64503cm</Width>
+              <ZIndex>44</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -4897,7 +5141,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
           <Style />
         </PageHeader>
         <PageFooter>
-          <Height>3.51094cm</Height>
+          <Height>3.61921cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
@@ -4924,7 +5168,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
               <Top>0.2287cm</Top>
               <Left>0.10266cm</Left>
               <Height>0.35048cm</Height>
-              <Width>11.3192cm</Width>
+              <Width>10.2826cm</Width>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -4952,10 +5196,10 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox9</rd:DefaultName>
-              <Top>1.1378cm</Top>
+              <Top>1.1766cm</Top>
               <Left>0.10266cm</Left>
               <Height>0.35048cm</Height>
-              <Width>5.42007cm</Width>
+              <Width>7.96109cm</Width>
               <ZIndex>1</ZIndex>
               <Style>
                 <Border>
@@ -4988,7 +5232,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
               <Top>0.75557cm</Top>
               <Left>0.10266cm</Left>
               <Height>0.35048cm</Height>
-              <Width>5.42007cm</Width>
+              <Width>7.96109cm</Width>
               <ZIndex>2</ZIndex>
               <Style>
                 <Border>
@@ -5017,10 +5261,10 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox9</rd:DefaultName>
-              <Top>1.52003cm</Top>
+              <Top>1.63292cm</Top>
               <Left>0.10266cm</Left>
               <Height>0.35048cm</Height>
-              <Width>5.42007cm</Width>
+              <Width>7.96109cm</Width>
               <ZIndex>3</ZIndex>
               <Style>
                 <Border>
@@ -5029,51 +5273,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Line Name="Line1">
-              <Top>0.16695cm</Top>
-              <Left>0.15557cm</Left>
-              <Height>0cm</Height>
-              <Width>18.36717cm</Width>
-              <ZIndex>4</ZIndex>
-              <Style>
-                <Border>
-                  <Style>Solid</Style>
-                </Border>
-              </Style>
-            </Line>
-            <Textbox Name="Textbox18">
-              <CanGrow>true</CanGrow>
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value EvaluationMode="Auto">=First(Fields!CompanyInfoCurrCode.Value, "DataSet_Result") &amp; " " &amp; First(Fields!CompanyInfoIBAN.Value, "DataSet_Result")</Value>
-                      <Style>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <rd:DefaultName>Textbox9</rd:DefaultName>
-              <Top>1.17661cm</Top>
-              <Left>11.715cm</Left>
-              <Height>0.35048cm</Height>
-              <Width>5.42007cm</Width>
-              <ZIndex>5</ZIndex>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="Textbox19">
+            <Textbox Name="Textbox17">
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
@@ -5093,11 +5293,11 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox9</rd:DefaultName>
-              <Top>1.91163cm</Top>
+              <Top>2.05395cm</Top>
               <Left>0.10266cm</Left>
               <Height>0.35048cm</Height>
-              <Width>5.42007cm</Width>
-              <ZIndex>6</ZIndex>
+              <Width>7.96109cm</Width>
+              <ZIndex>4</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -5105,7 +5305,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="Textbox21">
+            <Textbox Name="Textbox18">
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
@@ -5125,10 +5325,75 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox9</rd:DefaultName>
-              <Top>2.26563cm</Top>
+              <Top>2.58082cm</Top>
               <Left>0.10266cm</Left>
               <Height>0.35048cm</Height>
-              <Width>5.42007cm</Width>
+              <Width>7.96109cm</Width>
+              <ZIndex>5</ZIndex>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="Textbox19">
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=Parameters!IBANTxT.Value</Value>
+                      <Style>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <rd:DefaultName>Textbox9</rd:DefaultName>
+              <Top>0.75557cm</Top>
+              <Left>10.56165cm</Left>
+              <Height>0.35048cm</Height>
+              <Width>7.96109cm</Width>
+              <ZIndex>6</ZIndex>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="Textbox20">
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=First(Fields!CompanyInfoCurrCode.Value, "DataSet_Result") &amp; " " &amp; First(Fields!CompanyInfoIBAN.Value, "DataSet_Result")</Value>
+                      <Style>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <rd:DefaultName>Textbox9</rd:DefaultName>
+              <Top>1.21188cm</Top>
+              <Left>10.56165cm</Left>
+              <Height>0.35048cm</Height>
+              <Width>7.96109cm</Width>
               <ZIndex>7</ZIndex>
               <Style>
                 <Border>
@@ -5137,7 +5402,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="Textbox26">
+            <Textbox Name="Textbox21">
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
@@ -5157,10 +5422,10 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox9</rd:DefaultName>
-              <Top>1.52709cm</Top>
-              <Left>11.715cm</Left>
+              <Top>1.6682cm</Top>
+              <Left>10.56165cm</Left>
               <Height>0.35048cm</Height>
-              <Width>5.42007cm</Width>
+              <Width>7.96109cm</Width>
               <ZIndex>8</ZIndex>
               <Style>
                 <Border>
@@ -5169,7 +5434,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="Textbox31">
+            <Textbox Name="Textbox26">
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
@@ -5189,10 +5454,10 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox9</rd:DefaultName>
-              <Top>1.91285cm</Top>
-              <Left>11.715cm</Left>
+              <Top>2.05395cm</Top>
+              <Left>10.56165cm</Left>
               <Height>0.35048cm</Height>
-              <Width>5.42007cm</Width>
+              <Width>7.96109cm</Width>
               <ZIndex>9</ZIndex>
               <Style>
                 <Border>
@@ -5221,10 +5486,10 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox9</rd:DefaultName>
-              <Top>2.29861cm</Top>
-              <Left>11.715cm</Left>
+              <Top>2.47499cm</Top>
+              <Left>10.56165cm</Left>
               <Height>0.35048cm</Height>
-              <Width>5.42007cm</Width>
+              <Width>7.96109cm</Width>
               <ZIndex>10</ZIndex>
               <Style>
                 <Border>
@@ -5233,14 +5498,25 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="Textbox20">
+            <Line Name="Line1">
+              <Top>0.16695cm</Top>
+              <Height>0cm</Height>
+              <Width>18.89576cm</Width>
+              <ZIndex>11</ZIndex>
+              <Style>
+                <Border>
+                  <Style>Solid</Style>
+                </Border>
+              </Style>
+            </Line>
+            <Textbox Name="Textbox38">
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=Parameters!IBANTxT.Value</Value>
+                      <Value EvaluationMode="Auto">=Last(Fields!NOK_VAT_HEADER.Value, "DataSet_Result")</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
@@ -5254,11 +5530,14 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox9</rd:DefaultName>
-              <Top>0.75557cm</Top>
-              <Left>11.715cm</Left>
+              <Top>0.27278cm</Top>
+              <Left>10.56165cm</Left>
               <Height>0.35048cm</Height>
-              <Width>5.42007cm</Width>
-              <ZIndex>11</ZIndex>
+              <Width>2.80695cm</Width>
+              <ZIndex>12</ZIndex>
+              <Visibility>
+                <Hidden>=Last(Fields!NOK_VAT.Value, "DataSet_Result") = 0</Hidden>
+              </Visibility>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -5266,7 +5545,44 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="Textbox17">
+            <Textbox Name="Textbox39">
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=Last(Fields!NOK_VAT.Value, "DataSet_Result")</Value>
+                      <Style>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                        <Format>#,0.00</Format>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <rd:DefaultName>Textbox9</rd:DefaultName>
+              <Top>0.29926cm</Top>
+              <Left>16.02063cm</Left>
+              <Height>0.35048cm</Height>
+              <Width>2.87514cm</Width>
+              <ZIndex>13</ZIndex>
+              <Visibility>
+                <Hidden>=Last(Fields!NOK_VAT.Value, "DataSet_Result") = 0</Hidden>
+              </Visibility>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="Textbox31">
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
@@ -5286,11 +5602,11 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox9</rd:DefaultName>
-              <Top>2.74065cm</Top>
+              <Top>3.08869cm</Top>
               <Left>0.23784cm</Left>
               <Height>0.42104cm</Height>
               <Width>18.42008cm</Width>
-              <ZIndex>12</ZIndex>
+              <ZIndex>14</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -5409,33 +5725,6 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
       </DefaultValue>
       <Prompt>Text002</Prompt>
     </ReportParameter>
-    <ReportParameter Name="Text003">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Text003</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Text003</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Text004">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Text004</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Text004</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Text005">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Text005</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Text005</Prompt>
-    </ReportParameter>
   </ReportParameters>
   <Code>Public Function BlankZero(ByVal Value As Decimal)
     if Value = 0 then
@@ -5525,15 +5814,6 @@ End Function
 Public Function GetNoOfCopies() As integer
    Return  NoOfCopies 
 End Function</Code>
-  <EmbeddedImages>
-    <EmbeddedImage Name="logo">
-      <MIMEType>image/png</MIMEType>
-      <ImageData>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</ImageData>
-    </EmbeddedImage>
-  </EmbeddedImages>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
@@ -5682,12 +5962,6 @@ E7vTkj5JjH6ToK3ZqfL4wSp8Wn+GPRHXRSutRTdWdNwNmbLOOTIyl+asNj3jzfAX7EfYWISc/lBE1Btq
         <Field Name="CompanyInfoSwift">
           <DataField>CompanyInfoSwift</DataField>
         </Field>
-        <Field Name="CompanyInfoRegistrationNo">
-          <DataField>CompanyInfoRegistrationNo</DataField>
-        </Field>
-        <Field Name="CompanyInfoWeeRegistrationNo">
-          <DataField>CompanyInfoWeeRegistrationNo</DataField>
-        </Field>
         <Field Name="BilltoCustNo_SalesInvHdr">
           <DataField>BilltoCustNo_SalesInvHdr</DataField>
         </Field>
@@ -5781,6 +6055,9 @@ E7vTkj5JjH6ToK3ZqfL4wSp8Wn+GPRHXRSutRTdWdNwNmbLOOTIyl+asNj3jzfAX7EfYWISc/lBE1Btq
         <Field Name="BilltoCustNo_SalesInvHdrCaption">
           <DataField>BilltoCustNo_SalesInvHdrCaption</DataField>
         </Field>
+        <Field Name="HeaderExternalNo">
+          <DataField>HeaderExternalNo</DataField>
+        </Field>
         <Field Name="PricesInclVAT_SalesInvHdrCaption">
           <DataField>PricesInclVAT_SalesInvHdrCaption</DataField>
         </Field>
@@ -5849,6 +6126,9 @@ E7vTkj5JjH6ToK3ZqfL4wSp8Wn+GPRHXRSutRTdWdNwNmbLOOTIyl+asNj3jzfAX7EfYWISc/lBE1Btq
         </Field>
         <Field Name="TarrifNo">
           <DataField>TarrifNo</DataField>
+        </Field>
+        <Field Name="SalesInvoiceHeaderIntercompanyPurchase">
+          <DataField>SalesInvoiceHeaderIntercompanyPurchase</DataField>
         </Field>
         <Field Name="ArticleText">
           <DataField>ArticleText</DataField>
@@ -6021,6 +6301,12 @@ E7vTkj5JjH6ToK3ZqfL4wSp8Wn+GPRHXRSutRTdWdNwNmbLOOTIyl+asNj3jzfAX7EfYWISc/lBE1Btq
         <Field Name="ExternalDocumentNoLine">
           <DataField>ExternalDocumentNoLine</DataField>
         </Field>
+        <Field Name="Item_Reference_No_">
+          <DataField>Item_Reference_No_</DataField>
+        </Field>
+        <Field Name="Item_Reference_No_Caption">
+          <DataField>Item_Reference_No_Caption</DataField>
+        </Field>
         <Field Name="SalesShptBufferPostDate">
           <DataField>SalesShptBufferPostDate</DataField>
         </Field>
@@ -6179,6 +6465,15 @@ E7vTkj5JjH6ToK3ZqfL4wSp8Wn+GPRHXRSutRTdWdNwNmbLOOTIyl+asNj3jzfAX7EfYWISc/lBE1Btq
         </Field>
         <Field Name="SelltoCustNo_SalesInvHdr">
           <DataField>SelltoCustNo_SalesInvHdr</DataField>
+        </Field>
+        <Field Name="NOK_VAT_HEADER">
+          <DataField>NOK_VAT_HEADER</DataField>
+        </Field>
+        <Field Name="NOK_VAT">
+          <DataField>NOK_VAT</DataField>
+        </Field>
+        <Field Name="NOK_VATFormat">
+          <DataField>NOK_VATFormat</DataField>
         </Field>
         <Field Name="LineFeeCaptionLbl">
           <DataField>LineFeeCaptionLbl</DataField>
