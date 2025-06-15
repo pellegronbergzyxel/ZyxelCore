@@ -293,6 +293,7 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
         WhseInbHead: Record "Warehouse Inbound Header";
         POL: Record "Purchase Line";
         CreateWIO: Report "Create Whse. Inbound Order";
+        Location: Record Location; //13-06-25 BK #511511
 
     begin
         WhseInbHead.SetCurrentkey("Shipper Reference");
@@ -335,6 +336,8 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
                     WhseInbLine."Purchase Order Line No." := Pol."Line No.";
                     WhseInbLine.insert(true);
                     WhseInbLine.Location := PurchaseHeader."Location Code";
+                    if Location.get(PurchaseHeader."Location Code") then
+                        WhseInbLine."Main Warehouse" := Location."Main Warehouse"; //13-06-025 BK #511511
                     WhseInbLine."Item No." := Pol."No.";
                     WhseInbLine.Quantity := Pol.Quantity;
                     WhseInbLine.ETA := Pol."Expected Receipt Date";
