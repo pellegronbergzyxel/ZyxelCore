@@ -27,10 +27,10 @@ page 50133 "Amazon setup list"
                     ApplicationArea = All;
                     Editable = false;
                 }
-                field(Bill2Customer; Rec.Bill2Customer)
-                {
-                    ApplicationArea = All;
-                }
+                //field(Bill2Customer; Rec.Bill2Customer)
+                //{
+                //   ApplicationArea = All;
+                //}
                 field(UpdateCustOnStatus; Rec.UpdateCustOnStatus)
                 {
                     ApplicationArea = All;

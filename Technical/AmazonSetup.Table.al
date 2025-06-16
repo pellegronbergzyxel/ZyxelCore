@@ -89,7 +89,7 @@ table 50090 "Amazon Setup"
         {
             CalcFormula = lookup(Customer."No." where(AMAZONID = field(ZyxelPartyid)));
 
-            Caption = 'Bill-to customer';
+            Caption = 'Sell-to customer';
             Editable = false;
             FieldClass = FlowField;
 

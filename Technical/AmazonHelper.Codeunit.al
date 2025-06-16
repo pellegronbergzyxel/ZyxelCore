@@ -77,11 +77,10 @@ codeunit 50055 AmazonHelper
                                     if orderDetails.SelectToken('sellingParty', temptoken) then
                                         if temptoken.SelectToken('partyId', TokenValue) then
                                             EVALUATE(sellingParty, TokenValue.AsValue().AsText());
-
-
-
-                                Custbill := AmazonID2CustNo(buyingParty, sellingParty);
+                                CustSell := '';
+                                Custbill := '';
                                 CustSell := AmazonID2CustNoShipto(buyingParty, sellingParty);
+                                Custbill := AmazonID2CustNo(buyingParty, sellingParty, CustSell);
                                 shipno := sellingParty;
 
                                 if (Custbill <> '') and (AmazonORder <> '') then begin
@@ -220,9 +219,10 @@ codeunit 50055 AmazonHelper
                                         if orderDetails.SelectToken('sellingParty', temptoken) then
                                             if temptoken.SelectToken('partyId', TokenValue) then
                                                 EVALUATE(sellingParty, TokenValue.AsValue().AsText());
-
-                                    Custbill := AmazonID2CustNo(sellingParty, buyingParty);
+                                    Custbill := '';
+                                    Custsell := '';
                                     CustSell := AmazonID2CustNoShipto(sellingParty, buyingParty);
+                                    Custbill := AmazonID2CustNo(sellingParty, buyingParty, CustSell);
                                     shipno := buyingParty;
 
                                     if (Custbill <> '') and (AmazonORder <> '') then begin
@@ -484,8 +484,9 @@ codeunit 50055 AmazonHelper
                                     EVALUATE(sellingParty, TokenValue.AsValue().AsText());
 
 
-                            Custbill := AmazonID2CustNo(buyingParty, sellingParty);
+
                             CustSell := AmazonID2CustNoShipto(buyingParty, sellingParty);
+                            Custbill := AmazonID2CustNo(buyingParty, sellingParty, CustSell);
                             ShipCode := sellingParty;
 
                             IF amazonsetup.get(Salesheader.AmazonSellpartyid) then
@@ -714,16 +715,18 @@ codeunit 50055 AmazonHelper
             error('Amazon ID missing for customer', CustNo);
     end;
 
-    procedure AmazonID2CustNo(Amazonid: Code[10]; partyid: Code[10]): code[20]
+    procedure AmazonID2CustNo(Amazonid: Code[10]; partyid: Code[10]; sellcust: code[20]): code[20]
     var
         customer: record customer;
-        customerCreate: record customer;
+        customer2: record customer;
         Amazonsetup: Record "Amazon Setup";
 
     begin
-        Amazonsetup.get(Amazonid);
-        if Amazonsetup.Bill2Customer <> '' then
-            exit(Amazonsetup.Bill2Customer);
+        if sellcust <> '' then begin
+            customer2.get(sellcust);
+            if customer."Bill-to Customer No." <> '' then
+                exit(customer."Bill-to Customer No.");
+        end;
 
         customer.setrange(AMAZONID, Amazonid);
         if customer.findset then begin
@@ -755,10 +758,12 @@ codeunit 50055 AmazonHelper
         customer.SETRANGE(AMAZONID, Amazonid);
         if customer.findset then begin
             if Amazonsetup.testmode then begin
-                ShiptoAddress.init;
-                ShiptoAddress."Customer No." := customer."No.";
-                ShiptoAddress.code := partyid;
-                ShiptoAddress.insert;
+                if not ShiptoAddress.get(customer."No.", partyid) then begin
+                    ShiptoAddress.init;
+                    ShiptoAddress."Customer No." := customer."No.";
+                    ShiptoAddress.code := partyid;
+                    ShiptoAddress.insert;
+                end;
                 exit(customer."No.");
             end;
         end;
@@ -1247,6 +1252,7 @@ codeunit 50055 AmazonHelper
                     itemAcknowledgements.add('scheduledShipDate', format(CreateDateTime(SalesLine."Shipment Date", 000000T), 0, 9));  //picking date
                     itemAcknowledgementsarray.add(itemAcknowledgements);
                     Clear(ItemQuantity);
+                    clear(itemAcknowledgements);
                 end;
 
 
@@ -1256,6 +1262,7 @@ codeunit 50055 AmazonHelper
                 clear(item);
                 clear(ItemQuantity);
                 clear(itemAcknowledgements);
+                clear(itemAcknowledgementsarray);
                 Clear(ItemQuantity);
             until salesline.Next() = 0;
 
