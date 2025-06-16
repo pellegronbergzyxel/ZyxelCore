@@ -1252,6 +1252,7 @@ codeunit 50055 AmazonHelper
                     itemAcknowledgements.add('scheduledShipDate', format(CreateDateTime(SalesLine."Shipment Date", 000000T), 0, 9));  //picking date
                     itemAcknowledgementsarray.add(itemAcknowledgements);
                     Clear(ItemQuantity);
+                    clear(itemAcknowledgements);
                 end;
 
 
@@ -1261,6 +1262,7 @@ codeunit 50055 AmazonHelper
                 clear(item);
                 clear(ItemQuantity);
                 clear(itemAcknowledgements);
+                clear(itemAcknowledgementsarray);
                 Clear(ItemQuantity);
             until salesline.Next() = 0;
 
