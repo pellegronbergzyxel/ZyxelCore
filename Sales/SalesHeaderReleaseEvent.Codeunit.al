@@ -6,7 +6,6 @@ codeunit 50052 SalesHeaderReleaseEvent
     var
         recSalesLine: Record "Sales Line";
         recSalesLine2: Record "Sales Line";
-        recSalesLine3: Record "Sales Line";
         recItem: Record Item;
         recAddItem: Record "Additional Item";
         recSalesSetup: Record "Sales & Receivables Setup";
@@ -16,18 +15,13 @@ codeunit 50052 SalesHeaderReleaseEvent
         recLocation: Record Location;
         recCustOvership: Record "Customer/Item Overshipment";
         recGenProdPostGrp: Record "Gen. Product Posting Group";
-        recCountry: Record "Country/Region";
         recAddEicardOrderInfo: Record "Add. Eicard Order Info";
         SalOrdTypeRel: Record "Sales Order Type Relation";
-        AddItemMgt: Codeunit "ZyXEL Additional Items Mgt";
-        ZyXELVCK: Codeunit "ZyXEL VCK";
         ReleaseOrder: Codeunit "Customer Credit Limit Check";
         ZGT: Codeunit "ZyXEL General Tools";
         SalesHeadEvent: Codeunit "Sales Header/Line Events";
         SI: Codeunit "Single Instance";
         ItemLogisticEvents: Codeunit "Item / Logistic Events";
-        EInvoiceCommentEnable: Boolean;
-        CurrencyCode: Code[10];
         Balance: Decimal;
         BalanceDue: Decimal;
         Credit: Decimal;
@@ -36,13 +30,10 @@ codeunit 50052 SalesHeaderReleaseEvent
         lText001: Label '"Item No." %1 on Sales Order %2 Line No. %3 must have an "%4" %5.';
         lText002: Label '"%1" is blank, and delivery document will not be created.\ Do you want to continue?';
         lText003: Label 'If "%1" is blank. Delivery Document will not be created.';
-        lText005: Label 'Please enter "%1" on item no. %2. (Line %3).';
         lText006: Label '"%1" has been reached.\%4.\\ "%1": %2\"Order Balance": %3';
         lText007: Label 'Unaccepted lines with zero "%1" exists (%3).\\You need to tick off the field "%2" on the sales line to confirm that zero "%1" is correct.';
-        lText008: Label 'Release is cancled.';
         lText009: Label 'External document number can not be blank!';
         lText011: Label '"%1" %2 and "%3" %4 must not be different on "%5" %6 %7. Re-enter "%1".';
-        lText012: Label 'Both "%1" and "%2" must be filled on line no. %3.';
         lText013: Label 'The "%1" "%2" on %3 %4 must be identical to "%1" "%5" on the sales header.';
         lText014: Label '"%1" must not be 0,00 on %4 sales order %2 line no. %3.';
         lText015: Label '"%1" must be 0,00 on %4 sales order %2 line no. %3.';
@@ -51,7 +42,6 @@ codeunit 50052 SalesHeaderReleaseEvent
         lText018: Label 'You can not combine EiCard orders with items for both ZCom and ZNet.\The field "SBU Company" on the item card define the company. Create one sales order for ZCom and one for ZNet.';
         lText019: Label 'You must choose an option for "%1".';
         lText020: Label '"Item No." %1 on Sales Order %2 Line No. %3 does not have an "%4" %5.\Do you want to continue?';
-        lText021: Label 'For "Customer No." %1 you can only sell "Item No." %2 from "Location Code" %3.\See "%4".';
         lText022: Label '"%1" must be identical to "%5" on %4 sales order %2 line no. %3.';
         lText023: Label 'You are trying to release an "%1" for location "%2" without a "Shipment No.".\Are you sure you want to continue?';
         lText024: Label 'The sales document (Invoice, Cr. Memo)  in the subsidary will be invoiced in "Currency Code" %1.\Do you want to continue?';
@@ -59,13 +49,9 @@ codeunit 50052 SalesHeaderReleaseEvent
         lText026: Label '"%1" %2 on "%3" does not match "%1" %4 on "%5".';
         lText027: Label '"Line No." %1 with commercial products is not related to a line with overshipment products.\Do you want to continue?';
         lText028: Label '"%1" must have a value, or "%2" must be blank on "%3" %4.';
-        lText029: Label '"%1" and "%2" must not be identical.';
         lText030: Label 'The field "%1" must be filled on the item card. The field tell which "HQ Company" the item is linked to. The field must be updated by "HQ PLMS Update".\\"HQ PLMS Update" is running for single items every night, and a full update for all items is running during the weekend.\\You can not start the Eicard process until the field "%1" has been filled.';
-        lText031: Label '"%1" is a freight cost, and can be related to an item line.\If the relation is filled in, it freight will be posted same invoice together with the related item.\\Do you want to continue without a relation?';
-        lText032: Label '"%1" %2 must be identical to the first two characters on "%3" %4.';
         lText033: Label 'Please contact the accounting manager to get the order released.';
         lText034: Label 'Do you want to continue?';
-        lText035: Label 'Quantiry for GLC products must be equal to one.';
         lText036: Label 'Quantity %1 and "%2 security" %3 does not match.';
         lText037: Label 'The Item No. %1 is blocked. Please contact your Supply Chain Manager.';
         lText038: Label '"%1" is a freight cost, and can be related to an item line.\If the relation is filled in, it freight will be posted on the same invoice together with the related item.\\Do you want to continue without a relation?';
@@ -73,7 +59,7 @@ codeunit 50052 SalesHeaderReleaseEvent
         lText042: Label '"%1" on %2 "Line No." %3 is a non returnable item.';
     begin
         if SalesHeader."Document Type" in [SalesHeader."document type"::Order, SalesHeader."document type"::"Return Order"] then begin
-            if (not SI.GetHideSalesDialog) and GuiAllowed() then begin
+            if (not SI.GetHideSalesDialog()) and GuiAllowed() then begin
                 recSalesLine.SetRange("Document Type", SalesHeader."Document Type");
                 recSalesLine.SetRange("Document No.", SalesHeader."No.");
                 recSalesLine.SetFilter(Type, '>%1', recSalesLine.Type::" ");
@@ -95,7 +81,7 @@ codeunit 50052 SalesHeaderReleaseEvent
         end;
 
         IF SalesHeader."Document Type" IN [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::"Credit Memo"] THEN BEGIN
-            recSalesLine.RESET;
+            recSalesLine.RESET();
             recSalesLine.SETRANGE("Document Type", SalesHeader."Document Type");
             recSalesLine.SETRANGE("Document No.", SalesHeader."No.");
             recSalesLine.SETRANGE(Type, recSalesLine.Type::Item);
@@ -112,7 +98,7 @@ codeunit 50052 SalesHeaderReleaseEvent
                             recSalesLine.VALIDATE("Unit Cost (LCY)", recItem."Last Direct Cost");
                             recSalesLine.MODIFY();
                         end;
-                UNTIL recSalesLine.NEXT = 0;
+                UNTIL recSalesLine.NEXT() = 0;
 
             ValidateDimensionsOnRelease2(SalesHeader);
         END;
@@ -145,21 +131,6 @@ codeunit 50052 SalesHeaderReleaseEvent
                         if not Confirm(lText002, false, SalesHeader.FieldCaption(SalesHeader."Shipment Method Code")) then
                             Message(lText003, SalesHeader.FieldCaption(SalesHeader."Shipment Method Code"));
                     //13-06-2025 BK #511511
-                    /*if SalesHeader."Sell-to Customer No." = recSalesSetup."Customer No. on Sister Company" then begin
-                        recSalesLine3.SetRange("Document Type", SalesHeader."Document Type");
-                        recSalesLine3.SetRange("Document No.", SalesHeader."No.");
-                        recSalesLine3.SetRange(Type, recSalesLine3.Type::Item);
-                        recSalesLine3.SetFilter("No.", '<>%1', '');OnBeforeRunOutboxTransactionsOnBeforeRunOutboxTransactions
-                        recSalesLine3.SetRange("Hide Line", false);
-                        if recSalesLine3.FindSet() then
-                            repeat
-                                if (recSalesLine3."Ext Vend Purch. Order No." = '') or (recSalesLine3."Ext Vend Purch. Order Line No." = 0) then
-                                    Error(lText012,
-                                      recSalesLine3.FieldCaption("Ext Vend Purch. Order No."),
-                                      recSalesLine3.FieldCaption("Ext Vend Purch. Order Line No."),
-                                      recSalesLine3."Line No.");
-                            until recSalesLine3.Next() = 0;
-                    end; */
                 end;
 
             case SalesHeader."Sales Order Type" of
@@ -195,7 +166,7 @@ codeunit 50052 SalesHeaderReleaseEvent
                         Error(lText026, SalesHeader.FieldCaption(SalesHeader."Sales Order Type"), recSalesLine."Sales Order Type", recSalesLine.TableCaption(), SalesHeader."Sales Order Type", SalesHeader.TableCaption());
                     if recSalesLine."Location Code" <> SalesHeader."Location Code" then
                         Error(lText026, SalesHeader.FieldCaption(SalesHeader."Location Code"), recSalesLine."Location Code", recSalesLine.TableCaption(), SalesHeader."Location Code", SalesHeader.TableCaption());
-                    if not SI.GetWarehouseManagement then
+                    if not SI.GetWarehouseManagement() then
                         if recItem."Block on Sales Order" and ((recSalesLine."Qty. to Ship" <> 0) or (recSalesLine."Qty. to Invoice" <> 0)) then
                             Error(lText037, recItem."No.");
 
@@ -331,7 +302,7 @@ codeunit 50052 SalesHeaderReleaseEvent
                             end;
                         end;
 
-                    if not SI.GetWarehouseManagement then
+                    if not SI.GetWarehouseManagement() then
                         if recItem."Freight Cost Item" and
                            (recSalesLine."Outstanding Quantity" <> 0) and
                            (recSalesLine."Freight Cost Related Line No." = 0)
@@ -374,13 +345,11 @@ codeunit 50052 SalesHeaderReleaseEvent
     var
         recActCode: Record "Action Codes";
         recDefAction: Record "Default Action";
-        ZyWebServMgt: Codeunit "Zyxel Web Service Management";
-        AutoConfirm: Codeunit "Pick. Date Confirm Management";
         SalesHeadEvent: Codeunit "Sales Header/Line Events";
         SI: Codeunit "Single Instance";
     begin
         //>> 23-03-20 ZY-LD 054
-        if SalesHeader."Document Type" = SalesHeader."document type"::Order then begin
+        if SalesHeader."Document Type" = SalesHeader."document type"::Order then
             case SalesHeader."Sales Order Type" of
                 SalesHeader."sales order type"::Normal:
                     SalesHeadEvent.UpdateUnshippedQuantity(SalesHeader."Sell-to Customer No.");
@@ -407,7 +376,6 @@ codeunit 50052 SalesHeaderReleaseEvent
                             until recActCode.Next() = 0;
                     end;
             end;
-        end;
 
         SI.SetManualChange(true);
     end;
@@ -418,9 +386,10 @@ codeunit 50052 SalesHeaderReleaseEvent
         SalesLine: Record "Sales Line";
         SalesLine2: Record "Sales Line";
         Item: Record Item;
+        BOMComp: Record "BOM Component";
         LineNo: Integer;
         BOMAmount: Decimal;
-        BOMComp: Record "BOM Component";
+
     begin
         //>> 01-03-19 ZY-LD 023
         SalesLine.Reset();
@@ -523,23 +492,23 @@ codeunit 50052 SalesHeaderReleaseEvent
     begin
         Cust.get(SalesHeader."Sell-to Customer No.");
         if Cust."Sample Account" then begin
-            GenLedgSetup.get;
+            GenLedgSetup.get();
             DimSetEntry.SetRange("Dimension Set ID", SalesHeader."Dimension Set ID");
             DimSetEntry.SetRange("Dimension Code", GenLedgSetup."Shortcut Dimension 3 Code");
-            If not DimSetEntry.FindFirst then
+            If not DimSetEntry.FindFirst() then
                 Error(lText001, GenLedgSetup."Shortcut Dimension 3 Code", SalesHeader."No.");
 
             DefaultDim.SetRange("Table ID", Database::"Customer");
             DefaultDim.SetRange("No.", Cust."No.");
             DefaultDim.SetRange("Dimension Code", GenLedgSetup."Shortcut Dimension 3 Code");
-            if DefaultDim.FindFirst then begin
+            if DefaultDim.FindFirst() then begin
                 DimValue.SetRange("Dimension Code", GenLedgSetup."Shortcut Dimension 3 Code");
                 DimValue.SetRange(Blocked, false);
                 if DefaultDim."Allowed Values Filter" <> '' then
                     DimValue.SetFilter(Code, DefaultDim."Allowed Values Filter")
                 else
                     DimValue.SetRange(Code, DefaultDim."Dimension Value Code");
-                If DimValue.FindSet then
+                If DimValue.FindSet() then
                     Repeat
                         DimValueLocated := DimSetEntry."Dimension Value Code" = DimValue.Code;
                     Until (DimValue.Next() = 0) or DimValueLocated;

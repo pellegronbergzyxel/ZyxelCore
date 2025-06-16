@@ -107,7 +107,7 @@ codeunit 50048 "Intercompany Events"
                 if SalesInvLine."VAT Prod. Posting Group" <> Item."VAT Prod. Posting Group" then
                     ICOutBoxSalesLine."VAT Prod. Posting Group" := SalesInvLine."VAT Prod. Posting Group";
             end;
-        end else begin
+        end else
             case SalesInvLine.Type of
                 SalesInvLine.Type::Item:
                     begin
@@ -138,7 +138,6 @@ codeunit 50048 "Intercompany Events"
                             ICOutBoxSalesLine."VAT Prod. Posting Group" := SalesInvLine."VAT Prod. Posting Group";
                     end;
             end;
-        end;
 
         ICOutBoxSalesLine."Gen. Prod. Posting Group" := SalesInvLine."Gen. Prod. Posting Group";
         ICOutboxSalesLine."IC Payment Terms" := SalesInvLine."IC Payment Terms";
@@ -237,12 +236,11 @@ codeunit 50048 "Intercompany Events"
 
         if ICOutBoxSalesLine."IC Partner Ref. Type" = ICOutBoxSalesLine."IC Partner Ref. Type"::Item then begin
             recGenBusPostGrp.Get(SalesCrMemoLine."Gen. Bus. Posting Group");
-            if recGenBusPostGrp."Sample / Test Equipment" > recGenBusPostGrp."Sample / Test Equipment"::" " then begin
+            if recGenBusPostGrp."Sample / Test Equipment" > recGenBusPostGrp."Sample / Test Equipment"::" " then
                 if recGenBusPostGrp."Sample G/L Account No." <> '' then begin
                     ICOutBoxSalesLine."IC Partner Ref. Type" := ICOutBoxSalesLine."IC Partner Ref. Type"::"G/L Account";
                     ICOutBoxSalesLine."IC Partner Reference" := recGenBusPostGrp."Sample G/L Account No.";
                 end;
-            end;
         end;
 
         case SalesCrMemoLine.Type of
@@ -327,7 +325,7 @@ codeunit 50048 "Intercompany Events"
         ICDocDim: Record "IC Document Dimension";
         DimMgt: Codeunit DimensionManagement;
         DimensionSetIDArr: array[10] of Integer;
-        CountryDimCode: Code[10];
+        CountryDimCode: Code[20];
     begin
         DimMgt.SetICDocDimFilters(
           ICDocDim, Database::"IC Inbox Purchase Header", ICInboxPurchHeader."IC Transaction No.",
@@ -349,7 +347,7 @@ codeunit 50048 "Intercompany Events"
         PurchHeader."Dimension Set ID" :=
             DimMgt.GetCombinedDimensionSetID(DimensionSetIDArr, PurchHeader."Shortcut Dimension 1 Code", PurchHeader."Shortcut Dimension 2 Code");
 
-        CountryDimCode := GetCountryDimension(PurchHeader."Buy-from Vendor No.", PurchHeader."Location Code", PurchHeader."Sell-to Customer No.");
+        CountryDimCode := GetCountryDimension(PurchHeader."Location Code");
         if CountryDimCode <> '' then
             PurchHeader.ValidateShortcutDimCode(3, CountryDimCode);
 
@@ -402,8 +400,7 @@ codeunit 50048 "Intercompany Events"
         Vendor: Record Vendor;
         ZyWsReq: Codeunit "Zyxel Web Service Request";
         VendorNoSub: Code[20];
-        TypeErr: Label '"%1" must be "%2" or "%3".';
-        ICPartnerErr: Label '%1 %2 does not exist as a %3 in %1 %4.';
+        ICPartnerErr: Label '%1 %2 does not exist as a %3 in %1 %4';
         NotCreatedOrVendorMissingErr: Label '"%1" %2 is not created in %3, or "Vendor No." is missing.';
     begin
         ICSetup.Get();
@@ -412,10 +409,10 @@ codeunit 50048 "Intercompany Events"
         else begin
             ICPartner.Get(ICOutboxSalesHeader."IC Partner Code");
             if (ICPartner."Inbox Type" <> ICPartner."Inbox Type"::Database) and (ICPartner."Inbox Type" <> ICPartner."Inbox Type"::"Web Service") then
-                Error(ICPartnerErr, ICPartner.FieldCaption("Inbox Type"), ICPartner."Inbox Type"::Database, ICPartner."Inbox Type"::"Web Service");
+                Error(ICPartnerErr, ICPartner.FieldCaption("Inbox Type"), ICPartner."Inbox Type"::Database, ICPartner."Inbox Type"::"Web Service", '');
             ICPartner.TestField("Inbox Details");
             if ICPartner."Inbox Type" = ICPartner."Inbox Type"::"Web Service" then begin
-                VendorNoSub := ZyWsReq.ICPartnerExistsInSub(ICPartner."Inbox Details", ICInboxTrans."IC Partner Code");
+                VendorNoSub := Copystr(ZyWsReq.ICPartnerExistsInSub(copystr(ICPartner."Inbox Details", 1, 80), ICInboxTrans."IC Partner Code"), 1, 20);
                 if VendorNoSub <> '' then
                     ICPartner."Vendor No." := VendorNoSub
                 else
@@ -476,7 +473,7 @@ codeunit 50048 "Intercompany Events"
         ICInboxPurchHeader."Salesperson Code" := ICOutboxSalesHeader."Salesperson Code";
         ICInboxPurchHeader."Ship-to Code" := ICOutboxSalesHeader."Ship-to Code";
         ICInboxPurchHeader."Order Date" := ICOutboxSalesHeader."Order Date";
-        ICInboxPurchHeader."E-Invoice Comment" := ICOutboxSalesHeader."E-Invoice Comment";
+        ICInboxPurchHeader."E-Invoice Comment" := Copystr(ICOutboxSalesHeader."E-Invoice Comment", 1, 25);
         ICInboxPurchHeader."Currency Code Sales Doc SUB" := ICOutboxSalesHeader."Currency Code Sales Doc SUB";
         ICInboxPurchHeader."Shipment Method Code" := ICOutboxSalesHeader."Shipment Method Code";
         ICInboxPurchHeader."VAT Registration No." := ICOutboxSalesHeader."VAT Registration No.";
@@ -568,11 +565,11 @@ codeunit 50048 "Intercompany Events"
         ICLocation: Record "IC Vendors";
         recCust: Record Customer;
         DimMgt: Codeunit DimensionManagement;
+        SI: Codeunit "Single Instance";
         ICCompanyName: Text[30];
         ICVatBusinessCode1: Code[10];
         ShortcutDimCode: Array[8] of Code[20];
         eCommerceInvoiceNo: Text[50];
-        SI: Codeunit "Single Instance";
         GlDimCode: Code[20];
     begin
         if (pPurch."End Customer" = '') or
@@ -588,12 +585,12 @@ codeunit 50048 "Intercompany Events"
         if SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice then
             if SalesHeader."Currency Factor" = 0 then SalesHeader."Currency Factor" := 1;
         eCommerceInvoiceNo := pPurch."Your Reference";
-        eCommerceInvoiceNo := ReplaceString(eCommerceInvoiceNo, 'INV-GB-', '');
-        eCommerceInvoiceNo := ReplaceString(eCommerceInvoiceNo, 'INV-DE-', '');
-        eCommerceInvoiceNo := ReplaceString(eCommerceInvoiceNo, 'INV-IT-', '');
-        eCommerceInvoiceNo := ReplaceString(eCommerceInvoiceNo, 'CN-GB-', '');
-        eCommerceInvoiceNo := ReplaceString(eCommerceInvoiceNo, 'CN-DE-', '');
-        eCommerceInvoiceNo := ReplaceString(eCommerceInvoiceNo, 'CN-IT-', '');
+        eCommerceInvoiceNo := Copystr(ReplaceString(eCommerceInvoiceNo, 'INV-GB-', ''), 1, 50);
+        eCommerceInvoiceNo := Copystr(ReplaceString(eCommerceInvoiceNo, 'INV-DE-', ''), 1, 50);
+        eCommerceInvoiceNo := Copystr(ReplaceString(eCommerceInvoiceNo, 'INV-IT-', ''), 1, 50);
+        eCommerceInvoiceNo := Copystr(ReplaceString(eCommerceInvoiceNo, 'CN-GB-', ''), 1, 50);
+        eCommerceInvoiceNo := Copystr(ReplaceString(eCommerceInvoiceNo, 'CN-DE-', ''), 1, 50);
+        eCommerceInvoiceNo := Copystr(ReplaceString(eCommerceInvoiceNo, 'CN-IT-', ''), 1, 50);
 
         SalesHeader."No." := '';
         if pPurch."eCommerce Order" then SalesHeader."Your Reference" := pPurch."Reference 2";
@@ -619,26 +616,24 @@ codeunit 50048 "Intercompany Events"
 
         SalesHeader."Shipment Method Code" := pPurch."Shipment Method Code";
 
-        SalesHeader."RHQ Invoice No" := pPurch."Vendor Invoice No.";
-        SalesHeader."RHQ Credit Memo No" := pPurch."Vendor Cr. Memo No.";
+        SalesHeader."RHQ Invoice No" := Copystr(pPurch."Vendor Invoice No.", 1, 30);
+        SalesHeader."RHQ Credit Memo No" := copystr(pPurch."Vendor Cr. Memo No.", 1, 20);
         SalesHeader."Your Reference" := pPurch."Your Reference";
 
-        if (SalesHeader."Location Code" = 'EICARD') and (SalesHeader."Gen. Bus. Posting Group" = 'EU') then begin
+        if (SalesHeader."Location Code" = 'EICARD') and (SalesHeader."Gen. Bus. Posting Group" = 'EU') then
             if ICLocation.FindFirst() then begin
 
                 ICCompanyName := ICLocation."IC Company Name";
                 ICVatBusinessCode1 := ICLocation."VAT Bus.Posting Group Rev";
 
-                if ICLocation."Sub Yes/No" = true then begin
+                if ICLocation."Sub Yes/No" = true then
                     if CompanyName() = ICCompanyName then begin
                         SalesHeader.SetHideValidationDialog(true);
                         if (SalesHeader."VAT Bus. Posting Group" <> ICVatBusinessCode1)
                            and (ICVatBusinessCode1 <> '') then
                             SalesHeader.Validate(SalesHeader."VAT Bus. Posting Group", ICVatBusinessCode1);
                     end;
-                end;
             end;
-        end;
 
         if pCurrencyCode <> '' then
             SalesHeader.Validate("Currency Code", pCurrencyCode);
@@ -747,15 +742,15 @@ codeunit 50048 "Intercompany Events"
 
     begin
         VATCode := Copystr(recPurchaseHeader."VAT Bus. Posting Group", 1, 10);
-        if recCustomer.Get(ICInboxPurchHeader."End Customer") then begin
-            if (recPurchaseHeader."Location Code" = LocationLbl2) or (recPurchaseHeader."Location Code" = LocationLbl) then begin
+        if recCustomer.Get(ICInboxPurchHeader."End Customer") then
+            if (recPurchaseHeader."Location Code" = LocationLbl2) or (recPurchaseHeader."Location Code" = LocationLbl) then
                 if ICLocation.FindFirst() then begin
                     ICCompanyName := ICLocation."IC Company Name";
                     ICVATGenBusCode := ICLocation."Gen.Bus.Posting Group";
                     ICVATCode3P := ICLocation."VAT Bus.Posting Group 3P";
                     ICVATCodeReverse := ICLocation."VAT Bus.Posting Group Rev";
 
-                    if ICLocation."Sub Yes/No" = true then begin
+                    if ICLocation."Sub Yes/No" = true then
                         if CompanyName() = ICCompanyName then begin
                             recPurchaseHeader.SetHideValidationDialog(true);
                             if (recCustomer."Gen. Bus. Posting Group" = ICVATGenBusCode) and
@@ -767,13 +762,10 @@ codeunit 50048 "Intercompany Events"
                                (ICVATCodeReverse <> '') then
                                 VATCode := ICVATCodeReverse;
                         end;
-                    end;
                 end;
-            end;
-        end;
     end;
 
-    local procedure GetCountryDimension(pByFromVendorNo: Code[20]; pLocationCode: Code[10]; pSellToCustNo: Code[20]): Code[10]
+    local procedure GetCountryDimension(pLocationCode: Code[10]): Code[10]
     var
         recLocation: Record Location;
     begin
@@ -838,7 +830,6 @@ codeunit 50048 "Intercompany Events"
         FileMgt: Codeunit "File Management";
         ICInboxOutboxMgt: Codeunit ICInboxOutboxMgt;
         MailHandler: Codeunit Mail;
-        ICOutboxExport: Codeunit "IC Outbox Export";
         DocumentMailing: Codeunit "Document-Mailing";
         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
         InStream: InStream;
@@ -864,7 +855,7 @@ codeunit 50048 "Intercompany Events"
 
         ICPartner.SetFilter("Inbox Type", '<>%1&<>%2', ICPartner."Inbox Type"::Database, ICPartner."Inbox Type"::"Web Service");
 
-        ICPartnerFilter := ICOutboxTransaction.GetFilter("IC Partner Code");
+        ICPartnerFilter := CopyStr(ICOutboxTransaction.GetFilter("IC Partner Code"), 1, 1024);
         if ICPartnerFilter <> '' then
             ICPartner.SetFilter(Code, ICPartnerFilter);
         if ICPartner.Find('-') then
@@ -903,7 +894,7 @@ codeunit 50048 "Intercompany Events"
                         ICPartner.TestField(Blocked, false);
                         if ICPartner."Inbox Details" = '' then
                             Error(EmailAddressMissingErr, ICPartner.Code);
-                        ToName := ICPartner."Inbox Details";
+                        ToName := Copystr(ICPartner."Inbox Details", 1, 100);
                         if StrPos(ToName, ';') > 0 then begin
                             CcName := CopyStr(ToName, StrPos(ToName, ';') + 1);
                             ToName := CopyStr(ToName, 1, StrPos(ToName, ';') - 1);
@@ -979,7 +970,7 @@ codeunit 50048 "Intercompany Events"
             repeat
                 if recICOutboxSalesHead.Get(ICOutboxTrans."Transaction No.", ICOutboxTrans."IC Partner Code", ICOutboxTrans."Transaction Source") then
                     if recICOutboxSalesHead."End Customer" <> '' then
-                        ZyWsMgt.ReplicateCustomers(recICPartner."Inbox Details", recICOutboxSalesHead."End Customer", false);
+                        ZyWsMgt.ReplicateCustomers(copystr(recICPartner."Inbox Details", 1, 30), recICOutboxSalesHead."End Customer", false);
 
                 recICOutboxSalesLine.SetRange("IC Transaction No.", recICOutboxSalesHead."IC Transaction No.");
                 recICOutboxSalesLine.SetRange("IC Partner Code", recICOutboxSalesHead."IC Partner Code");
@@ -995,7 +986,7 @@ codeunit 50048 "Intercompany Events"
                         end;
                     until recICOutboxSalesLine.Next() = 0;
 
-                    ZyWsMgt.ReplicateItems(recICPartner."Inbox Details", ItemNoFilter, false, true);
+                    ZyWsMgt.ReplicateItems(copystr(recICPartner."Inbox Details", 1, 30), ItemNoFilter, false, true);
                 end;
             until ICOutboxTrans.Next() = 0;
         end;
@@ -1013,7 +1004,7 @@ codeunit 50048 "Intercompany Events"
         ICOutboxImpExpXML: XmlPort "IC Outbox Imp/Exp";
         OFile: File;
         OStr: OutStream;
-        IsHandled: Boolean;
+
     begin
         OFile.Create(FileName);
         OFile.CreateOutStream(OStr);
@@ -1059,7 +1050,7 @@ codeunit 50048 "Intercompany Events"
             repeat
                 if recICOutboxSalesHead.Get(ICOutboxTransaction."Transaction No.", ICOutboxTransaction."IC Partner Code", ICOutboxTransaction."Transaction Source") then
                     if recICOutboxSalesHead."End Customer" <> '' then
-                        ZyWsMgt.ReplicateCustomers(recICPartner."Inbox Details", recICOutboxSalesHead."End Customer", false);
+                        ZyWsMgt.ReplicateCustomers(copystr(recICPartner."Inbox Details", 1, 30), recICOutboxSalesHead."End Customer", false);
 
                 recICOutboxSalesLine.SetRange("IC Transaction No.", recICOutboxSalesHead."IC Transaction No.");
                 recICOutboxSalesLine.SetRange("IC Partner Code", recICOutboxSalesHead."IC Partner Code");
@@ -1075,7 +1066,7 @@ codeunit 50048 "Intercompany Events"
                         end;
                     until recICOutboxSalesLine.Next() = 0;
 
-                    ZyWsMgt.ReplicateItems(recICPartner."Inbox Details", ItemNoFilter, false, true);
+                    ZyWsMgt.ReplicateItems(copystr(recICPartner."Inbox Details", 1, 30), ItemNoFilter, false, true);
                 end;
             until ICOutboxTransaction.Next() = 0;
         end;

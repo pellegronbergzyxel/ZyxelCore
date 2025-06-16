@@ -276,7 +276,7 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
     trigger OnInsert()
     begin
         //005. Added By Craig on 20120222 for adding creation user id
-        "Create User ID" := UserId();
+        "Create User ID" := copystr(UserId(), 1, 30);
         "Transport Method" := AllIn.GetTransportMethod(IsEICard);
     end;
 
@@ -292,7 +292,6 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
         WhseInbLine: Record "VCK Shipping Detail";
         WhseInbHead: Record "Warehouse Inbound Header";
         POL: Record "Purchase Line";
-        CreateWIO: Report "Create Whse. Inbound Order";
         Location: Record Location; //13-06-25 BK #511511
 
     begin
@@ -305,7 +304,7 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
             Pol.Setrange(Type, Pol.Type::item);
             Pol.setfilter(Quantity, '<>%1', 0);
             if Pol.findset() then begin
-                WhseInbHead.init;
+                WhseInbHead.init();
                 WhseInbHead.insert(true);
                 IF PurchaseHeader."Expected Receipt Date" = 0D THEN
                     PurchaseHeader."Expected Receipt Date" := PurchaseHeader."Document Date";
@@ -319,8 +318,8 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
                 WhseInbHead."Sender Post Code" := PurchaseHeader."Buy-from Post Code";
                 WhseInbHead."Sender City" := PurchaseHeader."Buy-from City";
                 WhseInbHead."Sender Country/Region Code" := PurchaseHeader."Buy-from Country/Region Code";
-                WhseInbHead."Sender County" := PurchaseHeader."Buy-from County";
-                WhseInbHead."Sender Contact" := PurchaseHeader."Buy-from Contact";
+                WhseInbHead."Sender County" := copystr(PurchaseHeader."Buy-from County", 1, 10);
+                WhseInbHead."Sender Contact" := copystr(PurchaseHeader."Buy-from Contact", 1, 50);
                 WhseInbHead."Estimated Date of Departure" := PurchaseHeader."Expected Receipt Date";
                 WhseInbHead."Estimated Date of Arrival" := PurchaseHeader."Expected Receipt Date";
                 WhseInbHead."Expected Receipt Date" := PurchaseHeader."Expected Receipt Date";
@@ -349,7 +348,7 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
 
 
 
-                until Pol.next = 0;
+                until Pol.next() = 0;
             end;
         end;
     end;
