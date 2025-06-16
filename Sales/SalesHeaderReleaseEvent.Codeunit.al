@@ -144,12 +144,12 @@ codeunit 50052 SalesHeaderReleaseEvent
                     if (SalesHeader."Shipment Method Code" = '') and GuiAllowed() then
                         if not Confirm(lText002, false, SalesHeader.FieldCaption(SalesHeader."Shipment Method Code")) then
                             Message(lText003, SalesHeader.FieldCaption(SalesHeader."Shipment Method Code"));
-
-                    if SalesHeader."Sell-to Customer No." = recSalesSetup."Customer No. on Sister Company" then begin
+                    //13-06-2025 BK #511511
+                    /*if SalesHeader."Sell-to Customer No." = recSalesSetup."Customer No. on Sister Company" then begin
                         recSalesLine3.SetRange("Document Type", SalesHeader."Document Type");
                         recSalesLine3.SetRange("Document No.", SalesHeader."No.");
                         recSalesLine3.SetRange(Type, recSalesLine3.Type::Item);
-                        recSalesLine3.SetFilter("No.", '<>%1', '');
+                        recSalesLine3.SetFilter("No.", '<>%1', '');OnBeforeRunOutboxTransactionsOnBeforeRunOutboxTransactions
                         recSalesLine3.SetRange("Hide Line", false);
                         if recSalesLine3.FindSet() then
                             repeat
@@ -159,7 +159,7 @@ codeunit 50052 SalesHeaderReleaseEvent
                                       recSalesLine3.FieldCaption("Ext Vend Purch. Order Line No."),
                                       recSalesLine3."Line No.");
                             until recSalesLine3.Next() = 0;
-                    end;
+                    end; */
                 end;
 
             case SalesHeader."Sales Order Type" of

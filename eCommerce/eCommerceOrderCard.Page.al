@@ -14,6 +14,8 @@ page 50239 "eCommerce Order Card"
             {
                 group(Control51)
                 {
+                    Caption = 'General';
+
                     field("Transaction Type"; Rec."Transaction Type")
                     {
                         ApplicationArea = Basic, Suite;

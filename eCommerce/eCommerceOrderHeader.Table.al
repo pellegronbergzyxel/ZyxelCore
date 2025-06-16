@@ -266,14 +266,14 @@ table 50103 "eCommerce Order Header"
                             if (recAmzCtryMapFrom."Ship-to Country Code" = recAmzCtryMapFrom."Ship-to Country Code") and (recAmzCtryMapFrom."Domestic Reverse Charge") then
                                 "VAT Bus. Posting Group" := Copystr(recAmzMktPlace."VAT Bus Posting Group (EU)", 1, 10)
                             else
-                                if "Ship To Country" = "Ship From Country" then begin
+                                if "Ship To Country" = "Ship From Country" then
                                     case "Tax Address Role" of
                                         "tax address role"::"Ship-from":
                                             "VAT Bus. Posting Group" := Copystr(recAmzCtryMapFrom."VAT Bus. Posting Group", 1, 10);
                                         "tax address role"::"Ship-to":
                                             "VAT Bus. Posting Group" := Copystr(recAmzCtryMapTo."VAT Bus. Posting Group", 1, 10);
-                                    end;
-                                end else
+                                    end
+                                else
                                     if "Tax Rate" = 0 then
                                         "VAT Bus. Posting Group" := copystr(recAmzMktPlace."VAT Bus Posting Group (EU)", 1, 10)
                                     else
@@ -888,7 +888,8 @@ table 50103 "eCommerce Order Header"
 
         if "Error Description" = '' then
             if ("Amount Including VAT" = 0) and (not "Give Away Order") then
-                "Error Description" := StrSubstNo(lText012, FieldCaption("Amount Including VAT"));
+                IF Not Find0Lines(Rec) then //15-06-2025 BK #511617
+                    "Error Description" := StrSubstNo(lText012, FieldCaption("Amount Including VAT"));
 
         if "Error Description" = '' then
             if "Invoice No." = 'N/A' then begin
@@ -960,13 +961,13 @@ table 50103 "eCommerce Order Header"
                                 VatBusPostGrp := "Alt. VAT Bus. Posting Group"
                             ELSE
                                 VatBusPostGrp := "VAT Bus. Posting Group";
-                            if not recVatPostSetup.Get(VatBusPostGrp, recAmzOrderLine."VAT Prod. Posting Group") then begin
+                            if not recVatPostSetup.Get(VatBusPostGrp, recAmzOrderLine."VAT Prod. Posting Group") then
                                 "Error Description" :=
                                   StrSubstNo(lText013,
                                     recVatPostSetup.TableCaption(),
                                     FieldCaption("VAT Bus. Posting Group"), VatBusPostGrp,
-                                    recAmzOrderLine.FieldCaption("VAT Prod. Posting Group"), recAmzOrderLine."VAT Prod. Posting Group");
-                            end else
+                                    recAmzOrderLine.FieldCaption("VAT Prod. Posting Group"), recAmzOrderLine."VAT Prod. Posting Group")
+                            else
                                 if recVatPostSetup."Sales VAT Account" = '' then
                                     "Error Description" := StrSubstNo(lText020, recVatPostSetup.TableCaption(), recVatPostSetup.FieldCaption("Sales VAT Account"));
                         end;
@@ -1141,5 +1142,22 @@ table 50103 "eCommerce Order Header"
             end else
                 Error(ErrorAllowed, UserId);
 
+    end;
+
+    //15-06-2025 BK #511617
+    procedure Find0Lines(AmzOrderHeader: record "eCommerce Order Header"): Boolean
+    var
+        AmzOrderLine: Record "eCommerce Order Line";
+
+    begin
+        AmzOrderLine.setrange(AmzOrderLine."Transaction Type", AmzOrderHeader."Transaction Type");
+        AmzOrderLine.setrange(AmzOrderLine."eCommerce Order Id", AmzOrderHeader."eCommerce Order Id");
+        AmzOrderLine.setrange(AmzOrderLine."Invoice No.", AmzOrderHeader."Invoice No.");
+        IF AmzOrderLine.findset() then
+            repeat
+                if (AmzOrderLine."Total (Inc. Tax)" <> 0) and ((AmzOrderLine."Total (Inc. Tax)" + AmzOrderLine."Line Discount Incl. Tax") = 0) then
+                    exit(True);
+            until AmzOrderLine.Next() = 0;
+        exit(false);
     end;
 }
