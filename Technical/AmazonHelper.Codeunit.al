@@ -892,7 +892,7 @@ codeunit 50055 AmazonHelper
             responseMessage.Content().ReadAs(content);
 
             // Save the data of the InStream as a file.
-            if (userid in ['PGR 1', 'PGR']) and GuiAllowed then begin
+            if (UPPERCASE(userid).Contains('PELLE')) and GuiAllowed then begin
                 TempBlob.CreateOutStream(outStr, TextEncoding::UTF8);
                 outStr.WriteText(content);
                 TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
@@ -1018,6 +1018,7 @@ codeunit 50055 AmazonHelper
         request: HttpRequestMessage;
         responseMessage: HttpResponseMessage;
         httpResponse: HttpResponseMessage;
+        httpcontents: HttpContent;
         client: HttpClient;
         content: Text;
         url: Text;
@@ -1037,10 +1038,10 @@ codeunit 50055 AmazonHelper
     begin
         if SO.Status = SO.Status::Released then
             exit;
-        Amazsetup.get(NordiskPartyid);
-        temptext := makeJsonPayloadAcknowledgement(SO, NordiskPartyid);
+        Amazsetup.get(so.AmazonSellpartyid);
+        temptext := makeJsonPayloadAcknowledgement(SO, so.AmazonSellpartyid);
         if not Amazsetup.NoSendfilonPost then
-            IF GetnewToken(newtoken, NordiskPartyid) then begin
+            IF GetnewToken(newtoken, so.AmazonSellpartyid) then begin
                 httpcontent.writefrom(temptext);
                 httpcontent.GetHeaders(contentHeaders);
                 contentHeaders.Clear();
@@ -1059,20 +1060,22 @@ codeunit 50055 AmazonHelper
                     //  exit(false);
                 end;
 
+                if not (httpResponse.IsSuccessStatusCode()) then begin
+                    httpcontents := httpResponse.Content();
+                    httpcontents.ReadAs(content);
 
-
-
-                if not (responseMessage.IsSuccessStatusCode()) then begin
-                    Message('Status code: %1\Description: %2, (%3)', responseMessage.HttpStatusCode(), responseMessage.ReasonPhrase());
+                    Message('Status code: %1\Description: %2, (%3) %4 %5', responseMessage.HttpStatusCode(), responseMessage.ReasonPhrase(), content, newtoken);
                     exit(false);
                 end;
 
                 responseMessage.Content().ReadAs(content);
 
                 // Save the data of the InStream as a file.
-                if (userid in ['PGR 1', 'PGR']) and GuiAllowed then begin
+                if (UPPERCASE(userid).Contains('PELLE')) and GuiAllowed then begin
                     TempBlob.CreateOutStream(outStr, TextEncoding::UTF8);
-                    outStr.WriteText(content);
+                    httpcontents := httpResponse.Content();
+                    httpcontents.ReadAs(content);
+                    outStr.WriteText(content + ' ' + newtoken);
                     TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
                     fileName := StrSubstNo('Amazon__%1_.txt', format(responseMessage.HttpStatusCode()));
                     File.DownloadFromStream(inStr, 'Export', '', '', fileName);
@@ -1232,6 +1235,7 @@ codeunit 50055 AmazonHelper
 
                     itemAcknowledgements.add('acknowledgementCode', 'Rejected');
                     ItemQuantity.add('amount', (salesline.AmazorderedQuantity - salesline.Quantity));
+                    ItemQuantity.add('unitOfMeasure', 'Eaches');
                     itemAcknowledgements.add('acknowledgedQuantity', ItemQuantity);
                     itemAcknowledgements.add('rejectionReason', 'TemporarilyUnavailable');
                     itemAcknowledgementsarray.add(itemAcknowledgements);
@@ -1248,6 +1252,7 @@ codeunit 50055 AmazonHelper
                     //             },
                     itemAcknowledgements.add('acknowledgementCode', 'Accepted');
                     ItemQuantity.add('amount', SalesLine.Quantity);
+                    ItemQuantity.add('unitOfMeasure', 'Eaches');
                     itemAcknowledgements.add('acknowledgedQuantity', ItemQuantity);
                     itemAcknowledgements.add('scheduledShipDate', format(CreateDateTime(SalesLine."Shipment Date", 000000T), 0, 9));  //picking date
                     itemAcknowledgementsarray.add(itemAcknowledgements);
@@ -1268,7 +1273,7 @@ codeunit 50055 AmazonHelper
 
         OrderAcknowledgement.Add('items', itemarray);
         OrderAcknowledgementArray.Add(OrderAcknowledgement);
-        order.add('orders', OrderAcknowledgementArray);
+        order.add('acknowledgements', OrderAcknowledgementArray);
         order.WriteTo(totextvar);
 
         // Create an outStream from the Blob, notice the encoding.
