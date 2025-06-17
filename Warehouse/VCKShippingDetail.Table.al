@@ -1,21 +1,5 @@
 Table 50046 "VCK Shipping Detail"
 {
-    // 001. 24-10-18 ZY-LD 000 - New field. Archive and Quantity is removed from primary key.
-    // 002. 01-11-18 ZY-LD 2018110110000032 - New field.
-    // 003. 14-01-19 ZY-LD 000 - On Delete.
-    // 004. 23-01-19 ZY-LD 000 - New key "Archive,Batch No.".
-    // 005. 15-03-19 ZY-LD 000 - New field.
-    // 006. 14-01-20 ZY-LD 000 - New field.
-    // 007. 06-02-20 ZY-LD P0388 - New fields and New keys.
-    // 008. 09-07-20 ZY-LD P0455 - Caption on "Shipment Method Code" has changed to "Shipment Method Code / Incoterms".
-    // 009. 27-10-20 ZY-LD 2020101610000298 - Validate Pallet No. 2.
-    // 010. 18-05-21 ZY-LD 000 - New key "Item No.,Archive,Order Type" based on Sql Powerhouse.
-    // 011. 27-07-21 ZY-LD 2021071310000057 - New field.
-    // 012. 15-11-21 ZY-LD 2021090610000067 - New primary key, to be able to do change log history.
-    // 013. 24-11-21 ZY-LD 2021112210000041 - Calculate shipping days.
-    // 014. 20-01-22 ZY-LD 000 - Field to regocnize the main warehouse from drop shipments.
-    // 015. 23-05-22 ZY-LD 000 - We will delete it, if it has been replaced by another record.
-    // 016. 01-09-22 ZY-LD 000 - New field.
 
     DrillDownPageID = "VCK Shipping Detail";
     LookupPageID = "VCK Shipping Detail";
@@ -61,7 +45,7 @@ Table 50046 "VCK Shipping Detail"
 
             trigger OnValidate()
             begin
-                Evaluate("Pallet No. 2", DelChr("Pallet No.", '=', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'));  // 27-10-20 ZY-LD 009
+                Evaluate("Pallet No. 2", DelChr("Pallet No.", '=', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'));
             end;
         }
         field(6; "Item No."; Code[20])
@@ -87,12 +71,10 @@ Table 50046 "VCK Shipping Detail"
 
             trigger OnValidate()
             begin
-                //>> 27-07-21 ZY-LD 011
                 if ETA <> 0D then
                     "Previous ETA Date" := xRec.ETA;
-                //<< 27-07-21 ZY-LD 011
 
-                "Expected Shipping Days" := ETA - ETD;  // 24-11-21 ZY-LD 013
+                "Expected Shipping Days" := ETA - ETD;
                 if (xRec.ETA <> 0D) and ("Expected Receipt Date" <> 0D) then
                     Validate("Expected Receipt Date", CalcDate('+' + Format("Expected Receipt Date" - xRec.ETA) + 'D', ETA));
             end;
@@ -131,6 +113,17 @@ Table 50046 "VCK Shipping Detail"
         {
             Caption = 'Location';
             Description = 'RD 1.0';
+
+            trigger OnValidate()
+            var
+                LocationRec: Record Location;
+            begin
+                //17-06-2025 BK #511511
+                if locationRec.get(location) then
+                    IF LocationRec."Main Warehouse" then
+                        "Main Warehouse" := locationrec."Main Warehouse";
+            end;
+
         }
         field(16; "Quantity Received"; Decimal)
         {
@@ -267,7 +260,7 @@ Table 50046 "VCK Shipping Detail"
 
             trigger OnValidate()
             begin
-                "Original Shipping Days" := "Original ETA Date" - ETD;  // 24-11-21 ZY-LD 013
+                "Original Shipping Days" := "Original ETA Date" - ETD;
                 Validate(ETA);
             end;
         }
@@ -388,9 +381,8 @@ Table 50046 "VCK Shipping Detail"
 
     trigger OnDelete()
     begin
-        //>> 14-01-19 ZY-LD 003
+
         if recPurchLine.Get(recPurchLine."document type"::Order, "Purchase Order No.", "Purchase Order Line No.") then begin
-            //>> 23-05-22 ZY-LD 015
             recShipDet.SetRange("Invoice No.", "Invoice No.");
             recShipDet.SetRange("Purchase Order No.", "Purchase Order No.");
             recShipDet.SetRange("Purchase Order Line No.", "Purchase Order Line No.");
@@ -399,7 +391,7 @@ Table 50046 "VCK Shipping Detail"
             recShipDet.SetRange("Shipping Method", "Shipping Method");
             recShipDet.SetRange("Order No.");
             recShipDet.SetFilter("Container No.", '<>%1', "Container No.");
-            if not recShipDet.FindFirst then  //<< 23-05-22 ZY-LD 015
+            if not recShipDet.FindFirst() then
                 Error(Text001, recPurchLine.TableCaption);
         end;
         if "Purchase Order Line No." = 0 then
@@ -414,52 +406,46 @@ Table 50046 "VCK Shipping Detail"
         recShipDetReceived.SetRange("Shipping Method", "Shipping Method");
         recShipDetReceived.SetRange("Order No.", "Order No.");
         recShipDetReceived.DeleteAll(true);
-        //<< 14-01-19 ZY-LD 003
 
-        //>> 15-11-21 ZY-LD 012
         recCngLogEntry.SetCurrentkey("Table No.", "Primary Key Field 1 Value");
         recCngLogEntry.SetRange("Table No.", Database::"VCK Shipping Detail");
         recCngLogEntry.SetRange("Primary Key Field 1 Value", Format("Entry No."));
         recCngLogEntry.DeleteAll(true);
-        //<< 15-11-21 ZY-LD 012
+
     end;
 
     trigger OnInsert()
     var
         recShipDetail: Record "VCK Shipping Detail";
     begin
-        //>> 15-11-21 ZY-LD 012
-        if "Entry No." = 0 then begin
-            if recShipDetail.FindLast then
+        if "Entry No." = 0 then
+            if recShipDetail.FindLast() then
                 "Entry No." := recShipDetail."Entry No." + 1
             else
                 "Entry No." := 1;
-        end;
-        //<< 15-11-21 ZY-LD 012
     end;
 
     var
         recShipDet: Record "VCK Shipping Detail";
         recShipDetReceived: Record "VCK Shipping Detail Received";
         recPurchLine: Record "Purchase Line";
+        recCngLogEntry: Record "Change Log Entry";
         Text001: label 'You canÍt delete the line, while the "%1" still exists.';
         Text002: label 'You canÍt delete the line, because "%1" is 0.';
-        recCngLogEntry: Record "Change Log Entry";
-
 
 
     procedure movetobeETA()
     var
         VcKshipdetail: record "VCK Shipping Detail";
     begin
-        if VcKshipdetail.findset then
+        if VcKshipdetail.findset() then
             repeat
                 if VcKshipdetail.tobeETA <> 0D Then begin
                     VcKshipdetail.validate(ETA, VcKshipdetail.tobeETA);
                     VcKshipdetail.tobeETA := 0D;
                     VcKshipdetail.modify(true);
                 end
-            until VcKshipdetail.next = 0;
+            until VcKshipdetail.next() = 0;
 
     end;
 
