@@ -55,7 +55,7 @@ Report 50094 "Zyxel Item list"
     var
         TempExcelBuf: Record "Excel Buffer" temporary;
 
-        Text002: Label 'Items';
+        Text002: Label 'Item';
 
     procedure MakeExcelHead()
     begin

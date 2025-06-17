@@ -40,9 +40,9 @@ pageextension 50200 PurchaseLinesZX extends "Purchase Lines"
         {
             field("Requested Date From Factory"; Rec."Requested Date From Factory")
             {
+                //16-06-2025 BK #511337
                 ApplicationArea = Basic, Suite;
                 ToolTip = 'Specifies Requested Date From Factory';
-                //16-06-2025 BK #511337
             }
 
             Field(DocumentDate; DocumentDate)

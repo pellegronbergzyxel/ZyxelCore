@@ -1,6 +1,6 @@
 codeunit 50048 "Intercompany Events"
 {
-
+    //117-06-2025 BK #Cleanup
     #region ICSalesInvoice
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"ICInboxOutboxMgt", 'OnCreateOutboxSalesInvTransOnBeforeOutboxTransactionInsert', '', false, false)]
     local procedure ICInboxOutboxMgt_OnCreateOutboxSalesInvTransOnBeforeOutboxTransactionInsert(var OutboxTransaction: Record "IC Outbox Transaction")
@@ -55,7 +55,6 @@ codeunit 50048 "Intercompany Events"
         ICOutBoxSalesHeader."Ship-to VAT" := SalesInvHdr."Ship-to VAT";
         ICOutBoxSalesHeader."eCommerce Order" := SalesInvHdr."eCommerce Order";
         ICOutBoxSalesHeader."Your Reference 2" := SalesInvHdr."Reference 2";
-
         ICOutBoxSalesHeader."Salesperson Code" := SalesInvHdr."Salesperson Code";
         ICOutBoxSalesHeader."Ship-to Code" := SalesInvHdr."Ship-to Code";
         ICOutBoxSalesHeader."Order Date" := SalesInvHdr."Order Date";
@@ -162,7 +161,6 @@ codeunit 50048 "Intercompany Events"
                 ICOutBoxSalesLine2."Line Discount Amount" := 0;
                 ICOutBoxSalesLine2."Amount Including VAT" := 0;
                 ICOutBoxSalesLine2.Insert(true);
-
                 ICDocDim."Transaction No." := ICOutBoxSalesHeader."IC Transaction No.";
                 ICDocDim."IC Partner Code" := ICOutBoxSalesHeader."IC Partner Code";
                 ICDocDim."Transaction Source" := ICOutBoxSalesHeader."Transaction Source";

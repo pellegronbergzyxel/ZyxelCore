@@ -1,5 +1,6 @@
 tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
 {
+    //17-06-2025 BK #Clean up   
     fields
     {
         modify("Shipment Method Code")

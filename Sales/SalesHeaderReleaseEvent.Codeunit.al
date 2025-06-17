@@ -1,6 +1,6 @@
 codeunit 50052 SalesHeaderReleaseEvent
 {
-
+    //17-06-2025 BK #Clean Up
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Release Sales Document", 'OnBeforeReleaseSalesDoc', '', false, false)]
     local procedure OnBeforeReleaseSalesDoc(var SalesHeader: Record "Sales Header")
     var
