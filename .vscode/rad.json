@@ -1,9 +1,1 @@
-<<<<<<< HEAD
-﻿{"Added":[{"Id":50094,"Kind":13,"Name":"Zyxel Item list","Namespace":""},{"Kind":106,"Name":"RequestOptionsPage","Namespace":""}],"Modified":[{"Id":50052,"Kind":11,"Name":"SalesHeaderReleaseEvent","Namespace":""},{"Id":50118,"Kind":17,"Name":"PurchaseHeaderZX","Namespace":""},{"Id":50048,"Kind":11,"Name":"Intercompany Events","Namespace":""}],"Removed":[]}
-=======
-<<<<<<< HEAD
-﻿{"Added":[],"Modified":[],"Removed":[]}
-=======
-﻿{"Added":[],"Modified":[{"Kind":106,"Name":"RequestOptionsPage","Namespace":""},{"Id":50239,"Kind":12,"Name":"eCommerce Order Card","Namespace":""},{"Id":50103,"Kind":10,"Name":"eCommerce Order Header","Namespace":""},{"Id":50025,"Kind":13,"Name":"Batch Post eCommerce Orders","Namespace":""}],"Removed":[]}
->>>>>>> d943fd0b3bfb5ecb2dd06be21dc85e60bae6d502
->>>>>>> dc7b564bd5830e3b9450af6c70ed80fc37250f5b
+﻿{"Added":[],"Modified":[{"Id":50048,"Kind":11,"Name":"Intercompany Events","Namespace":""}],"Removed":[]}
