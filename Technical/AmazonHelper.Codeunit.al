@@ -1,12 +1,28 @@
 codeunit 50055 AmazonHelper
 {
+    TableNo = "Job Queue Entry";
+
     trigger OnRun()
     begin
-        MainProcessOrders('', true, '');
-        commit;
-        UpdateMainAmazonstatus();
-        Commit;
-        RemoveOpenClosedRejectedAmazon();
+        CASE rec."Parameter String" OF
+
+            '':
+                begin
+                    MainProcessOrders('', true, '');
+                    commit;
+                    UpdateMainAmazonstatus();
+                    Commit;
+                    RemoveOpenClosedRejectedAmazon();
+                end;
+            'STATUS':
+                begin
+                    UpdateMainAmazonstatus();
+                end;
+            'DELETE':
+                begin
+                    RemoveOpenClosedRejectedAmazon();
+                end;
+        end;
     end;
 
     procedure MainProcessOrders(Amazcode: code[10]; Full: Boolean; amazdocno: code[20])
@@ -418,7 +434,7 @@ codeunit 50055 AmazonHelper
         Salesheader: record "Sales Header";
     begin
         Salesheader.setrange("Document Type", Salesheader."Document Type"::Order);
-        Salesheader.setrange(Status, Salesheader.Status::Open);
+        //  Salesheader.setrange(Status, Salesheader.Status::Open);
         Salesheader.setfilter(AmazonSellpartyid, '<>%1', '');
         salesheader.setfilter(AmazonePoNo, '<>%1', '');
         if Salesheader.findset Then
@@ -473,17 +489,13 @@ codeunit 50055 AmazonHelper
                                 EVALUATE(purchaseOrderStatus, TokenValue.AsValue().AsText());
 
                             // >>
-
                             if TokenOrder.SelectToken('sellingParty', temptoken) then
                                 if temptoken.SelectToken('partyId', TokenValue) then
                                     EVALUATE(buyingParty, TokenValue.AsValue().AsText());
 
-
                             if TokenOrder.SelectToken('shipToParty', temptoken) then
                                 if temptoken.SelectToken('partyId', TokenValue) then
                                     EVALUATE(sellingParty, TokenValue.AsValue().AsText());
-
-
 
                             CustSell := AmazonID2CustNoShipto(buyingParty, sellingParty);
                             Custbill := AmazonID2CustNo(buyingParty, sellingParty, CustSell);
@@ -584,8 +596,20 @@ codeunit 50055 AmazonHelper
                                             end;
                                         end
                                     end;
-                                end
+                                end;
                             end;
+                            Salesline.setrange("Document No.", Salesheader."No.");
+                            Salesline.setrange("Document Type", Salesheader."Document type");
+                            Salesline.setrange(type, Salesline.Type::Item);
+                            Salesline.Setrange("No.");
+                            if Salesline.findset() then
+                                repeat
+                                    if Salesline.AmazconfirmationStatus in ['ACCEPTED', 'PARTIALLY_ACCEPTED'] then begin
+                                        Salesheader.AmazconfirmationStatus := Salesline.AmazconfirmationStatus;
+                                        Salesheader.modify(false);
+                                    end;
+                                until Salesline.next = 0;
+
                         end;
 
                     end;
@@ -1044,27 +1068,17 @@ codeunit 50055 AmazonHelper
             IF GetnewToken(newtoken, so.AmazonSellpartyid) then begin
                 httpcontent.writefrom(temptext);
                 httpcontent.GetHeaders(contentHeaders);
-                contentHeaders.Clear();
-                request.GetHeaders(contentHeaders);
                 contentHeaders.Add('x-amz-access-token', newtoken);
-                contentHeaders.Add('Accept', 'application/json');
-                //  request.SetRequestUri(StrSubstNo(Amazsetup.URL_PO_GET, Amazsetup.URL_PO_GET_status));
-                // request.Method := 'GET';
-                HttpContent.GetHeaders(contentHeaders);
                 contentHeaders.Remove('Content-Type');
                 contentHeaders.Add('Content-Type', 'application/json');
-                contentHeaders.Add('Content-Length', format(StrLen(temptext)));
-
-                if not (client.post(Amazsetup.URL_Set_AKN, HttpContent, httpResponse)) then begin
+                if not (client.post(Amazsetup.URL_Set_AKN, HttpContent, httpResponse)) then
                     Message('Url virker ikke : ' + Amazsetup.URL_Set_AKN);
-                    //  exit(false);
-                end;
 
                 if not (httpResponse.IsSuccessStatusCode()) then begin
                     httpcontents := httpResponse.Content();
                     httpcontents.ReadAs(content);
 
-                    Message('Status code: %1\Description: %2, (%3) %4 %5', responseMessage.HttpStatusCode(), responseMessage.ReasonPhrase(), content, newtoken);
+                    Message('Status code: %1\Description: %2, (%3) \%4 \%5\%6', responseMessage.HttpStatusCode(), responseMessage.ReasonPhrase(), content, newtoken);
                     exit(false);
                 end;
 
@@ -1653,14 +1667,17 @@ codeunit 50055 AmazonHelper
             end;
 
             if not (responseMessage.IsSuccessStatusCode()) then begin
-                Message('Status code: %1\Description: %2, (%3)', responseMessage.HttpStatusCode(), responseMessage.ReasonPhrase());
+                responseMessage.Content().ReadAs(content);
+                ;
+
+                Message('Status code: %1\Description: %2, (%3) %4 %5', responseMessage.HttpStatusCode(), responseMessage.ReasonPhrase(), content, newtoken, StrSubstNo(Amazsetup.URL_packingSlips_order, salesheader.AmazonePoNo));
                 exit(false);
             end;
 
             responseMessage.Content().ReadAs(content);
 
             // Save the data of the InStream as a file.
-            if (userid in ['PGR 1', 'ZYXEL\PELLE.GRONBERG']) and GuiAllowed then begin
+            if Amazsetup.testmode and GuiAllowed then begin
                 TempBlob.CreateOutStream(outStr, TextEncoding::UTF8);
                 outStr.WriteText(content);
                 TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
