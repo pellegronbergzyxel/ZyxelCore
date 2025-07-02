@@ -562,6 +562,7 @@ codeunit 50048 "Intercompany Events"
         CurrExchRates: Record "Currency Exchange Rate";
         ICLocation: Record "IC Vendors";
         recCust: Record Customer;
+        CompanyInf: Record "Company Information";
         DimMgt: Codeunit DimensionManagement;
         SI: Codeunit "Single Instance";
         ICCompanyName: Text[30];
@@ -574,6 +575,10 @@ codeunit 50048 "Intercompany Events"
            (not recCust.Get(pPurch."End Customer"))
         then
             exit;
+
+        if CompanyInf.get() then
+            if reccust."Sample Account" and (Not CompanyInf."Main Company") then
+                exit; // 25-06-2025 BK #506118 customer in BCIT is set to Sample Account, so we skip this salesinvoice in this case.    
 
         SI.SetKeepLocationCode(true);
         SalesHeader.Init();

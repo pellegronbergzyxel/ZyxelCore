@@ -45,6 +45,13 @@ pageextension 50200 PurchaseLinesZX extends "Purchase Lines"
                 ToolTip = 'Specifies Requested Date From Factory';
             }
 
+            field("Order Date"; Rec."Order Date")
+            {
+                //25-06-2025 BK #511337
+                ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies Order Date';
+            }
+
             Field(DocumentDate; DocumentDate)
             {
                 Caption = 'Document Date';

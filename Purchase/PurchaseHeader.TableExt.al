@@ -294,12 +294,18 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
         WhseInbHead: Record "Warehouse Inbound Header";
         POL: Record "Purchase Line";
         Location: Record Location; //13-06-25 BK #511511
+        ZGT: Codeunit "ZyXEL General Tools";
+        ZNetLabel1: Label 'ZNET-INTERNAL';
+        ZNetLabel2: Label 'ZNET-';
+        ZComLabel1: Label 'ZYXEL-INTERNAL';
+        ZComLabel2: Label 'ZCOM-';
 
     begin
         WhseInbHead.SetCurrentkey("Shipper Reference");
         WhseInbHead.SetRange("Shipper Reference", 'INV' + PurchaseHeader."No.");
-        WhseInbHead.SetRange("Location Code", PurchaseHeader."Location Code");  // 03-08-20 ZY-LD 001
-        if not WhseInbHead.FindSET() then begin
+        WhseInbHead.SetRange("Location Code", PurchaseHeader."Location Code");
+
+        if Not WhseInbHead.FindSet() then begin
             POL.Setrange("Document Type", PurchaseHeader."Document Type");
             POL.setrange("Document No.", PurchaseHeader."No.");
             Pol.Setrange(Type, Pol.Type::item);
@@ -341,9 +347,19 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
                     WhseInbLine."Item No." := Pol."No.";
                     WhseInbLine.Quantity := Pol.Quantity;
                     WhseInbLine.ETA := Pol."Expected Receipt Date";
+                    WhseInbLine.ETD := Pol."Expected Receipt Date";
                     WhseInbLine."Expected Receipt Date" := Pol."Expected Receipt Date";
-                    //WhseInbLine."Shipping Method" := 'internal';
-                    WhseInbLine."Order No." := WhseInbHead."No.";
+
+                    //01-07-025 BK #511511
+                    if ZGT.IsZNetCompany() then begin
+                        WhseInbLine."Bill of Lading No." := ZNetLabel1;
+                        WhseInbLine."Order No." := ZNetLabel2 + WhseInbHead."No.";
+                    End else begin
+                        WhseInbLine."Bill of Lading No." := zComLabel1;
+                        WhseInbLine."Order No." := ZcomLabel2 + WhseInbHead."No.";
+                    end;
+                    WhseInbLine."Invoice No." := copystr(PurchaseHeader."Vendor Invoice No.", 1, 30);
+                    WhseInbLine."Container No." := Pol."Picking List No.";
                     WhseInbLine."Document No." := WhseInbHead."No.";
                     WhseInbLine.modify(false);
 
