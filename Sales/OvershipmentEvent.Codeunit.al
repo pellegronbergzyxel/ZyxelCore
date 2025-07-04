@@ -63,6 +63,8 @@ Codeunit 50072 "Overshipment Event"
                             recSalesLine.Validate(Quantity, Qty);
                             recSalesLine.Validate("Gen. Prod. Posting Group", recGenProdPostGrp.Code);
                             recSalesLine.Validate("Unit Price", recCustOvership."Unit Price");
+                            IF recsalesline."Unit Price" = 0 then
+                                recSalesLine.Validate("Line Discount %", 0); //04-07-2025 BK "515823
                             recSalesLine.Insert(true);
 
                             if recCustOvership.Type = recCustOvership.Type::"Included in Quantity" then
