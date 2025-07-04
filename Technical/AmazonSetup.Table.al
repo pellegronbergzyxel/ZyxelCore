@@ -108,7 +108,18 @@ table 50090 "Amazon Setup"
             Caption = 'Update customer on status';
 
         }
-
+        field(26; AutorejectedFutureSOOver; Integer)
+        {
+            Caption = 'Auto reject orders with shipdate over days in the future';
+        }
+        field(27; OnlyReleaseafterStatus; Boolean)
+        {
+            Caption = 'Only allow release after confirmed status';
+        }
+        field(28; OnlyReleaseafterStatusvalue; text[20])
+        {
+            Caption = 'status value for Only allow release after confirmed status';
+        }
     }
     keys
     {

@@ -22,6 +22,10 @@ codeunit 50055 AmazonHelper
                 begin
                     RemoveOpenClosedRejectedAmazon();
                 end;
+            'AUTOREJECT':
+                begin
+                    checksalesheaderforautoreject();
+                end;
         end;
     end;
 
@@ -146,6 +150,7 @@ codeunit 50055 AmazonHelper
                                                             shipdate := DMY2Date(DD, MM, YYYY);
 
                                             if Shipdate <> 0D then begin
+                                                Salesheader.Amazonfirstwindowdate := Shipdate;
                                                 Salesheader.Validate("Shipment Date", Shipdate);
                                                 salesheader.Validate("Requested Delivery Date", Shipdate);
                                                 Salesheader."Order Date" := Shipdate;
@@ -1690,6 +1695,86 @@ codeunit 50055 AmazonHelper
         end;
 
 
+    end;
+
+
+    procedure AllowReleaseamazonorder(SH: Record "Sales Header")
+    var
+        SL: Record "Sales Line";
+        amazSetup: Record "Amazon Setup";
+        Errorlabel: Label 'All items lines with qty from Amazon must have either rejected or accepted as status, see %1';
+    begin
+        if sh.AmazonePoNo <> '' then begin
+            amazSetup.get;
+            if amazSetup.OnlyReleaseafterStatus then begin
+                SL.setrange("Document No.", sh."No.");
+                SL.SetRange("Document Type", sh."Document Type");
+                SL.setrange(Type, SL.type::Item);
+                Sl.setfilter("No.", '<>%1', '');
+                IF SL.findset then
+                    repeat
+                        IF (SL.AmazacceptedQuantity = 0) and (Sl.AmazrejectedQuantity = 0) and (sl.AmazorderedQuantity <> 0) then begin
+                            error(Errorlabel, sl."No.");
+                        end;
+                    until SL.next = 0;
+            end;
+        end;
+    end;
+
+
+    procedure checksalesheaderforautoreject()
+    var
+        SH: Record "Sales Header";
+        amazSetup: Record "Amazon Setup";
+    begin
+
+        amazSetup.SetRange(ActiveClient, true);
+        amazSetup.setfilter(OnlyReleaseafterStatusvalue, '<>%1', '');
+        if amazSetup.findset then
+            repeat
+                sh.setrange(AmazonSellpartyid, amazSetup.Code);
+                sh.setrange("Document Type", sh."Document Type"::Order);
+                sh.setfilter(AmazonePoNo, '<>%1', '');
+                sh.setrange(Status, sh.status::Open);
+                sh.setrange(AmazonpurchaseOrderState, 'OPEN');
+                sh.setrange(AmazconfirmationStatus, amazSetup.OnlyReleaseafterStatusvalue);
+                if sh.FindSet() then
+                    repeat
+                        if autorejectSalesheader(SH) then
+                            commit();
+
+                    until sh.next = 0;
+            until amazSetup.next = 0;
+
+    end;
+
+
+
+    procedure autorejectSalesheader(SH: Record "Sales Header"): boolean
+    var
+        SL: Record "Sales Line";
+        amazSetup: Record "Amazon Setup";
+    begin
+        if (sh.AmazonePoNo <> '') and (Sh.Amazonfirstwindowdate <> 0D) then begin
+            amazSetup.get(sh.AmazonSellpartyid);
+            if amazSetup.AutorejectedFutureSOOver <> 0 then
+                if (Sh.Amazonfirstwindowdate > (Sh.Amazonfirstwindowdate + amazSetup.AutorejectedFutureSOOver)) then begin
+                    SL.setrange("Document No.", sh."No.");
+                    SL.SetRange("Document Type", sh."Document Type");
+                    SL.setrange(Type, SL.type::Item);
+                    Sl.setfilter("No.", '<>%1', '');
+                    IF SL.findset then
+                        repeat
+                            SL.validate(Quantity, 0);
+                            SL.modifY()
+
+
+                        until SL.next = 0;
+                end;
+            IF SetAmazonOrderRejected(SH, amazSetup.Code) then
+                exit(true);
+            exit(false)
+        end;
     end;
 
 }

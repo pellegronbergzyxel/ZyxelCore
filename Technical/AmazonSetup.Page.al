@@ -99,6 +99,18 @@ page 50133 "Amazon setup list"
                 {
                     ApplicationArea = All;
                 }
+                field(AutorejectedFutureSOOver; Rec.AutorejectedFutureSOOver)
+                {
+                    ApplicationArea = All;
+                }
+                field(OnlyReleaseafterStatus; Rec.OnlyReleaseafterStatus)
+                {
+                    ApplicationArea = All;
+                }
+                field(OnlyReleaseafterStatusvalue; Rec.OnlyReleaseafterStatusvalue)
+                {
+                    ApplicationArea = All;
+                }
             }
         }
     }
