@@ -22,6 +22,7 @@ codeunit 50052 SalesHeaderReleaseEvent
         SalesHeadEvent: Codeunit "Sales Header/Line Events";
         SI: Codeunit "Single Instance";
         ItemLogisticEvents: Codeunit "Item / Logistic Events";
+        amazon: codeunit AmazonHelper;
         Balance: Decimal;
         BalanceDue: Decimal;
         Credit: Decimal;
@@ -113,7 +114,11 @@ codeunit 50052 SalesHeaderReleaseEvent
                         Error('')
                 end else
                     Error(lText006, recCust.FieldCaption("Credit Limit (LCY)"), recCust."Credit Limit (LCY)", Balance, lText033);
+
+
             end;
+
+            amazon.AllowReleaseamazonorder(SalesHeader);// amazon 20250703 
 
             if SalesHeader."External Document No." = '' then
                 Error(lText009);
