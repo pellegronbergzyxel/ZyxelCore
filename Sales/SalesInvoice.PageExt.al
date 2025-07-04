@@ -10,7 +10,7 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
         {
             trigger OnAfterValidate()
             begin
-                SetActions();  // 01-02-19 ZY-LD 008
+                SetActions();
             end;
         }
         movebefore("Sell-to"; "Location Code")
@@ -18,7 +18,7 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
         {
             trigger OnAfterValidate()
             begin
-                SetActions();  // 01-02-19 ZY-LD 008
+                SetActions();
             end;
         }
         modify("Ship-to Contact")
@@ -31,6 +31,7 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
             field("Sales Order Type"; Rec."Sales Order Type")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the type of sales order. The type determines how the sales order is processed.';
             }
         }
         addafter("Location Code")
@@ -41,12 +42,14 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
                 field("External Invoice No."; Rec."External Invoice No.")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the external invoice number.';
                     Importance = Additional;
                     Visible = ExternalInvoiceNoVisible;
                 }
                 field("E-Invoice Comment"; Rec."E-Invoice Comment")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the comment for the e-invoice.';
                     Enabled = EInvoiceCommentEnable;
                     ShowMandatory = EInvoiceCommentEnable;
                 }
@@ -54,16 +57,19 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
             field("Customer Document No."; Rec."Customer Document No.")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the customer document number.';
                 Importance = Additional;
             }
             field("SAP No."; Rec."SAP No.")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the SAP number.';
                 Importance = Additional;
             }
             field("Create User ID"; Rec."Create User ID")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the user ID of the user who created the sales invoice.';
                 Importance = Additional;
             }
         }
@@ -74,7 +80,7 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
 
             trigger OnAfterValidate()
             begin
-                SetActions;  // 01-02-19 ZY-LD 008
+                SetActions();
             end;
         }
         addbefore("VAT Bus. Posting Group")
@@ -82,6 +88,7 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
             field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the general business posting group for the sales invoice.';
                 Importance = Additional;
             }
         }
@@ -100,17 +107,19 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
             field("Ship-to VAT"; Rec."Ship-to VAT")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the VAT for the ship-to address.';
                 Importance = Additional;
-                // Visible = VATRegistrationNoSellToVisible;  12-02-24 ZY-LD 000
             }
             field("VAT Registration No. Zyxel"; Rec."VAT Registration No. Zyxel")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the VAT registration number for Zyxel.';
                 Importance = Additional;
             }
             field("Send Mail"; Rec."Send Mail")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies whether to send an email with the sales invoice.';
             }
         }
         addafter("Ship-to Name")
@@ -118,6 +127,7 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
             field("Ship-to Name 2"; Rec."Ship-to Name 2")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the second line of the ship-to name.';
             }
         }
         addafter("Ship-to Post Code")
@@ -125,6 +135,7 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
             field("Ship-to E-Mail"; Rec."Ship-to E-Mail")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the email address for the ship-to contact.';
             }
         }
         addafter("Shipment Date")
@@ -132,6 +143,7 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
             field("Picking List No."; Rec."Picking List No.")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the picking list number associated with the sales invoice.';
             }
         }
         addafter("Currency Code")
@@ -152,14 +164,17 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
                 field("Applies-to Doc. Type"; Rec."Applies-to Doc. Type")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the type of document to which this sales invoice applies.';
                 }
                 field("Applies-to Doc. No."; Rec."Applies-to Doc. No.")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the document number to which this sales invoice applies.';
                 }
                 field("Applies-to ID"; Rec."Applies-to ID")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the ID of the document to which this sales invoice applies.';
                 }
             }
         }
@@ -184,6 +199,7 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Import Sales Lines';
+                ToolTip = 'Imports sales lines from an external source into the sales invoice.';
                 Image = ImportExcel;
 
                 trigger OnAction()
@@ -192,7 +208,30 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
                 begin
                     Clear(ImportSalesLine);
                     ImportSalesLine.Init(Rec."Document Type", Rec."No.");
-                    ImportSalesLine.RunModal;
+                    ImportSalesLine.RunModal();
+                end;
+            }
+
+            action("Set the Correction Flag")
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Set the Correction Flag';
+                ToolTip = 'Sets the correction flag for the sales invoice.';
+                Image = ChangeTo;
+
+                trigger OnAction()
+                var
+                    ConfirmLB: Label 'Do you want to change the correction flag?';
+                    ResultLB: Label 'The correction flag has been set to %1.';
+                begin
+                    // 25-06-25 BK #513757
+                    if Confirm(ConfirmLB, false) then begin
+                        Rec."Correction" := not Rec."Correction";
+                        Rec.Modify(true);
+                        Commit();
+                        CurrPage.Update(false);
+                        Message(ResultLB, Rec."Correction");
+                    End;
                 end;
             }
         }
@@ -202,11 +241,12 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Skip Posting Group Validation';
+                ToolTip = 'Skips the posting group validation for the sales invoice.';
                 Image = ChangeTo;
 
                 trigger OnAction()
                 begin
-                    SkipPostGrpValidation;  // 28-06-21 ZY-LD 004
+                    SkipPostGrpValidation();
                 end;
             }
         }
@@ -214,13 +254,13 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
 
     trigger OnOpenPage()
     begin
-        SI.SetRejectChangeLog(false);  // 25-04-18 ZY-LD 007
-        SetActions;  // 01-02-19 ZY-LD 008
+        SI.SetRejectChangeLog(false);
+        SetActions();
     end;
 
     trigger OnClosePage()
     begin
-        SI.SetRejectChangeLog(false);  // 25-04-18 ZY-LD 007
+        SI.SetRejectChangeLog(false);
     end;
 
     var
@@ -234,14 +274,14 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
         recInvSetup: Record "Inventory Setup";
         ZGT: Codeunit "ZyXEL General Tools";
     begin
-        recInvSetup.Get();  // 01-02-19 ZY-LD 016
-        EInvoiceCommentEnable := (Rec."Bill-to Country/Region Code" = 'IT') and (Rec."Location Code" = recInvSetup."AIT Location Code");  // 01-02-19 ZY-LD 016
+        recInvSetup.Get();
+        EInvoiceCommentEnable := (Rec."Bill-to Country/Region Code" = 'IT') and (Rec."Location Code" = recInvSetup."AIT Location Code");
         VATRegistrationNoSellToVisible :=
-          ZGT.IsRhq and
-          ((ZGT.IsZComCompany and (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.")) or  //<< 18-08-21 ZY-LD 032
-           (ZGT.IsZNetCompany and (Rec."VAT Registration No." <> Rec."Ship-to VAT")));  // 28-10-21 ZY-LD 032
+          ZGT.IsRhq() and
+          ((ZGT.IsZComCompany() and (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.")) or
+           (ZGT.IsZNetCompany() and (Rec."VAT Registration No." <> Rec."Ship-to VAT")));
 
-        ExternalInvoiceNoVisible := Rec."eCommerce Order";  // 26-10-21 ZY-LD 011 ExternalInvoiceNoVisible
+        ExternalInvoiceNoVisible := Rec."eCommerce Order";  // ExternalInvoiceNoVisible
     end;
 
     local procedure SkipPostGrpValidation()
@@ -249,9 +289,9 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
         recSalesHead: Record "Sales Header";
         SalesHeaderEvent: Codeunit "Sales Header/Line Events";
     begin
-        //>> 28-06-21 ZY-LD 003
+
         CurrPage.SetSelectionFilter(recSalesHead);
         SalesHeaderEvent.SkipPostGrpValidationWithConfirm(recSalesHead, CurrPage.Caption);
-        //<< 28-06-21 ZY-LD 003
+
     end;
 }

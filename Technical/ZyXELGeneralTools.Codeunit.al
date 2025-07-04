@@ -159,7 +159,7 @@ Codeunit 50000 "ZyXEL General Tools"
         if accessControl.findset then
             exit(true);
 
-        exit(UpperCase(UserId()) in ['ZYEU\LARS.DYRING', 'ZYEU\SL', 'ZYEU\ANDREA.GIORDANI', 'ZYEU\PELLE.GRONBERG']);
+        exit(UpperCase(UserId()) in ['ZYEU\BIRGITTE.KLAPROTH', 'ZYEU\SL', 'ZYEU\ANDREA.GIORDANI', 'ZYEU\PELLE.GRONBERG']);
     end;
 
 
