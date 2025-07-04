@@ -419,7 +419,7 @@ tableextension 50116 SalesHeaderZX extends "Sales Header"
             Caption = 'Amazon confirmationStatus';
             DataClassification = ToBeClassified;
         }
-        field(55020; Amazonfirstwindowdate; date)
+        field(55021; Amazonfirstwindowdate; date)
         {
             Caption = 'Amazon first date in delivery window';
             DataClassification = ToBeClassified;

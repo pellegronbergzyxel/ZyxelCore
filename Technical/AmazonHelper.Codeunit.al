@@ -1742,7 +1742,6 @@ codeunit 50055 AmazonHelper
                     repeat
                         if autorejectSalesheader(SH) then
                             commit();
-
                     until sh.next = 0;
             until amazSetup.next = 0;
 
@@ -1767,8 +1766,6 @@ codeunit 50055 AmazonHelper
                         repeat
                             SL.validate(Quantity, 0);
                             SL.modifY()
-
-
                         until SL.next = 0;
                 end;
             IF SetAmazonOrderRejected(SH, amazSetup.Code) then
