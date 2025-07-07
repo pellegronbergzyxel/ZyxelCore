@@ -1693,10 +1693,7 @@ codeunit 50055 AmazonHelper
             end;
             ResponseString := content;
             exit(true);
-
         end;
-
-
     end;
 
 
