@@ -1704,19 +1704,19 @@ codeunit 50055 AmazonHelper
         Errorlabel: Label 'All items lines with qty from Amazon must have either rejected or accepted as status, see %1';
     begin
         if sh.AmazonePoNo <> '' then begin
-            amazSetup.get(sh.AmazonSellpartyid);
-            if amazSetup.OnlyReleaseafterStatus then begin
-                SL.setrange("Document No.", sh."No.");
-                SL.SetRange("Document Type", sh."Document Type");
-                SL.setrange(Type, SL.type::Item);
-                Sl.setfilter("No.", '<>%1', '');
-                IF SL.findset then
-                    repeat
-                        IF (SL.AmazacceptedQuantity = 0) and (Sl.AmazrejectedQuantity = 0) and (sl.AmazorderedQuantity <> 0) then begin
-                            error(Errorlabel, sl."No.");
-                        end;
-                    until SL.next = 0;
-            end;
+            if amazSetup.get(sh.AmazonSellpartyid) then
+                if amazSetup.OnlyReleaseafterStatus then begin
+                    SL.setrange("Document No.", sh."No.");
+                    SL.SetRange("Document Type", sh."Document Type");
+                    SL.setrange(Type, SL.type::Item);
+                    Sl.setfilter("No.", '<>%1', '');
+                    IF SL.findset then
+                        repeat
+                            IF (SL.AmazacceptedQuantity = 0) and (Sl.AmazrejectedQuantity = 0) and (sl.AmazorderedQuantity <> 0) then begin
+                                error(Errorlabel, sl."No.");
+                            end;
+                        until SL.next = 0;
+                end;
         end;
     end;
 
