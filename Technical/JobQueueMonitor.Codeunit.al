@@ -28,19 +28,16 @@ Codeunit 62024 "Job Queue Monitor"
         if ZGT.IsRhq then
             if (not GuiAllowed and RunMonitor) or (GuiAllowed and ZGT.UserIsDeveloper) then
                 if recEmailAdd.Get('JOBQUEUE') then begin
-                    //>> 17-06-22 ZY-LD 004
                     // IF a process is stocked with status "In Process" for more than 60 min, it will be set to ready.
                     recJobQueEntry.SetRange("Job Queue Category Code", recJobQueCat.Code);
                     recJobQueEntry.SetRange(Status, recJobQueEntry.Status::"In Process");
                     recJobQueEntry.SetFilter("User Session Started", '<%1', CreateDatetime(Today, Time - (1000 * 60 * 60)));
                     if recJobQueEntry.FindSet(true) then
                         repeat
-                            //recJobQueEntry.SetStatus(recJobQueEntry.Status::Ready);
                             recJobQueEntry.Restart();  // 15-07-24 ZY-LD 000
                         until recJobQueEntry.Next() = 0;
-                    //<< 17-06-22 ZY-LD 004
 
-                    //>> 17-07-24 ZY-LD 005
+
                     // We have seen entries with status ready but scheduled = false;
                     recJobQueEntry.Reset;
                     recJobQueEntry.SetRange(Status, recJobQueEntry.Status::Ready);
@@ -49,7 +46,6 @@ Codeunit 62024 "Job Queue Monitor"
                         repeat
                             recJobQueEntry.Restart();
                         until recJobQueEntry.Next = 0;
-                    //<< 17-07-24 ZY-LD 005
 
                     // If a process has status Error, it will be restarted if it´s an accepted error. If not, a mail will be sent.
                     recJobQueEntry.Reset;
@@ -62,7 +58,6 @@ Codeunit 62024 "Job Queue Monitor"
                                     SendEmail := true;
                                     repeat
                                         if StrPos(UpperCase(recJobQueLogEntry."Error Message"), UpperCase(recAccJobQErrMessage.Message)) <> 0 then begin
-                                            //recJobQueEntry.SetStatus(recJobQueEntry.Status::Ready);
                                             recJobQueEntry.Restart();
                                             SendEmail := false;
                                         end else begin
@@ -72,7 +67,7 @@ Codeunit 62024 "Job Queue Monitor"
                                         end;
                                     until (recAccJobQErrMessage.Next() = 0) or (not SendEmail);
                                 end;
-                            //>> 17-07-24 ZY-LD 005
+
                             if SendEmail and not GuiAllowed then begin
                                 if DT2Date(recJobQueEntry."Last Support Mail Sent") < today then begin
                                     Clear(EmailAddMgt);
@@ -82,7 +77,7 @@ Codeunit 62024 "Job Queue Monitor"
                                     recJobQueEntry.Modify;
                                 end;
                             end;
-                        //<< 17-07-24 ZY-LD 005                                
+
                         until recJobQueEntry.Next() = 0;
                     end;
                 end;
@@ -95,7 +90,7 @@ Codeunit 62024 "Job Queue Monitor"
         ZGT: Codeunit "ZyXEL General Tools";
         EmailAddMgt: Codeunit "E-mail Address Management";
     begin
-        //>> 05-10-20 ZY-LD 001
+
         if ZGT.IsRhq then
             if (Time >= 060000T) and (Time <= 210000T) then
                 if recEmailAdd.Get('HARTBEAT') then begin
@@ -105,6 +100,6 @@ Codeunit 62024 "Job Queue Monitor"
                         EmailAddMgt.Send;
                     end;
                 end;
-        //<< 05-10-20 ZY-LD 001
+
     end;
 }
