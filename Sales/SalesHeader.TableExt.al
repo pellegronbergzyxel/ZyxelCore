@@ -399,7 +399,7 @@ tableextension 50116 SalesHeaderZX extends "Sales Header"
 
         field(55015; AmazonePoNo; Code[35])
         {
-            Caption = 'Amazon PO No.';
+            // Caption = 'Amazon PO No.';
             DataClassification = ToBeClassified;
         }
 

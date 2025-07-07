@@ -290,6 +290,7 @@ codeunit 50055 AmazonHelper
                                                             if (DD <> 0) and (mm <> 0) and (yyyy <> 0) then
                                                                 shipdate := DMY2Date(DD, MM, YYYY);
                                                 if Shipdate <> 0D then begin
+                                                    Salesheader.Amazonfirstwindowdate := Shipdate;
                                                     Salesheader.Validate("Shipment Date", Shipdate);
                                                     salesheader.Validate("Requested Delivery Date", Shipdate);
                                                     Salesheader."Order Date" := Shipdate;
@@ -302,6 +303,7 @@ codeunit 50055 AmazonHelper
                                                     Salesheader.Modify(true);
                                                 end;
                                             end;
+
 
                                             // items (arrays)
                                             if orderDetails.SelectToken('items', TokenValue) then begin
@@ -1705,7 +1707,7 @@ codeunit 50055 AmazonHelper
         Errorlabel: Label 'All items lines with qty from Amazon must have either rejected or accepted as status, see %1';
     begin
         if sh.AmazonePoNo <> '' then begin
-            amazSetup.get;
+            amazSetup.get(sh.AmazonSellpartyid);
             if amazSetup.OnlyReleaseafterStatus then begin
                 SL.setrange("Document No.", sh."No.");
                 SL.SetRange("Document Type", sh."Document Type");
