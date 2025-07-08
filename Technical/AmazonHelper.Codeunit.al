@@ -290,6 +290,7 @@ codeunit 50055 AmazonHelper
                                                             if (DD <> 0) and (mm <> 0) and (yyyy <> 0) then
                                                                 shipdate := DMY2Date(DD, MM, YYYY);
                                                 if Shipdate <> 0D then begin
+                                                    Salesheader.Amazonfirstwindowdate := Shipdate;
                                                     Salesheader.Validate("Shipment Date", Shipdate);
                                                     salesheader.Validate("Requested Delivery Date", Shipdate);
                                                     Salesheader."Order Date" := Shipdate;
@@ -302,6 +303,7 @@ codeunit 50055 AmazonHelper
                                                     Salesheader.Modify(true);
                                                 end;
                                             end;
+
 
                                             // items (arrays)
                                             if orderDetails.SelectToken('items', TokenValue) then begin
@@ -1691,10 +1693,7 @@ codeunit 50055 AmazonHelper
             end;
             ResponseString := content;
             exit(true);
-
         end;
-
-
     end;
 
 
@@ -1705,19 +1704,19 @@ codeunit 50055 AmazonHelper
         Errorlabel: Label 'All items lines with qty from Amazon must have either rejected or accepted as status, see %1';
     begin
         if sh.AmazonePoNo <> '' then begin
-            amazSetup.get;
-            if amazSetup.OnlyReleaseafterStatus then begin
-                SL.setrange("Document No.", sh."No.");
-                SL.SetRange("Document Type", sh."Document Type");
-                SL.setrange(Type, SL.type::Item);
-                Sl.setfilter("No.", '<>%1', '');
-                IF SL.findset then
-                    repeat
-                        IF (SL.AmazacceptedQuantity = 0) and (Sl.AmazrejectedQuantity = 0) and (sl.AmazorderedQuantity <> 0) then begin
-                            error(Errorlabel, sl."No.");
-                        end;
-                    until SL.next = 0;
-            end;
+            if amazSetup.get(sh.AmazonSellpartyid) then
+                if amazSetup.OnlyReleaseafterStatus then begin
+                    SL.setrange("Document No.", sh."No.");
+                    SL.SetRange("Document Type", sh."Document Type");
+                    SL.setrange(Type, SL.type::Item);
+                    Sl.setfilter("No.", '<>%1', '');
+                    IF SL.findset then
+                        repeat
+                            IF (SL.AmazacceptedQuantity = 0) and (Sl.AmazrejectedQuantity = 0) and (sl.AmazorderedQuantity <> 0) then begin
+                                error(Errorlabel, sl."No.");
+                            end;
+                        until SL.next = 0;
+                end;
         end;
     end;
 
