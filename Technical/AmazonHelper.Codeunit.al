@@ -1731,6 +1731,7 @@ codeunit 50055 AmazonHelper
         amazSetup.setfilter(OnlyReleaseafterStatusvalue, '<>%1', '');
         if amazSetup.findset then
             repeat
+                // RULE 1 - > 1 month to delivery 
                 sh.setrange(AmazonSellpartyid, amazSetup.Code);
                 sh.setrange("Document Type", sh."Document Type"::Order);
                 sh.setfilter(AmazonePoNo, '<>%1', '');
@@ -1742,6 +1743,22 @@ codeunit 50055 AmazonHelper
                         if autorejectSalesheader(SH) then
                             commit();
                     until sh.next = 0;
+
+                // Loop order for status update
+                Commit();
+                if sh.FindSet() then
+                    repeat
+                        UpdateAmazonstatus(SH);
+                    until sh.next = 0;
+                Commit();
+                // RULE 2 - < 1000 EUR 
+                if sh.FindSet() then
+                    repeat
+                        IF autorejectSalesheaderLowAmount(sh) then
+                            Commit;
+                    until sh.next = 0;
+
+
             until amazSetup.next = 0;
 
     end;
@@ -1772,5 +1789,34 @@ codeunit 50055 AmazonHelper
             exit(false)
         end;
     end;
+
+
+    procedure autorejectSalesheaderLowAmount(SH: Record "Sales Header"): boolean
+    var
+        SL: Record "Sales Line";
+        amazSetup: Record "Amazon Setup";
+    begin
+        if (sh.AmazonePoNo <> '') then begin
+            amazSetup.get(sh.AmazonSellpartyid);
+            if amazSetup.AutoRejectOrderbelowlcy > 0 then begin
+                sh.CalcFields(Amount);
+                if (Sh.amount < (amazSetup.AutoRejectOrderbelowlcy)) then begin
+                    SL.setrange("Document No.", sh."No.");
+                    SL.SetRange("Document Type", sh."Document Type");
+                    SL.setrange(Type, SL.type::Item);
+                    Sl.setfilter("No.", '<>%1', '');
+                    IF SL.findset then
+                        repeat
+                            SL.validate(Quantity, 0);
+                            SL.modifY()
+                        until SL.next = 0;
+                end;
+                IF SetAmazonOrderRejected(SH, amazSetup.Code) then
+                    exit(true);
+                exit(false)
+            end;
+        end;
+    end;
+
 
 }

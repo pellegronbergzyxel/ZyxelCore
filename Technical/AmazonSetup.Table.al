@@ -120,6 +120,10 @@ table 50090 "Amazon Setup"
         {
             Caption = 'status value for Only allow release after confirmed status';
         }
+        field(29; AutoRejectOrderbelowlcy; decimal)
+        {
+            Caption = 'Auto reject orders below LCY value';
+        }
     }
     keys
     {

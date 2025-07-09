@@ -111,6 +111,12 @@ page 50133 "Amazon setup list"
                 {
                     ApplicationArea = All;
                 }
+
+                field(AutoRejectOrderbelowlcy; Rec.AutoRejectOrderbelowlcy)
+                {
+                    ApplicationArea = All;
+                }
+
             }
         }
     }
