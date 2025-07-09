@@ -1757,8 +1757,6 @@ codeunit 50055 AmazonHelper
                         IF autorejectSalesheaderLowAmount(sh) then
                             Commit;
                     until sh.next = 0;
-
-
             until amazSetup.next = 0;
 
     end;
