@@ -1,11 +1,6 @@
 XmlPort 50069 "WS Container Detail"
 {
-    // 001. 07-08-19 ZY-LD 2019080710000035 - Fixed error, if there are two DD's on the same invoice no.
-    // 002. 18-03-20 ZY-LD 000 - Bill of Ladung is filled with DD No.
-    // 003. 02-04-20 ZY-LD P0362 - Sales Return Order.
-    // 004. 30-11-20 ZY-LD P0499 - Transfer Order.
-    // 005. 09-03-21 ZY-LD 2021030910000223 - If it´s an internal movement, we have to send the warehouse inbound right away.
-    // 006. 15-11-21 ZY-LD 2021090610000067 - New primary key.
+
 
     Caption = 'WS Container Detail';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/cd';
@@ -68,10 +63,9 @@ XmlPort 50069 "WS Container Detail"
 
                 trigger OnBeforeInsertRecord()
                 begin
-                    //>> 15-11-21 ZY-LD 006
                     EntryNo += 1;
                     "VCK Shipping Detail"."Entry No." := EntryNo;
-                    //<< 15-11-21 ZY-LD 006
+
                 end;
             }
         }
@@ -106,8 +100,8 @@ XmlPort 50069 "WS Container Detail"
                 if not recSaleShipLine.Get(recSaleInvLine."Shipment No.", recSaleInvLine."Shipment Line No.") then
                     Clear(recSaleShipLine);
 
-                EntryNo += 1;  // 15-11-21 ZY-LD 006
-                "VCK Shipping Detail"."Entry No." := EntryNo;  // 15-11-21 ZY-LD 006
+                EntryNo += 1;
+                "VCK Shipping Detail"."Entry No." := EntryNo;
                 if ZGT.IsZNetCompany then
                     "VCK Shipping Detail"."Bill of Lading No." := 'ZNET-INTERNAL'
                 else
@@ -120,15 +114,15 @@ XmlPort 50069 "WS Container Detail"
                 "VCK Shipping Detail".Quantity := recSaleInvLine.Quantity;
                 "VCK Shipping Detail".ETA := recSaleInvLine."Shipment Date";
                 "VCK Shipping Detail".ETD := recSaleInvLine."Shipment Date";
-                "VCK Shipping Detail"."Order No." := recSaleShipLine."Picking List No.";  // 07-08-19 ZY-LD 001
+                "VCK Shipping Detail"."Order No." := recSaleShipLine."Picking List No.";
                 "VCK Shipping Detail"."Order Type" := "VCK Shipping Detail"."order type"::"Purchase Order";
-                "VCK Shipping Detail"."Container No." := recSaleShipLine."Picking List No.";  // 18-03-20 ZY-LD 002
+                "VCK Shipping Detail"."Container No." := recSaleShipLine."Picking List No.";
+
                 if not "VCK Shipping Detail".Insert then
-                    //>> 07-08-19 ZY-LD 001
                     repeat
                         "VCK Shipping Detail"."Pallet No." := IncStr("VCK Shipping Detail"."Pallet No.");
                     until "VCK Shipping Detail".Insert;
-            //<< 07-08-19 ZY-LD 001
+
             until recSaleInvLine.Next() = 0;
 
         exit(true);
@@ -139,10 +133,10 @@ XmlPort 50069 "WS Container Detail"
     var
         recSalesLine: Record "Sales Line";
         recAutoSetup: Record "Automation Setup";
+        Location: Record Location;
         CalculatedDate: Date;
         NoOfDays: Integer;
     begin
-        //>> 02-04-20 ZY-LD 003
         recAutoSetup.Get;
         CalculatedDate := CalcDate(recAutoSetup."Release HQ Whse. Indb. DateF.", Today);
         NoOfDays := (Today - CalculatedDate) + 5;
@@ -152,8 +146,8 @@ XmlPort 50069 "WS Container Detail"
         recSalesLine.SetRange(Type, recSalesLine.Type::Item);
         if recSalesLine.FindSet then
             repeat
-                EntryNo += 1;  // 15-11-21 ZY-LD 006
-                "VCK Shipping Detail"."Entry No." := EntryNo;  // 15-11-21 ZY-LD 006
+                EntryNo += 1;
+                "VCK Shipping Detail"."Entry No." := EntryNo;
                 "VCK Shipping Detail"."Container No." := recSalesLine."Document No.";
                 "VCK Shipping Detail"."Bill of Lading No." := 'RETURN ORDER';
                 "VCK Shipping Detail"."Invoice No." := recSalesLine."Document No.";
@@ -167,12 +161,16 @@ XmlPort 50069 "WS Container Detail"
                 "VCK Shipping Detail"."Order No." := recSalesLine."Document No.";
                 "VCK Shipping Detail"."Order Type" := "VCK Shipping Detail"."order type"::"Sales Return Order";
                 "VCK Shipping Detail".Location := recSalesLine."Location Code";
+                // 07-07-2025 BK #506753
+                if recSalesLine."Location Code" <> '' then
+                    if location.get(recSalesLine."Location Code") then
+                        "VCK Shipping Detail"."Main Warehouse" := location."Main Warehouse";
                 "VCK Shipping Detail"."Expected Receipt Date" := Today + NoOfDays;
                 "VCK Shipping Detail"."Shipping Method" := 'DDP';
                 "VCK Shipping Detail".Insert;
             until recSalesLine.Next() = 0;
         exit(true);
-        //<< 02-04-20 ZY-LD 003
+
     end;
 
 
@@ -192,8 +190,8 @@ XmlPort 50069 "WS Container Detail"
                 if recPurchLine.ETA = 0D then
                     recPurchLine.ETA := recPurchLine."Expected Receipt Date";
 
-                EntryNo += 1;  // 15-11-21 ZY-LD 006
-                "VCK Shipping Detail"."Entry No." := EntryNo;  // 15-11-21 ZY-LD 006
+                EntryNo += 1;
+                "VCK Shipping Detail"."Entry No." := EntryNo;
                 "VCK Shipping Detail"."Container No." := recPurchLine."Document No.";
                 "VCK Shipping Detail"."Bill of Lading No." := 'PURCHASE ORDER';
                 "VCK Shipping Detail"."Invoice No." := recPurchLine."Document No.";
@@ -215,7 +213,6 @@ XmlPort 50069 "WS Container Detail"
                 "VCK Shipping Detail".Insert;
             until recPurchLine.Next() = 0;
         exit(true);
-        //<< 02-04-20 ZY-LD 003
     end;
 
 
@@ -227,14 +224,12 @@ XmlPort 50069 "WS Container Detail"
         CalculatedDate: Date;
         NoOfDays: Integer;
     begin
-        //>> 30-11-20 ZY-LD 004
-        //>> 09-03-21 ZY-LD 005
         recTransHead.Get(pTransferOrderNo);
         if (recTransHead."Transfer-from Address" = recTransHead."Transfer-to Address") and
            (recTransHead."Transfer-from Post Code" = recTransHead."Transfer-to Post Code")
         then
             NoOfDays := 0
-        else begin  //<< 09-03-21 ZY-LD 005
+        else begin
             recAutoSetup.Get;
             CalculatedDate := CalcDate(recAutoSetup."Release HQ Whse. Indb. DateF.", Today);
             NoOfDays := (Today - CalculatedDate) + 3;
@@ -243,8 +238,8 @@ XmlPort 50069 "WS Container Detail"
         recTransLine.SetRange("Derived From Line No.", 0);
         if recTransLine.FindSet then
             repeat
-                EntryNo += 1;  // 15-11-21 ZY-LD 006
-                "VCK Shipping Detail"."Entry No." := EntryNo;  // 15-11-21 ZY-LD 006
+                EntryNo += 1;
+                "VCK Shipping Detail"."Entry No." := EntryNo;
                 "VCK Shipping Detail"."Container No." := recTransLine."Document No.";
                 "VCK Shipping Detail"."Bill of Lading No." := 'TRANSFER ORDER';
                 "VCK Shipping Detail"."Invoice No." := recTransLine."Document No.";
@@ -263,7 +258,6 @@ XmlPort 50069 "WS Container Detail"
                 "VCK Shipping Detail".Insert;
             until recTransLine.Next() = 0;
         exit(true);
-        //<< 30-11-20 ZY-LD 004
     end;
 
 
@@ -275,16 +269,15 @@ XmlPort 50069 "WS Container Detail"
         if "VCK Shipping Detail".FindSet then begin
             recInvSetup.Get;
             repeat
-                //>> 12-08-20 ZY-LD 004
+
                 if "VCK Shipping Detail"."Item No." = 'MK0000' then
                     Error(lText001, "VCK Shipping Detail"."Item No.");
-                //<< 12-08-20 ZY-LD 004
 
                 pContainerDetail := "VCK Shipping Detail";
-                //>> 02-04-20 ZY-LD 003
+
                 if pContainerDetail.Location = '' then
                     pContainerDetail.Location := recInvSetup."AIT Location Code";
-                //<< 02-04-20 ZY-LD 003
+
                 pContainerDetail.Insert;
             until "VCK Shipping Detail".Next() = 0;
         end;

@@ -33,7 +33,8 @@ Codeunit 50056 "Job Queue Event"
     end;
     #endregion
 
-    #region Job Queue Log Entry
+    /* 07-07-25 BK #515695
+   
     [EventSubscriber(ObjectType::Table, Database::"Job Queue Log Entry", 'OnBeforeInsertEvent', '', false, false)]
     local procedure OnBeforeInsert(var Rec: Record "Job Queue Log Entry"; RunTrigger: Boolean)
     begin
@@ -47,7 +48,9 @@ Codeunit 50056 "Job Queue Event"
         if Rec.Status = Rec.Status::Error then
             SendEmailToNavSupport(Rec.Description, Rec."Error Message");
     end;
+    */ //07-07-25 BK #515695
 
+    #region Job Queue Log Entry
     local procedure SendEmailToNavSupport(pDescription: Text; pErrorMessage: Text)
     var
         lEmailAdd: Record "E-mail address";
