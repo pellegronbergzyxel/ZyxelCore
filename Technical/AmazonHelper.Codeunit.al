@@ -1762,7 +1762,6 @@ codeunit 50055 AmazonHelper
     end;
 
 
-
     procedure autorejectSalesheader(SH: Record "Sales Header"): boolean
     var
         SL: Record "Sales Line";

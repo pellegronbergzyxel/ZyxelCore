@@ -134,7 +134,6 @@ page 50133 "Amazon setup list"
                 var
                     Customer: record Customer;
                     CustomerList: Page "Customer List";
-
                 begin
                     Customer.setfilter(AMAZONID, '<>%1', '');
                     CustomerList.SetTableView(Customer);
@@ -156,8 +155,6 @@ page 50133 "Amazon setup list"
                     Salesheader.setfilter(AmazonePoNo, '<>%1', '');
                     LookupPageId.SetTableView(Salesheader);
                     LookupPageId.run();
-
-
                 end;
             }
         }

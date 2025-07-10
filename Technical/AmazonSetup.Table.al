@@ -92,7 +92,6 @@ table 50090 "Amazon Setup"
             Caption = 'Sell-to customer';
             Editable = false;
             FieldClass = FlowField;
-
         }
         field(23; NoSendfilonPost; Boolean)
         {
