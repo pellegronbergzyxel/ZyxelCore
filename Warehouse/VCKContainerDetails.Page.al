@@ -1,10 +1,5 @@
 Page 50101 "VCK Container Details"
 {
-    // 001. 24-10-18 ZY-LD 000 - New field.
-    // 002. 14-12-18 ZY-LD 000 - Confirm.
-    // 003. 28-01-19 ZY-LD 000 - Prevent modify after 25-01-19. Data is received by web service.
-    // 004. 05-01-21 ZY-LD 000 - "New" has been set to No.
-    // 005. 15-10-21 ZY-LD 2021101510000047 - Amount it added to the page.
 
     ApplicationArea = Basic, Suite;
     DeleteAllowed = true;
@@ -231,7 +226,7 @@ Page 50101 "VCK Container Details"
                 trigger OnAction()
                 begin
                     CurrPage.SetSelectionFilter(Rec);
-                    if Confirm(Text001, true, Rec.Count) then  // 14-12-18 ZY-LD 002
+                    if Confirm(Text001, true, Rec.Count) then
                         if Rec.FindSet(false) then
                             repeat
                                 Rec.Archive := true;
@@ -253,7 +248,6 @@ Page 50101 "VCK Container Details"
                 trigger OnAction()
                 begin
                     Report.RunModal(50169);
-                    //CurrPage.Update(true);
                 end;
             }
             action("Update VCK Inbound Lines")
@@ -265,7 +259,7 @@ Page 50101 "VCK Container Details"
 
                 trigger OnAction()
                 begin
-                    CreateVCKInbound;  // 14-12-18 ZY-LD 002
+                    CreateVCKInbound;
                 end;
             }
             action(tobeETA)
@@ -345,7 +339,7 @@ Page 50101 "VCK Container Details"
 
                 trigger OnAction()
                 begin
-                    PrintContainerDetails;
+                    PrintContainerDetails();
                 end;
             }
         }
@@ -353,20 +347,16 @@ Page 50101 "VCK Container Details"
 
     trigger OnAfterGetRecord()
     begin
-        //>> 15-10-21 ZY-LD 005
         Rec.CalcFields(Rec."Quantity Received", Rec."Direct Unit Cost");
         Rec."Calculated Quantity" := Rec.Quantity - Rec."Quantity Received";
         Rec.Amount := Rec."Calculated Quantity" * Rec."Direct Unit Cost";
-        //<< 15-10-21 ZY-LD 005
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
-        //>> 28-01-19 ZY-LD 003
         if Rec."Data Received Created" <> 0DT then
             if not Confirm(Text003, false) then
                 Error(Text002);
-        //<< 28-01-19 ZY-LD 003
     end;
 
     trigger OnOpenPage()
@@ -390,35 +380,7 @@ Page 50101 "VCK Container Details"
         ZyVCKPostMgt: Codeunit "Zyxel VCK Post Management";
         lText001: label 'Do you want to create VCK Post Line?';
     begin
-        //>> 14-12-18 ZY-LD 002
-        // IF CONFIRM(lText001) THEN BEGIN
-        //  CurrPage.SETSELECTIONFILTER(recContDetail);
-        //  IF recContDetail.FINDSET THEN BEGIN
-        //    ZGT.OpenProgressWindow('',COUNT);
-        //    REPEAT
-        //      ZGT.UpdateProgressWindow("Purchase Order No.",0,TRUE);
-        //
-        //      recVCKPostLine.SETRANGE(Date,TODAY);
-        //      recVCKPostLine.SETRANGE("Order No.",recContDetail."Purchase Order No.");
-        //      recVCKPostLine.SETRANGE("Line No.",recContDetail."Purchase Order Line No.");
-        //      recVCKPostLine.SETRANGE("Invoice No.",recContDetail."Invoice No.");
-        //      recVCKPostLine.SETRANGE(Posted,FALSE);
-        //      IF recVCKPostLine.FINDFIRST THEN BEGIN
-        //        recVCKPostLine.Quantity += recContDetail.Quantity;
-        //        recVCKPostLine.MODIFY;
-        //      END ELSE BEGIN
-        //        recVCKPostLine.Date := TODAY;
-        //        recVCKPostLine."Order No." := recContDetail."Purchase Order No.";
-        //        recVCKPostLine."Line No." := recContDetail."Purchase Order Line No.";
-        //        recVCKPostLine."Invoice No." := recContDetail."Invoice No.";
-        //        recVCKPostLine.Quantity := recContDetail.Quantity;
-        //        recVCKPostLine.INSERT;
-        //      END;
-        //    UNTIL recContDetail.Next() = 0;
-        //    ZGT.CloseProgressWindow;
-        //  END;
-        // END;
-        //<< 14-12-18 ZY-LD 002
+
     end;
 
     local procedure SetActions()

@@ -35,10 +35,10 @@ Codeunit 62007 "Inventory Template Report"
         EmailAddMgt.AddAttachment(FilenameServerEoY, StrSubstNo(lText001, CalcDate('<CY>', Today)), false);
         EmailAddMgt.Send;
 
-        //>> 18-10-22 ZY-LD 002
-        TargetFilename := StrSubstNo('\\ZYEU-NAVSQL02\NAV Archive\ZNet\EMEA\MR Inventory Template\MRInventoryTemplate %1.xlsx', Today);
-        ZyXELFileMgt.MoveServerFile(FilenameServerToday, TargetFilename);
-        //<< 18-10-22 ZY-LD 002
+
+        //TargetFilename := StrSubstNo('\\ZYEU-NAVSQL02\NAV Archive\ZNet\EMEA\MR Inventory Template\MRInventoryTemplate %1.xlsx', Today);
+        //ZyXELFileMgt.MoveServerFile(FilenameServerToday, TargetFilename);
+
 
         FileMgt.DeleteServerFile(FilenameServerToday);
         FileMgt.DeleteServerFile(FilenameServerEoY);
