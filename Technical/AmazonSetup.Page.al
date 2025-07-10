@@ -166,7 +166,6 @@ page 50133 "Amazon setup list"
                 caption = 'Resesh new token';
                 Image = GetSourceDoc;
                 ApplicationArea = all;
-
                 trigger OnAction()
                 var
                     amazhelper: codeunit amazonHelper;
@@ -184,7 +183,6 @@ page 50133 "Amazon setup list"
                 caption = 'Processes orders';
                 Image = GetSourceDoc;
                 ApplicationArea = all;
-
                 trigger OnAction()
                 var
                     amazhelper: codeunit amazonHelper;
