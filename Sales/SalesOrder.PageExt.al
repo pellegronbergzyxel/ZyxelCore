@@ -510,21 +510,6 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
             {
                 Caption = 'Amazon';
                 Image = Documents;
-                Action(updateStatus)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Update status';
-                    Image = UpdateXML;
-
-                    trigger OnAction()
-                    var
-                        AmazonHelper: Codeunit AmazonHelper;
-                        texttemp: text;
-                    begin
-                        AmazonHelper.UpdateAmazonstatus(rec);
-
-                    end;
-                }
                 Action(SendAcknowledge)
                 {
                     ApplicationArea = Basic, Suite;
@@ -541,6 +526,53 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
 
                     end;
                 }
+                Action(updateStatus)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Update status';
+                    Image = UpdateXML;
+
+                    trigger OnAction()
+                    var
+                        AmazonHelper: Codeunit AmazonHelper;
+                        texttemp: text;
+                    begin
+                        AmazonHelper.UpdateAmazonstatus(rec);
+
+                    end;
+                }
+
+                Action(Rule1)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Check rule - delivery window';
+                    Image = UpdateXML;
+
+                    trigger OnAction()
+                    var
+                        AmazonHelper: Codeunit AmazonHelper;
+                        texttemp: text;
+                    begin
+                        AmazonHelper.autorejectSalesheader(rec);
+
+                    end;
+                }
+                Action(Rule2)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Check rule - low order value';
+                    Image = UpdateXML;
+
+                    trigger OnAction()
+                    var
+                        AmazonHelper: Codeunit AmazonHelper;
+                        texttemp: text;
+                    begin
+                        AmazonHelper.autorejectSalesheaderLowAmount(rec);
+
+                    end;
+                }
+
                 action(packingSlips)
                 {
                     ApplicationArea = Basic, Suite;
