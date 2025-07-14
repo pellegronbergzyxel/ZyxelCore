@@ -299,6 +299,8 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
         ZNetLabel2: Label 'ZNET-';
         ZComLabel1: Label 'ZYXEL-INTERNAL';
         ZComLabel2: Label 'ZCOM-';
+        First: Boolean;
+        EntryNo: Integer;
 
     begin
         WhseInbHead.SetCurrentkey("Shipper Reference");
@@ -335,12 +337,20 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
                 WhseInbHead."Order Type" := WhseInbHead."Order Type"::"Purchase Invoice";
                 WhseInbHead."Automatic Created" := true;
                 WhseInbHead.Modify(true);
+                First := true;
                 repeat
                     WhseInbLine.init();
                     WhseInbLine."Order Type" := WhseInbLine."Order Type"::"Purchase Invoice";
                     WhseInbLine."Purchase Order No." := Pol."Document No.";
                     WhseInbLine."Purchase Order Line No." := Pol."Line No.";
-                    WhseInbLine.insert(true);
+                    IF First then begin //13-06-025 BK #511511
+                        WhseInbLine.insert(true);
+                        EntryNo := WhseInbLine."Entry No.";
+                        First := false;
+                    end else begin
+                        WhseInbLine."Entry No." := EntryNo + 1;
+                        WhseInbLine.insert(true);
+                    end;
                     WhseInbLine.Location := PurchaseHeader."Location Code";
                     if Location.get(PurchaseHeader."Location Code") then
                         WhseInbLine."Main Warehouse" := Location."Main Warehouse"; //13-06-025 BK #511511
