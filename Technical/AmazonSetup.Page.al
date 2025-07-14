@@ -134,7 +134,6 @@ page 50133 "Amazon setup list"
                 var
                     Customer: record Customer;
                     CustomerList: Page "Customer List";
-
                 begin
                     Customer.setfilter(AMAZONID, '<>%1', '');
                     CustomerList.SetTableView(Customer);
@@ -156,8 +155,6 @@ page 50133 "Amazon setup list"
                     Salesheader.setfilter(AmazonePoNo, '<>%1', '');
                     LookupPageId.SetTableView(Salesheader);
                     LookupPageId.run();
-
-
                 end;
             }
         }
@@ -169,7 +166,6 @@ page 50133 "Amazon setup list"
                 caption = 'Resesh new token';
                 Image = GetSourceDoc;
                 ApplicationArea = all;
-
                 trigger OnAction()
                 var
                     amazhelper: codeunit amazonHelper;
@@ -187,7 +183,6 @@ page 50133 "Amazon setup list"
                 caption = 'Processes orders';
                 Image = GetSourceDoc;
                 ApplicationArea = all;
-
                 trigger OnAction()
                 var
                     amazhelper: codeunit amazonHelper;

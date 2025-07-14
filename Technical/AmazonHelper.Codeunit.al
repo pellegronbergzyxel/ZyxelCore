@@ -1761,8 +1761,6 @@ codeunit 50055 AmazonHelper
 
     end;
 
-
-
     procedure autorejectSalesheader(SH: Record "Sales Header"): boolean
     var
         SL: Record "Sales Line";
@@ -1787,7 +1785,6 @@ codeunit 50055 AmazonHelper
             exit(false)
         end;
     end;
-
 
     procedure autorejectSalesheaderLowAmount(SH: Record "Sales Header"): boolean
     var
@@ -1815,6 +1812,5 @@ codeunit 50055 AmazonHelper
             end;
         end;
     end;
-
 
 }

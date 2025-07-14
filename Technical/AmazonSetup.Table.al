@@ -92,7 +92,6 @@ table 50090 "Amazon Setup"
             Caption = 'Sell-to customer';
             Editable = false;
             FieldClass = FlowField;
-
         }
         field(23; NoSendfilonPost; Boolean)
         {
@@ -106,7 +105,6 @@ table 50090 "Amazon Setup"
         field(25; UpdateCustOnStatus; Boolean)
         {
             Caption = 'Update customer on status';
-
         }
         field(26; AutorejectedFutureSOOver; Integer)
         {
