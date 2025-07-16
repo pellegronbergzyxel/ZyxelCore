@@ -1217,9 +1217,7 @@ codeunit 50055 AmazonHelper
         itemrec: record item;
         Counter: integer;
     begin
-
         Amazsetup.get(NordiskPartyid);
-
         OrderAcknowledgement.add('purchaseOrderNumber', so.AmazonePoNo);
         partyId.Add('partyId', Amazsetup.ZyxelPartyid);
         OrderAcknowledgement.add('sellingParty', partyId);
