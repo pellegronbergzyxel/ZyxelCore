@@ -845,7 +845,7 @@ codeunit 50055 AmazonHelper
             request.Method := 'GET';
 
             if not (client.send(request, responseMessage)) then begin
-                error('Url virker ikke: ' + url);
+                message('Url not working : ' + request.GetRequestUri);
                 exit(false);
             end;
 
@@ -911,7 +911,7 @@ codeunit 50055 AmazonHelper
             request.Method := 'GET';
 
             if not (client.send(request, responseMessage)) then begin
-                error('Url virker ikke: ' + url);
+                message('Url not working : ' + request.GetRequestUri);
                 exit(false);
             end;
 
@@ -1008,7 +1008,7 @@ codeunit 50055 AmazonHelper
                 // contentHeaders.Add('Content-Length', format(StrLen(temptext)));
 
                 if not (client.post(Amazsetup.URL_Post_Invoice, HttpContent, httpResponse)) then begin
-                    Message('Url virker ikke : %1 %2 %3', Amazsetup.URL_Post_Invoice, httpResponse.HttpStatusCode(), httpResponse.ReasonPhrase());
+                    Message('Url not workign : %1 %2 %3', Amazsetup.URL_Post_Invoice, httpResponse.HttpStatusCode(), httpResponse.ReasonPhrase());
                     exit(false);
                 end;
                 if not (httpResponse.IsSuccessStatusCode()) then begin
@@ -1079,7 +1079,7 @@ codeunit 50055 AmazonHelper
                 contentHeaders.Remove('Content-Type');
                 contentHeaders.Add('Content-Type', 'application/json');
                 if not (client.post(Amazsetup.URL_Set_AKN, HttpContent, httpResponse)) then
-                    Message('Url virker ikke : ' + Amazsetup.URL_Set_AKN);
+                    Message('Url not working: ' + Amazsetup.URL_Set_AKN);
 
                 if not (httpResponse.IsSuccessStatusCode()) then begin
                     httpcontents := httpResponse.Content();
@@ -1153,8 +1153,7 @@ codeunit 50055 AmazonHelper
         HttpHeadersContent.Add('Content-Type', 'application/x-www-form-urlencoded');
 
         if not (client.post(Amazsetup."Token endpoint", HttpContent, responseMessage)) then begin
-
-            Message('Url virker ikke : ' + Amazsetup."Token endpoint");
+            Message('Url not working: ' + Amazsetup."Token endpoint");
             exit(false);
         end;
 
@@ -1241,28 +1240,6 @@ codeunit 50055 AmazonHelper
                 ItemQuantity.add('unitOfMeasure', 'Eaches');
                 item.add('orderedQuantity', ItemQuantity);
                 Clear(ItemQuantity);
-                if (salesline.AmazorderedQuantity - salesline.Quantity) > 0 then begin
-
-                    //               {
-                    //                 "acknowledgementCode": "Rejected",
-                    //                 "acknowledgedQuantity": {
-                    //                   "amount": 10,
-                    //                   "unitOfMeasure": "Cases",
-                    //                   "unitSize": "5"
-                    //                 },
-                    //                 "rejectionReason": "TemporarilyUnavailable"
-                    //               }
-
-
-                    itemAcknowledgements.add('acknowledgementCode', 'Rejected');
-                    ItemQuantity.add('amount', (salesline.AmazorderedQuantity - salesline.Quantity));
-                    ItemQuantity.add('unitOfMeasure', 'Eaches');
-                    itemAcknowledgements.add('acknowledgedQuantity', ItemQuantity);
-                    itemAcknowledgements.add('rejectionReason', 'TemporarilyUnavailable');
-                    itemAcknowledgementsarray.add(itemAcknowledgements);
-                    Clear(ItemQuantity);
-                    clear(itemAcknowledgements);
-                end;
                 if (salesline.Quantity) > 0 then begin
                     //  {
                     //               "acknowledgementCode": "Accepted",
@@ -1279,7 +1256,30 @@ codeunit 50055 AmazonHelper
                     itemAcknowledgementsarray.add(itemAcknowledgements);
                     Clear(ItemQuantity);
                     clear(itemAcknowledgements);
-                end;
+                end else // else is new 
+                    if (salesline.AmazorderedQuantity - salesline.Quantity) > 0 then begin
+
+                        //               {
+                        //                 "acknowledgementCode": "Rejected",
+                        //                 "acknowledgedQuantity": {
+                        //                   "amount": 10,
+                        //                   "unitOfMeasure": "Cases",
+                        //                   "unitSize": "5"
+                        //                 },
+                        //                 "rejectionReason": "TemporarilyUnavailable"
+                        //               }
+
+
+                        itemAcknowledgements.add('acknowledgementCode', 'Rejected');
+                        ItemQuantity.add('amount', (salesline.AmazorderedQuantity - salesline.Quantity));
+                        ItemQuantity.add('unitOfMeasure', 'Eaches');
+                        itemAcknowledgements.add('acknowledgedQuantity', ItemQuantity);
+                        itemAcknowledgements.add('rejectionReason', 'TemporarilyUnavailable');
+                        itemAcknowledgementsarray.add(itemAcknowledgements);
+                        Clear(ItemQuantity);
+                        clear(itemAcknowledgements);
+                    end;
+
 
 
                 //  "itemAcknowledgements": [
@@ -1669,7 +1669,7 @@ codeunit 50055 AmazonHelper
             request.Method := 'GET';
 
             if not (client.send(request, responseMessage)) then begin
-                error('Url virker ikke: ' + url);
+                message('Url not working : ' + request.GetRequestUri);
                 exit(false);
             end;
 
