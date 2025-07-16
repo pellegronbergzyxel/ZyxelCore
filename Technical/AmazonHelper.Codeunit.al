@@ -1240,7 +1240,23 @@ codeunit 50055 AmazonHelper
                 ItemQuantity.add('unitOfMeasure', 'Eaches');
                 item.add('orderedQuantity', ItemQuantity);
                 Clear(ItemQuantity);
-                if (salesline.AmazorderedQuantity - salesline.Quantity) > 0 then begin
+                if (salesline.Quantity) > 0 then begin
+                    //  {
+                    //               "acknowledgementCode": "Accepted",
+                    //               "acknowledgedQuantity": {
+                    //                 "amount": 6
+                    //               },
+                    //               "scheduledShipDate": "2019-07-17T19:17:34.304Z"
+                    //             },
+                    itemAcknowledgements.add('acknowledgementCode', 'Accepted');
+                    ItemQuantity.add('amount', SalesLine.Quantity);
+                    ItemQuantity.add('unitOfMeasure', 'Eaches');
+                    itemAcknowledgements.add('acknowledgedQuantity', ItemQuantity);
+                    itemAcknowledgements.add('scheduledShipDate', format(CreateDateTime(SalesLine."Shipment Date", 000000T), 0, 9));  //picking date
+                    itemAcknowledgementsarray.add(itemAcknowledgements);
+                    Clear(ItemQuantity);
+                    clear(itemAcknowledgements);
+                end else if (salesline.AmazorderedQuantity - salesline.Quantity) > 0 then begin  // else added 16/07-2025
                     //               {
                     //                 "acknowledgementCode": "Rejected",
                     //                 "acknowledgedQuantity": {
@@ -1257,23 +1273,6 @@ codeunit 50055 AmazonHelper
                     ItemQuantity.add('unitOfMeasure', 'Eaches');
                     itemAcknowledgements.add('acknowledgedQuantity', ItemQuantity);
                     itemAcknowledgements.add('rejectionReason', 'TemporarilyUnavailable');
-                    itemAcknowledgementsarray.add(itemAcknowledgements);
-                    Clear(ItemQuantity);
-                    clear(itemAcknowledgements);
-                end;
-                if (salesline.Quantity) > 0 then begin
-                    //  {
-                    //               "acknowledgementCode": "Accepted",
-                    //               "acknowledgedQuantity": {
-                    //                 "amount": 6
-                    //               },
-                    //               "scheduledShipDate": "2019-07-17T19:17:34.304Z"
-                    //             },
-                    itemAcknowledgements.add('acknowledgementCode', 'Accepted');
-                    ItemQuantity.add('amount', SalesLine.Quantity);
-                    ItemQuantity.add('unitOfMeasure', 'Eaches');
-                    itemAcknowledgements.add('acknowledgedQuantity', ItemQuantity);
-                    itemAcknowledgements.add('scheduledShipDate', format(CreateDateTime(SalesLine."Shipment Date", 000000T), 0, 9));  //picking date
                     itemAcknowledgementsarray.add(itemAcknowledgements);
                     Clear(ItemQuantity);
                     clear(itemAcknowledgements);
