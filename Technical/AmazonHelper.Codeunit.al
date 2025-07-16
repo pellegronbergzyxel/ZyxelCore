@@ -1694,7 +1694,6 @@ codeunit 50055 AmazonHelper
         end;
     end;
 
-
     procedure AllowReleaseamazonorder(SH: Record "Sales Header")
     var
         SL: Record "Sales Line";
