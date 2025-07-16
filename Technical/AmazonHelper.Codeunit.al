@@ -1217,7 +1217,9 @@ codeunit 50055 AmazonHelper
         itemrec: record item;
         Counter: integer;
     begin
+
         Amazsetup.get(NordiskPartyid);
+
         OrderAcknowledgement.add('purchaseOrderNumber', so.AmazonePoNo);
         partyId.Add('partyId', Amazsetup.ZyxelPartyid);
         OrderAcknowledgement.add('sellingParty', partyId);
@@ -1238,6 +1240,27 @@ codeunit 50055 AmazonHelper
                 ItemQuantity.add('unitOfMeasure', 'Eaches');
                 item.add('orderedQuantity', ItemQuantity);
                 Clear(ItemQuantity);
+                if (salesline.AmazorderedQuantity - salesline.Quantity) > 0 then begin
+                    //               {
+                    //                 "acknowledgementCode": "Rejected",
+                    //                 "acknowledgedQuantity": {
+                    //                   "amount": 10,
+                    //                   "unitOfMeasure": "Cases",
+                    //                   "unitSize": "5"
+                    //                 },
+                    //                 "rejectionReason": "TemporarilyUnavailable"
+                    //               }
+
+
+                    itemAcknowledgements.add('acknowledgementCode', 'Rejected');
+                    ItemQuantity.add('amount', (salesline.AmazorderedQuantity - salesline.Quantity));
+                    ItemQuantity.add('unitOfMeasure', 'Eaches');
+                    itemAcknowledgements.add('acknowledgedQuantity', ItemQuantity);
+                    itemAcknowledgements.add('rejectionReason', 'TemporarilyUnavailable');
+                    itemAcknowledgementsarray.add(itemAcknowledgements);
+                    Clear(ItemQuantity);
+                    clear(itemAcknowledgements);
+                end;
                 if (salesline.Quantity) > 0 then begin
                     //  {
                     //               "acknowledgementCode": "Accepted",
@@ -1254,30 +1277,7 @@ codeunit 50055 AmazonHelper
                     itemAcknowledgementsarray.add(itemAcknowledgements);
                     Clear(ItemQuantity);
                     clear(itemAcknowledgements);
-                end else // else is new 
-                    if (salesline.AmazorderedQuantity - salesline.Quantity) > 0 then begin
-
-                        //               {
-                        //                 "acknowledgementCode": "Rejected",
-                        //                 "acknowledgedQuantity": {
-                        //                   "amount": 10,
-                        //                   "unitOfMeasure": "Cases",
-                        //                   "unitSize": "5"
-                        //                 },
-                        //                 "rejectionReason": "TemporarilyUnavailable"
-                        //               }
-
-
-                        itemAcknowledgements.add('acknowledgementCode', 'Rejected');
-                        ItemQuantity.add('amount', (salesline.AmazorderedQuantity - salesline.Quantity));
-                        ItemQuantity.add('unitOfMeasure', 'Eaches');
-                        itemAcknowledgements.add('acknowledgedQuantity', ItemQuantity);
-                        itemAcknowledgements.add('rejectionReason', 'TemporarilyUnavailable');
-                        itemAcknowledgementsarray.add(itemAcknowledgements);
-                        Clear(ItemQuantity);
-                        clear(itemAcknowledgements);
-                    end;
-
+                end;
 
 
                 //  "itemAcknowledgements": [
@@ -1700,6 +1700,8 @@ codeunit 50055 AmazonHelper
         SL: Record "Sales Line";
         amazSetup: Record "Amazon Setup";
         Errorlabel: Label 'All items lines with qty from Amazon must have either rejected or accepted as status, see %1';
+        Errorlabel2: Label 'One item must be accepted from Amazon';
+        NotAllrejected: Boolean;
     begin
         if sh.AmazonePoNo <> '' then begin
             if amazSetup.get(sh.AmazonSellpartyid) then
@@ -1713,7 +1715,11 @@ codeunit 50055 AmazonHelper
                             IF (SL.AmazacceptedQuantity = 0) and (Sl.AmazrejectedQuantity = 0) and (sl.AmazorderedQuantity <> 0) then begin
                                 error(Errorlabel, sl."No.");
                             end;
+                            if NOT (SL.AmazconfirmationStatus in ['', 'REJECTED']) then
+                                NotAllrejected := true;
                         until SL.next = 0;
+                    if not NotAllrejected then
+                        error(Errorlabel2);
                 end;
         end;
     end;
