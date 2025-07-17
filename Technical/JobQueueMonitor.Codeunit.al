@@ -34,7 +34,7 @@ Codeunit 62024 "Job Queue Monitor"
                     recJobQueEntry.SetFilter("User Session Started", '<%1', CreateDatetime(Today, Time - (1000 * 60 * 60)));
                     if recJobQueEntry.FindSet(true) then
                         repeat
-                            recJobQueEntry.Restart();  // 15-07-24 ZY-LD 000
+                            recJobQueEntry.Restart();
                         until recJobQueEntry.Next() = 0;
 
 

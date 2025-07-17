@@ -1,13 +1,5 @@
 XmlPort 50003 "Send Inbound Order Request"
 {
-    // 001. 19-02-19 PAB - Updated for new NAV XML
-    // 002. 02-05-19 ZY-LD "Due Date" is used as "Expected Receipt Date" on the header. We don't know why.
-    // 003. 14-06-19 ZY-LD 2019061410000043 - Purchase order can contain more than one location code on the lines.
-    // 004. 17-06-19 ZY-LD 2019061710000056 - Filter lines only on Type = Item. "DeliveryTerms/Terms" is left blank instead of Warehouse Inbound Header::Shipping Method, which was wrong. It was blank on PO´s.
-    // 005. 05-02-21 ZY-LD 000 - TO was missing.
-    // 006. 08-09-21 ZY-LD 2021090810000072 - ShipmentNo is changed from "Warehouse Inbound Header::Shipment No." to "Warehouse Inbound Header::Invoice No.".
-    // 007. 22-02-22 ZY-LD P0767 - Namespace is changed.
-    // 008. 13-03-23 ZY-LD 000 - Wrong warehouse was set.
 
     Caption = 'Send Inbound Order Request';
     DefaultNamespace = 'http://schemas.allincontrol.com/BizTalk/2013';
@@ -283,7 +275,7 @@ XmlPort 50003 "Send Inbound Order Request"
 
                         trigger OnBeforePassVariable()
                         begin
-                            Warehouse := ItemLogisticEvent.GetMainWarehouseLocation;  // 13-03-23 ZY-LD 008
+                            Warehouse := ItemLogisticEvent.GetMainWarehouseLocation;
                         end;
                     }
                     fieldelement(Location; "Warehouse Inbound Header"."Location Code")
@@ -325,14 +317,12 @@ XmlPort 50003 "Send Inbound Order Request"
                                 if recPurchLine.Get(recPurchHead."Document Type", recPurchHead."No.", "VCK Shipping Detail"."Purchase Order Line No.") then
                                     UnitPrice := Format(recPurchLine."Unit Price (LCY)")
                                 else begin
-                                    //>> 03-07-20 ZY-LD 005
                                     UnitPrice := '';
                                     SI.SetMergefield(100, "VCK Shipping Detail"."Batch No.");
                                     SI.SetMergefield(101, recPurchHead."No.");
                                     SI.SetMergefield(102, Format("VCK Shipping Detail"."Purchase Order Line No."));
                                     EmailAddMgt.CreateSimpleEmail('HQCONTDETE', '', '');
                                     EmailAddMgt.Send;
-                                    //<< 03-07-20 ZY-LD 005
                                 end;
                             end;
                         "VCK Shipping Detail"."order type"::"Sales Return Order":
@@ -355,7 +345,8 @@ XmlPort 50003 "Send Inbound Order Request"
                 ProjectID := recWarehouse."Project ID";
 
                 case "Warehouse Inbound Header"."Order Type" of
-                    "Warehouse Inbound Header"."order type"::"Purchase Order":
+                    "Warehouse Inbound Header"."order type"::"Purchase Order",
+                    "Warehouse Inbound Header"."order type"::"Purchase Invoice": //17-07-2025 BK #511511
                         begin
                             recVend.Get("Warehouse Inbound Header"."Sender No.");
                             Phone := recVend."Phone No.";
@@ -369,7 +360,6 @@ XmlPort 50003 "Send Inbound Order Request"
                             Email := recCust."E-Mail";
                             OrderType := 'SR';
                         end;
-                    //>> 05-02-21 ZY-LD 005
                     "Warehouse Inbound Header"."order type"::"Transfer Order":
                         begin
                             recLocation.Get("Warehouse Inbound Header"."Sender No.");
@@ -377,7 +367,6 @@ XmlPort 50003 "Send Inbound Order Request"
                             Email := recLocation."E-Mail";
                             OrderType := 'TO';
                         end;
-                //<< 05-02-21 ZY-LD 005
                 end;
             end;
         }
@@ -415,10 +404,11 @@ XmlPort 50003 "Send Inbound Order Request"
         recSalesLine: Record "Sales Line";
         recCust: Record Customer;
         recVend: Record Vendor;
-        Text001: label 'Container No.: %1';
-        Text002: label 'Invoice No.: %1';
         recLocation: Record Location;
         EmailAddMgt: Codeunit "E-mail Address Management";
         SI: Codeunit "Single Instance";
         ItemLogisticEvent: Codeunit "Item / Logistic Events";
+        Text001: label 'Container No.: %1';
+        Text002: label 'Invoice No.: %1';
+
 }

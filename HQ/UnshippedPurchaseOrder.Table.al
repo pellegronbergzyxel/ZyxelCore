@@ -74,6 +74,12 @@ table 50012 "Unshipped Purchase Order"
             FieldClass = FlowField;
             Editable = false;
         }
+        /*
+        field(15; "DN Number"; Code[20])
+        {
+            Caption = 'DN Number';
+        }
+        */ //Mail from John in HQ - first in test BK
     }
     keys
     {
