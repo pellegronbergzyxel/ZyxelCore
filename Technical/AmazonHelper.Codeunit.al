@@ -256,7 +256,6 @@ codeunit 50055 AmazonHelper
                                                 Salesheader.validate("Order Date", orderdate);
                                                 Salesheader.modify(true);
                                             end;
-
                                             if shiptoadd.get(shipno) then
                                                 salesheader.SetShipToCustomerAddressFieldsFromShipToAddr(shiptoadd);
                                             Salesheader.Validate("Ship-to Code", shipno);
@@ -303,8 +302,6 @@ codeunit 50055 AmazonHelper
                                                     Salesheader.Modify(true);
                                                 end;
                                             end;
-
-
                                             // items (arrays)
                                             if orderDetails.SelectToken('items', TokenValue) then begin
                                                 tokenarray := TokenValue.AsArray();
