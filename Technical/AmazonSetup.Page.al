@@ -116,6 +116,11 @@ page 50133 "Amazon setup list"
                 {
                     ApplicationArea = All;
                 }
+                field(Locationcode; Rec.Locationcode)
+                {
+                    ApplicationArea = All;
+                }
+
 
             }
         }

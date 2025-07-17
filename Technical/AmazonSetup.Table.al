@@ -122,6 +122,12 @@ table 50090 "Amazon Setup"
         {
             Caption = 'Auto reject orders below LCY value';
         }
+        field(30; Locationcode; code[10]
+         )
+        {
+            Caption = 'Auto reject orders below LCY value';
+            TableRelation = Location;
+        }
     }
     keys
     {

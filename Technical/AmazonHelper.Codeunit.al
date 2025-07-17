@@ -293,7 +293,7 @@ codeunit 50055 AmazonHelper
                                                     Salesheader.Amazonfirstwindowdate := Shipdate;
                                                     Salesheader.Validate("Shipment Date", Shipdate);
                                                     salesheader.Validate("Requested Delivery Date", Shipdate);
-                                                    Salesheader."Order Date" := Shipdate;
+                                                    Salesheader."Order Date" := today;
                                                     // Salesheader."Order Receipt Date" := Today;
                                                     Salesheader."VAT Reporting Date" := Shipdate;
                                                     Salesheader."Posting Date" := Shipdate;
@@ -677,6 +677,7 @@ codeunit 50055 AmazonHelper
         salesline: record "Sales Line";
         NoSeriesMgt: Codeunit NoSeriesManagement;
         salesSetup: Record "Sales & Receivables Setup";
+        Amazonsetup: record "Amazon Setup";
     begin
         SalesRecord.setrange("Document Type", SalesRecord."Document Type"::Order);
         SalesRecord.setrange(AmazonePoNo, Amazonorder);
@@ -702,9 +703,11 @@ codeunit 50055 AmazonHelper
             SalesRecord.validate("External Document No.", Amazonorder);
             SalesRecord.insert(false);
             // Flyt til setup >>
-
+            Amazonsetup.get(Partyid);
             salesrecord."Sales Order Type" := salesrecord."Sales Order Type"::Normal;
-            SalesRecord."Location Code" := 'VCK ZNET';
+            SalesRecord."Location Code" := Amazonsetup.Locationcode;
+            if SalesRecord."Location Code" = '' then
+                SalesRecord."Location Code" := 'VCK ZNET';
             // Flyt til setup <<
             //SalesRecord."eCommerce Order" := true;
             SalesRecord.validate("Sell-to Customer No.", sellcustomerno);
@@ -712,8 +715,6 @@ codeunit 50055 AmazonHelper
             SalesRecord.Validate(AmazonSellpartyid, Partyid);
             SalesRecord.Validate("Your Reference", Amazonorder);
             SalesRecord."Posting Date" := Today;
-
-
             SalesRecord.validate("Requested delivery Date", Today);
 
             SalesRecord.Modify(true);
@@ -1277,8 +1278,6 @@ codeunit 50055 AmazonHelper
                     Clear(ItemQuantity);
                     clear(itemAcknowledgements);
                 end;
-
-
                 //  "itemAcknowledgements": [
                 item.add('itemAcknowledgements', itemAcknowledgementsarray);
                 itemarray.Add(item);
