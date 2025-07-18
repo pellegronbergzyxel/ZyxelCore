@@ -45,6 +45,7 @@ Codeunit 62007 "Inventory Template Report"
             repInvTempl.InitReport(Today, true, true, false, false, true);
             repInvTempl.UseRequestPage(false);
             repInvTempl.RunModal;
+            // Loop 1 -> 3
             repInvTempl.getExcelbuffer(tempExcelbuffer, 1);
             ExportExcelFileToBlob(tempExcelbuffer, TempBlob);
             TempBlob.CreateInStream(InStr);
@@ -57,6 +58,7 @@ Codeunit 62007 "Inventory Template Report"
             repInvTempl.InitReport(CalcDate('<CY>', Today), true, true, false, false, true);
             repInvTempl.UseRequestPage(false);
             repInvTempl.RunModal;
+            // Loop 1 -> 3
             repInvTempl.getExcelbuffer(tempExcelbuffer, 1);
             ExportExcelFileToBlob(tempExcelbuffer, TempBlob);
             TempBlob.CreateInStream(InStr);
