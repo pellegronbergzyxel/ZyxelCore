@@ -318,7 +318,7 @@ Report 50098 "MR Inventory Template"
             MakeExcelGrandFoot;
             MakeExcelGrandFootColumn;
             MakeExcelGrandFootRMA;
-            if not skipcreate then 
+
             CreateExcelbook;
         end else begin
             //>> 11-02-20 ZY-LD 004
@@ -794,7 +794,7 @@ Report 50098 "MR Inventory Template"
         end;
 
         ExcelBuf.CloseBook;
-        if GuiAllowed then begin
+        if GuiAllowed and (not skipcreate) then begin
             ExcelBuf.OpenExcel;
         end else
             FilenameServer := ExcelBuf.GetFileNameServer;  // 01-12-20 ZY-LD 007
@@ -1180,5 +1180,13 @@ Report 50098 "MR Inventory Template"
 
                 end;
                     end;
+                end;
+
+
+                procedure gettempblob(var TempBlob: Codeunit "Temp Blob")
+                OutStr: outstream;
+                begin 
+                    TempBlob.CreateOutStream(OutStr);
+            ExcelBuf.SaveToStream(OutStr, true);
                 end;
 }
