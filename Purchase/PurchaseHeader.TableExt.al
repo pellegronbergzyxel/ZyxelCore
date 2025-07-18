@@ -317,7 +317,13 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
                 WhseInbHead.insert(true);
                 IF PurchaseHeader."Expected Receipt Date" = 0D THEN
                     PurchaseHeader."Expected Receipt Date" := PurchaseHeader."Document Date";
-                WhseInbHead."Shipper Reference" := 'INV' + PurchaseHeader."No.";
+
+                if ZGT.IsZNetCompany() then //18-07-2025 BK #511511
+                    WhseInbHead."Shipper Reference" := ZNetLabel2 + Pol."Picking List No."
+                else
+                    WhseInbHead."Shipper Reference" := ZComLabel2 + Pol."Picking List No.";
+
+                //WhseInbHead."Shipper Reference" := 'INV' + PurchaseHeader."No.";
                 WhseInbHead."Location Code" := PurchaseHeader."Location Code";
                 WhseInbHead."Sender No." := PurchaseHeader."Buy-from Vendor No.";
                 WhseInbHead."Sender Name" := PurchaseHeader."Buy-from Vendor Name";
@@ -368,12 +374,11 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
                         WhseInbLine."Bill of Lading No." := zComLabel1;
                         WhseInbLine."Order No." := ZcomLabel2 + WhseInbHead."No.";
                     end;
+
                     WhseInbLine."Invoice No." := copystr(PurchaseHeader."Vendor Invoice No.", 1, 30);
                     WhseInbLine."Container No." := Pol."Picking List No.";
                     WhseInbLine."Document No." := WhseInbHead."No.";
                     WhseInbLine.modify(false);
-
-
 
                 until Pol.next() = 0;
             end;
