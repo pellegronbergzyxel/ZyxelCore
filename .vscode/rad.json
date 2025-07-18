@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 ﻿{"Added":[],"Modified":[],"Removed":[]}
+=======
+﻿{"Added":[],"Modified":[{"Kind":106,"Name":"RequestOptionsPage","Namespace":""},{"Id":50098,"Kind":13,"Name":"MR Inventory Template","Namespace":""},{"Id":62007,"Kind":11,"Name":"Inventory Template Report","Namespace":""},{"Id":62013,"Kind":11,"Name":"Update Inventory Movement","Namespace":""},{"Id":50055,"Kind":11,"Name":"AmazonHelper","Namespace":""}],"Removed":[]}
+>>>>>>> c09b9cb02f1acf28030d8418b58c0807022b6cd6

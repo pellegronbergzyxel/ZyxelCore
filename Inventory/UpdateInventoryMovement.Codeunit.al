@@ -34,7 +34,7 @@ Codeunit 62013 "Update Inventory Movement"
                 ZGT.UpdateProgressWindow(Format(BaseDate), 0, true);
 
                 Clear(MRInventoryTemplate);
-                MRInventoryTemplate.InitReport(BaseDate, false, false, false, true);
+                MRInventoryTemplate.InitReport(BaseDate, false, false, false, true, false);
                 MRInventoryTemplate.UseRequestPage(false);
                 MRInventoryTemplate.RunModal;
             until recDate.Next() = 0;

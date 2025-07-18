@@ -1777,9 +1777,10 @@ codeunit 50055 AmazonHelper
                             SL.validate(Quantity, 0);
                             SL.modifY()
                         until SL.next = 0;
+                    IF SetAmazonOrderRejected(SH, amazSetup.Code) then
+                        exit(true);
                 end;
-            IF SetAmazonOrderRejected(SH, amazSetup.Code) then
-                exit(true);
+
             exit(false)
         end;
     end;
@@ -1803,9 +1804,10 @@ codeunit 50055 AmazonHelper
                             SL.validate(Quantity, 0);
                             SL.modifY()
                         until SL.next = 0;
+                    IF SetAmazonOrderRejected(SH, amazSetup.Code) then
+                        exit(true);
                 end;
-                IF SetAmazonOrderRejected(SH, amazSetup.Code) then
-                    exit(true);
+
                 exit(false)
             end;
         end;

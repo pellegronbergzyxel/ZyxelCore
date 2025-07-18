@@ -303,6 +303,7 @@ Report 50098 "MR Inventory Template"
         text025 = 'Page';
         RptTitle = 'Inventory Report';
         text026 = 'Cost posted to G/L';
+        
     }
 
     trigger OnPostReport()
@@ -317,6 +318,7 @@ Report 50098 "MR Inventory Template"
             MakeExcelGrandFoot;
             MakeExcelGrandFootColumn;
             MakeExcelGrandFootRMA;
+            if not skipcreate then 
             CreateExcelbook;
         end else begin
             //>> 11-02-20 ZY-LD 004
@@ -433,6 +435,7 @@ Report 50098 "MR Inventory Template"
         BlockExcelInventory: Boolean;
         FilenameServer: Text;
         ShowSummedUpAs: Option Item,Location;
+        skipcreate: boolean;
 
     local procedure CreateItemLedgerEntryTemp(pItemNo: Code[20]; pLocationCode: Code[10]; pDivisionCode: Code[10]; pPostingDate: Date; pQuantity: Decimal; pLineCostAmount: Decimal; pLineCostAmountGL: Decimal; pEntryType: Enum "Item Ledger Document Type")
     var
@@ -1123,13 +1126,14 @@ Report 50098 "MR Inventory Template"
     end;
 
 
-    procedure InitReport(pBaseDate: Date; pShowQuantity: Boolean; pShowDifference: Boolean; pShowClosedDetailedEntries: Boolean; pBlockExcel: Boolean)
+    procedure InitReport(pBaseDate: Date; pShowQuantity: Boolean; pShowDifference: Boolean; pShowClosedDetailedEntries: Boolean; pBlockExcel: Boolean;pSkipcreate: Boolean)
     begin
         BaseDate := pBaseDate;
         ShowQuantity := pShowQuantity;  // 01-12-20 ZY-LD 007
         ShowDifference := pShowDifference;  // 01-12-20 ZY-LD 007
         ShowClosedDetailedEntries := pShowClosedDetailedEntries;  // 01-12-20 ZY-LD 007
         BlockExcelInventory := pBlockExcel;
+        Skipcreate := pSkipcreate;
     end;
 
 
@@ -1137,4 +1141,44 @@ Report 50098 "MR Inventory Template"
     begin
         exit(FilenameServer);  // 01-12-20 ZY-LD 007
     end;
+
+    // PG 18-07-2025
+    procedure getExcelbuffer(var gExcelbuf: Record "Excel Buffer" temporary; type: Integer)
+    begin
+        // ExcelBuf: Record "Excel Buffer" temporary;
+        // ExcelBuf2: Record "Excel Buffer" temporary;
+        // ExcelBufRMA: Record "Excel Buffer" temporary;
+        gExcelbuf.DeleteAll();
+        case type of
+            1:
+                begin
+  if ExcelBuf.FindFirst then begin
+                        repeat
+                            gExcelbuf := ExcelBuf;
+                            gExcelbuf.Insert;
+                        until ExcelBuf.Next() = 0;
+                    end;
+                end;
+
+            2:
+                begin
+                    if ExcelBuf2.FindFirst then begin
+                        repeat
+                            gExcelbuf := ExcelBuf2;
+                            gExcelbuf.Insert;
+                        until ExcelBuf2.Next() = 0;
+                    end;
+                end;
+            3:
+                begin
+                        if ExcelBufRMA.FindFirst then begin
+                            repeat
+                                gExcelbuf := ExcelBufRMA;
+                                gExcelbuf.Insert;
+                            until ExcelBufRMA.Next() = 0;
+                        end;
+
+                end;
+                    end;
+                end;
 }
