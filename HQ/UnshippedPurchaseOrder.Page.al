@@ -61,6 +61,10 @@ page 50012 "Unshipped Purchase Order"
                 {
                     ToolTip = 'Specifies the value of the Vendor Type field.';
                 }
+                field("DN Number"; Rec."DN Number")
+                {
+                    ToolTip = 'Specifies the value of the DN Number field.';
+                } //Mail from John in HQ - first in test BK
                 field(SystemCreatedAt; Rec.SystemCreatedAt)
                 {
                     ToolTip = 'Specifies the value of the SystemCreatedAt field.';
