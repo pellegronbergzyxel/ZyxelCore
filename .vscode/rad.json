@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-﻿{"Added":[],"Modified":[],"Removed":[]}
-=======
-﻿{"Added":[],"Modified":[{"Id":50012,"Kind":10,"Name":"Unshipped Purchase Order","Namespace":""},{"Id":50067,"Kind":11,"Name":"Sales Header/Line Events","Namespace":""},{"Id":50003,"Kind":15,"Name":"Send Inbound Order Request","Namespace":""},{"Id":62024,"Kind":11,"Name":"Job Queue Monitor","Namespace":""},{"Id":50055,"Kind":11,"Name":"AmazonHelper","Namespace":""},{"Id":50048,"Kind":15,"Name":"HQ Unshipped Quantity","Namespace":""},{"Kind":106,"Name":"RequestOptionsPage","Namespace":""}],"Removed":[]}
->>>>>>> c5de8d44f0d8446f1bd471262d1689781c22c9fa
+﻿{"Added":[],"Modified":[{"Kind":106,"Name":"RequestOptionsPage","Namespace":""},{"Id":50098,"Kind":13,"Name":"MR Inventory Template","Namespace":""},{"Id":62007,"Kind":11,"Name":"Inventory Template Report","Namespace":""},{"Id":62013,"Kind":11,"Name":"Update Inventory Movement","Namespace":""},{"Id":50055,"Kind":11,"Name":"AmazonHelper","Namespace":""}],"Removed":[]}
