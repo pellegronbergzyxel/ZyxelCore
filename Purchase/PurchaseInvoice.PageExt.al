@@ -159,8 +159,6 @@ pageextension 50133 PurchaseInvoiceZX extends "Purchase Invoice"
                 Image = TestFile;
                 Promoted = true;
                 PromotedCategory = Category6;
-
-
                 trigger OnAction()
                 var
                     ApprovalEntry: record "Approval Entry";
