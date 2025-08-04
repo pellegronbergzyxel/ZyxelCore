@@ -521,8 +521,11 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                         AmazonHelper: Codeunit AmazonHelper;
                         Confirmtext: Label 'have you updated quantities on all lines? ';
                     begin
-                        if confirm(Confirmtext, true) then
+                        if confirm(Confirmtext, true) then begin
                             AmazonHelper.SetAmazonOrderRejected(rec, rec.AmazonSellpartyid);
+                            commit;
+                            AmazonHelper.UpdateAmazonstatus(rec);
+                        end;
 
                     end;
                 }

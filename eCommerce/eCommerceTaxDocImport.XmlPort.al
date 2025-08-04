@@ -619,11 +619,11 @@ XmlPort 50013 "eCommerce Tax Doc. Import"
 
             recAmzOrderLine.Init;
             recAmzOrderLine.Validate(recAmzOrderLine."Transaction Type", recAmzOrderHead."Transaction Type");
-            recAmzOrderLine.Validate(recAmzOrderLine."eCommerce Order Id", OrderID);
+            recAmzOrderLine.Validate(recAmzOrderLine."eCommerce Order Id", copystr(OrderID, 1, 30));  //pg 2025-07-28
             recAmzOrderLine.Validate(recAmzOrderLine."Invoice No.", VATInvoiceNumber);
             recAmzOrderLine.Validate(recAmzOrderLine."Line No.", recAmzOrderLine2."Line No." + 10000);
-            recAmzOrderLine.Validate(recAmzOrderLine.ASIN, ASINImport);
-            recAmzOrderLine.Validate(recAmzOrderLine."Item No.", SKU);
+            recAmzOrderLine.Validate(recAmzOrderLine.ASIN, copystr(ASINImport, 1, 20)); //pg 2025-07-28
+            recAmzOrderLine.Validate(recAmzOrderLine."Item No.", copystr(SKU, 1, 30)); //pg 2025-07-28
             recAmzOrderLine.Validate(recAmzOrderLine.Quantity, QuantityImport);
             recAmzOrderLine.Validate(recAmzOrderLine."VAT Prod. Posting Group", VATProdPostingGroup);
 

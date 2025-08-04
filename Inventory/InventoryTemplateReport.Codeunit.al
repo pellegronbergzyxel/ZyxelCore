@@ -32,13 +32,27 @@ Codeunit 62007 "Inventory Template Report"
         lText001a: label 'Detailed ';
         lText002a: label 'Summed Up ';
         lText003a: label 'RMA ';
+        temptext: text;
+        I: integer;
+        x: integer;
+        app: text[80];
 
     begin
         // 
         if lEmailAdd.Get('HQINVTEMPL') then begin
 
-            if lEmailAdd.Recipients <> '' then
-                Recipients.Add(lEmailAdd.Recipients);
+            if lEmailAdd.Recipients <> '' then begin
+                if lEmailAdd.Recipients.Contains(';') then begin
+                    temptext := ConvertStr(lEmailAdd.Recipients, ';', ',');
+                    x := StrLen(temptext) - StrLen(DelChr(temptext, '=', ',')) + 1;
+                    for I := 1 to x do begin
+                        app := SelectStr(I, temptext);
+                        Recipients.Add(app);
+                    end;
+                end else
+                    Recipients.Add(lEmailAdd.Recipients);
+            end;
+
 
             emailmessage.Create(Recipients, lEmailAdd.Description, '', true);
             repInvTempl.InitReport(Today, true, true, false, false, true);

@@ -149,6 +149,39 @@ pageextension 50133 PurchaseInvoiceZX extends "Purchase Invoice"
 
             }
         }
+
+        addafter(CancelApprovalRequest)
+        {
+            action(ForceOpen)
+            {
+                ApplicationArea = all;
+                Caption = 'Force Cancel Approval Request';
+                Image = TestFile;
+                Promoted = true;
+                PromotedCategory = Category6;
+
+
+                trigger OnAction()
+                var
+                    ApprovalEntry: record "Approval Entry";
+
+                begin
+                    rec.Status := rec.Status::Open;
+                    rec.modify(false);
+                    ApprovalEntry.setrange("Table ID", 38);
+                    ApprovalEntry.setrange("Document Type", rec."Document Type");
+                    ApprovalEntry.setrange("Document No.", rec."No.");
+                    if ApprovalEntry.findset then
+                        repeat
+                            if ApprovalEntry.status in [ApprovalEntry.Status::Created, ApprovalEntry.Status::Open] then begin
+                                ApprovalEntry.Status := ApprovalEntry.status::Canceled;
+                                ApprovalEntry.modify;
+                            end;
+                        until ApprovalEntry.next = 0;
+                    CurrPage.Update(false);
+                end;
+            }
+        }
     }
 
     var

@@ -6,13 +6,9 @@ codeunit 50055 AmazonHelper
     begin
         CASE rec."Parameter String" OF
 
-            '':
+            'IMPORT':
                 begin
                     MainProcessOrders('', true, '');
-                    commit;
-                    UpdateMainAmazonstatus();
-                    Commit;
-                    RemoveOpenClosedRejectedAmazon();
                 end;
             'STATUS':
                 begin
@@ -97,11 +93,11 @@ codeunit 50055 AmazonHelper
                                     if orderDetails.SelectToken('sellingParty', temptoken) then
                                         if temptoken.SelectToken('partyId', TokenValue) then
                                             EVALUATE(sellingParty, TokenValue.AsValue().AsText());
-                                CustSell := '';
                                 Custbill := '';
-                                CustSell := AmazonID2CustNoShipto(buyingParty, sellingParty);
-                                Custbill := AmazonID2CustNo(buyingParty, sellingParty, CustSell);
-                                shipno := sellingParty;
+                                Custsell := '';
+                                CustSell := AmazonID2CustNoShipto(sellingParty, buyingParty);
+                                Custbill := AmazonID2CustNo(sellingParty, buyingParty, CustSell);
+                                shipno := buyingParty;
 
                                 if (Custbill <> '') and (AmazonORder <> '') then begin
                                     if createorClearAmazonorder(Custbill, CustSell, AmazonORder, Salesheader, sellingParty) then begin
@@ -115,7 +111,7 @@ codeunit 50055 AmazonHelper
                                             Salesheader.modify(true);
 
                                         end;
-                                        shipno := AmazonID2CustNoShipto(buyingParty, sellingParty);
+
                                         if shiptoadd.get(shipno) then
                                             salesheader.SetShipToCustomerAddressFieldsFromShipToAddr(shiptoadd);
                                         Salesheader.Validate("Ship-to Code", shipno);
@@ -153,7 +149,7 @@ codeunit 50055 AmazonHelper
                                                 Salesheader.Amazonfirstwindowdate := Shipdate;
                                                 Salesheader.Validate("Shipment Date", Shipdate);
                                                 salesheader.Validate("Requested Delivery Date", Shipdate);
-                                                Salesheader."Order Date" := Shipdate;
+                                                Salesheader."Order Date" := Today;
                                                 //Salesheader."Order Receipt Date" := Today;
                                                 Salesheader."VAT Reporting Date" := Shipdate;
                                                 Salesheader."Posting Date" := Shipdate;
@@ -178,6 +174,18 @@ codeunit 50055 AmazonHelper
                                                 end;
                                                 if itemno <> '' then begin
                                                     saleslineinit(Salesline, Salesheader, lineno);
+                                                    item.get(itemno);
+                                                    if item."Block on Sales Order" then begin
+                                                        itemsalesblocked := true;
+                                                        item."Block on Sales Order" := false;
+                                                        item.modify(false);
+                                                    end;
+
+                                                    if item.blocked then begin
+                                                        itemblocked := true;
+                                                        item.blocked := false;
+                                                        item.modify(false);
+                                                    end;
                                                     Salesline.Type := Salesline.Type::"item";
                                                     Salesline.Validate("No.", itemno);
                                                     Salesline.Modify(true);
@@ -210,6 +218,24 @@ codeunit 50055 AmazonHelper
                                                         Salesline.Modify(true);
                                                     end;
 
+                                                    if itemblocked then begin
+                                                        Salesline."Description 2" := 'Item blocked';
+                                                        if (item."End of Life Date" <> 0D) and (item."End of Life Date" < Salesheader."Document Date") then
+                                                            Salesline."Description 2" := Salesline."Description 2" + ', EOL';
+                                                        Salesline.Modify(true);
+                                                        item.get(itemno);
+                                                        item.blocked := true;
+                                                        item.modify(false);
+                                                    end;
+                                                    if itemsalesblocked then begin
+                                                        Salesline."Description 2" := 'Item sales blocked';
+                                                        if (item."End of Life Date" <> 0D) and (item."End of Life Date" < Salesheader."Document Date") then
+                                                            Salesline."Description 2" := Salesline."Description 2" + ', EOL';
+                                                        Salesline.Modify(true);
+                                                        item.get(itemno);
+                                                        item."Block on Sales Order" := true;
+                                                        item.modify(false);
+                                                    end;
 
                                                 end;
                                             end;
@@ -1090,11 +1116,11 @@ codeunit 50055 AmazonHelper
                 responseMessage.Content().ReadAs(content);
 
                 // Save the data of the InStream as a file.
-                if (UPPERCASE(userid).Contains('PELLE')) and GuiAllowed then begin
+                if Amazsetup.testmode and GuiAllowed then begin
                     TempBlob.CreateOutStream(outStr, TextEncoding::UTF8);
                     httpcontents := httpResponse.Content();
                     httpcontents.ReadAs(content);
-                    outStr.WriteText(content + ' ' + newtoken);
+                    outStr.WriteText(content + ' ' + newtoken + ' ' + temptext);
                     TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
                     fileName := StrSubstNo('Amazon__%1_.txt', format(responseMessage.HttpStatusCode()));
                     File.DownloadFromStream(inStr, 'Export', '', '', fileName);
@@ -1299,11 +1325,10 @@ codeunit 50055 AmazonHelper
         TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
 
         // Save the data of the InStream as a file.
-        if (UPPERCASE(userid).Contains('PELLE')) and GuiAllowed then begin
+        if Amazsetup.testmode and GuiAllowed then begin
             fileName := 'Amaz_Acknowledge_message.txt';
             File.DownloadFromStream(inStr, 'Export', '', '', fileName);
         end;
-
 
         exit(totextvar);
 
