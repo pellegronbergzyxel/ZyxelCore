@@ -303,7 +303,7 @@ Report 50098 "MR Inventory Template"
         text025 = 'Page';
         RptTitle = 'Inventory Report';
         text026 = 'Cost posted to G/L';
-        
+
     }
 
     trigger OnPostReport()
@@ -318,7 +318,7 @@ Report 50098 "MR Inventory Template"
             MakeExcelGrandFoot;
             MakeExcelGrandFootColumn;
             MakeExcelGrandFootRMA;
-            if not skipcreate then 
+
             CreateExcelbook;
         end else begin
             //>> 11-02-20 ZY-LD 004
@@ -794,7 +794,7 @@ Report 50098 "MR Inventory Template"
         end;
 
         ExcelBuf.CloseBook;
-        if GuiAllowed then begin
+        if GuiAllowed and (not skipcreate) then begin
             ExcelBuf.OpenExcel;
         end else
             FilenameServer := ExcelBuf.GetFileNameServer;  // 01-12-20 ZY-LD 007
@@ -1126,7 +1126,7 @@ Report 50098 "MR Inventory Template"
     end;
 
 
-    procedure InitReport(pBaseDate: Date; pShowQuantity: Boolean; pShowDifference: Boolean; pShowClosedDetailedEntries: Boolean; pBlockExcel: Boolean;pSkipcreate: Boolean)
+    procedure InitReport(pBaseDate: Date; pShowQuantity: Boolean; pShowDifference: Boolean; pShowClosedDetailedEntries: Boolean; pBlockExcel: Boolean; pSkipcreate: Boolean)
     begin
         BaseDate := pBaseDate;
         ShowQuantity := pShowQuantity;  // 01-12-20 ZY-LD 007
@@ -1143,42 +1143,10 @@ Report 50098 "MR Inventory Template"
     end;
 
     // PG 18-07-2025
-    procedure getExcelbuffer(var gExcelbuf: Record "Excel Buffer" temporary; type: Integer)
+    procedure gettempblob(var TempBlob: Codeunit "Temp Blob")
+                OutStr: outstream;
     begin
-        // ExcelBuf: Record "Excel Buffer" temporary;
-        // ExcelBuf2: Record "Excel Buffer" temporary;
-        // ExcelBufRMA: Record "Excel Buffer" temporary;
-        gExcelbuf.DeleteAll();
-        case type of
-            1:
-                begin
-  if ExcelBuf.FindFirst then begin
-                        repeat
-                            gExcelbuf := ExcelBuf;
-                            gExcelbuf.Insert;
-                        until ExcelBuf.Next() = 0;
-                    end;
-                end;
-
-            2:
-                begin
-                    if ExcelBuf2.FindFirst then begin
-                        repeat
-                            gExcelbuf := ExcelBuf2;
-                            gExcelbuf.Insert;
-                        until ExcelBuf2.Next() = 0;
-                    end;
-                end;
-            3:
-                begin
-                        if ExcelBufRMA.FindFirst then begin
-                            repeat
-                                gExcelbuf := ExcelBufRMA;
-                                gExcelbuf.Insert;
-                            until ExcelBufRMA.Next() = 0;
-                        end;
-
-                end;
-                    end;
-                end;
+        TempBlob.CreateOutStream(OutStr);
+        ExcelBuf.SaveToStream(OutStr, true);
+    end;
 }

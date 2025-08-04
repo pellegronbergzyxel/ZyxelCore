@@ -208,13 +208,13 @@ page 50133 "Amazon setup list"
                 trigger OnAction()
                 var
                     amazhelper: codeunit amazonHelper;
-                    //amazonunput: page "Amazon PO input";
+                    amazonunput: page "Amazon PO input";
                     order: code[20];
                 begin
-                    //if amazonunput.RunModal() = Action::OK then begin
-                    //    order := amazonunput.getvalue();
-                    //    amazhelper.MainProcessOrders(rec.Code, false, order);
-                    //end;
+                    if amazonunput.RunModal() = Action::OK then begin
+                        order := amazonunput.getvalue();
+                        amazhelper.MainProcessOrders(rec.Code, false, order);
+                    end;
 
 
                 end;
