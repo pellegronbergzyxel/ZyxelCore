@@ -481,7 +481,7 @@ codeunit 50008 "Delivery Document Management"
                 recSalesHead.TestField("Ship-to Code");
 
                 //11-08-2025 BK #518362
-                if Not CheckShippingAdvise(recSalesHead, recSalesLine) then
+                if CheckShippingAdvise(recSalesHead, recSalesLine) then
                     if recSalesHead."On Hold" = '' then begin
 
                         if ZGT.IsZNetCompany() and (recSalesHead."Ship-to Code Del. Doc" <> '') then
