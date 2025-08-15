@@ -301,6 +301,7 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
         ZComLabel2: Label 'ZCOM-';
         First: Boolean;
         EntryNo: Integer;
+        WarehouseLineNo: Integer;
 
     begin
         WhseInbHead.SetCurrentkey("Shipper Reference");
@@ -344,6 +345,7 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
                 WhseInbHead."Automatic Created" := true;
                 WhseInbHead.Modify(true);
                 First := true;
+                WarehouseLineNo := 10000;
                 repeat
                     WhseInbLine.init();
                     WhseInbLine."Order Type" := WhseInbLine."Order Type"::"Purchase Invoice";
@@ -378,6 +380,8 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
                     WhseInbLine."Invoice No." := copystr(PurchaseHeader."Vendor Invoice No.", 1, 30);
                     WhseInbLine."Container No." := Pol."Picking List No.";
                     WhseInbLine."Document No." := WhseInbHead."No.";
+                    WhseInbLine."Line No." := WarehouseLineNo; //08-08-2025 BK #511511
+                    WarehouseLineNo += 10000;
                     WhseInbLine.modify(false);
 
                 until Pol.next() = 0;
