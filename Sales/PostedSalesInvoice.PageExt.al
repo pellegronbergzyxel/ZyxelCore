@@ -140,6 +140,22 @@ pageextension 50148 PostedSalesInvoiceZX extends "Posted Sales Invoice"
                 ToolTip = 'Open the invoice sent to the eCommerce customer.';
             }
         }
+        addLast(Processing)
+        {
+            action(AmazonInv)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Send Amazon Invoice';
+                Description = 'Send amazon eletronice invoice';
+                Image = SendElectronicDocument;
+                trigger OnAction()
+                var
+                    amazonhelper: codeunit AmazonHelper;
+                begin
+                    amazonhelper.SentAmazonInvoice(rec);
+                end;
+            }
+        }
     }
 
     var
