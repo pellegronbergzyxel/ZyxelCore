@@ -16,6 +16,7 @@ codeunit 50048 "Intercompany Events"
     var
         lCust: Record Customer;
         BillToCustomer: Record Customer;
+
     begin
         lCust.Get(SalesHeader."Sell-to Customer No.");
         BillToCustomer.Get(SalesHeader."Bill-to Customer No.");
@@ -25,7 +26,6 @@ codeunit 50048 "Intercompany Events"
             ICOutBoxSalesHeader."End Customer" := SalesHeader."Sell-to Customer No.";
 
         ICOutBoxSalesHeader."Sales Order Type" := SalesHeader."Sales Order Type";
-
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"ICInboxOutboxMgt", 'OnCreateOutboxSalesInvTransOnAfterTransferFieldsFromSalesInvHeader', '', false, false)]
@@ -33,6 +33,9 @@ codeunit 50048 "Intercompany Events"
     var
         lCust: Record Customer;
         BillToCustomer: Record Customer;
+        ShipToAddress: Record "Ship-to Address";
+        Zgt: Codeunit "ZyXEL General Tools";
+
     begin
 
         lCust.Get(SalesInvHdr."Sell-to Customer No.");
@@ -62,6 +65,15 @@ codeunit 50048 "Intercompany Events"
         ICOutBoxSalesHeader."Currency Code Sales Doc SUB" := SalesInvHdr."Currency Code Sales Doc SUB";
         ICOutBoxSalesHeader."Shipment Method Code" := SalesInvHdr."Shipment Method Code";
         ICOutBoxSalesHeader."VAT Registration No." := SalesInvHdr."Company VAT Registration Code";
+
+        //15-08-2025 BK #514725
+        /*if zgt.IsZComCompany() then
+            If (ICOutBoxSalesHeader."Sell-to Customer No." = ICOutBoxSalesHeader."Bill-to Customer No.") and (ICOutBoxSalesHeader."Ship-to Code" <> '') then
+                IF ShipToAddress.get(ICOutBoxSalesHeader."Sell-to Customer No.", ICOutBoxSalesHeader."Ship-to Code") then
+                    If ShipToAddress."Location Code" <> '' then
+                        ICOutBoxSalesHeader."Location Code" := ShipToAddress."Location Code";
+        */
+        //15-08-2025 BK #514725  
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"ICInboxOutboxMgt", 'OnCreateOutboxSalesInvTransOnBeforeICOutBoxSalesLineInsert', '', false, false)]
@@ -77,12 +89,24 @@ codeunit 50048 "Intercompany Events"
         ICOutboxSalesLine2: Record "IC Outbox Sales Line";
         ICOutBoxSalesHeader: Record "IC Outbox Sales Header";
         ICInboxOutboxMgt: Codeunit ICInboxOutboxMgt;
+        ShipToAddress: Record "Ship-to Address"; //15-08-2025 BK #514725
+        Zgt: Codeunit "ZyXEL General Tools";//15-08-2025 BK #514725
         lText001: Label 'Problem with creation of "%1" on sales invoice "%2". Please raise a ticket to navsupport with the error.';
     begin
 
         SalesInvHdr.Get(SalesInvLine."Document No.");
         if SalesInvLine."Location Code" <> '' then
             ICOutboxSalesLine."Location Code" := GetLocationCode(SalesInvHdr."Ship-to Country/Region Code", SalesInvHdr."Location Code", SalesInvHdr."Sell-to Customer No.");
+
+
+        //15-08-2025 BK #514725
+        /*if zgt.IsZComCompany() then
+            If (SalesInvHdr."Sell-to Customer No." = SalesInvHdr."Bill-to Customer No.") and (SalesInvHdr."Ship-to Code" <> '') then
+                IF ShipToAddress.get(SalesInvHdr."Sell-to Customer No.", SalesInvHdr."Ship-to Code") then
+                    If ShipToAddress."Location Code" <> '' then
+                        ICOutBoxSalesLine."Location Code" := ShipToAddress."Location Code";
+        */
+        //15-08-2025 BK #514725  
 
         ICOutBoxSalesLine."Return Reason Code" := SalesInvLine."Return Reason Code";
 

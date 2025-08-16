@@ -6,16 +6,16 @@ codeunit 50008 "Delivery Document Management"
         recAutoSetup: Record "Automation Setup";
     begin
         recAutoSetup.Get();
-        if recAutoSetup.WhseCreateOutboundSales then
+        if recAutoSetup.WhseCreateOutboundSales() then
             CreateDeliveryDocument('');
-        if recAutoSetup.WhseCreateOutboundTransfer then
+        if recAutoSetup.WhseCreateOutboundTransfer() then
             CreateDeliveryDocumentTransfer('');
     end;
 
     var
-        nocreated: Integer;
         ZGT: Codeunit "ZyXEL General Tools";
         ReworkLbl: Label 'REWORK';
+        nocreated: Integer;
 
 
     procedure PerformManuelCreation()
@@ -40,7 +40,7 @@ codeunit 50008 "Delivery Document Management"
 
     procedure PerformCreationForSingleOrderWithoutConfirmation(SalesOrderNo: Code[20])
     var
-        lText001: Label 'Do you want to create delivery document for sales order %1?';
+
     begin
         CreateDeliveryDocument(SalesOrderNo);
     end;
@@ -64,7 +64,7 @@ codeunit 50008 "Delivery Document Management"
             recTransLine.SetFilter(recTransLine."Shipment Date", '..%1', CalcDate(recSalesSetup."Del. Doc. Creation Calculation", Today));
             recTransLine.SetRange(recTransLine.Status, recTransLine.Status::Released);
             recTransLine.SetFilter(recTransLine."Delivery Document No.", '%1', '');
-            recTransLine.SetFilter(recTransLine."Transfer-from Code", ItemLogisticEvents.GetRequireShipmentLocations);
+            recTransLine.SetFilter(recTransLine."Transfer-from Code", ItemLogisticEvents.GetRequireShipmentLocations());
             recTransLine.SetFilter(recTransLine."Outstanding Quantity", '>0');
             recTransLine.SetFilter(recTransLine."Transfer-to Code", '<>%1', '');
             if pNo <> '' then
@@ -90,7 +90,7 @@ codeunit 50008 "Delivery Document Management"
                         CreateDeliveryDocumentLineTransfer(
                           recTransLine,
                           recDelDocHead."No.",
-                          recTransHead."Ref./ PO",
+                          CopyStr(recTransHead."Ref./ PO", 1, 30),
                           recTransHead."Assigned User ID",
                           recDelDocHead."Currency Code");
                     end;
@@ -127,22 +127,22 @@ codeunit 50008 "Delivery Document Management"
             else
                 recDelDocHead."Salesperson Code" := CopyStr(recDelDocHead."Create User ID", 1, MaxStrLen(recUserSetup."Salespers./Purch. Code"));
 
-            recDelDocHead."Order Desk Resposible Code" := recDelDocHead."Salesperson Code";
+            recDelDocHead."Order Desk Resposible Code" := copystr(recDelDocHead."Salesperson Code", 1, 20);
             recDelDocHead."Document Type" := recDelDocHead."document type"::Transfer;
             recDelDocHead."Source No." := pTransHead."No.";
             recDelDocHead."Document Status" := recDelDocHead."document status"::Open;
             recDelDocHead."Warehouse Status" := recDelDocHead."warehouse status"::New;
 
             recDelDocHead."Mode Of Transport" := pTransHead."Transport Method";
-            recDelDocHead."Shipment Agent Code" := GetDefaultShipmentAgentCode;
+            recDelDocHead."Shipment Agent Code" := GetDefaultShipmentAgentCode();
             recDelDocHead."Delivery Terms City" := pTransHead."Transfer-to City";
 
-            recDelDocHead."Shipment Agent Service" := GetDefaultShipmentAgentSerCode(GetDefaultShipmentAgentCode);
-            recDelDocHead."Shipment Agent Code" := GetDefaultShipmentAgentCode;
+            recDelDocHead."Shipment Agent Service" := GetDefaultShipmentAgentSerCode(GetDefaultShipmentAgentCode());
+            recDelDocHead."Shipment Agent Code" := GetDefaultShipmentAgentCode();
             recDelDocHead."Currency Code" := recGenLedgSetup."LCY Code";
 
-            recDelDocHead."Document Date" := WorkDate;
-            recDelDocHead."Ship-to Code" := pShipToCode;
+            recDelDocHead."Document Date" := WorkDate();
+            recDelDocHead."Ship-to Code" := copystr(pShipToCode, 1, 20);
 
             if recTransToAddr.Get(pTransHead."Transfer-to Code", CopyStr(pShipToCode, StrPos(pShipToCode, '.') + 1, StrLen(pShipToCode))) then begin
                 recDelDocHead."Ship-to Name" := recTransToAddr.Name;
@@ -201,8 +201,8 @@ codeunit 50008 "Delivery Document Management"
             recDelDocHead.Validate(recDelDocHead."Delivery Terms Terms", pTransHead."Shipment Method Code");
 
             if recLocation.Get(pTransHead."Transfer-to Code") then begin
-                recDelDocHead."Notification Email" := recLocation."Notification Email";
-                recDelDocHead."Confirmation Email" := recLocation."Confirmation Email";
+                recDelDocHead."Notification Email" := CopyStr(recLocation."Notification Email", 1, 80);
+                recDelDocHead."Confirmation Email" := copystr(recLocation."Confirmation Email", 1, 80);
             end;
             recDelDocHead.Modify(true);
 
@@ -210,7 +210,7 @@ codeunit 50008 "Delivery Document Management"
             recDefAction.SetRange("Source Type", recDefAction."source type"::Location, recDefAction."source type"::"Transfer-to Address");
             recDefAction.SetFilter("Source Code", '%1|%2', pTransHead."Transfer-to Code", CopyStr(pShipToCode, StrPos(pShipToCode, '.') + 1, StrLen(pShipToCode)));
             recDefAction.SetRange("Header / Line", recDefAction."header / line"::Header);
-            recDefAction.SetFilter("End Date", '%1|%2..', 0D, WorkDate);
+            recDefAction.SetFilter("End Date", '%1|%2..', 0D, WorkDate());
             if recDefAction.FindSet() then begin
                 LineNo := 0;
                 repeat
@@ -226,7 +226,7 @@ codeunit 50008 "Delivery Document Management"
             recDefAction.SetRange("Source Type", recDefAction."source type"::"Transfer-to Address");
             recDefAction.SetRange("Source Code", CopyStr(pShipToCode, StrPos(pShipToCode, '.') + 1, StrLen(pShipToCode)));
             recDefAction.SetRange("Header / Line", recDefAction."header / line"::Line);
-            recDefAction.SetFilter("End Date", '%1|%2..', 0D, WorkDate);
+            recDefAction.SetFilter("End Date", '%1|%2..', 0D, WorkDate());
             if recDefAction.FindSet() then begin
                 LineNo := 0;
                 repeat
@@ -254,7 +254,7 @@ codeunit 50008 "Delivery Document Management"
             recDelDocLine2.SetRange("Sales Order Line No.", pTransLine."Line No.");
             recDelDocLine2.SetFilter("Document No.", '<>%1', pDocumentNo);
             recDelDocLine2.SetFilter(Quantity, '<>0');
-            if not recDelDocLine2.FindFirst() then begin
+            if recDelDocLine2.IsEmpty() then begin
                 recDelDocLine.Init();
                 recDelDocLine."Document No." := pDocumentNo;
                 recDelDocLine."Line No." := GetNextLineNo(pDocumentNo);
@@ -283,18 +283,20 @@ codeunit 50008 "Delivery Document Management"
 
     procedure CalcDeliveryDate(ShipDate: Date; Country: Code[20]) DeliveryDate: Date
     var
-        DeliveryOffset: Integer;
         recCountryShipmentDays: Record "VCK Country Shipment Days";
+        DeliveryOffset: Integer;
+
     begin
         DeliveryOffset := 0;
-        if ShipDate <= Today then
-            ShipDate := Today;
+        if ShipDate <= Today() then
+            ShipDate := Today();
 
         recCountryShipmentDays.SetFilter("Country Code", Country);
         if recCountryShipmentDays.FindFirst() then DeliveryOffset := recCountryShipmentDays."Delivery Days";
-        DeliveryDate := CalcDate(Format(DeliveryOffset) + 'D', ShipDate);
-        if Date2dwy(DeliveryDate, 1) = 6 then DeliveryDate := CalcDate('2D', DeliveryDate);
-        if Date2dwy(DeliveryDate, 1) = 7 then DeliveryDate := CalcDate('1D', DeliveryDate);
+
+        DeliveryDate := CalcDate('<' + Format(DeliveryOffset) + 'D>', ShipDate);
+        if Date2dwy(DeliveryDate, 1) = 6 then DeliveryDate := CalcDate('<2D>', DeliveryDate);
+        if Date2dwy(DeliveryDate, 1) = 7 then DeliveryDate := CalcDate('<1D>', DeliveryDate);
     end;
 
 
@@ -306,15 +308,16 @@ codeunit 50008 "Delivery Document Management"
         recServEnviron: Record "Server Environment";
         recItemPickDateCountry: Record "Item Picking Date pr. Country";
         recCust: Record Customer;
-        LocalTODAY: Date;
         EmailAddMgt: Codeunit "E-mail Address Management";
+        LocalTODAY: Date;
+
     begin
         recSalesSetup.Get();
         if recSalesSetup."Calculate Shipment Date" then begin
-            if recServEnviron.ProductionEnvironment then
-                LocalTODAY := Today
+            if recServEnviron.ProductionEnvironment() then
+                LocalTODAY := Today()
             else
-                LocalTODAY := WorkDate;
+                LocalTODAY := WorkDate();
 
             NewShipmentDate := pInitDate;
 
@@ -331,14 +334,13 @@ codeunit 50008 "Delivery Document Management"
                (StrPos(pDivisionCode, 'CH') <> 0)   // Only Channes is doing this
             then begin
                 // Send e-mail for updating EOQ Dates
-                if recServEnviron.ProductionEnvironment then
+                if recServEnviron.ProductionEnvironment() then
                     if (Date2dmy(LocalTODAY, 2) mod 3 = 0) and (Date2dmy(recCtryShipDay."Eoq Start Date", 2) <> Date2dmy(LocalTODAY, 2)) then
-                        if (LocalTODAY > recCtryShipDay."Eoq End Date") or (recCtryShipDay."Eoq End Date" = 0D) then begin
+                        if (LocalTODAY > recCtryShipDay."Eoq End Date") or (recCtryShipDay."Eoq End Date" = 0D) then
                             if not EmailAddMgt.EmailIsSendToday('UPDEOQDATE', true) then begin
                                 EmailAddMgt.CreateSimpleEmail('UPDEOQDATE', '', '');
-                                EmailAddMgt.Send;
+                                EmailAddMgt.Send();
                             end;
-                        end;
 
                 if (NewShipmentDate >= recCtryShipDay."Eoq Start Date") and
                    (NewShipmentDate <= recCtryShipDay."Eoq End Date")
@@ -451,7 +453,7 @@ codeunit 50008 "Delivery Document Management"
     begin
         recSalesSetup.Get();
         recSalesSetup.TestField("Del. Doc. Creation Calculation");
-        recGenLedgSetup.get;
+        recGenLedgSetup.get();
 
         recSalesLine.SetRange("Document Type", recSalesLine."document type"::Order);
         if SalesOrderNo <> '' then
@@ -461,7 +463,7 @@ codeunit 50008 "Delivery Document Management"
         recSalesLine.SetFilter("Shipment Date", '..%1', CalcDate(recSalesSetup."Del. Doc. Creation Calculation", Today));
         recSalesLine.SetRange(Status, recSalesLine.Status::Released);
         recSalesLine.SetFilter("Delivery Document No.", '%1', '');
-        recSalesLine.SetFilter("Location Code", ItemLogisticEvents.GetRequireShipmentLocations);
+        recSalesLine.SetFilter("Location Code", ItemLogisticEvents.GetRequireShipmentLocations());
         recSalesLine.SetRange(Type, recSalesLine.Type::Item);
         recSalesLine.SetFilter("BOM Line No.", '<1');
         recSalesLine.SetFilter("Outstanding Quantity", '>0');
@@ -478,76 +480,76 @@ codeunit 50008 "Delivery Document Management"
                 recSalesHead.Get(recSalesLine."Document Type", recSalesLine."Document No.");
                 recSalesHead.TestField("Ship-to Code");
 
-                if recSalesHead."On Hold" = '' then begin
+                //11-08-2025 BK #518362
+                if CheckShippingAdvise(recSalesHead, recSalesLine) then
+                    if recSalesHead."On Hold" = '' then begin
 
-                    if ZGT.IsZNetCompany and (recSalesHead."Ship-to Code Del. Doc" <> '') then
-                        recSalesHead."Ship-to Code Del. Doc" := '';  // We have seen data in this field in ZNet DK, but it should not be possible.
-                    if recSalesHead."Ship-to Code Del. Doc" <> '' then begin
-                        CustRework.SetRange("Search Name", ReworkLbl);
-                        CustRework.FindFirst();
-                        SellToCustNo := CustRework."No.";
-                    end else
-                        SellToCustNo := recSalesLine."Sell-to Customer No.";
+                        if ZGT.IsZNetCompany() and (recSalesHead."Ship-to Code Del. Doc" <> '') then
+                            recSalesHead."Ship-to Code Del. Doc" := '';  // We have seen data in this field in ZNet DK, but it should not be possible.
+                        if recSalesHead."Ship-to Code Del. Doc" <> '' then begin
+                            CustRework.SetRange("Search Name", ReworkLbl);
+                            CustRework.FindFirst();
+                            SellToCustNo := CustRework."No.";
+                        end else
+                            SellToCustNo := recSalesLine."Sell-to Customer No.";
 
-                    if recSalesLine."Create Delivery Doc. pr. Item" and
-                       (recSalesLine."Ship-to Code Cust/Item Relat." <> '')
-                    then
-                        ShipToCode := SellToCustNo + '.' + recSalesLine."Ship-to Code Cust/Item Relat."
-                    else
-                        ShipToCode := SellToCustNo + '.' + recSalesLine."Ship-to Code";
-                    if recSalesHead."Ship-to Code Del. Doc" = '' then begin
-                        recDelDocHead.SetRange("Sell-to Customer No.", recSalesLine."Sell-to Customer No.");
-                        recDelDocHead.SetRange("Delivery Terms Terms", recSalesHead."Shipment Method Code");
-                    end else begin
-                        recDelDocHead.SetRange("Sell-to Customer No.", CustRework."No.");
-                        ShipToAddRework.get(recSalesHead."Sell-to Customer No.", recSalesHead."Ship-to Code Del. Doc");
-                        recDelDocHead.SetRange("Delivery Terms Terms", ShipToAddRework."Shipment Method Code");
-                    end;
-                    recDelDocHead.SetRange("Ship-to Code", ShipToCode);
-                    recDelDocHead.SetRange("Document Status", recDelDocHead."document status"::Open);
-
-                    if (recSalesHead."Sales Order Type" = recSalesHead."sales order type"::"Spec. Order") or
-                       recSalesHead."Create Delivery Doc. pr. Order" or
-                       recSalesLine."Create Delivery Doc. pr. Item"
-                    then begin
-                        if recSalesLine."Create Delivery Doc. pr. Item" then
-                            recDelDocHead.SetRange("Spec. Order No.", recSalesLine."No.")
+                        if recSalesLine."Create Delivery Doc. pr. Item" and
+                        (recSalesLine."Ship-to Code Cust/Item Relat." <> '')
+                        then
+                            ShipToCode := SellToCustNo + '.' + recSalesLine."Ship-to Code Cust/Item Relat."
                         else
-                            recDelDocHead.SetRange("Spec. Order No.", recSalesHead."No.")
-                    end else
-                        recDelDocHead.SetFilter("Spec. Order No.", '%1', '');
-                    recDelDocHead.SetRange("Ship-From Code", recSalesLine."Location Code");
+                            ShipToCode := SellToCustNo + '.' + recSalesLine."Ship-to Code";
+                        if recSalesHead."Ship-to Code Del. Doc" = '' then begin
+                            recDelDocHead.SetRange("Sell-to Customer No.", recSalesLine."Sell-to Customer No.");
+                            recDelDocHead.SetRange("Delivery Terms Terms", recSalesHead."Shipment Method Code");
+                        end else begin
+                            recDelDocHead.SetRange("Sell-to Customer No.", CustRework."No.");
+                            ShipToAddRework.get(recSalesHead."Sell-to Customer No.", recSalesHead."Ship-to Code Del. Doc");
+                            recDelDocHead.SetRange("Delivery Terms Terms", ShipToAddRework."Shipment Method Code");
+                        end;
+                        recDelDocHead.SetRange("Ship-to Code", ShipToCode);
+                        recDelDocHead.SetRange("Document Status", recDelDocHead."document status"::Open);
 
-                    if recSalesLine."Currency Code" = '' then
-                        recDelDocHead.SetRange("Currency Code", recGenLedgSetup."LCY Code")
-                    else
-                        recDelDocHead.SetRange("Currency Code", recSalesLine."Currency Code");
-                    recDelDocHead.SetRange("Ship-From Code", recSalesLine."Location Code");
-                    if not recDelDocHead.FindFirst() then
-                        recDelDocHead."No." :=
-                          CreateDeliveryDocumentHeader(
-                          recSalesHead,
-                          recSalesLine."Planned Delivery Date",
-                          recSalesLine."Shipment Date",
-                          recSalesLine."Transport Method",
-                          ShipToCode);
+                        if (recSalesHead."Sales Order Type" = recSalesHead."sales order type"::"Spec. Order") or
+                        recSalesHead."Create Delivery Doc. pr. Order" or
+                        recSalesLine."Create Delivery Doc. pr. Item"
+                        then begin
+                            if recSalesLine."Create Delivery Doc. pr. Item" then
+                                recDelDocHead.SetRange("Spec. Order No.", recSalesLine."No.")
+                            else
+                                recDelDocHead.SetRange("Spec. Order No.", recSalesHead."No.")
+                        end else
+                            recDelDocHead.SetFilter("Spec. Order No.", '%1', '');
+                        recDelDocHead.SetRange("Ship-From Code", recSalesLine."Location Code");
 
-                    if CreateDeliveryDocumentLine(
-                      recSalesLine,
-                      recDelDocHead."No.",
-                      recSalesHead."Ship-to Country/Region Code",
-                      recSalesHead."Ship-to Code",
-                      recSalesHead."Salesperson Code")
-                    then begin
-                        recSalesLine."Delivery Document No." := recDelDocHead."No.";
-                        recSalesLine.Modify();
+                        if recSalesLine."Currency Code" = '' then
+                            recDelDocHead.SetRange("Currency Code", recGenLedgSetup."LCY Code")
+                        else
+                            recDelDocHead.SetRange("Currency Code", recSalesLine."Currency Code");
+                        recDelDocHead.SetRange("Ship-From Code", recSalesLine."Location Code");
+                        if not recDelDocHead.FindFirst() then
+                            recDelDocHead."No." :=
+                            CreateDeliveryDocumentHeader(
+                            recSalesHead,
+                            recSalesLine."Planned Delivery Date",
+                            recSalesLine."Shipment Date",
+                            recSalesLine."Transport Method",
+                            ShipToCode);
 
-                        if recSalesSetup."Copy Comments Order to Shpt." then
-                            CopyCommentLines(recSalesHead."Document Type", "Sales Comment Document Type"::Value20, recSalesHead."No.", recDelDocHead."No.");
+                        if CreateDeliveryDocumentLine(
+                        recSalesLine,
+                        recDelDocHead."No.",
+                        recSalesHead."Salesperson Code")
+                        then begin
+                            recSalesLine."Delivery Document No." := recDelDocHead."No.";
+                            recSalesLine.Modify();
+
+                            if recSalesSetup."Copy Comments Order to Shpt." then
+                                CopyCommentLines(recSalesHead."Document Type", "Sales Comment Document Type"::Value20, recSalesHead."No.", recDelDocHead."No.");
+                        end;
                     end;
-                end;
             until recSalesLine.Next() = 0;
-            ZGT.CloseProgressWindow;
+            ZGT.CloseProgressWindow();
         end;
     end;
 
@@ -565,21 +567,21 @@ codeunit 50008 "Delivery Document Management"
         recGenLedgSetup: Record "General Ledger Setup";
     begin
         begin
-            recGenLedgSetup.get;
+            recGenLedgSetup.get();
             recDelDocHead.Init();
             recDelDocHead.Insert(true);
             recDelDocHead."Document Type" := recDelDocHead."document type"::Sales;
             recDelDocHead."Document Status" := recDelDocHead."document status"::Open;
             recDelDocHead."Requested Delivery Date" := pPlannedDeliveryDate;
             recDelDocHead."Requested Ship Date" := pSlShipmentDate;
-            SetRequestedDates(pSlShipmentDate, pSalesHead."Ship-to Country/Region Code", pSalesHead."Shortcut Dimension 1 Code", recDelDocHead."Requested Ship Date", recDelDocHead."Requested Delivery Date", recDelDocHead."Expected Release Date");  // 14-11-18 ZY-LD 006  // 14-11-19 ZY-LD 015
+            SetRequestedDates(pSlShipmentDate, pSalesHead."Ship-to Country/Region Code", COPYSTR(pSalesHead."Shortcut Dimension 1 Code", 1, 10), recDelDocHead."Requested Ship Date", recDelDocHead."Requested Delivery Date", recDelDocHead."Expected Release Date");  // 14-11-18 ZY-LD 006  // 14-11-19 ZY-LD 015
             recDelDocHead."Requested Delivery Date" := 0D;
             recDelDocHead."Requested Ship Date" := 0D;
-            recDelDocHead."Create User ID" := UserId();
-            recDelDocHead."Create Date" := Today;
-            recDelDocHead."Create Time" := Time;
+            recDelDocHead."Create User ID" := copystr(UserId(), 1, 50);
+            recDelDocHead."Create Date" := Today();
+            recDelDocHead."Create Time" := Time();
             recDelDocHead."Warehouse Status" := recDelDocHead."warehouse status"::New;
-            recDelDocHead."Mode Of Transport" := pTransportMethod;
+            recDelDocHead."Mode Of Transport" := CopyStr(pTransportMethod, 1, 10);
             if pSalesHead."Currency Code" = '' then
                 recDelDocHead."Currency Code" := recGenLedgSetup."LCY Code"
             else
@@ -592,7 +594,7 @@ codeunit 50008 "Delivery Document Management"
                 recDelComment.Insert();
             end;
 
-            recDelDocHead."Document Date" := WorkDate;
+            recDelDocHead."Document Date" := WorkDate();
 
             recDelDocHead."Salesperson Code" := pSalesHead."Salesperson Code";
             recDelDocHead."Order Desk Resposible Code" := pSalesHead."Order Desk Resposible Code";
@@ -720,10 +722,10 @@ codeunit 50008 "Delivery Document Management"
                 recDelDocHead.Validate(recDelDocHead."Delivery Terms Terms", pSalesHead."Shipment Method Code");
             end;
 
-            recDelDocHead."Ship-to Code" := pShipToCode;
-            recDelDocHead."Shipment Agent Code" := GetDefaultShipmentAgentCode;
+            recDelDocHead."Ship-to Code" := copystr(pShipToCode, 1, 20);
+            recDelDocHead."Shipment Agent Code" := GetDefaultShipmentAgentCode();
             recDelDocHead."Delivery Terms City" := recDelDocHead."Ship-to City";
-            recDelDocHead."Shipment Agent Service" := GetDefaultShipmentAgentSerCode(GetDefaultShipmentAgentCode);
+            recDelDocHead."Shipment Agent Service" := GetDefaultShipmentAgentSerCode(GetDefaultShipmentAgentCode());
 
             if (pSalesHead."Sales Order Type" = pSalesHead."sales order type"::"Spec. Order") or
                pSalesHead."Create Delivery Doc. pr. Order"
@@ -743,7 +745,7 @@ codeunit 50008 "Delivery Document Management"
             recDefAction.SetFilter("Source Code", '%1|%2', recDelDocHead."Sell-to Customer No.", CopyStr(pShipToCode, StrPos(pShipToCode, '.') + 1, StrLen(pShipToCode)));
             recDefAction.SetRange("Customer No.", recDelDocHead."Sell-to Customer No.");
             recDefAction.SetRange("Header / Line", recDefAction."header / line"::Header);
-            recDefAction.SetFilter("End Date", '%1|%2..', 0D, WorkDate);
+            recDefAction.SetFilter("End Date", '%1|%2..', 0D, WorkDate());
 
             if pSalesHead."Sales Order Type" <> pSalesHead."sales order type"::"Spec. Order" then
                 recDefAction.SetFilter("Sales Order Type", '<>%1', pSalesHead."Sales Order Type");
@@ -760,7 +762,7 @@ codeunit 50008 "Delivery Document Management"
             recDefAction.SetRange("Source Code", CopyStr(pShipToCode, StrPos(pShipToCode, '.') + 1, StrLen(pShipToCode)));
             recDefAction.SetRange("Customer No.", recDelDocHead."Sell-to Customer No.");
             recDefAction.SetRange("Header / Line", recDefAction."header / line"::Line);
-            recDefAction.SetFilter("End Date", '%1|%2..', 0D, WorkDate);
+            recDefAction.SetFilter("End Date", '%1|%2..', 0D, WorkDate());
             if recDefAction.FindSet() then
                 repeat
                     recDelDocAction.InitLine(recDefAction);
@@ -779,16 +781,16 @@ codeunit 50008 "Delivery Document Management"
         recCtryShipDay: Record "VCK Country Shipment Days";
     begin
         recSalesSetup.Get();
-        if pShipmentDate >= Today then begin  // Forward
+        if pShipmentDate >= Today() then begin  // Forward
             if pShipmentDate = 0D then
-                ReqShipmentDate := Today;
+                ReqShipmentDate := Today();
             if ReqDeliveryDate = 0D then
-                ReqDeliveryDate := Today;
+                ReqDeliveryDate := Today();
         end else begin  // Backward
             if not recCtryShipDay.Get(pShipToCountry) then
                 recCtryShipDay."Delivery Days" := recSalesSetup."Delivery Days to Add";
 
-            ReqShipmentDate := CalcShipmentDate('', '', pShipToCountry, pDivisionCode, Today, false);
+            ReqShipmentDate := CalcShipmentDate('', '', pShipToCountry, pDivisionCode, Today(), false);
 
             ReqDeliveryDate := CalcDate(Format(recCtryShipDay."Delivery Days") + 'D', ReqShipmentDate);
             if Date2dwy(ReqDeliveryDate, 1) > 5 then
@@ -800,7 +802,7 @@ codeunit 50008 "Delivery Document Management"
         end;
     end;
 
-    local procedure CreateDeliveryDocumentLine(pSalesLine: Record "Sales Line"; pDocumentNo: Code[20]; pShipToCountry: Code[20]; pShipToCode: Code[20]; pSalesPersonCode: Code[50]) rValue: Boolean
+    local procedure CreateDeliveryDocumentLine(pSalesLine: Record "Sales Line"; pDocumentNo: Code[20]; pSalesPersonCode: Code[50]) rValue: Boolean
     var
         recDelDocLine: Record "VCK Delivery Document Line";
         recDelDocLine2: Record "VCK Delivery Document Line";
@@ -808,9 +810,10 @@ codeunit 50008 "Delivery Document Management"
         recSalesLine: Record "Sales Line";
         GenBusPostGrp: Record "Gen. Business Posting Group";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
+        SalesLinePrice: Codeunit "Sales Line - Price";
         LineWithPrice: Interface "Line With Price";
         PriceCalculation: Interface "Price Calculation";
-        SalesLinePrice: Codeunit "Sales Line - Price";
+
         Line: Variant;
     begin
         begin
@@ -818,7 +821,7 @@ codeunit 50008 "Delivery Document Management"
             recDelDocLine2.SetRange("Sales Order Line No.", pSalesLine."Line No.");
             recDelDocLine2.SetFilter("Document No.", '<>%1', pDocumentNo);
             recDelDocLine2.SetFilter(Quantity, '<>0');  //It can happent that a line is created and set to 0 on the delivery document.
-            if not recDelDocLine2.FindFirst() then begin
+            if recDelDocLine2.IsEmpty() then begin
                 recDelDocLine.Init();
                 recDelDocLine."Salesperson Code" := pSalesPersonCode;
                 recDelDocLine."Document No." := pDocumentNo;
@@ -927,8 +930,8 @@ codeunit 50008 "Delivery Document Management"
                             if pSalesLine."Shipment Date" > CalcDate(recSalesSetup."Del. Doc. Creation Calculation", Today) then
                                 Message('%1 > "%2"', pSalesLine.FieldCaption(pSalesLine."Shipment Date"), CalcDate(recSalesSetup."Del. Doc. Creation Calculation", Today))
                             else
-                                if StrPos(ItemLogisticEvents.GetRequireShipmentLocations, pSalesLine."Location Code") = 0 then
-                                    Message('%1 <> "%2"', pSalesLine.FieldCaption(pSalesLine."Location Code"), ItemLogisticEvents.GetRequireShipmentLocations)
+                                if StrPos(ItemLogisticEvents.GetRequireShipmentLocations(), pSalesLine."Location Code") = 0 then
+                                    Message('%1 <> "%2"', pSalesLine.FieldCaption(pSalesLine."Location Code"), ItemLogisticEvents.GetRequireShipmentLocations())
                                 else
                                     if pSalesLine."Ship-to Code" = '' then
                                         Message('%1 = "%2"', pSalesLine.FieldCaption(pSalesLine."Ship-to Code"), pSalesLine."Ship-to Code")
@@ -1023,5 +1026,23 @@ codeunit 50008 "Delivery Document Management"
         recShipAgentServ.SetRange("Shipment Agent Code", ShippingAgentCode);
         if recShipAgentServ.FindFirst() then
             exit(recShipAgentServ.Code);
+    end;
+
+    //11-08-2025 BK #518362
+    local procedure CheckShippingAdvise(LocSalesHeader: Record "Sales Header"; LocSalesLine: Record "Sales Line"): Boolean
+    var
+        FullyConfirmed: Boolean;
+    begin
+        FullyConfirmed := true;
+        If LocSalesHeader."Shipping Advice" = LocSalesHeader."Shipping Advice"::Complete then begin
+            LocSalesLine.SetRange("Document Type", LocSalesLine."Document Type"::Order);
+            LocSalesLine.SetRange("Document No.", LocSalesHeader."No.");
+            if LocSalesLine.FindSet() then
+                repeat
+                    If NOT LocSalesLine."Shipment Date Confirmed" then
+                        FullyConfirmed := false;
+                until (LocSalesLine.Next() = 0) OR (Not FullyConfirmed);
+        end;
+        exit(FullyConfirmed);
     end;
 }
