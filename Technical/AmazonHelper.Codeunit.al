@@ -1009,13 +1009,12 @@ codeunit 50055 AmazonHelper
         filename: text;
         temptext: text;
     begin
-        if not ((userid in ['PGR', 'PGR', 'PGR_NAVKONSULENT.DK#EXT#']) and GuiAllowed) then
+        Amazsetup.get(Sinv.AmazonSellpartyid);
+        if not (Amazsetup.testmode) and GuiAllowed then
             if Sinv.AmazonInvSent <> 0DT then
                 exit;
 
-        Amazsetup.get(Sinv.AmazonSellpartyid);
         temptext := makeJsonPayloadInvoice(Sinv, Sinv.AmazonSellpartyid);
-
         if temptext <> '' then
             IF GetnewToken(newtoken, Sinv.AmazonSellpartyid) then begin
                 httpcontent.writefrom(temptext);
@@ -1045,7 +1044,7 @@ codeunit 50055 AmazonHelper
                 httpResponse.Content().ReadAs(content);
 
                 // Save the data of the InStream as a file.
-                if (userid in ['PGR 1', 'PGR', 'PGR_NAVKONSULENT.DK#EXT#']) and GuiAllowed then begin
+                if (Amazsetup.testmode) and GuiAllowed then begin
                     message('ok: %1', copystr(content, 1, 512));
                     TempBlob.CreateOutStream(outStr, TextEncoding::UTF8);
                     outStr.WriteText(content + ' ' + temptext);
@@ -1053,13 +1052,9 @@ codeunit 50055 AmazonHelper
                     fileName := StrSubstNo('Amazon_inv_%1_.txt', format(responseMessage.HttpStatusCode()));
                     File.DownloadFromStream(inStr, 'Export', '', '', fileName);
                 end;
-
                 // TEMP TEST >>
                 exit(true);
-
             end;
-
-
     end;
 
 
