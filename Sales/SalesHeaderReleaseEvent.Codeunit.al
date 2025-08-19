@@ -176,7 +176,7 @@ codeunit 50052 SalesHeaderReleaseEvent
                             Error(lText037, recItem."No.");
 
                     if SalesHeader."Sales Order Type" = SalesHeader."sales order type"::EICard then begin
-                        //14-07-2025 BK #  517290  
+                        //14-07-2025 BK #517290  
                         if recItem."Enter Security for Eicard on" = recItem."enter security for eicard on"::"GLC License" then begin
                             recAddEicardOrderInfo.SetRange("Document Type", recSalesLine."Document Type");
                             recAddEicardOrderInfo.SetRange("Document No.", recSalesLine."Document No.");

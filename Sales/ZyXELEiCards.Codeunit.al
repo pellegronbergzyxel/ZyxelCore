@@ -119,17 +119,25 @@ Codeunit 50001 "ZyXEL EiCards"
                                     recAddEicardOrderInfo.SetRange("Document No.", recSalesLine."Document No.");
                                     recAddEicardOrderInfo.SetRange("Sales Line Line No.", recSalesLine."Line No.");
                                     recAddEicardOrderInfo.SetRange(Validated, true);
-                                    if recSalesLine.Quantity = recAddEicardOrderInfo.Count then begin
+                                    if recItem."Enter Security for Eicard on" = recItem."enter security for eicard on"::"GLC License" then begin
+                                        //18-08-2025 BK #517290
+                                        if recSalesLine.Quantity = recAddEicardOrderInfo.Count then begin
+                                            if recAddEicardOrderInfo.FindSet() then
+                                                repeat
+                                                    InsertPurchLine(pSalesOrder, recSalesLine, recPurchHead, recAddEicardOrderInfo, 1);
+                                                until recAddEicardOrderInfo.Next() = 0;
+                                        end else
+                                            Error(lText006, recSalesLine.Quantity, recAddEicardOrderInfo.TableCaption, recAddEicardOrderInfo.Count);
+                                    End else begin
                                         if recAddEicardOrderInfo.FindSet() then
                                             repeat
                                                 InsertPurchLine(pSalesOrder, recSalesLine, recPurchHead, recAddEicardOrderInfo, 1);
                                             until recAddEicardOrderInfo.Next() = 0;
-                                    end else
-                                        Error(lText006, recSalesLine.Quantity, recAddEicardOrderInfo.TableCaption, recAddEicardOrderInfo.Count);
+                                    end; //18-08-2025 BK #517290
                                 end else begin
                                     Clear(recAddEicardOrderInfo);
                                     InsertPurchLine(pSalesOrder, recSalesLine, recPurchHead, recAddEicardOrderInfo, recSalesLine.Quantity);
-                                end;
+                                end; //18-08-2025 BK #517290
                             end;
                     end;
 

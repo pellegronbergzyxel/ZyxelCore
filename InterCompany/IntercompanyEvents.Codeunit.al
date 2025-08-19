@@ -67,12 +67,12 @@ codeunit 50048 "Intercompany Events"
         ICOutBoxSalesHeader."VAT Registration No." := SalesInvHdr."Company VAT Registration Code";
 
         //15-08-2025 BK #514725
-        /*if zgt.IsZComCompany() then
+        if zgt.IsZComCompany() then
             If (ICOutBoxSalesHeader."Sell-to Customer No." = ICOutBoxSalesHeader."Bill-to Customer No.") and (ICOutBoxSalesHeader."Ship-to Code" <> '') then
                 IF ShipToAddress.get(ICOutBoxSalesHeader."Sell-to Customer No.", ICOutBoxSalesHeader."Ship-to Code") then
                     If ShipToAddress."Location Code" <> '' then
                         ICOutBoxSalesHeader."Location Code" := ShipToAddress."Location Code";
-        */
+
         //15-08-2025 BK #514725  
     end;
 
@@ -100,12 +100,12 @@ codeunit 50048 "Intercompany Events"
 
 
         //15-08-2025 BK #514725
-        /*if zgt.IsZComCompany() then
+        if zgt.IsZComCompany() then
             If (SalesInvHdr."Sell-to Customer No." = SalesInvHdr."Bill-to Customer No.") and (SalesInvHdr."Ship-to Code" <> '') then
                 IF ShipToAddress.get(SalesInvHdr."Sell-to Customer No.", SalesInvHdr."Ship-to Code") then
                     If ShipToAddress."Location Code" <> '' then
                         ICOutBoxSalesLine."Location Code" := ShipToAddress."Location Code";
-        */
+
         //15-08-2025 BK #514725  
 
         ICOutBoxSalesLine."Return Reason Code" := SalesInvLine."Return Reason Code";
@@ -312,6 +312,7 @@ codeunit 50048 "Intercompany Events"
     local procedure ICInboxOutboxMgt_OnCreatePurchDocumentOnBeforeSalesHeaderModify(var PurchHeader: Record "Purchase Header"; var ICInboxPurchHeader: Record "IC Inbox Purchase Header")
     var
         ICpartner: Record "IC Partner";
+        Customer: Record Customer;
     begin
 
         PurchHeader.Validate("Ship-to Country/Region Code", ICInboxPurchHeader."Ship-to Country/Region Code");
@@ -323,10 +324,11 @@ codeunit 50048 "Intercompany Events"
         PurchHeader."eCommerce Order" := ICInboxPurchHeader."eCommerce Order";
         PurchHeader."Reference 2" := copystr(ICInboxPurchHeader."Your Reference 2", 1, 30);
         if ICpartner.get(ICInboxPurchHeader."IC Partner Code") then;
-        if not ICpartner.Skip_sellCustomer then begin
-            PurchHeader."End Customer" := ICInboxPurchHeader."End Customer";
-            PurchHeader.Validate("Sell-to Customer No.", ICInboxPurchHeader."End Customer");
-        end;
+        if not ICpartner.Skip_sellCustomer then
+            IF Customer.get(ICInboxPurchHeader."End Customer") then begin //18-08-2025 BK #514725
+                PurchHeader."End Customer" := ICInboxPurchHeader."End Customer";
+                PurchHeader.Validate("Sell-to Customer No.", ICInboxPurchHeader."End Customer");
+            end;
 
         if (PurchHeader."Document Type" in [PurchHeader."Document Type"::Invoice, PurchHeader."Document Type"::"Credit Memo"]) and
            (ICInboxPurchHeader."Location Code" <> '')
