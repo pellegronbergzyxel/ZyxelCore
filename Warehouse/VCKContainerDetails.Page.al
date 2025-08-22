@@ -23,122 +23,178 @@ Page 50101 "VCK Container Details"
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = true;
+                    ToolTip = 'Container No. is the unique identifier for the container.';
                 }
                 field("Bill of Lading No."; Rec."Bill of Lading No.")
                 {
                     ApplicationArea = Basic, Suite;
+                    Editable = true;
+                    ToolTip = 'Bill of Lading No. is the unique identifier for the bill of lading.';
                 }
                 field("Invoice No."; Rec."Invoice No.")
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = true;
+                    ToolTip = 'Invoice No. is the unique identifier for the invoice.';
                 }
                 field("Purchase Order No."; Rec."Purchase Order No.")
                 {
                     ApplicationArea = Basic, Suite;
+                    Editable = true;
+                    ToolTip = 'Purchase Order No. is the unique identifier for the purchase order.';
                 }
                 field("Purchase Order Line No."; Rec."Purchase Order Line No.")
                 {
                     ApplicationArea = Basic, Suite;
+                    Editable = true;
+                    ToolTip = 'Purchase Order Line No. is the unique identifier for the purchase order line';
                 }
                 field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = Basic, Suite;
+                    Editable = true;
+                    ToolTip = 'Item No. is the unique identifier for the item.';
                 }
                 field("Pallet No."; Rec."Pallet No.")
                 {
                     ApplicationArea = Basic, Suite;
+                    Editable = true;
+                    ToolTip = 'Pallet No. is the unique identifier for the pallet.';
                 }
                 field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Quantity to Receive';
                     Visible = false;
+                    ToolTip = 'Quantity to Receive is the total quantity of items expected in the container.';
                 }
                 field("Quantity Received"; Rec."Quantity Received")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    Caption = 'Quantity Received';
+                    ToolTip = 'Quantity Received is the total quantity of items that have been received in the container.';
                 }
                 field("Quantity-""Quantity Received"""; Rec.Quantity - Rec."Quantity Received")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Quantity';
                     DecimalPlaces = 0 : 5;
+                    ToolTip = 'Quantity is the difference between the total quantity expected and the quantity received.';
                 }
                 field(ETA; Rec.ETA)
                 {
                     ApplicationArea = Basic, Suite;
+                    Caption = 'ETA Date';
+                    ToolTip = 'ETA Date is the expected time of arrival for the container.';
                 }
                 field(ETD; Rec.ETD)
                 {
                     ApplicationArea = Basic, Suite;
+                    Caption = 'ETD Date';
+                    ToolTip = 'ETD Date is the expected time of departure for the container.';
                 }
                 field("Shipping Method"; Rec."Shipping Method")
                 {
                     ApplicationArea = Basic, Suite;
+                    Caption = 'Shipping Method';
+                    ToolTip = 'Shipping Method indicates the method used for shipping the container.';
+                    Editable = true;
                 }
                 field("Order No."; Rec."Order No.")
                 {
                     ApplicationArea = Basic, Suite;
+                    Caption = 'Order No.';
+                    ToolTip = 'Order No. is the unique identifier for the order associated with the container.';
+                    Editable = true;
                 }
                 field("Expected Receipt Date"; Rec."Expected Receipt Date")
                 {
                     ApplicationArea = Basic, Suite;
+                    Caption = 'Expected Receipt Date';
+                    ToolTip = 'Expected Receipt Date is the date when the items in the container are expected to be received.';
+                    Editable = true;
                 }
                 field("Batch No."; Rec."Batch No.")
                 {
                     ApplicationArea = Basic, Suite;
+                    Caption = 'Batch No.';
+                    ToolTip = 'Batch No. is the unique identifier for the batch of items in the container.';
+                    Editable = false;
                 }
                 field("Previous Batch No."; Rec."Previous Batch No.")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    Caption = 'Previous Batch No.';
+                    ToolTip = 'Previous Batch No. is the unique identifier for the previous batch of items in the container.';
                 }
                 field("Data Received Created"; Rec."Data Received Created")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    Caption = 'Data Received Created';
+                    ToolTip = 'Data Received Created indicates the date and time when the data for the container was created.';
+
                 }
                 field("Data Received Updated"; Rec."Data Received Updated")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    Caption = 'Data Received Updated';
+                    ToolTip = 'Data Received Updated indicates the date and time when the data for the container was last updated.';
                 }
                 field("Buy-from Vendor No."; Rec."Buy-from Vendor No.")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    Caption = 'Buy-from Vendor No.';
+                    ToolTip = 'Buy-from Vendor No. is the unique identifier for the vendor from whom the items are purchased.';
                 }
                 field(Location; Rec.Location)
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    Caption = 'Location';
+                    ToolTip = 'Location indicates the warehouse or location where the items are stored.';
+
                 }
                 field("Original ETA Date"; Rec."Original ETA Date")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    Caption = 'Original ETA Date';
+                    ToolTip = 'Original ETA Date is the initial expected time of arrival for the container.';
+
                 }
                 field("Previous ETA Date"; Rec."Previous ETA Date")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    Caption = 'Previous ETA Date';
+                    ToolTip = 'Previous ETA Date is the last expected time of arrival for the container before the current one.';
                 }
                 field("Expected Shipping Days"; Rec."Expected Shipping Days")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    Caption = 'Expected Shipping Days';
+                    ToolTip = 'Expected Shipping Days indicates the number of days expected for shipping the container.';
+
                 }
                 field("Original Shipping Days"; Rec."Original Shipping Days")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    Caption = 'Original Shipping Days';
+                    ToolTip = 'Original Shipping Days indicates the initial number of days expected for shipping the container.';
                 }
                 field(Amount; Rec.Amount)
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    Caption = 'Amount';
+                    ToolTip = 'Amount is the total cost of the items in the container, calculated as Quantity * Direct Unit Cost.';
                 }
                 field("""Expected Shipping Days""-""Original Shipping Days"""; Rec."Expected Shipping Days" - Rec."Original Shipping Days")
                 {
@@ -146,29 +202,46 @@ Page 50101 "VCK Container Details"
                     BlankZero = true;
                     Caption = 'Delayed Shipping Days';
                     Visible = false;
+                    ToolTip = 'Delayed Shipping Days indicates the difference between the expected and original shipping days.';
                 }
                 field("Item Category 1 Code"; Rec."Item Category 1 Code")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    Caption = 'Item Category 1 Code';
+                    ToolTip = 'Item Category 1 Code is the code for the first category of the item.';
                 }
                 field("Item Category 2 Code"; Rec."Item Category 2 Code")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    Caption = 'Item Category 2 Code';
+                    ToolTip = 'Item Category 2 Code is the code for the second category of the item.';
                 }
                 field("Item Category 3 Code"; Rec."Item Category 3 Code")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    Caption = 'Item Category 3 Code';
+                    ToolTip = 'Item Category 3 Code is the code for the third category of the item.';
                 }
                 // #490711
                 field(tobeETA; Rec.tobeETA)
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    Caption = 'Move to be ETA';
+                    ToolTip = 'Move to be ETA indicates whether the item is to be moved to the to-be ETA status.';
                 }
                 // #490711
+                field("Main Warehouse"; Rec."Main Warehouse")
+                {   //20-08-2025 BK #523968
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
+                    Caption = 'Main Warehouse';
+                    ToolTip = 'Main Warehouse indicates the primary warehouse for the item.';
+                    Editable = true;
+                }
 
             }
         }
@@ -230,7 +303,7 @@ Page 50101 "VCK Container Details"
                         if Rec.FindSet(false) then
                             repeat
                                 Rec.Archive := true;
-                                Rec.Modify;
+                                Rec.Modify();
                             until Rec.Next() = 0;
                 end;
             }
@@ -256,16 +329,20 @@ Page 50101 "VCK Container Details"
                 Caption = 'Update VCK Inbound Lines';
                 Image = UpdateShipment;
                 Visible = CreateVCKInboundVisible;
+                ToolTip = 'Update VCK Inbound Lines';
 
                 trigger OnAction()
                 begin
-                    CreateVCKInbound;
+                    CreateVCKInbound();
                 end;
             }
-            action(tobeETA)
+            action("tobeETA Move")
             {
                 ApplicationArea = all;
                 caption = 'Move to be ETA > ETA';
+                Image = MoveDown;
+                ToolTip = 'Move to be ETA > ETA';
+
                 trigger OnAction()
                 begin
                     rec.movetobeETA();
@@ -278,6 +355,7 @@ Page 50101 "VCK Container Details"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Warehouse Inbound';
+                ToolTip = 'View the warehouse inbound details for the selected container.';
                 Image = Document;
                 RunObject = Page "Warehouse Inbound Card";
                 RunPageLink = "No." = field("Document No.");
@@ -286,6 +364,7 @@ Page 50101 "VCK Container Details"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Purchase Order';
+                ToolTip = 'View the purchase order details for the selected container.';
                 Image = Document;
                 Promoted = true;
                 PromotedCategory = Process;
@@ -297,6 +376,8 @@ Page 50101 "VCK Container Details"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Unshipped Quantity';
+                ToolTip = 'View the unshipped quantity for the selected container.';
+
                 Image = Shipment;
                 RunObject = Page "Purchase Lines";
                 RunPageLink = "Document Type" = const(Order), Type = const(Item), OriginalLineNo = filter(<> 0);
@@ -306,10 +387,12 @@ Page 50101 "VCK Container Details"
             {
                 Caption = 'History';
                 Image = History;
+                ToolTip = 'View the history of changes made to the container details.';
                 action("Change Log")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Change Log';
+                    ToolTip = 'View the change log entries for the selected container.';
                     Image = ChangeLog;
                     Promoted = true;
                     PromotedCategory = Process;
@@ -333,6 +416,7 @@ Page 50101 "VCK Container Details"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Print';
+                ToolTip = 'Print the container details report.';
                 Image = Print;
                 Promoted = true;
                 PromotedCategory = Process;
@@ -364,21 +448,17 @@ Page 50101 "VCK Container Details"
         if UserId() = 'jkral' then
             CurrPage.Editable := true;
 
-        SetActions;
+        SetActions();
     end;
 
     var
-        Text001: label 'Do you want to archive %1 line(s)?';
-        ZGT: Codeunit "ZyXEL General Tools";
         CreateVCKInboundVisible: Boolean;
+        Text001: label 'Do you want to archive %1 line(s)?';
         Text002: label 'You are not allowed to modify lines received after 25-01-19.';
         Text003: label 'The data has been received from electronically.\Are you sure you want to change the line?';
 
     local procedure CreateVCKInbound()
     var
-        recContDetail: Record "VCK Shipping Detail";
-        ZyVCKPostMgt: Codeunit "Zyxel VCK Post Management";
-        lText001: label 'Do you want to create VCK Post Line?';
     begin
 
     end;
@@ -387,7 +467,7 @@ Page 50101 "VCK Container Details"
     var
         recServEnviron: Record "Server Environment";
     begin
-        CreateVCKInboundVisible := not recServEnviron.ProductionEnvironment;  // 14-12-18 ZY-LD 002
+        CreateVCKInboundVisible := not recServEnviron.ProductionEnvironment();
     end;
 
     local procedure PrintContainerDetails()

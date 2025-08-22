@@ -8,7 +8,6 @@ Codeunit 50001 "ZyXEL EiCards"
     var
         recPurchSetup: Record "Purchases & Payables Setup";
         PurchLineNo: Integer;
-        //ZGT: Codeunit "ZyXEL General Tools";
         Text005: label 'The Sales Order has been successfully added to the EiCard Queue.\\\There is a %1 min. delay before the Eicard is sent to eShop.\Go to the Eicard queue if you want send it right away.\\If you delete the sales order before the Eicard Links is sent to the customer, the Eicard links will not be sent.\If the Eicard have not been sent to eShop, the purchase order will also be deleted when the sales order is deleted.';
         Text014: label 'Are you sure that you want to add this order to the EiCard Queue. \The Order cannot be changed once queued.';
 
@@ -131,7 +130,7 @@ Codeunit 50001 "ZyXEL EiCards"
                                     End else begin
                                         if recAddEicardOrderInfo.FindSet() then
                                             repeat
-                                                InsertPurchLine(pSalesOrder, recSalesLine, recPurchHead, recAddEicardOrderInfo, 1);
+                                                InsertPurchLine(pSalesOrder, recSalesLine, recPurchHead, recAddEicardOrderInfo, recSalesLine.Quantity); //22-08-2025 BK #505159
                                             until recAddEicardOrderInfo.Next() = 0;
                                     end; //18-08-2025 BK #517290
                                 end else begin
@@ -176,7 +175,6 @@ Codeunit 50001 "ZyXEL EiCards"
     begin
         PurchLineNo := PurchLineNo + 10000;
 
-        //>> 10-07-24 ZY-LD 021
         recPurchLine.SetRange("Document Type", pPurchHead."Document Type");
         recPurchLine.SetRange("Document No.", pPurchHead."No.");
         recPurchLine.SetRange(Type, recPurchLine.Type::Item);

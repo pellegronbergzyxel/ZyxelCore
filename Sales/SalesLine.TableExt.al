@@ -26,7 +26,7 @@ tableextension 50117 SalesLineZX extends "Sales Line"
                     recSalesHeader.SetFilter("No.", "Document No.");
                     recSalesHeader.SetRange("Document Type", recSalesHeader."Document Type"::Order);
                     recSalesHeader.SetRange("Sales Order Type", recSalesHeader."Sales Order Type"::EICard);
-                    if recSalesHeader.FindFirst() then
+                    if Not recSalesHeader.IsEmpty() then
                         Message(Text0063);
                 end;
             end;
@@ -304,6 +304,15 @@ tableextension 50117 SalesLineZX extends "Sales Line"
         {
             Caption = 'Zero Unit Price Approved';
             Description = '24-05-22 ZY-LD 047';
+
+            trigger OnValidate()
+            begin //20-08-2025 BK #524052 
+                if Rec."Zero Unit Price Accepted" then begin
+                    ;
+                    Rec.Validate("Line Discount %", 0);
+                    rec.validate("Line Discount Amount", 0)
+                end;
+            end;
         }
         field(50047; "Order Desk Responsible Code"; Code[20])
         {
@@ -520,17 +529,18 @@ tableextension 50117 SalesLineZX extends "Sales Line"
 
     procedure ValidateLocation()
     var
-        LMSG000: Label 'Location and sales order type mismatch!';
         SalesSetup: Record "Sales & Receivables Setup";
         SalesHeader: Record "Sales Header";
         Location: Record Location;
+        LMSG000: Label 'Location and sales order type mismatch!';
+
     begin
         //Tectura Taiwan ZL100526A+
         SalesSetup.Get();
         if (Rec."Document Type" = Rec."document type"::Order) and
            SalesSetup."Sales Order Type Mandatory"
         then begin
-            SalesHeader := Rec.GetSalesHeader;
+            SalesHeader := Rec.GetSalesHeader();
             if SalesHeader."Sales Order Type" <> Rec."Sales Order Type" then
                 Rec."Sales Order Type" := SalesHeader."Sales Order Type";
 
@@ -641,11 +651,12 @@ tableextension 50117 SalesLineZX extends "Sales Line"
 
     procedure compareAmazonprices(): Boolean
     var
+        Salesheader: Record "Sales Header";
+        Line: record "Sales Line";
+        vLine: Variant;
         PriceCalculation: Interface "Price Calculation";
         PriceType: Enum "Price Type";
-        Salesheader: Record "Sales Header";
-        vLine: Variant;
-        Line: record "Sales Line";
+
     begin
         GetPriceCalculationHandler(PriceType::Sale, SalesHeader, PriceCalculation);
         PriceCalculation.ApplyPrice(line.FieldNo(Quantity));
@@ -659,9 +670,6 @@ tableextension 50117 SalesLineZX extends "Sales Line"
 
 
     var
-        recSalesHeader: Record "Sales Header";
-        SRSetup: Record "Sales & Receivables Setup";
-        AllInDates: Codeunit "Delivery Document Management";
         ConfirmDate: Boolean;
         DontUpdateDeliveryDates: Boolean;
         Text0061: Label 'No Delivery Document has been specified.';
