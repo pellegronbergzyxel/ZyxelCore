@@ -714,7 +714,7 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
                     END;
 
                     IF recAutoSetup."Upd. Unit Price on Purch.Order" THEN
-                        IF recUnshipPurchder."Unit Price" > 0 THEN
+                        IF (recUnshipPurchder."Unit Price" > 0) and (recUnshipPurchder."DN Number" = '') THEN //06-08-2025 BK #From HQ John and Steven
                             IF recPurchLine.GET(recPurchLine."Document Type"::Order, recUnshipPurchder."Purchase Order No.", recUnshipPurchder."Purchase Order Line No.") THEN
                                 IF (recPurchLine.Type = recPurchLine.Type::Item) AND (recPurchLine."Direct Unit Cost" <> recUnshipPurchder."Unit Price") THEN BEGIN
                                     recPurchLine.SuspendStatusCheck(TRUE);
@@ -806,7 +806,7 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
                     END;
 
                     IF recAutoSetup."Upd. Unit Price on Purch.Order" THEN
-                        IF recUnshipPurchder."Unit Price" > 0 THEN
+                        IF (recUnshipPurchder."Unit Price" > 0) and (recUnshipPurchder."DN Number" = '') THEN //06-08-2025 BK #From HQ John and Steven
                             IF recPurchLine.GET(recPurchLine."Document Type"::Order, recUnshipPurchder."Purchase Order No.", recUnshipPurchder."Purchase Order Line No.") THEN
                                 IF (recPurchLine.Type = recPurchLine.Type::Item) AND (recPurchLine."Direct Unit Cost" <> recUnshipPurchder."Unit Price") THEN BEGIN
                                     recPurchLine.SuspendStatusCheck(TRUE);
@@ -1026,14 +1026,14 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
             repeat
                 if recPurchLine.Get(recPurchLine."document type"::Order, recPurchLineTmp."Document No.", recPurchLineTmp."Line No.") then
                     //06-08-2025 BK #From HQ John and Steven
-                    //If NOT FindDNNumber(recPurchLine) then begin
+                    If NOT FindDNNumber(recPurchLine) then begin
                         recPurchLine.SuspendStatusCheck(true);
-                recPurchLine.Validate("Direct Unit Cost", recPurchLineTmp."Direct Unit Cost");
-                recPurchLine.Modify(true);
-                recPurchLine.SuspendStatusCheck(false);
+                        recPurchLine.Validate("Direct Unit Cost", recPurchLineTmp."Direct Unit Cost");
+                        recPurchLine.Modify(true);
+                        recPurchLine.SuspendStatusCheck(false);
 
-                WebServiceLogEntry."Quantity Inserted" += 1;
-            //end;
+                        WebServiceLogEntry."Quantity Inserted" += 1;
+                    end;
             until recPurchLineTmp.Next() = 0;
         CloseWebServiceLog();
         rValue := true;

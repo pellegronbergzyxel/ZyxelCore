@@ -162,8 +162,8 @@ XmlPort 50069 "WS Container Detail"
                 "VCK Shipping Detail"."Order Type" := "VCK Shipping Detail"."order type"::"Sales Return Order";
                 "VCK Shipping Detail".Location := recSalesLine."Location Code";
                 // 07-07-2025 BK #506753
-                if recSalesLine."Location Code" <> '' then
-                    if location.get(recSalesLine."Location Code") then
+                if "VCK Shipping Detail".Location <> '' then
+                    if location.get("VCK Shipping Detail".Location) then
                         "VCK Shipping Detail"."Main Warehouse" := location."Main Warehouse";
                 "VCK Shipping Detail"."Expected Receipt Date" := Today + NoOfDays;
                 "VCK Shipping Detail"."Shipping Method" := 'DDP';
@@ -179,6 +179,7 @@ XmlPort 50069 "WS Container Detail"
         recSalesLine: Record "Sales Line";
         recPurchHead: Record "Purchase Header";
         recPurchLine: Record "Purchase Line";
+        Location: Record Location;
     begin
         //>> 02-04-20 ZY-LD 003
         recPurchLine.SetRange("Document Type", recPurchLine."document type"::Order);
@@ -207,6 +208,10 @@ XmlPort 50069 "WS Container Detail"
                 "VCK Shipping Detail"."Order No." := recPurchLine."Document No.";
                 "VCK Shipping Detail"."Order Type" := "VCK Shipping Detail"."order type"::"Purchase Order";
                 "VCK Shipping Detail".Location := recPurchLine."Location Code";
+                // 02-09-2025 BK #506753,  #526138
+                if "VCK Shipping Detail".Location <> '' then
+                    if location.get("VCK Shipping Detail".Location) then
+                        "VCK Shipping Detail"."Main Warehouse" := location."Main Warehouse";
                 "VCK Shipping Detail"."Expected Receipt Date" := recPurchLine."Expected Receipt Date";
                 recPurchHead.Get(recPurchHead."document type"::Order, pPurchOrderNo);
                 "VCK Shipping Detail"."Shipping Method" := recPurchHead."Shipment Method Code";
@@ -221,6 +226,7 @@ XmlPort 50069 "WS Container Detail"
         recTransHead: Record "Transfer Header";
         recTransLine: Record "Transfer Line";
         recAutoSetup: Record "Automation Setup";
+        Location: Record Location;
         CalculatedDate: Date;
         NoOfDays: Integer;
     begin
@@ -253,6 +259,10 @@ XmlPort 50069 "WS Container Detail"
                 "VCK Shipping Detail"."Order No." := recTransLine."Document No.";
                 "VCK Shipping Detail"."Order Type" := "VCK Shipping Detail"."order type"::"Transfer Order";
                 "VCK Shipping Detail".Location := recTransLine."Transfer-to Code";
+                // 02-09-2025 BK #506753,  #526138
+                if "VCK Shipping Detail".Location <> '' then
+                    if location.get("VCK Shipping Detail".Location) then
+                        "VCK Shipping Detail"."Main Warehouse" := location."Main Warehouse";
                 "VCK Shipping Detail"."Expected Receipt Date" := Today + NoOfDays;
                 "VCK Shipping Detail"."Shipping Method" := 'DDP';
                 "VCK Shipping Detail".Insert;

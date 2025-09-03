@@ -307,8 +307,7 @@ tableextension 50117 SalesLineZX extends "Sales Line"
 
             trigger OnValidate()
             begin //20-08-2025 BK #524052 
-                if Rec."Zero Unit Price Accepted" then begin
-                    ;
+                if (Rec."Zero Unit Price Accepted") and (rec.Quantity <> 0) then begin //01-09-2025 BK #425355
                     Rec.Validate("Line Discount %", 0);
                     rec.validate("Line Discount Amount", 0)
                 end;

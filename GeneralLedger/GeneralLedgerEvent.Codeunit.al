@@ -550,6 +550,49 @@ codeunit 50085 "General Ledger Event"
 
     end;
 
+    //26-08-25 BK #506594
+    //Pretending that non-inventory items are inventory items during posting to G/L
+    [eventsubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforePostInventoryToGL', '', false, false)]
+    local procedure OnBeforePostInventoryToGL(var ValueEntry: Record "Value Entry"; var IsHandled: Boolean; var ItemJnlLine: Record "Item Journal Line"; PostToGL: Boolean; CalledFromAdjustment: Boolean)
+    var
+        zgt: Codeunit "ZyXEL General Tools";
+        Item: Record Item;
+
+    begin
+        /*IF zgt.IsZComCompany() THEN
+            if Item.get(ValueEntry."Item No.") then
+                if Item.type = item.type::"Non-Inventory" then begin
+                    ValueEntry.Inventoriable := true;
+                    ValueEntry."Inventory Posting Group" := 'NON-INVENTORY';
+                    ValueEntry."Cost Amount (Actual)" := ValueEntry."Cost Amount (Non-Invtbl.)";
+                    ValueEntry."Cost Amount (Actual) (ACY)" := ValueEntry."Cost Amount (Non-Invtbl.)(ACY)";
+                end;*/
+    end;
+
+
+    //26-08-25 BK #506594
+    //Pretending that non-inventory items are inventory items during posting to G/L - reset
+    [eventsubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnAfterPostInventoryToGL', '', false, false)]
+    local procedure OnAfterPostInventoryToGL(var ValueEntry: Record "Value Entry")
+    var
+        zgt: Codeunit "ZyXEL General Tools";
+        Item: Record Item;
+    begin
+        /*IF zgt.IsZComCompany() THEN
+            if Item.get(ValueEntry."Item No.") then
+                if Item.type = item.type::"Non-Inventory" then begin
+                    ValueEntry.Inventoriable := false;
+                    ValueEntry."Inventory Posting Group" := '';
+                    ValueEntry."Cost Amount (Actual)" := 0;
+                    ValueEntry."Cost Amount (Actual) (ACY)" := 0;
+                    ValueEntry."Cost Posted to G/L" := 0;
+                    ValueEntry."Cost Posted to G/L (ACY)" := 0;
+
+                end;*/
+    end;
+
+
+
     local procedure ErrorOnDeletePostedDocument()
     var
         ZGT: Codeunit "ZyXEL General Tools";

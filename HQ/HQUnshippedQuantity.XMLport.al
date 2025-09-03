@@ -46,11 +46,10 @@ xmlport 50048 "HQ Unshipped Quantity"
                 fieldelement(HQSalesOrderLineID; UnshippedPurchaseOrder."Sales Order Line ID")
                 {
                 }
-                // /*
                 fieldelement(DNNumber; UnshippedPurchaseOrder."DN Number")
                 {
                 }
-                //                 */ //Mail from John in HQ - first in test BK
+                //Mail from John in HQ - first in test BK
             }
 
         }

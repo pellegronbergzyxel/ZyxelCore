@@ -6,8 +6,7 @@ report 50053 "Update Purchase Order / Unship"
     ProcessingOnly = true;
     dataset
     {
-        dataitem(UnshippedPurchaseOrder;
-        "Unshipped Purchase Order")
+        dataitem(UnshippedPurchaseOrder; "Unshipped Purchase Order")
         {
             DataItemTableView = sorting("Purchase Order No.", "Purchase Order Line No.");
 
