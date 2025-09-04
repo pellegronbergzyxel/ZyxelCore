@@ -714,7 +714,7 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
                     END;
 
                     IF recAutoSetup."Upd. Unit Price on Purch.Order" THEN
-                        IF (recUnshipPurchder."Unit Price" > 0) and (recUnshipPurchder."DN Number" = '') THEN //06-08-2025 BK #From HQ John and Steven
+                        IF (recUnshipPurchder."Unit Price" > 0) THEN //06-08-2025 BK #From HQ John and Steven - and (recUnshipPurchder."DN Number" = '')
                             IF recPurchLine.GET(recPurchLine."Document Type"::Order, recUnshipPurchder."Purchase Order No.", recUnshipPurchder."Purchase Order Line No.") THEN
                                 IF (recPurchLine.Type = recPurchLine.Type::Item) AND (recPurchLine."Direct Unit Cost" <> recUnshipPurchder."Unit Price") THEN BEGIN
                                     recPurchLine.SuspendStatusCheck(TRUE);
