@@ -58,6 +58,11 @@ Page 50164 "VCK Container Details ETA"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Quantity to Receive';
                 }
+                field("Calculated ETA Date"; Rec."Calculated ETA Date") //08-09-2025 BK #525482
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Calculated ETA Date';
+                }
             }
         }
         area(factboxes)

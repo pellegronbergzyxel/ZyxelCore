@@ -52,7 +52,7 @@ pageextension 50200 PurchaseLinesZX extends "Purchase Lines"
                 ToolTip = 'Specifies Order Date';
             }
 
-            Field(DocumentDate; DocumentDate)
+            Field(DocumentDate; rec."Document Date")
             {
                 Caption = 'Document Date';
                 ToolTip = 'Specifies Document Date';
@@ -68,22 +68,43 @@ pageextension 50200 PurchaseLinesZX extends "Purchase Lines"
                 //16-06-2025 BK #511337
             }
 
+            field("Warehouse Inbound No."; Rec."Warehouse Inbound No.") //07-09-2025 BK #511337
+            {
+                ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies Warehouse Inbound No.';
+            }
+        }
+
+    }
+    actions //07-09-2025 BK #511337
+    {
+
+        addafter("Reservation Entries")
+        {
+            action("Receipts")
+            {
+                ApplicationArea = Suite;
+                Caption = 'Receipts';
+                Image = PostedReceipts;
+                RunObject = Page "Posted Purchase Receipts";
+                RunPageLink = "Order No." = FIELD("Document No.");
+                RunPageView = SORTING("Order No.");
+                ToolTip = 'View a list of posted purchase receipts for the order.';
+
+            }
         }
     }
 
-    //16-06-2025 BK #511337
+    //16-06-2025 BK #511337 and #511337
     trigger OnAfterGetRecord()
     var
         PurchaseHeader: Record "Purchase Header";
 
     begin
-        If PurchaseHeader.get(rec."Document Type", rec."Document No.") then begin
-            DocumentDate := PurchaseHeader."Document Date";
-            ShippingRequestNote := PurchaseHeader."Shipping Request Notes";
-        end else begin
-            clear(DocumentDate);
+        If PurchaseHeader.get(rec."Document Type", rec."Document No.") then
+            ShippingRequestNote := PurchaseHeader."Shipping Request Notes"
+        else
             clear(ShippingRequestNote);
-        end;
     end;
 
     var

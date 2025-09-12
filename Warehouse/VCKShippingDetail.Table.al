@@ -83,6 +83,18 @@ Table 50046 "VCK Shipping Detail"
         {
             Caption = 'ETD Date';
             Description = 'PAB 1.0';
+
+            trigger OnValidate() //08-09-2025 BK #525482
+            var
+                ZGT: Codeunit "Zyxel General Tools";
+                WarehouseSetup: Record "Warehouse Setup";
+            begin
+                if zgt.IsZComCompany() then
+                    If (ETD <> 0D) and (WarehouseSetup.get()) THEN
+                        Validate("Calculated ETA Date", CALCDATE(WarehouseSetup."Expected Shipment Period", ETD))
+                    else
+                        Validate("Calculated ETA Date", 0D);
+            end;
         }
         field(10; "Shipping Method"; Code[30])
         {
@@ -333,12 +345,26 @@ Table 50046 "VCK Shipping Detail"
             Editable = false;
             FieldClass = FlowField;
         }
-        // #490711 >>
-        field(50005; tobeETA; Date)
+        field(50005; tobeETA; Date)  // #490711 >>
         {
             Caption = 'Not updated ETA from Zyxel HQ';
         }
-        // #490711 <<
+        field(50007; "Calculated ETA Date"; Date) //08-09-2025 BK #525482
+        {
+            Caption = 'Calculated ETA Date';
+
+            trigger OnValidate()
+            var
+                ZGT: Codeunit "Zyxel General Tools";
+                ShipmentMethodrec: Record "Shipment Method";
+            begin
+                if zgt.IsZComCompany() then
+                    if ShipmentMethodrec.get(rec."Shipping Method") then
+                        If Format(ShipmentMethodrec."Shipping Days") <> '' THEN
+                            If "Calculated ETA Date" <> 0D THEN
+                                Validate("Expected Receipt Date", CALCDATE(ShipmentMethodrec."Shipping Days", "Calculated ETA Date"))
+            end;
+        }
     }
 
     keys

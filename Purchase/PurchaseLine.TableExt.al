@@ -230,6 +230,14 @@ tableextension 50119 PurchaseLineZX extends "Purchase Line"
             Description = 'Unique identification of the sales order line in HQ.';
 
         }
+        field(500104; "Document Date"; Date) //07-09-2025 BK #511337
+        {
+            Description = 'Document Date from Purchase Header';
+            CalcFormula = lookup("Purchase Header"."Document Date" where("Document Type" = field("document Type"), "No." = field("Document No.")));
+            Caption = 'Document Date';
+            FieldClass = FlowField;
+            Editable = false;
+        }
         field(60002; "Vendor Order No."; Text[30])
         {
             Caption = 'Vendor Order No.';

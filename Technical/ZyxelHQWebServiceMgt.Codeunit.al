@@ -668,6 +668,7 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
         recPurchLine: Record "Purchase Line";
         recAutoSetup: Record "Automation Setup";
         recWhseSetup: Record "Warehouse Setup";
+        ZGT: Codeunit "Zyxel General Tools";
         lText001: Label 'Purchase Order No. must not be blank. "%1".';
         lText002: Label 'UNSHIPPEDQUANTITY';
         lText003: Label 'EMPTY';
@@ -702,16 +703,26 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
                         recUnshipPurchder."ETA Date" := 20991231D;
                     recUnshipPurchder.INSERT();
 
-                    IF FORMAT(recWhseSetup."Expected Shipment Period") <> '' THEN BEGIN
-                        IF recUnshipPurchder."Shipping Order ETD Date" <> 0D THEN
-                            recUnshipPurchder."Expected receipt date" := CALCDATE(recWhseSetup."Expected Shipment Period", recUnshipPurchder."Shipping Order ETD Date")
-                        ELSE
-                            IF recUnshipPurchder."ETD Date" <> 0D THEN
-                                recUnshipPurchder."Expected receipt date" := CALCDATE(recWhseSetup."Expected Shipment Period", recUnshipPurchder."ETD Date")
+                    IF zgt.IsZNetCompany() then begin //08-09-2025 BK #525482
+                        IF FORMAT(recWhseSetup."Expected Shipment Period") <> '' THEN BEGIN
+                            IF recUnshipPurchder."Shipping Order ETD Date" <> 0D THEN
+                                recUnshipPurchder."Expected receipt date" := CALCDATE(recWhseSetup."Expected Shipment Period", recUnshipPurchder."Shipping Order ETD Date")
+                            ELSE
+                                IF recUnshipPurchder."ETD Date" <> 0D THEN
+                                    recUnshipPurchder."Expected receipt date" := CALCDATE(recWhseSetup."Expected Shipment Period", recUnshipPurchder."ETD Date")
+                                ELSE
+                                    recUnshipPurchder."Expected receipt date" := 0D;
+                            recUnshipPurchder.MODIFY(TRUE);
+                        END;
+                    end else begin //08-09-2025 BK #525482
+                        IF FORMAT(recWhseSetup."Expected Shipment Period") <> '' THEN BEGIN
+                            IF recUnshipPurchder."ETA Date" <> 0D THEN
+                                recUnshipPurchder."Expected receipt date" := CALCDATE(recWhseSetup."Expected Shipment Period", recUnshipPurchder."ETA Date")
                             ELSE
                                 recUnshipPurchder."Expected receipt date" := 0D;
-                        recUnshipPurchder.MODIFY(TRUE);
-                    END;
+                            recUnshipPurchder.MODIFY(TRUE);
+                        end;
+                    end;
 
                     IF recAutoSetup."Upd. Unit Price on Purch.Order" THEN
                         IF (recUnshipPurchder."Unit Price" > 0) THEN //06-08-2025 BK #From HQ John and Steven - and (recUnshipPurchder."DN Number" = '')

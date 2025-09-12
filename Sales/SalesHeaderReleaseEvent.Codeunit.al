@@ -114,8 +114,6 @@ codeunit 50052 SalesHeaderReleaseEvent
                         Error('')
                 end else
                     Error(lText006, recCust.FieldCaption("Credit Limit (LCY)"), recCust."Credit Limit (LCY)", Balance, lText033);
-
-
             end;
 
             amazon.AllowReleaseamazonorder(SalesHeader);// amazon 20250703 

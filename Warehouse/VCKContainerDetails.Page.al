@@ -242,7 +242,13 @@ Page 50101 "VCK Container Details"
                     ToolTip = 'Main Warehouse indicates the primary warehouse for the item.';
                     Editable = true;
                 }
-
+                field("Calculated ETA Date"; Rec."Calculated ETA Date") //08-09-2025 BK #525482
+                {
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
+                    Caption = 'Calculated ETA Date';
+                    ToolTip = 'Calculated ETA Date is the ETA date calculated based on ETD and expected shipping days.';
+                }
             }
         }
         area(factboxes)

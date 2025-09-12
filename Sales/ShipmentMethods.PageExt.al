@@ -23,6 +23,11 @@ pageextension 50106 ShipmentMethodsZX extends "Shipment Methods"
             {
                 ApplicationArea = Basic, Suite;
             }
+            field(shippingDays; Rec."Shipping Days") //08-09-2025 BK #525482
+            {
+                ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the number of days for shipping. This value is used to calculate the Expected Receipt date on the shipping detail.';
+            }
         }
     }
 }

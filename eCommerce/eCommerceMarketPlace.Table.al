@@ -1,6 +1,5 @@
 table 50104 "eCommerce Market Place"
 {
-    // 001. 30-11-23 ZY-LD 000 - New fields.
 
     Caption = 'eCommerce Market Place';
 
@@ -291,11 +290,11 @@ table 50104 "eCommerce Market Place"
         {
             Caption = 'Code for Discount';
         }
-        field(72; "Use Main Market Place ID"; Boolean)  // 30-11-23 ZY-LD 001
+        field(72; "Use Main Market Place ID"; Boolean)
         {
             Caption = 'Use Main Market Place ID';
         }
-        field(73; "Code for Compensation Fee"; Code[20])  // 30-11-23 ZY-LD 001
+        field(73; "Code for Compensation Fee"; Code[20])
         {
             Caption = 'Code for Compensation Fee';
         }
@@ -307,15 +306,20 @@ table 50104 "eCommerce Market Place"
         {
             Caption = 'Tax Exception End Date';
         }
-        field(76; "VAT Prod. Posting Group (GB)"; Code[20])  // 13-09-24 ZY-LD 000
+        field(76; "VAT Prod. Posting Group (GB)"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group (GB)';
             TableRelation = "VAT Product Posting Group";
         }
-        field(77; "Country/Region Code (GB)"; Code[10])  // 13-09-24 ZY-LD 000
+        field(77; "Country/Region Code (GB)"; Code[10])
         {
             Caption = 'Country/Region Code (GB)';
             TableRelation = "Country/Region";
+        }
+        field(79; "No Comsuner VAT Check"; Boolean)  // 08-09-2025 BK #522911
+        {
+            Caption = 'No Consumer VAT Check';
+
         }
     }
 
@@ -363,7 +367,7 @@ table 50104 "eCommerce Market Place"
             if lrecAznCompMap.Insert() then begin
                 SI.SetMergefield(100, pNewMarketplace);
                 EmailAddMgt.CreateSimpleEmail('ECOMNMKTPL', '', '');
-                EmailAddMgt.Send;
+                EmailAddMgt.Send();
             end;
         end;
     end;

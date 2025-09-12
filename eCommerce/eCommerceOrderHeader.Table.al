@@ -678,6 +678,7 @@ table 50103 "eCommerce Order Header"
         recGenLedgSetup: Record "General Ledger Setup";
         recAmzCtryMap: Record "eCommerce Country Mapping";
         recEcomSetup: Record "eCommerce Setup";
+        AmzMarketPlace: Record "eCommerce Market Place";
         ItemLogisticEvent: Codeunit "Item / Logistic Events";
         ZGT: Codeunit "ZyXEL General Tools";
         VatBusPostGrp: Code[20];
@@ -763,7 +764,8 @@ table 50103 "eCommerce Order Header"
                ((WORKDATE() < recAmzMktPlace."Tax Exception Start Date") OR (WORKDATE() > recAmzMktPlace."Tax Exception End Date"))
             THEN
                 IF "Sell-to Type" = "Sell-to Type"::Consumer THEN BEGIN
-                    IF ("Tax Amount" = 0) AND (NOT "Prices Including VAT") THEN
+                    AmzMarketPlace.get("Marketplace ID"); // 08-09-2025 BK #522911
+                    IF ("Tax Amount" = 0) AND (NOT "Prices Including VAT") and (NOT AmzMarketPlace."No Comsuner VAT Check") THEN // 08-09-2025 BK #522911
                         "Error Description" := STRSUBSTNO(lText029, FIELDCAPTION("Tax Amount"));
                 END ELSE
                     IF ("Ship From Country" = "Ship To Country") AND ("Tax Amount" = 0) AND (NOT "Prices Including VAT") THEN BEGIN
