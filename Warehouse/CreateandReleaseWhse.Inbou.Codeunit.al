@@ -62,6 +62,12 @@ Codeunit 62015 "Create and Release Whse. Inbou"
                             recWhseInbHead."order type"::"Transfer Order":
                                 if recAutoSetup."Release Transf Order Whse Inb." then
                                     Codeunit.Run(Codeunit::"Release Warehouse Inbound", recWhseInbHead);
+
+                            recWhseInbHead."order type"::"Purchase Invoice": //12-09-2025 BK #527409
+                                if recAutoSetup."Release HQ Warehouse Inbound" then
+                                    if (recVend."SBU Company" in [recVend."sbu company"::"ZCom HQ", recVend."sbu company"::"ZNet HQ"]) and
+                                       (CalcDate(recAutoSetup."Release HQ Whse. Indb. DateF.", recWhseInbHead."Estimated Date of Arrival") <= Today) then
+                                    Codeunit.Run(Codeunit::"Release Warehouse Inbound", recWhseInbHead);
                         end;
                     until recWhseInbHead.Next() = 0;
                     ZGT.CloseProgressWindow;
