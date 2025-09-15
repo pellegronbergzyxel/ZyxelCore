@@ -112,6 +112,13 @@ Page 50109 "Goods in Transit"
                     ApplicationArea = Basic, Suite;
                     Visible = false;
                 }
+                field("Calculated ETA Date"; Rec."Calculated ETA Date") //08-09-2025 BK #525482
+                {
+                    ApplicationArea = Basic, Suite;
+                    Visible = CalETAVisible;
+                    Caption = 'Calculated ETA Date';
+                    ToolTip = 'Calculated ETA Date is the ETA date calculated based on ETD and expected shipping days.';
+                }
             }
         }
     }
@@ -139,32 +146,21 @@ Page 50109 "Goods in Transit"
         Rec.CalcFields(Rec."Quantity Received", Rec."Direct Unit Cost");
         Rec."Calculated Quantity" := Rec.Quantity - Rec."Quantity Received";
         Rec.Amount := Rec."Calculated Quantity" * Rec."Direct Unit Cost";
-        //>> 14-01-19 ZY-LD 002
-        /*
-        PurchaseLine.SETFILTER("Document No.","Purchase Order No.");
-        PurchaseLine.SETFILTER("Line No.",FORMAT("Purchase Order Line No."));
-        IF PurchaseLine.FINDFIRST THEN BEGIN
-          UPrice := PurchaseLine."Direct Unit Cost";
-          TAmount := Quantity * UPrice;
-          ItemDescription := PurchaseLine.Description;
-          RecItem.SETFILTER(RecItem."No.", PurchaseLine."No.");
-          IF RecItem.FINDFIRST THEN BEGIN
-            //>> 05-04-18 ZY-LD 001
-            //CAT1 :=  PurchaseLine."Item Category Code";
-            //CAT2 :=  RecItem."Product Group Code";
-            CAT1OLD :=  PurchaseLine."Item Category Code";
-            CAT1 :=  RecItem."Category 1 Code";
-            CAT2 :=  RecItem."Category 2 Code";
-            //<< 05-04-18 ZY-LD 001
-          END;
-        END;
-        */
-        //<< 14-01-19 ZY-LD 002
 
+
+    end;
+
+    trigger OnOpenPage()
+    begin
+        if ZGT.IsZComCompany() then
+            CalETAVisible := true
+        else
+            CalETAVisible := false;
     end;
 
     var
         PurchaseLine: Record "Purchase Line";
+        ZGT: Codeunit "ZyXEL General Tools";
         UPrice: Decimal;
         TAmount: Decimal;
         ItemDescription: Text[50];
@@ -172,4 +168,5 @@ Page 50109 "Goods in Transit"
         CAT2: Code[100];
         CAT1: Code[100];
         CAT1OLD: Code[10];
+        CalETAVisible: Boolean;
 }

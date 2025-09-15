@@ -90,8 +90,8 @@ Table 50046 "VCK Shipping Detail"
                 WarehouseSetup: Record "Warehouse Setup";
             begin
                 if zgt.IsZComCompany() then
-                    If (ETD <> 0D) and (WarehouseSetup.get()) THEN
-                        Validate("Calculated ETA Date", CALCDATE(WarehouseSetup."Expected Shipment Period", ETD))
+                    If (ETD <> 0D) and (WarehouseSetup.get()) and (format(WarehouseSetup."Calculated ETA Calculation") <> '') THEN
+                        Validate("Calculated ETA Date", CALCDATE(WarehouseSetup."Calculated ETA Calculation", ETD))
                     else
                         Validate("Calculated ETA Date", 0D);
             end;

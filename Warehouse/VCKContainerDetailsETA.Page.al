@@ -62,6 +62,7 @@ Page 50164 "VCK Container Details ETA"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Calculated ETA Date';
+                    Visible = CalETAVisible;
                 }
             }
         }
@@ -115,12 +116,17 @@ Page 50164 "VCK Container Details ETA"
             CurrPage.Editable := true;
 
         SetActions;
+        if ZGT.IsZComCompany() then
+            CalETAVisible := true
+        else
+            CalETAVisible := false;
     end;
 
     var
         Text001: label 'Do you want to archive %1 line(s)?';
         ZGT: Codeunit "ZyXEL General Tools";
         CreateVCKInboundVisible: Boolean;
+        CalETAVisible: Boolean;
         Text002: label 'You are not allowed to modify lines received after 25-01-19.';
         Text003: label 'The data has been received from electronically.\Are you sure you want to change the line?';
 

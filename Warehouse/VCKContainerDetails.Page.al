@@ -245,7 +245,7 @@ Page 50101 "VCK Container Details"
                 field("Calculated ETA Date"; Rec."Calculated ETA Date") //08-09-2025 BK #525482
                 {
                     ApplicationArea = Basic, Suite;
-                    Visible = false;
+                    Visible = CalETAVisible;
                     Caption = 'Calculated ETA Date';
                     ToolTip = 'Calculated ETA Date is the ETA date calculated based on ETD and expected shipping days.';
                 }
@@ -455,10 +455,17 @@ Page 50101 "VCK Container Details"
             CurrPage.Editable := true;
 
         SetActions();
+
+        if ZGT.IsZComCompany() then
+            CalETAVisible := true
+        else
+            CalETAVisible := false;
     end;
 
     var
+        ZGT: Codeunit "ZyXEL General Tools";
         CreateVCKInboundVisible: Boolean;
+        CalETAVisible: Boolean;
         Text001: label 'Do you want to archive %1 line(s)?';
         Text002: label 'You are not allowed to modify lines received after 25-01-19.';
         Text003: label 'The data has been received from electronically.\Are you sure you want to change the line?';
