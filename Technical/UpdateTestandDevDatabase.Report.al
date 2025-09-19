@@ -8,7 +8,6 @@ report 50006 "Update Test and Dev. Database"
 
     trigger OnPreReport()
     begin
-        //Codeunit.Run(Codeunit::"Update Test and Dev. Database");
         RunUpdate();
         CurrReport.Quit();
     end;
@@ -86,36 +85,8 @@ report 50006 "Update Test and Dev. Database"
                             WebServSetup.Modify();
                         until WebServSetup.Next() = 0;
                 until Comp.Next() = 0;
+
+
             end;
-
-        /*        // Set alle job queue entries to "On Hold".
-                JobQueueEntry.ChangeCompany(ZGT.GetRHQCompanyName);
-                JobQueueEntry.ModifyAll(Status, JobQueueEntry.Status::"On Hold");
-                JobQueueEntry.ChangeCompany(ZGT.GetSistersCompanyName(1));
-                JobQueueEntry.ModifyAll(Status, JobQueueEntry.Status::"On Hold");
-
-                // CRM Connection
-                CRMConnectionSetup.ChangeCompany(ZGT.GetRHQCompanyName);
-                CRMConnectionSetup.ModifyAll("Is Enabled", false);
-                CRMConnectionSetup.ChangeCompany(ZGT.GetSistersCompanyName(1));
-                CRMConnectionSetup.ModifyAll("Is Enabled", false);
-
-                // Update - Send orders to EShop
-                recPurchSetup.ChangeCompany(ZGT.GetRHQCompanyName());
-                recPurchSetup.Get;
-                recPurchSetup."Send Orders To EShop" := false;
-                recPurchSetup.Modify;
-                recPurchSetup.ChangeCompany(ZGT.GetSistersCompanyName(1));
-                recPurchSetup.Get;
-                recPurchSetup."Send Orders To EShop" := false;
-                recPurchSetup.Modify;
-
-                // Update FTP Folders
-                recFTPFolder.ChangeCompany(ZGT.GetRHQCompanyName);
-                recFTPFolder.SetRange("Server Environment", recFTPFolder."server environment"::Production);
-                recFTPFolder.ModifyAll(Active, false);
-                recFTPFolder.ChangeCompany(ZGT.GetSistersCompanyName(1));
-                recFTPFolder.SetRange("Server Environment", recFTPFolder."server environment"::Production);
-                recFTPFolder.ModifyAll(Active, false);*/
     end;
 }

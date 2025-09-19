@@ -94,11 +94,10 @@ Page 50164 "VCK Container Details ETA"
 
     trigger OnAfterGetRecord()
     begin
-        //>> 15-10-21 ZY-LD 005
+
         Rec.CalcFields(Rec."Quantity Received", Rec."Direct Unit Cost");
         Rec."Calculated Quantity" := Rec.Quantity - Rec."Quantity Received";
         Rec.Amount := Rec."Calculated Quantity" * Rec."Direct Unit Cost";
-        //<< 15-10-21 ZY-LD 005
     end;
 
     trigger OnModifyRecord(): Boolean
@@ -130,42 +129,6 @@ Page 50164 "VCK Container Details ETA"
         Text002: label 'You are not allowed to modify lines received after 25-01-19.';
         Text003: label 'The data has been received from electronically.\Are you sure you want to change the line?';
 
-    local procedure CreateVCKInbound()
-    var
-        recContDetail: Record "VCK Shipping Detail";
-        ZyVCKPostMgt: Codeunit "Zyxel VCK Post Management";
-        lText001: label 'Do you want to create VCK Post Line?';
-    begin
-        //>> 14-12-18 ZY-LD 002
-        // IF CONFIRM(lText001) THEN BEGIN
-        //  CurrPage.SETSELECTIONFILTER(recContDetail);
-        //  IF recContDetail.FINDSET THEN BEGIN
-        //    ZGT.OpenProgressWindow('',COUNT);
-        //    REPEAT
-        //      ZGT.UpdateProgressWindow("Purchase Order No.",0,TRUE);
-        //
-        //      recVCKPostLine.SETRANGE(Date,TODAY);
-        //      recVCKPostLine.SETRANGE("Order No.",recContDetail."Purchase Order No.");
-        //      recVCKPostLine.SETRANGE("Line No.",recContDetail."Purchase Order Line No.");
-        //      recVCKPostLine.SETRANGE("Invoice No.",recContDetail."Invoice No.");
-        //      recVCKPostLine.SETRANGE(Posted,FALSE);
-        //      IF recVCKPostLine.FINDFIRST THEN BEGIN
-        //        recVCKPostLine.Quantity += recContDetail.Quantity;
-        //        recVCKPostLine.MODIFY;
-        //      END ELSE BEGIN
-        //        recVCKPostLine.Date := TODAY;
-        //        recVCKPostLine."Order No." := recContDetail."Purchase Order No.";
-        //        recVCKPostLine."Line No." := recContDetail."Purchase Order Line No.";
-        //        recVCKPostLine."Invoice No." := recContDetail."Invoice No.";
-        //        recVCKPostLine.Quantity := recContDetail.Quantity;
-        //        recVCKPostLine.INSERT;
-        //      END;
-        //    UNTIL recContDetail.Next() = 0;
-        //    ZGT.CloseProgressWindow;
-        //  END;
-        // END;
-        //<< 14-12-18 ZY-LD 002
-    end;
 
     local procedure SetActions()
     var
@@ -181,4 +144,5 @@ Page 50164 "VCK Container Details ETA"
         recContDetail.SetRange("Batch No.", Rec."Batch No.");
         Report.RunModal(Report::"Container Details", true, true, recContDetail);
     end;
+
 }

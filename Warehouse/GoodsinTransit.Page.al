@@ -147,7 +147,6 @@ Page 50109 "Goods in Transit"
         Rec."Calculated Quantity" := Rec.Quantity - Rec."Quantity Received";
         Rec.Amount := Rec."Calculated Quantity" * Rec."Direct Unit Cost";
 
-
     end;
 
     trigger OnOpenPage()

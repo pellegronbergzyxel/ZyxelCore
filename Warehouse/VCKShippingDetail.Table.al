@@ -88,12 +88,15 @@ Table 50046 "VCK Shipping Detail"
             var
                 ZGT: Codeunit "Zyxel General Tools";
                 WarehouseSetup: Record "Warehouse Setup";
+                ShipmentMethodrec: Record "Shipment Method";
+
             begin
                 if zgt.IsZComCompany() then
-                    If (ETD <> 0D) and (WarehouseSetup.get()) and (format(WarehouseSetup."Calculated ETA Calculation") <> '') THEN
-                        Validate("Calculated ETA Date", CALCDATE(WarehouseSetup."Calculated ETA Calculation", ETD))
-                    else
-                        Validate("Calculated ETA Date", 0D);
+                    if ShipmentMethodrec.get(rec."Shipping Method") then
+                        If Format(ShipmentMethodrec."Shipping Days") <> '' THEN
+                            If ETD <> 0D THEN
+                                Validate("Calculated ETA Date", CALCDATE(ShipmentMethodrec."Shipping Days", ETD))
+
             end;
         }
         field(10; "Shipping Method"; Code[30])
@@ -357,12 +360,13 @@ Table 50046 "VCK Shipping Detail"
             var
                 ZGT: Codeunit "Zyxel General Tools";
                 ShipmentMethodrec: Record "Shipment Method";
+                warehouseSetup: Record "Warehouse Setup";
             begin
                 if zgt.IsZComCompany() then
-                    if ShipmentMethodrec.get(rec."Shipping Method") then
-                        If Format(ShipmentMethodrec."Shipping Days") <> '' THEN
+                    if warehouseSetup.get() then
+                        If Format(warehouseSetup."Expected Receipt Calculation") <> '' THEN
                             If "Calculated ETA Date" <> 0D THEN
-                                Validate("Expected Receipt Date", CALCDATE(ShipmentMethodrec."Shipping Days", "Calculated ETA Date"))
+                                Validate("Expected Receipt Date", CALCDATE(warehouseSetup."Expected Receipt Calculation", "Calculated ETA Date"))
             end;
         }
     }

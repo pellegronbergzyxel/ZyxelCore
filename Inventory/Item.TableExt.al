@@ -1,55 +1,5 @@
 tableextension 50114 ItemZX extends Item
 {
-    // 001. 12-12-17 ZY-LD New field "EMS License".
-    // 002. 08-03-18 ZY-LD 2018022810000231 - Category Code has moved into new fields. Caption has been changed to field name.
-    // 003. 14-03-18 ZY-LD 2018031310000276 - "Is EiCard is added to dropdown.
-    // 004. 09-04-18 ZY-LD 2018032210000151 - New field. 
-    // 005. 15-06-18 ZY-LD 000 - Count entries pr. country.
-    // 006. 17-08-18 ZY-LD 2018081710000054 - New field.
-    // 007. 25-09-18 ZY-LD 2018092510000144 - New option on "Warranty Period" = SP RMA.
-    // 008. 15-11-18 ZY-LD 000 - New field.
-    // 009. 29-11-18 ZY-LD 000 - Filter changed on "Country/Region Exists".
-    // 010. 13-12-18 ZY-LD 2018121310000115 - MDM and SCM is extended from 20 to 30 characters.
-    // 011. 16-01-19 ZY-LD 2019011610000085 - An Item can't be both B2B and B2C.
-    // 012. 11-02-19 ZY-LD 2019021110000136 - Caption added to "PP-Product CAT".
-    // 013. 11-03-19 PAB 2019031110000161 - New Fields Added
-    // 014. 27-05-19 ZY-LD 
-    // 015. 05-07-19 ZY-LD P0213 Calculate available stock.
-    // 016. 09-08-19 ZY-LD 2019080810000097 - New field.
-    // 017. 13-09-19 ZY-LD 000 - Option "Blocked" is added to Status.
-    // 018. 16-10-19 ZY-LD 000 - New field "SBU Company".
-    // 019. 23-10-19 ZY-LD 2019102210000109 - Deduct "Trans. Ord. Shipment (Qty.)" from Avaliable Stock.
-    // 020. 10-01-20 ZY-LD 2020011010000039 - "Qty. on Reciept Lines" has not been used for a long time. It had a filter, so it got active from 01-01-20. Field is deactivated.
-    // 021. 14-01-19 ZY-LD 000 - New field - Battery Certificate, and Rework is added as a Status.
-    // 022. 17-02-20 ZY-LD 000 - New fields.
-    // 023. 19-02-20 ZY-LD 000 - New fields.
-    // 024. 04-03-20 ZY-LD 000 - German language on table and selected fields.
-    // 025. 22-04-20 ZY-LD 2020042210000038 - "Order Type" and location code is added as filter on "Qty. on Shipping Detail" and "HQ Unshipped Quantity".
-    // 026. 06-08-20 ZY-LD 2020072910000047 - New option is added to Warrenty period.
-    // 027. 21-09-20 ZY-LD P0476 - New fields.
-    // 028. 06-10-20 ZY-LD 000 - New field used on the report Aged Stock.
-    // 029. 07-10-20 ZY-LD 000 - New field. "Business to" is replacing B2B and B2C.
-    // 030. 29-12-20 ZY-LD P0499 - New field.
-    // 031. 05-01-20 ZY-LD 000 - New field. Substances of Concern In articles as such or in complex objects (Products).
-    // 032. 24-02-21 ZY-LD 2021022310000136 - Customer Filter is added to "Sales (Qty)".
-    // 033. 22-04-21 ZY-LD 2021020910000118 - New field.
-    // 034. 05-07-21 ZY-LD 2021070210000247 - New field.
-    // 035. 24-08-21 ZY-LD 2021082410000071 - New fields.
-    // 036. 27-04-21 ZY-LD 2021042310000105 - "Identifier Code" is extended from 20 to 30 characters, so we can handle larger numbers from Amazon.
-    // 037. 28-10-21 ZY-LD 000 - 
-    // 038. 25-11-21 ZY-LD 2021112510000071 - New field.
-    // 039. 02-03-22 ZY-LD 2022030210000038 - New field.
-    // 040. 15-03-22 ZY-LD 000 - New field.
-    // 041. 12-04-22 ZY-LD P0747 - New field to calculate cost amount without freight cost. The filter is added to "Cost Amount (Expected)", "Cost Amount (Actual)" and "Cost Posted to G/L".
-    // 042. 18-05-22 ZY-LD 2022011110000088 - New field.
-    // 043. 03-06-22 ZY-LD 2022060310000049 - Get the filter from function.
-    // 044. 02-11-22 ZY-LD 000 - On request from Taiwan (John).
-    // 045. 23-02-22 ZY-LD 000 - New field.
-    // 046. 24-03-23 ZY-LD #4608164 - Only one rework item can be updated from PLMS. If there are more than one we can setup the update.
-    // 047. 17-05-23 ZY-LD New fields.
-    // 048. 25-10-23 ZY-LD 000 - New field.
-    // 049. 18-04-24 ZY-LD 000 - SCIP No. has been moved to a subtable, because there can be more than one number.
-
     fields
     {
         modify("Gross Weight")
@@ -1379,6 +1329,12 @@ tableextension 50114 ItemZX extends Item
             FieldClass = Normal;
             OptionCaption = ' ,ZCom HQ,ZNet HQ';
             OptionMembers = " ","ZCom HQ","ZNet HQ";
+        }
+        field(62532; NonInventoryPostingGroup; Code[20]) //17-09-2025 BK #506594
+        {
+            Caption = 'Non-Inventory Posting Group';
+            Description = 'ZY2.1';
+            TableRelation = "Inventory Posting Group";
         }
     }
 
