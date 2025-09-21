@@ -1,1 +1,1 @@
-﻿{"Added":[],"Modified":[{"Id":50006,"Kind":13,"Name":"Update Test and Dev. Database","Namespace":""},{"Id":50096,"Kind":13,"Name":"VAT Report For BCIT","Namespace":""},{"Id":50085,"Kind":11,"Name":"General Ledger Event","Namespace":""},{"Id":50048,"Kind":11,"Name":"Intercompany Events","Namespace":""}],"Removed":[]}
+﻿{"Added":[],"Modified":[{"Id":50085,"Kind":11,"Name":"General Ledger Event","Namespace":""},{"Id":50048,"Kind":11,"Name":"Intercompany Events","Namespace":""}],"Removed":[]}

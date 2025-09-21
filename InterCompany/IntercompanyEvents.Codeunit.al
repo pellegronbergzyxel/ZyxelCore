@@ -560,8 +560,8 @@ codeunit 50048 "Intercompany Events"
         if (PurchaseLine."Document Type" in [PurchaseLine."Document Type"::Invoice, PurchaseLine."Document Type"::"Credit Memo"]) then begin
             PurchaseLine.Validate("Location Code", ICInboxPurchaseLine."Location Code");
             PurchaseLine."Return Reason Code" := ICInboxPurchaseLine."Return Reason Code";
-            IF NOT vend."Sample Vendor" then //17-09-2025 BK #528766
-                PurchaseLine."Gen. Prod. Posting Group" := ICInboxPurchaseLine."Gen. Prod. Posting Group";
+            //IF NOT vend."Sample Vendor" then //17-09-2025 BK #528766
+            PurchaseLine."Gen. Prod. Posting Group" := ICInboxPurchaseLine."Gen. Prod. Posting Group";
             if ICInboxPurchaseLine."VAT Prod. Posting Group" <> '' then
                 PurchaseLine.Validate("VAT Prod. Posting Group", ICInboxPurchaseLine."VAT Prod. Posting Group");
         end;
@@ -699,6 +699,7 @@ codeunit 50048 "Intercompany Events"
                     SalesLine.Description := PurchLine.Description;
                     SalesLine."Description 2" := PurchLine."Description 2";
                 end;
+
                 if (SalesLine."Document Type" in [SalesLine."Document Type"::Invoice, SalesLine."Document Type"::"Credit Memo"]) then begin
                     SalesLine.Validate("Location Code", PurchLine."Location Code");
                     SalesLine."Return Reason Code" := PurchLine."Return Reason Code";
