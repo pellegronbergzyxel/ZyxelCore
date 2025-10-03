@@ -203,6 +203,8 @@ XmlPort 50069 "WS Container Detail"
                 "VCK Shipping Detail".Quantity := recPurchLine.Quantity;
                 "VCK Shipping Detail".ETA := recPurchLine.ETA;
                 "VCK Shipping Detail".ETD := recPurchLine."ETD Date";
+                if ZGT.IsZComCompany() then
+                    "VCK Shipping Detail".Validate(ETD); //26-09-2025 BK #525482
                 if "VCK Shipping Detail".ETD = 0D then
                     "VCK Shipping Detail".ETD := "VCK Shipping Detail".ETA;
                 "VCK Shipping Detail"."Order No." := recPurchLine."Document No.";
