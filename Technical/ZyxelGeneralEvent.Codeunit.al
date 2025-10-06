@@ -302,7 +302,7 @@ codeunit 50087 "Zyxel General Event"
     end;
 
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Change Log Management", 'OnBeforeInsertChangeLogEntry', '', false, false)]
+    /*[EventSubscriber(ObjectType::Codeunit, Codeunit::"Change Log Management", 'OnBeforeInsertChangeLogEntry', '', false, false)]
     local procedure ChangeLogManagement_OnBeforeInsertChangeLogEntry(var ChangeLogEntry: Record "Change Log Entry"; AlwaysLog: Boolean; var Handled: Boolean)
     var
         SI: Codeunit "Single Instance";
@@ -314,7 +314,8 @@ codeunit 50087 "Zyxel General Event"
         if TempChangeLogSetupTable2."Omit Modify on Creation Day" then
             if OmitModification(ChangeLogEntry."Table No.", SI.GetRecordRef()) then
                 Handled := true;
-    end;
+    end; 
+    */
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Change Log Management", 'OnBeforeLogInsertion', '', false, false)]
     local procedure ChangeLogManagement_OnBeforeLogInsertion(var RecRef: RecordRef)
