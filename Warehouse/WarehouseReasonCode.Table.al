@@ -1,4 +1,4 @@
-Table 50025 "Warehouse Reason Code"
+Table 50025 "Warehouse Reason Code ZY"
 {
     Caption = 'Warehouse Reason Code';
     DataCaptionFields = "Code", Description;

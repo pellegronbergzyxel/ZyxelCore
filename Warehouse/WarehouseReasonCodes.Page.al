@@ -3,7 +3,7 @@ Page 50156 "Warehouse Reason Codes"
     ApplicationArea = Basic, Suite;
     Caption = 'Warehouse Reason Codes';
     PageType = List;
-    SourceTable = "Warehouse Reason Code";
+    SourceTable = "Warehouse Reason Code ZY";
     UsageCategory = Administration;
 
     layout

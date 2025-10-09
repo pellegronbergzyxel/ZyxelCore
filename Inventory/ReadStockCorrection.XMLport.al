@@ -44,7 +44,7 @@ XmlPort 50061 "Read Stock Correction"
 
                 trigger OnAfterAssignField()
                 var
-                    recWhseReason: Record "Warehouse Reason Code";
+                    recWhseReason: Record "Warehouse Reason Code ZY";
                 begin
                     if recWhseReason.Get("Whse. Stock Corr. Led. Entry"."Reason Code") then begin
                         recWhseReason.Code := "Whse. Stock Corr. Led. Entry"."Reason Code";
