@@ -705,7 +705,6 @@ codeunit 50055 AmazonHelper
         SalesRecord.setrange("Document Type", SalesRecord."Document Type"::Order);
         SalesRecord.setrange(AmazonePoNo, Amazonorder);
         SalesRecord.setrange(AmazonSellpartyid, Partyid);
-        //SalesRecord.setrange("Sell-to Customer No.", customerno);
         if SalesRecord.findset then begin
             if SalesRecord.status = SalesRecord.status::Released Then begin
                 exit(false); // NOT UPDATES
@@ -732,14 +731,12 @@ codeunit 50055 AmazonHelper
             if SalesRecord."Location Code" = '' then
                 SalesRecord."Location Code" := 'VCK ZNET';
             // Flyt til setup <<
-            //SalesRecord."eCommerce Order" := true;
             SalesRecord.validate("Sell-to Customer No.", sellcustomerno);
             SalesRecord.validate("Bill-to Customer No.", billcustomerno);
             SalesRecord.Validate(AmazonSellpartyid, Partyid);
             SalesRecord.Validate("Your Reference", Amazonorder);
             SalesRecord."Posting Date" := Today;
             SalesRecord.validate("Requested delivery Date", Today);
-
             SalesRecord.Modify(true);
             exit(true);
         end;
@@ -753,7 +750,6 @@ codeunit 50055 AmazonHelper
         Cust: record customer;
     begin
         Cust.get(custno);
-        //Cust.get(cust."SeBill-to Customer No.");
         exit(cust."VAT Registration No.")
 
     end;
@@ -1120,7 +1116,6 @@ codeunit 50055 AmazonHelper
                     fileName := StrSubstNo('Amazon__%1_.txt', format(responseMessage.HttpStatusCode()));
                     File.DownloadFromStream(inStr, 'Export', '', '', fileName);
                 end;
-                // ResponseString := content;
                 exit(true);
 
             end;
@@ -1211,6 +1206,74 @@ codeunit 50055 AmazonHelper
         EXIT(FALSE);
 
     end;
+
+
+    procedure getrestrictedDataToken(NordiskPartyid: code[10]; rMethod: text; rpath: text; rdataElements: list of [text]; var rToken: text): Boolean
+    var
+
+        Amazsetup: record "amazon Setup";
+        Httpcontent: HttpContent;
+        contentHeaders: HttpHeaders;
+        request: HttpRequestMessage;
+        responseMessage: HttpResponseMessage;
+        httpResponse: HttpResponseMessage;
+        httpcontents: HttpContent;
+        client: HttpClient;
+        content: Text;
+        url: Text;
+        token: JsonToken;
+        token2: JsonToken;
+        JSonArray: JsonArray;
+        tiPartNumber: text;
+        quantity: Decimal;
+        newtoken: text;
+        // test
+        TempBlob: Codeunit "Temp Blob";
+        outStr: OutStream;
+        inStr: InStream;
+        filename: text;
+        temptext: text;
+
+    begin
+        Amazsetup.get(NordiskPartyid);
+        temptext := makeJsonPayloadrestrictedDataToken(NordiskPartyid, rMethod, rpath, rdataElements);
+        IF GetnewToken(newtoken, Amazsetup.code) then begin
+            httpcontent.writefrom(temptext);
+            httpcontent.GetHeaders(contentHeaders);
+            contentHeaders.Add('x-amz-access-token', newtoken);
+            contentHeaders.Remove('Content-Type');
+            contentHeaders.Add('Content-Type', 'application/json');
+            if not (client.post(Amazsetup.URL_Get_RCT, HttpContent, httpResponse)) then
+                Message('Url not working: ' + Amazsetup.URL_Set_AKN);
+
+            if not (httpResponse.IsSuccessStatusCode()) then begin
+                httpcontents := httpResponse.Content();
+                httpcontents.ReadAs(content);
+
+                Message('Status code: %1\Description: %2, (%3) \%4 \%5\%6', responseMessage.HttpStatusCode(), responseMessage.ReasonPhrase(), content, newtoken);
+                exit(false);
+            end;
+
+            responseMessage.Content().ReadAs(content);
+
+            // Save the data of the InStream as a file.
+            if Amazsetup.testmode and GuiAllowed then begin
+                TempBlob.CreateOutStream(outStr, TextEncoding::UTF8);
+                httpcontents := httpResponse.Content();
+                httpcontents.ReadAs(content);
+                outStr.WriteText(content + ' ' + newtoken + ' ' + temptext);
+                TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
+                fileName := StrSubstNo('Amazon__%1_.txt', format(responseMessage.HttpStatusCode()));
+                File.DownloadFromStream(inStr, 'Export', '', '', fileName);
+            end;
+            // ResponseString := content;
+            exit(true);
+
+        end;
+
+
+    end;
+
 
     Procedure makeJsonPayloadAcknowledgement(SO: record "Sales header"; NordiskPartyid: code[10]): text
     var
@@ -1322,6 +1385,58 @@ codeunit 50055 AmazonHelper
         // Save the data of the InStream as a file.
         if Amazsetup.testmode and GuiAllowed then begin
             fileName := 'Amaz_Acknowledge_message.txt';
+            File.DownloadFromStream(inStr, 'Export', '', '', fileName);
+        end;
+
+        exit(totextvar);
+
+    end;
+
+    Procedure makeJsonPayloadrestrictedDataToken(NordiskPartyid: code[10]; rMethod: text; rpath: text; rdataElements: list of [text]): text
+    var
+        Amazsetup: Record "Amazon Setup";
+        Payload: JsonObject;
+        restrictedResourcesArray: JsonArray;
+        restrictedResources: JsonObject;
+        TempBlob: Codeunit "Temp Blob";
+        sellingParty: JsonObject;
+        order: JsonObject;
+        partyId: JsonObject;
+        itemAcknowledgements: JsonObject;
+        dataElements: JsonArray;
+
+        outStr: OutStream;
+        inStr: InStream;
+        tdataElements: text;
+        TempFile: File;
+        fileName: Text;
+        totextvar: text;
+        itemrec: record item;
+        Counter: integer;
+        x: integer;
+    begin
+        Amazsetup.get(NordiskPartyid);
+        restrictedResources.add('method', rMethod);
+        restrictedResources.add('path', rpath);
+        for x := 1 to rdataElements.Count() do
+            dataElements.Add(rdataElements.Get(x));
+        restrictedResources.add('dataElements', dataElements);
+        restrictedResourcesarray.add(restrictedResources);
+        clear(restrictedResources);
+        order.add('targetApplication', Amazsetup.applicationID);
+        order.add('restrictedResources', restrictedResourcesarray);
+        order.WriteTo(totextvar);
+
+        // Create an outStream from the Blob, notice the encoding.
+        TempBlob.CreateOutStream(outStr, TextEncoding::UTF8);
+
+        // From the same Blob, that now contains the XML document, create an inStr
+        order.WriteTo(outStr);
+        TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
+
+        // Save the data of the InStream as a file.
+        if Amazsetup.testmode and GuiAllowed then begin
+            fileName := 'restrictedResources_message.txt';
             File.DownloadFromStream(inStr, 'Export', '', '', fileName);
         end;
 
