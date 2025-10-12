@@ -302,53 +302,6 @@ codeunit 50087 "Zyxel General Event"
     end;
 
 
-<<<<<<< HEAD
-    // V26 >>
-    // [EventSubscriber(ObjectType::Codeunit, Codeunit::"Change Log Management", 'OnBeforeInsertChangeLogEntry', '', false, false)]
-    // local procedure ChangeLogManagement_OnBeforeInsertChangeLogEntry(var ChangeLogEntry: Record "Change Log Entry"; AlwaysLog: Boolean; var Handled: Boolean)
-    // var
-    //     SI: Codeunit "Single Instance";
-    // begin
-    //     //>> 24-04-18 ZY-LD 002
-    //     if SI.GetRecordRef().CurrentCompany <> CompanyName then
-    //         exit;
-    //     if SI.RejectChangeLog then
-    //         exit;
-    //     //<< 24-04-18 ZY-LD 002
-
-    //     //>> 08-09-17 001 ZY-LD
-    //     if (ChangeLogEntry."Table No." = Database::Customer) and (ChangeLogEntry."Field No." in [55026, 55028, 54]) or
-    //        (ChangeLogEntry."Table No." = Database::"G/L Account") and (ChangeLogEntry."Field No." in [26]) or
-    //        (ChangeLogEntry."Table No." = Database::Item) and (ChangeLogEntry."Field No." in [30, 62, 55008, 55014, 55015, 55016, 55017]) or
-    //        (ChangeLogEntry."Table No." = Database::Vendor) and (ChangeLogEntry."Field No." in [54])
-    //     then
-    //         Handled := true;
-    //     //<< 08-09-17 001 ZY-LD
-
-    //     //>> 08-09-17 ZY-LD 001
-    //     if TempChangeLogSetupTable2."Omit Modify on Creation Day" then
-    //         if OmitModification(ChangeLogEntry."Table No.", SI.GetRecordRef()) then
-    //             Handled := true;
-    //     //<< 08-09-17 ZY-LD 001
-    // end;
-    // V26<<
-=======
-    /*[EventSubscriber(ObjectType::Codeunit, Codeunit::"Change Log Management", 'OnBeforeInsertChangeLogEntry', '', false, false)]
-    local procedure ChangeLogManagement_OnBeforeInsertChangeLogEntry(var ChangeLogEntry: Record "Change Log Entry"; AlwaysLog: Boolean; var Handled: Boolean)
-    var
-        SI: Codeunit "Single Instance";
-    begin
-        if SI.GetRecordRef().CurrentCompany() <> CompanyName() then
-            exit;
-        if SI.RejectChangeLog() then
-            exit;
-        if TempChangeLogSetupTable2."Omit Modify on Creation Day" then
-            if OmitModification(ChangeLogEntry."Table No.", SI.GetRecordRef()) then
-                Handled := true;
-    end; 
-    */
->>>>>>> 111787a2f0c658073ec47c92c11d15db5a9839d3
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Change Log Management", 'OnBeforeLogInsertion', '', false, false)]
     local procedure ChangeLogManagement_OnBeforeLogInsertion(var RecRef: RecordRef)
     var
