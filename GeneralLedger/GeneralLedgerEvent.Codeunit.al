@@ -1,24 +1,5 @@
 codeunit 50085 "General Ledger Event"
 {
-    // 001. 01-08-18 ZY-LD 000 - Created.
-    // 002. 15-08-18 ZY-LD 000 - RHQ G/L Account No. must be filled in Turkey.
-    // 003. 24-09-18 ZY-LD 000 - If sales price is modified we want the sales price to be replicated again.
-    // 004. 30-10-18 ZY-LD 2018102910000171 - Set "Global Dimension No." on "Dimension Value".
-    // 005. 13-11-19 ZY-LD 000 - Update RHQ Name.
-    // 006. 05-08-20 ZY-LD P0456 - Update Travel Expense.
-    // 007. 12-08-20 ZY-LD P0454 - Reset replication when modified.
-    // 008. 17-11-20 ZY-LD P0524 - OnBeforeCheckGenJnlLine.
-    // 009. 02-12-20 ZY-LD 2020113010000072 - Find Customer and Vendor Name for VAT Entries.
-    // 010. 17-08-21 ZY-LD 000 - If it´s eCommerce, then we have to use the "Ship-to Country/Region Code" to get the correct value on "Value Entry".
-    // 011. 04-11-21 ZY-LD 000 - New fields.
-    // 012. 03-01-24 ZY-LD 012 - Location Code is added to VAT Entries. Ref.: Vojtech.
-    // 013. 11-03-24 ZY-LD 000 - Ship-to Code moved to sale
-    // 014. 11-03-24 ZY-LD 000 - Set mapping of dimensions.
-    // 015. 18-03-24 ZY-LD 000 - We have setup a separate validation of the VAT posting date, in order to be able to post VAT back in time.
-    // 016. 09-04-24 ZY-LD 000 - Ship-to Address was not correct updated. It is now.
-    // 017. 15-04-24 ZY-LD 000 - Standard compare against "Country / Region Code", but we have our warehouse located in Holland.
-    // 018. 06-05-24 ZY-LD 000 - Select e-mail address for reminders.
-    // 019. 29-05-24 ZY-LD 000 - If the "Bill-to Country" and the "Ship-to Country" are the same, the VAT registration No. must be the subsidary "VAT Reg. No.", otherwise it must be the "Ship-to VAT Reg. No.".
 
     Permissions = tabledata "General Ledger Setup" = r;
 
@@ -30,21 +11,18 @@ codeunit 50085 "General Ledger Event"
     var
         recGlAcc: Record "G/L Account";
     begin
-        begin
-            //>> 13-11-19 ZY-LD 005
-            if Rec.Name <> xRec.Name then begin
-                if Rec."No." = Rec."RHQ G/L Account No." then
-                    Rec."RHQ G/L Account Name" := Rec.Name;
 
-                recGlAcc.SetRange("RHQ G/L Account No.", Rec."No.");
-                recGlAcc.SetFilter("No.", '<>%1', Rec."No.");
-                if recGlAcc.FindSet(true) then
-                    repeat
-                        recGlAcc."RHQ G/L Account Name" := Rec.Name;
-                        recGlAcc.Modify();
-                    until recGlAcc.Next() = 0;
-            end;
-            //<< 13-11-19 ZY-LD 005
+        if Rec.Name <> xRec.Name then begin
+            if Rec."No." = Rec."RHQ G/L Account No." then
+                Rec."RHQ G/L Account Name" := copystr(Rec.Name, 1, 50);
+
+            recGlAcc.SetRange("RHQ G/L Account No.", Rec."No.");
+            recGlAcc.SetFilter("No.", '<>%1', Rec."No.");
+            if recGlAcc.FindSet(true) then
+                repeat
+                    recGlAcc."RHQ G/L Account Name" := copystr(Rec.Name, 1, 50);
+                    recGlAcc.Modify();
+                until recGlAcc.Next() = 0;
         end;
     end;
 
@@ -54,13 +32,12 @@ codeunit 50085 "General Ledger Event"
         recGLAcc: Record "G/L Account";
         lText001: Label '"%1" must not be blank on "%2" "%3".';
     begin
-        //>> 15-08-18 ZY-LD 002
-        if ServEnviron.TurkishServer then begin
+        if ServEnviron.TurkishServer() then begin
             recGLAcc.Get(Rec."G/L Account No.");
             if recGLAcc."RHQ G/L Account No." = '' then
                 Error(lText001, recGLAcc.FieldCaption("RHQ G/L Account No."), Rec.FieldCaption(Rec."G/L Account No."), Rec."G/L Account No.");
         end;
-        //<< 15-08-18 ZY-LD 002
+
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Dimension Value", 'OnAfterInsertEvent', '', false, false)]
@@ -69,16 +46,13 @@ codeunit 50085 "General Ledger Event"
         IcDimValue: Record "IC Dimension Value";
         IcDim: Record "IC Dimension";
     begin
-        //>> 30-10-18 ZY-LD 004
+
         begin
-            //>> 11-03-24 ZY-LD 014
             Rec.Validate("Map-to IC Dimension Code", Rec."Dimension Code");
             Rec."Map-to IC Dimension Value Code" := Rec.Code;
-            //<< 11-03-24 ZY-LD 014
             Rec."Global Dimension No." := GetGlobalDimensionNo(Rec);
             Rec.Modify();
 
-            //>> 11-03-24 ZY-LD 014
             if IcDim.get(Rec."Dimension Code") then
                 if not IcDimValue.get(Rec."Dimension Code", Rec.Code) then begin
                     IcDimValue.Init();
@@ -89,20 +63,16 @@ codeunit 50085 "General Ledger Event"
                     IcDimValue."Map-to Dimension Value Code" := Rec.Code;
                     IcDimValue.Insert(true);
                 end;
-            //<< 11-03-24 ZY-LD 014
         end;
-        //<< 30-10-18 ZY-LD 004
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Dimension Value", 'OnAfterModifyEvent', '', false, false)]
     local procedure OnAfterModifyDimensionValue(var Rec: Record "Dimension Value"; var xRec: Record "Dimension Value"; RunTrigger: Boolean)
     begin
-        //>> 30-10-18 ZY-LD 004
         if RunTrigger then begin
             Rec."Global Dimension No." := GetGlobalDimensionNo(Rec);
             Rec.Modify();
         end;
-        //<< 30-10-18 ZY-LD 004
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"General Ledger Setup", 'OnAfterValidateEvent', 'Allow Posting From', false, false)]
@@ -166,40 +136,10 @@ codeunit 50085 "General Ledger Event"
     local procedure OnBeforePrintRecords(var IssuedReminderHeader: Record "Issued Reminder Header"; ShowRequestForm: Boolean; SendAsEmail: Boolean; HideDialog: Boolean; var IsHandled: Boolean)
     var
         Cust: Record Customer;
-
-    // DocumentSendingProfile: Record "Document Sending Profile";
-    // DummyReportSelections: Record "Report Selections";
-    // IssuedReminderHeaderCopy: Record "Issued Reminder Header";
-    // IssuedReminderHeaderToSend: Record "Issued Reminder Header";
-    // ReportDistributionMgt: Codeunit "Report Distribution Management";
-    // SuppresSendDialogQst: Label 'Do you want to suppress send dialog?';
     begin
 
-        //>> 03-08-18 CD-LD 001
-        if Cust.Get(IssuedReminderHeader."Customer No.") and (not Cust."E-Mail Reminder") then begin
+        if Cust.Get(IssuedReminderHeader."Customer No.") and (not Cust."E-Mail Reminder") then
             IsHandled := true;
-        end;
-        //<< 03-08-18 CD-LD 001
-
-        /*if SendAsEmail and IssuedReminderHeader.SendAsEmailCustomer(IssuedReminderHeader."Customer No.") then begin
-            IssuedReminderHeaderCopy.Copy(IssuedReminderHeader);
-            if (not HideDialog) and (IssuedReminderHeaderCopy.Count() > 1) then
-                if Confirm(SuppresSendDialogQst) then
-                    HideDialog := true;
-            if IssuedReminderHeaderCopy.FindSet() then
-                repeat
-                    IssuedReminderHeaderToSend.Copy(IssuedReminderHeaderCopy);
-                    IssuedReminderHeaderToSend.SetRecFilter();
-                    DocumentSendingProfile.TrySendToEMail(
-                      DummyReportSelections.Usage::Reminder.AsInteger(), IssuedReminderHeaderToSend, IssuedReminderHeaderToSend.FieldNo("No."),
-                      ReportDistributionMgt.GetFullDocumentTypeText(IssuedReminderHeader), IssuedReminderHeaderToSend.FieldNo("Customer No."), not HideDialog)
-                until IssuedReminderHeaderCopy.Next() = 0;
-        end else
-            DocumentSendingProfile.TrySendToPrinter(
-              DummyReportSelections.Usage::Reminder.AsInteger(), IssuedReminderHeader,
-              IssuedReminderHeaderToSend.FieldNo("Customer No."), ShowRequestForm);
-
-        IsHandled := true;*/
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Report Selections", 'OnBeforeGetEmailAddress', '', false, false)]
@@ -207,29 +147,12 @@ codeunit 50085 "General Ledger Event"
     var
         CustomRepSelec: Record "Custom Report Selection";
     begin
-        //>> 06-05-24 ZY-LD 018
         // I can not find anywhere the e-mail address is selected from custom report selection on reminders.
         CustomRepSelec.SetRange("Source Type", Database::Customer);
         CustomRepSelec.SetRange("Source No.", CustNo);
         CustomRepSelec.SetRange(Usage, ReportUsage);
         IsHandled := CustomRepSelec.FindFirst();
         EmailAddress := CustomRepSelec."Send To Email";
-        //<< 06-05-24 ZY-LD 018
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"Report Selections", 'OnBeforeGetEmailBodyCustomer', '', false, false)]
-    local procedure OnBeforeGetEmailBodyCustomer(ReportUsage: Integer; RecordVariant: Variant; var TempBodyReportSelections: Record "Report Selections" temporary; CustNo: Code[20]; var CustEmailAddress: Text[250]; var EmailBodyText: Text; var IsHandled: Boolean; var Result: Boolean)
-    var
-        EmailAdd: Record "E-mail address";
-        EmailAddMgt: Codeunit "E-mail Address Management";
-    begin
-        /*if ReportUsage = 15 then begin
-            EmailAdd.SetRange("Document Usage", EmailAdd."Document Usage"::Reminder);
-            if EmailAdd.FindFirst() then
-                EmailBodyText := EmailAddMgt.GetBody(EmailAdd.Code, '', CustNo, EmailAdd."Html Formatted");
-        end;
-        Result := EmailBodyText <> '';
-        IsHandled := Result;*/
     end;
 
     local procedure UpdateUserSetup(var Rec: Record "General Ledger Setup")
@@ -259,15 +182,12 @@ codeunit 50085 "General Ledger Event"
     var
         recGlSetup: Record "General Ledger Setup";
     begin
-        //>> 30-10-18 ZY-LD 004
         begin
             recGlSetup.Get();
-            //>> 20-08-23 ZY-LD 012
             if recGlSetup."Shortcut Dimension 1 Code" = Rec."Dimension Code" then
                 exit(1);
             if recGlSetup."Shortcut Dimension 2 Code" = Rec."Dimension Code" then
                 exit(2);
-            //<< 20-08-23 ZY-LD 012
             if recGlSetup."Shortcut Dimension 3 Code" = Rec."Dimension Code" then
                 exit(3);
             if recGlSetup."Shortcut Dimension 4 Code" = Rec."Dimension Code" then
@@ -281,11 +201,6 @@ codeunit 50085 "General Ledger Event"
             if recGlSetup."Shortcut Dimension 8 Code" = Rec."Dimension Code" then
                 exit(8);
         end;
-        //<< 30-10-18 ZY-LD 004
-    end;
-
-    local procedure ">> Post"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Gen. Jnl.-Check Line", 'OnBeforeRunCheck', '', false, false)]
@@ -293,7 +208,6 @@ codeunit 50085 "General Ledger Event"
     var
         lText001: Label 'If one of the four posting groups are filled, then "Gen. Posting Type" must also be filled. Account No. %9.\\%1: %2\%3: %4\%5: %6\%7: %8.';
     begin
-        //>> 17-11-20 ZY-LD 008
         if GenJournalLine."Account No." <> '' then
             case GenJournalLine."Account Type" of
                 GenJournalLine."account type"::"G/L Account":
@@ -311,34 +225,17 @@ codeunit 50085 "General Ledger Event"
                               GenJournalLine."Account No.");
                     end;
             end;
-        //<< 17-11-20 ZY-LD 008
     end;
-
-    // Event OnBeforeCheckVATDate does not exist in Italy. Event has been moved to MTD in order to run it in EMEA.
-    /*[EventSubscriber(ObjectType::Codeunit, Codeunit::"Gen. Jnl.-Check Line", 'OnBeforeCheckVATDate', '', false, false)]
-    local procedure OnBeforeCheckVATDate()
-    var
-        SI: Codeunit "Single Instance";
-    begin
-        SI.SetChechVATDate(true);  // 18-03-24 ZY-LD 015
-    end;*/
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Gen. Jnl.-Check Line", 'OnAfterDateNoAllowed', '', false, false)]
     local procedure OnAfterDateNoAllowed(PostingDate: Date; var DateIsNotAllowed: Boolean)
     var
         SI: Codeunit "Single Instance";
     begin
-        //>> 18-03-24 ZY-LD 015
-        if SI.GetCheckVATDate then begin
+        if SI.GetCheckVATDate() then begin
             DateIsNotAllowed := not IsVatPostingDateValidWithSetup(PostingDate);
             SI.SetChechVATDate(false);
         end;
-        //<< 18-03-24 ZY-LD 015
-    end;
-
-
-    local procedure ">> Page"()
-    begin
     end;
 
     [EventSubscriber(Objecttype::Page, 39, 'OnDeleteRecordEvent', '', false, false)]
@@ -347,30 +244,22 @@ codeunit 50085 "General Ledger Event"
         recTrvlExpHead: Record "Travel Expense Header";
         recGenJnl: Record "Gen. Journal Line";
     begin
-        begin
-            //>> 05-08-20 ZY-LD 006
-            // If we delete the last journal line, we have to re-open the travel expense.
-            if (Rec."Journal Template Name" = 'GENERAL') and (Rec."Journal Batch Name" = 'TRAVELEXP') then begin
-                recGenJnl.SetRange("Journal Template Name", Rec."Journal Template Name");
-                recGenJnl.SetRange("Journal Batch Name", Rec."Journal Batch Name");
-                recGenJnl.SetRange("Document No.", Rec."Document No.");
-                recGenJnl.SetFilter("Line No.", '<>%1', Rec."Line No.");
-                if not recGenJnl.FindFirst() then begin
-                    recTrvlExpHead.SetRange("G/L Document No.", Rec."Document No.");
-                    if recTrvlExpHead.FindFirst() then begin
-                        recTrvlExpHead."G/L Document No." := '';
-                        recTrvlExpHead."G/L Posting Date" := 0D;
-                        recTrvlExpHead."Document Status" := recTrvlExpHead."document status"::Open;
-                        recTrvlExpHead.Modify();
-                    end;
+        // If we delete the last journal line, we have to re-open the travel expense.
+        if (Rec."Journal Template Name" = 'GENERAL') and (Rec."Journal Batch Name" = 'TRAVELEXP') then begin
+            recGenJnl.SetRange("Journal Template Name", Rec."Journal Template Name");
+            recGenJnl.SetRange("Journal Batch Name", Rec."Journal Batch Name");
+            recGenJnl.SetRange("Document No.", Rec."Document No.");
+            recGenJnl.SetFilter("Line No.", '<>%1', Rec."Line No.");
+            if not recGenJnl.FindFirst() then begin
+                recTrvlExpHead.SetRange("G/L Document No.", Rec."Document No.");
+                if recTrvlExpHead.FindFirst() then begin
+                    recTrvlExpHead."G/L Document No." := '';
+                    recTrvlExpHead."G/L Posting Date" := 0D;
+                    recTrvlExpHead."Document Status" := recTrvlExpHead."document status"::Open;
+                    recTrvlExpHead.Modify();
                 end;
             end;
-            //<< 05-08-20 ZY-LD 006
         end;
-    end;
-
-    local procedure ">> VAT"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"VAT Entry", 'OnBeforeInsertEvent', '', false, false)]
@@ -389,7 +278,7 @@ codeunit 50085 "General Ledger Event"
         with Rec do begin
             "Company Country/Region Code" := "Country/Region Code";
             "VAT Registration No. ZX" := "VAT Registration No.";
-            "VAT Registration No. VIES" := "VAT Registration No.";  // 29-05-24 ZY-LD 019
+            "VAT Registration No. VIES" := "VAT Registration No.";
 
             case Type of
                 Type::Purchase:
@@ -403,14 +292,14 @@ codeunit 50085 "General Ledger Event"
                             "document type"::Invoice:
                                 if recPurchInvHead.Get("Document No.") then begin
                                     "Ship-to Name" := recPurchInvHead."Ship-to Name";
-                                    "Vendor Document No." := recPurchInvHead."Vendor Invoice No.";  // 04-11-21 ZY-LD 011
-                                    "Location Code" := recPurchInvHead."Location Code";  // 03-01-24 ZY-LD 012
+                                    "Vendor Document No." := recPurchInvHead."Vendor Invoice No.";
+                                    "Location Code" := recPurchInvHead."Location Code";
                                 end;
                             "document type"::"Credit Memo":
                                 if recPurchCrMemoHdr.Get("Document No.") then begin
                                     "Ship-to Name" := recPurchCrMemoHdr."Ship-to Name";
-                                    "Vendor Document No." := recPurchCrMemoHdr."Vendor Cr. Memo No.";  // 04-11-21 ZY-LD 011
-                                    "Location Code" := recPurchcrmemohdr."Location Code";  // 03-01-24 ZY-LD 012
+                                    "Vendor Document No." := recPurchCrMemoHdr."Vendor Cr. Memo No.";
+                                    "Location Code" := recPurchcrmemohdr."Location Code";
                                 end;
                         end;
                     end;
@@ -427,19 +316,18 @@ codeunit 50085 "General Ledger Event"
                                     "Company Country/Region Code" := recSalesInvHead."Ship-to Country/Region Code";
                                     "Company VAT Registration No." := recSalesInvHead."Company VAT Registration Code";
                                     "Ship-to Name" := recSalesInvHead."Ship-to Name";
-                                    "Location Code" := recsalesInvHead."Location Code";  // 03-01-24 ZY-LD 012
+                                    "Location Code" := recsalesInvHead."Location Code";
                                     if recSalesInvHead."Ship-to VAT" <> '' then
-                                        "VAT Registration No. ZX" := recSalesInvHead."Ship-to VAT"
+                                        "VAT Registration No. ZX" := copystr(recSalesInvHead."Ship-to VAT", 1, 20)
                                     else
                                         "VAT Registration No. ZX" := recSalesInvHead."VAT Registration No.";
-                                    //>> 29-05-24 ZY-LD 019
+
                                     If (recSalesInvHead."Bill-to Country/Region Code" <> recSalesInvHead."Ship-to Country/Region Code") and
                                        (recSalesInvHead."Ship-to VAT" <> '')
                                      then
-                                        "VAT Registration No. VIES" := recSalesInvHead."Ship-to VAT"
+                                        "VAT Registration No. VIES" := copystr(recSalesInvHead."Ship-to VAT", 1, 20)
                                     else
                                         "VAT Registration No. VIES" := recSalesInvHead."VAT Registration No.";
-                                    //>> 29-05-24 ZY-LD 019
 
                                     if recEcomHead.get(recEcomHead."Transaction Type"::Order, recSalesInvHead."External Document No.", recSalesInvHead."External Invoice No.") then begin
                                         "Ship-from Country/Region Code" := recEcomHead."Ship From Country";
@@ -459,21 +347,19 @@ codeunit 50085 "General Ledger Event"
                                     "Company Country/Region Code" := recsalescrmemohead."sell-to Country/Region Code";
                                     "Company VAT Registration No." := recSalesCrMemoHead."Company VAT Registration Code";
                                     "Ship-to Name" := recSalesCrMemoHead."Ship-to Name";
-                                    "Location Code" := recSalesCrMemoHead."Location Code";  // 03-01-24 ZY-LD 012
+                                    "Location Code" := recSalesCrMemoHead."Location Code";
                                     if recSalesCrMemoHead."Ship-to VAT" <> '' then
-                                        "VAT Registration No. ZX" := recSalesCrMemoHead."Ship-to VAT"
+                                        "VAT Registration No. ZX" := copystr(recSalesCrMemoHead."Ship-to VAT", 1, 20)
                                     else
                                         "VAT Registration No. ZX" := recSalesCrMemoHead."VAT Registration No.";
 
-                                    //>> 29-05-24 ZY-LD 019
                                     If (recSalesCrMemoHead."Bill-to Country/Region Code" <> recSalesCrMemoHead."Rcvd.-from Count./Region Code") and
                                        (recSalesCrMemoHead."Rcvd.-from Count./Region Code" <> '') and
                                        (recSalesCrMemoHead."Ship-to VAT" <> '')
                                      then
-                                        "VAT Registration No. VIES" := recSalesCrMemoHead."Ship-to VAT"
+                                        "VAT Registration No. VIES" := copystr(recSalesCrMemoHead."Ship-to VAT", 1, 20)
                                     else
                                         "VAT Registration No. VIES" := recSalesCrMemoHead."VAT Registration No.";
-                                    //>> 29-05-24 ZY-LD 019
 
                                     if recEcomHead.get(recEcomHead."Transaction Type"::Refund, recSalescrmemoHead."External Document No.", recSalescrmemoHead."External Invoice No.") then begin
                                         "Ship-from Country/Region Code" := recEcomHead."Ship From Country";
@@ -494,32 +380,29 @@ codeunit 50085 "General Ledger Event"
         end;
     end;
 
-    local procedure ">> Posted Documents"()
-    begin
-    end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Invoice Header", 'OnBeforeDeleteEvent', '', false, false)]
     local procedure OnBeforeDeletePostedSalesInvoice(var Rec: Record "Sales Invoice Header"; RunTrigger: Boolean)
     begin
-        ErrorOnDeletePostedDocument;
+        ErrorOnDeletePostedDocument();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Cr.Memo Header", 'OnBeforeDeleteEvent', '', false, false)]
     local procedure OnBeforeDeletePostedSalesCreditMemo(var Rec: Record "Sales Cr.Memo Header"; RunTrigger: Boolean)
     begin
-        ErrorOnDeletePostedDocument;
+        ErrorOnDeletePostedDocument();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Purch. Inv. Header", 'OnBeforeDeleteEvent', '', false, false)]
     local procedure OnBeforeDeletePostedPurchaseInvoice(var Rec: Record "Purch. Inv. Header"; RunTrigger: Boolean)
     begin
-        ErrorOnDeletePostedDocument;
+        ErrorOnDeletePostedDocument();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Purch. Cr. Memo Hdr.", 'OnBeforeDeleteEvent', '', false, false)]
     local procedure OnBeforeDeletePostedPurchaseCreditMemo(var Rec: Record "Purch. Cr. Memo Hdr."; RunTrigger: Boolean)
     begin
-        ErrorOnDeletePostedDocument;
+        ErrorOnDeletePostedDocument();
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"IC Chart of Accounts", 'OnCopyFromChartOfAccountsOnBeforeICGLAccInsert', '', false, false)]
@@ -528,10 +411,8 @@ codeunit 50085 "General Ledger Event"
         ZGT: Codeunit "ZyXEL General Tools";
     begin
         //Remember to change in CopyFromChartOfAccounts on XmlPort 50037 "WS Replicate G/L Account" if new changes are made
-        //>> 04-09-18 ZY-LD 001
-        if ZGT.IsRhq then
+        if ZGT.IsRhq() then
             ICGLAccount."Map-to G/L Acc. No." := ICGLAccount."No.";
-        //<< 04-09-18 ZY-LD 001
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Deferral Utilities", 'OnBeforeUpdateDeferralLineDescription', '', false, false)]
@@ -539,34 +420,34 @@ codeunit 50085 "General Ledger Event"
     var
         DefUtil: Codeunit "Deferral Utilities";
     begin
-        //>> 28-01-20 ZY-LD 001
         case DeferralTemplate."Deferral Line Description" of
             DeferralTemplate."Deferral Line Description"::"Template Period Description":
                 DeferralLine.Description := DefUtil.CreateRecurringDescription(PostDate, DeferralTemplate."Period Description");
             DeferralTemplate."Deferral Line Description"::"Header Schedule Description":
                 DeferralLine.Description := DefUtil.CreateRecurringDescription(PostDate, DeferralHeader."Schedule Description");
         end;
-        //<< 28-01-20 ZY-LD 001
 
     end;
 
     //26-08-25 BK #506594
     //Pretending that non-inventory items are inventory items during posting to G/L
+
     [eventsubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforePostInventoryToGL', '', false, false)]
     local procedure OnBeforePostInventoryToGL(var ValueEntry: Record "Value Entry"; var IsHandled: Boolean; var ItemJnlLine: Record "Item Journal Line"; PostToGL: Boolean; CalledFromAdjustment: Boolean)
     var
-        zgt: Codeunit "ZyXEL General Tools";
         Item: Record Item;
+        zgt: Codeunit "ZyXEL General Tools";
+
 
     begin
-        /*IF zgt.IsZComCompany() THEN
+        IF zgt.IsZComCompany() THEN
             if Item.get(ValueEntry."Item No.") then
-                if Item.type = item.type::"Non-Inventory" then begin
+                if (Item.type = item.type::"Non-Inventory") and (Item.NonInventoryPostingGroup <> '') then begin
                     ValueEntry.Inventoriable := true;
-                    ValueEntry."Inventory Posting Group" := 'NON-INVENTORY';
+                    ValueEntry."Inventory Posting Group" := item.NonInventoryPostingGroup;
                     ValueEntry."Cost Amount (Actual)" := ValueEntry."Cost Amount (Non-Invtbl.)";
                     ValueEntry."Cost Amount (Actual) (ACY)" := ValueEntry."Cost Amount (Non-Invtbl.)(ACY)";
-                end;*/
+                end;
     end;
 
 
@@ -575,20 +456,20 @@ codeunit 50085 "General Ledger Event"
     [eventsubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnAfterPostInventoryToGL', '', false, false)]
     local procedure OnAfterPostInventoryToGL(var ValueEntry: Record "Value Entry")
     var
-        zgt: Codeunit "ZyXEL General Tools";
         Item: Record Item;
+        zgt: Codeunit "ZyXEL General Tools";
+
     begin
-        /*IF zgt.IsZComCompany() THEN
+        IF zgt.IsZComCompany() THEN
             if Item.get(ValueEntry."Item No.") then
-                if Item.type = item.type::"Non-Inventory" then begin
+                if (Item.type = item.type::"Non-Inventory") and (Item.NonInventoryPostingGroup <> '') then Begin
                     ValueEntry.Inventoriable := false;
                     ValueEntry."Inventory Posting Group" := '';
                     ValueEntry."Cost Amount (Actual)" := 0;
                     ValueEntry."Cost Amount (Actual) (ACY)" := 0;
                     ValueEntry."Cost Posted to G/L" := 0;
                     ValueEntry."Cost Posted to G/L (ACY)" := 0;
-
-                end;*/
+                end;
     end;
 
 
@@ -599,13 +480,12 @@ codeunit 50085 "General Ledger Event"
         lText001: Label 'It is not allowed to delete posted documents.';
         lText002: Label 'Are you absolutely sure that you want to delete the document.';
     begin
-        if not ZGT.UserIsDeveloper() then begin
+        if not ZGT.UserIsDeveloper() then
             Error(lText001)
-        end else
+        else
             if not Confirm(lText002) then
                 Error('');
     end;
-
 
     local procedure IsVatPostingDateValidWithSetup(PostingDate: Date) Result: Boolean
     var
@@ -613,8 +493,7 @@ codeunit 50085 "General Ledger Event"
         AllowPostingFrom: Date;
         AllowPostingTo: Date;
     begin
-        //>> 18-03-24 ZY-LD 015
-        GLSetup.Get;
+        GLSetup.Get();
         if (AllowPostingFrom = 0D) and (AllowPostingTo = 0D) then begin
             AllowPostingFrom := GLSetup."Allow VAT Posting From";
             AllowPostingTo := GLSetup."Allow VAT Posting To";
@@ -626,6 +505,5 @@ codeunit 50085 "General Ledger Event"
         if AllowPostingTo = 0D then
             AllowPostingTo := DMY2Date(31, 12, 9999);
         exit(PostingDate in [AllowPostingFrom .. AllowPostingTo]);
-        //<< 18-03-24 ZY-LD 015
     end;
 }

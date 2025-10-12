@@ -1,19 +1,5 @@
 codeunit 50087 "Zyxel General Event"
 {
-    // 004. 06-12-18 ZY-LD 000 - Replicate User Setup.
-    // 005. 13-05-20 ZY-LD P0435 - Run Job Queue Monitor.
-    // 006. 16-10-20 ZY-LD P0500 - Use of Report.
-    // 007. 21-12-20 ZY-LD 000 - When communication with HMRC a security protocol needs to be added.
-    // 008. 09-02-21 ZY-LD 000 - Create User Setup and user personailzation.
-    // 009. 26-02-21 ZY-LD 2021021810000306 - Set "Start Date" on Exchange Rate.
-    // 010. 07-04-21 ZY-LD 000 - Check for negative values in MTD.
-    // 011. 14-04-21 ZY-LD P0559 - Automated replication after update.
-    // 012. 19-04-21 ZY-LD 2021041910000131 - Insert "Inventory Posting Setup" when creating new location.
-    // 013. 18-10-21 ZY-LD 2021101810000032 - It happens from time to time that "Type" doesn´t get transferred to the IC Outbox document. We need to locate the error.
-    // 014. 31-03-22 ZY-LD 000 - Copy TYR from last month automatic.
-    // 015. 01-07-22 ZY-LD 000 - Adjusted Currency Exchange Rate Handling.
-    // 016. 30-09-22 ZY-LD 2022092710000043 - Security Layer must be TLS1.2 to download exchange rates.
-    // 017. 02-04-24 ZY-LD 000 - Customized customer statement.
 
     Permissions = TableData "Use of Report Entry" = rimd,
                   tabledata "Substitute Report" = r;
@@ -25,43 +11,31 @@ codeunit 50087 "Zyxel General Event"
     var
         ZyWebServMgt: Codeunit "Zyxel Web Service Management";
 
-    local procedure "Sales Price"()
-    begin
-    end;
 
     [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnAfterModifyEvent', '', false, false)]
     local procedure OnAfterModifySalesPrice(var Rec: Record "Price List Line"; var xRec: Record "Price List Line"; RunTrigger: Boolean)
     begin
-        //DeleteSalesPriceReplicated(Rec);  // 24-09-18 ZY-LD 003
+
         //We need TO investigate all delete functions first.
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnAfterDeleteEvent', '', false, false)]
     local procedure OnAfterDeleteSalesPrice(var Rec: Record "Price List Line"; RunTrigger: Boolean)
     begin
-        //DeleteSalesPriceReplicated(Rec);  // 24-09-18 ZY-LD 003
+        //DeleteSalesPriceReplicated(Rec);  
     end;
 
     local procedure DeleteSalesPriceReplicated(var Rec: Record "Price List Line")
     var
         recSalesPriceRep: Record "Price List Line Replicated";
     begin
-        //>> 24-09-18 ZY-LD 003
         begin
             recSalesPriceRep.SetRange("Price List Code", Rec."Price List Code");
             recSalesPriceRep.SetRange("Line No.", Rec."Line No.");
             recSalesPriceRep.DeleteAll(true);
         end;
-        //<< 24-09-18 ZY-LD 003
     end;
 
-    local procedure ">> Bank Account"()
-    begin
-    end;
-
-    local procedure ">> User"()
-    begin
-    end;
 
     [EventSubscriber(ObjectType::Table, Database::User, 'OnAfterInsertEvent', '', false, false)]
     local procedure OnAfterInsertUser(var Rec: Record User; RunTrigger: Boolean)
@@ -73,37 +47,30 @@ codeunit 50087 "Zyxel General Event"
         if Rec."User Name" = '' then
             exit;
 
-        //>> 09-02-21 ZY-LD 008
-        if not ZGT.ItalianServer() and not ZGT.TurkishServer() then  // 02-01-24 ZY-LD 017
-            recUserSetup.ChangeCompany(ZGT.GetRHQCompanyName);
+        if not ZGT.ItalianServer() and not ZGT.TurkishServer() then
+            recUserSetup.ChangeCompany(ZGT.GetRHQCompanyName());
         recUserSetup.Validate("User ID", Rec."User Name");
         if not recUserSetup.Insert(true) then;
 
-        if not ZGT.ItalianServer() and not ZGT.TurkishServer() then  // 02-01-24 ZY-LD 017
+        if not ZGT.ItalianServer() and not ZGT.TurkishServer() then
             recUserSetup.ChangeCompany(ZGT.GetSistersCompanyName(1))
         else
-            //>> 02-01-24 ZY-LD 017
+
             if ZGT.ItalianServer() then
                 recUserSetup.ChangeCompany(ZGT.GetSistersCompanyName(14))
             else
                 if ZGT.TurkishServer() then
-                    recUserSetup.ChangeCompany(ZGT.GetSistersCompanyName(15));  //<< 02-01-24 ZY-LD 017
+                    recUserSetup.ChangeCompany(ZGT.GetSistersCompanyName(15));
         if not recUserSetup.Insert(true) then;
 
-        //recUserPer.VALIDATE("User ID","User Name");
         recUserPer.Validate("User SID", Rec."User Security ID");
         if not recUserPer.Insert(true) then;
-        //<< 09-02-21 ZY-LD 008
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"User Setup", 'OnAfterModifyEvent', '', false, false)]
     local procedure OnAfterModifyUserSetup(var Rec: Record "User Setup"; var xRec: Record "User Setup"; RunTrigger: Boolean)
     begin
-        ZyWebServMgt.ReplicateUserSetup(Rec."User ID");  // 06-12-18 ZY-LD 004
-    end;
-
-    local procedure ">> Currency"()
-    begin
+        ZyWebServMgt.ReplicateUserSetup(Rec."User ID");
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Currency Exchange Rate", 'OnBeforeInsertEvent', '', false, false)]
@@ -111,71 +78,30 @@ codeunit 50087 "Zyxel General Event"
     var
         SI: Codeunit "Single Instance";
     begin
-        begin
-            //>> 26-02-21 ZY-LD 009
-            if not Rec.IsTemporary and not SI.GetWebServiceUpdate then
-                if SI.GetDate <> 0D then
-                    Rec."Starting Date" := SI.GetDate;
-            //<< 26-02-21 ZY-LD 009
-        end;
+
+        if not Rec.IsTemporary() and not SI.GetWebServiceUpdate() then
+            if SI.GetDate() <> 0D then
+                Rec."Starting Date" := SI.GetDate();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Currency Exchange Rate", 'OnAfterInsertEvent', '', false, false)]
     local procedure OnAfterInsertCurrencyExchangeRate(var Rec: Record "Currency Exchange Rate"; RunTrigger: Boolean)
     var
         recCurrency: Record Currency;
-        recCurrExchRate: Record "Currency Exchange Rate";
-        recServerEnviron: Record "Server Environment";
         ZGT: Codeunit "ZyXEL General Tools";
         SI: Codeunit "Single Instance";
     begin
-        begin
-            //>> 31-03-22 ZY-LD 014
-            /*//>> 26-02-21 ZY-LD 009
-            IF recCurrency.GET("Currency Code") THEN BEGIN
-              IF NOT recCurrency."Update via Exchange Rate Serv." THEN
-                DELETE(TRUE);
-            END;
-            //<< 26-02-21 ZY-LD 009*/
 
-            //>> 01-07-22 ZY-LD 015
-            if not Rec.IsTemporary then begin
-                if ZGT.IsRhq and ZGT.IsZComCompany then
-                    if SI.GetExchangeRateService then
-                        if recCurrency.Get(Rec."Currency Code") then
-                            if not recCurrency."Update via Exchange Rate Serv." then
-                                Rec.Delete(true);
+        if not Rec.IsTemporary() then begin
+            if ZGT.IsRhq() and ZGT.IsZComCompany() then
+                if SI.GetExchangeRateService() then
+                    if recCurrency.Get(Rec."Currency Code") then
+                        if not recCurrency."Update via Exchange Rate Serv." then
+                            Rec.Delete(true);
 
-                /*IF NOT ISTEMPORARY THEN BEGIN
-                  IF NOT SI.GetWebServiceUpdate THEN
-                    IF ZGT.IsRhq AND ZGT.IsZComCompany THEN
-                      IF SI.GetDate = 0D THEN BEGIN  // During the month
-                        IF recCurrency.GET("Currency Code") THEN
-                          IF NOT recCurrency."Update via Exchange Rate Serv." THEN
-                            DELETE(TRUE);
-                      END ELSE BEGIN  // At end of month
-                        IF recCurrency.GET("Currency Code") THEN
-                          IF recCurrency."Copy Last Months Exch. Rate" THEN BEGIN
-                            recCurrExchRate.SETRANGE("Currency Code","Currency Code");
-                            recCurrExchRate.SETFILTER("Starting Date",'<%1',"Starting Date");
-                            IF recCurrExchRate.FINDLAST THEN BEGIN
-                              "Exchange Rate Amount" := recCurrExchRate."Exchange Rate Amount";
-                              "Adjustment Exch. Rate Amount" := recCurrExchRate."Adjustment Exch. Rate Amount";
-                              Modify(true);
-                            END;
-                          END ELSE
-                            IF NOT recCurrency."Update via Exchange Rate Serv." THEN
-                              DELETE(TRUE);
-                      END;*/
-                //<< 31-03-22 ZY-LD 014
-                //<< 01-07-22 ZY-LD 015
-
-                //>> 12-08-20 ZY-LD 007
-                recCurrency.Get(Rec."Currency Code");
-                recCurrency.Replicated := false;
-                recCurrency.Modify(true);
-                //<< 12-08-20 ZY-LD 007
-            end;
+            recCurrency.Get(Rec."Currency Code");
+            recCurrency.Replicated := false;
+            recCurrency.Modify(true);
         end;
     end;
 
@@ -187,17 +113,15 @@ codeunit 50087 "Zyxel General Event"
         ZGT: Codeunit "ZyXEL General Tools";
         SI: Codeunit "Single Instance";
     begin
-        //>> 01-07-22 ZY-LD 015
-        if not Rec.IsTemporary then
-            if ZGT.IsRhq and ZGT.IsZComCompany then
-                if SI.GetExchangeRateService then
+        if not Rec.IsTemporary() then
+            if ZGT.IsRhq() and ZGT.IsZComCompany() then
+                if SI.GetExchangeRateService() then
                     if recCurrency.Get(Rec."Currency Code") then
                         if not recCurrency."Update via Exchange Rate Serv." then
                             if SI.GetExchangeRateTmp(Rec."Currency Code", recCurrExchRateTmp) then begin
                                 Rec."Exchange Rate Amount" := recCurrExchRateTmp."Exchange Rate Amount";
                                 Rec."Adjustment Exch. Rate Amount" := recCurrExchRateTmp."Adjustment Exch. Rate Amount";
                             end;
-        //<< 01-07-22 ZY-LD 015
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Currency Exchange Rate", 'OnAfterModifyEvent', '', false, false)]
@@ -206,11 +130,9 @@ codeunit 50087 "Zyxel General Event"
         recCurrency: Record Currency;
     begin
         begin
-            //>> 12-08-20 ZY-LD 007
             recCurrency.Get(Rec."Currency Code");
             recCurrency.Replicated := false;
             recCurrency.Modify(true);
-            //<< 12-08-20 ZY-LD 007
         end;
     end;
 
@@ -221,69 +143,14 @@ codeunit 50087 "Zyxel General Event"
         SI: Codeunit "Single Instance";
         DateTimeDialog: Page "Date-Time Dialog";
     begin
-        //>> 26-02-21 ZY-LD 009
         DateTimeDialog.SetDateTime(CreateDatetime(CalcDate('<CM+1D>', Today), 0T));
-        if DateTimeDialog.RunModal = Action::OK then begin
-            SI.SetDate(Dt2Date(DateTimeDialog.GetDateTime));
-            UpdateCurrencyExchangeRates.Run;
+        if DateTimeDialog.RunModal() = Action::OK then begin
+            SI.SetDate(Dt2Date(DateTimeDialog.GetDateTime()));
+            UpdateCurrencyExchangeRates.Run();
             SI.SetDate(0D);
         end;
-        //<< 26-02-21 ZY-LD 009
     end;
 
-    local procedure ">> VAT Registration No. Format"()
-    begin
-    end;
-
-    // [EventSubscriber(ObjectType::Table, Database::"VAT Registration No. Format", 'OnBeforeExitTest', '', false, false)]
-    // local procedure OnBeforeExitTest(VATRegNo: Text[20]; CountryCode: Code[10]; Number: Code[20]; TableID: Option)
-    // begin
-    //     //>> 31-03-21 ZY-LD 010
-    //     case TableID of
-    //         Database::"Concur Vendor":
-    //             CheckConcurVendor(VATRegNo, Number);
-    //     end;
-    //     //<< 31-03-21 ZY-LD 010
-    // end;
-
-    // local procedure CheckConcurVendor(VATRegNo: Text[20]; Number: Code[20])
-    // var
-    //     ConcVend: Record "Concur Vendor";
-    //     Check: Boolean;
-    //     Finish: Boolean;
-    //     t: Text[250];
-    //     lText001: Label 'This VAT registration number has already been entered for the following concur vendors:\ %1';
-    // begin
-    //     //>> 31-03-21 ZY-LD 010
-    //     Check := true;
-    //     t := '';
-    //     ConcVend.SetCurrentkey("VAT Registration No.");
-    //     ConcVend.SetRange("VAT Registration No.", VATRegNo);
-    //     ConcVend.SetFilter("No.", '<>%1', Number);
-    //     if ConcVend.Find('-') then begin
-    //         Check := false;
-    //         Finish := false;
-    //         repeat
-    //             if ConcVend."No." <> Number then
-    //                 if t = '' then
-    //                     t := ConcVend."No."
-    //                 else
-    //                     if StrLen(t) + StrLen(ConcVend."No.") + 5 <= MaxStrLen(t) then
-    //                         t := t + ', ' + ConcVend."No."
-    //                     else begin
-    //                         t := t + '...';
-    //                         Finish := true;
-    //                     end;
-    //         until (ConcVend.Next() = 0) or Finish;
-    //     end;
-    //     if Check = false then
-    //         Message(lText001, t);
-    //     //<< 31-03-21 ZY-LD 010
-    // end;
-
-    local procedure ">> Location"()
-    begin
-    end;
 
     [EventSubscriber(ObjectType::Table, Database::Location, 'OnAfterInsertEvent', '', false, false)]
     local procedure OnAfterInsertLocation(var Rec: Record Location; RunTrigger: Boolean)
@@ -293,11 +160,10 @@ codeunit 50087 "Zyxel General Event"
         recInvPostSetup2: Record "Inventory Posting Setup";
         ItemLogisticEvents: Codeunit "Item / Logistic Events";
     begin
-        //>> 19-04-21 ZY-LD 012
         if RunTrigger then
             if recInvPostGrp.FindFirst() then
                 repeat
-                    recInvPostSetup2.SetRange("Location Code", ItemLogisticEvents.GetMainWarehouseLocation);
+                    recInvPostSetup2.SetRange("Location Code", ItemLogisticEvents.GetMainWarehouseLocation());
                     recInvPostSetup2.SetRange("Invt. Posting Group Code", recInvPostGrp.Code);
                     if recInvPostSetup2.FindFirst() then begin
                         recInvPostSetup := recInvPostSetup2;
@@ -305,47 +171,33 @@ codeunit 50087 "Zyxel General Event"
                         if not recInvPostSetup.Insert(true) then;
                     end;
                 until recInvPostGrp.Next() = 0;
-        //<< 19-04-21 ZY-LD 012
     end;
 
-    local procedure ">> IC Intercompany"()
-    begin
-    end;
 
     [EventSubscriber(ObjectType::Table, Database::"IC Outbox Sales Line", 'OnAfterInsertEvent', '', false, false)]
     local procedure OnAfterInsertICOutboxSalesLine(var Rec: Record "IC Outbox Sales Line"; RunTrigger: Boolean)
     var
         recSalesInvLine: Record "Sales Invoice Line";
-        lText001: Label 'A difference has occured between the %1" on the "%2" and the "%3" on the "%4".\Please advice navsupport@zyxel.eu';
         recGenBusPostGrp: Record "Gen. Business Posting Group";
+
+        lText001: Label 'A difference has occured between the %1" on the "%2" and the "%3" on the "%4".\Please advice navsupport@zyxel.eu';
+
     begin
-        begin
-            //>> 18-10-21 ZY-LD 013
-            if recSalesInvLine.Get(Rec."Document No.", Rec."Line No.") then
-                if recSalesInvLine.Type <> Rec."IC Partner Ref. Type" then
-                    if recGenBusPostGrp.Get(recSalesInvLine."Gen. Bus. Posting Group") and (recGenBusPostGrp."Sample / Test Equipment" = recGenBusPostGrp."sample / test equipment"::" ") then
-                        Error(lText001, recSalesInvLine.FieldCaption(Type), recSalesInvLine.TableCaption(), Rec.FieldCaption(Rec."IC Partner Ref. Type"), Rec.TableCaption());
-            //<< 18-10-21 ZY-LD 013
-        end;
+        if recSalesInvLine.Get(Rec."Document No.", Rec."Line No.") then
+            if recSalesInvLine.Type <> Rec."IC Partner Ref. Type" then
+                if recGenBusPostGrp.Get(recSalesInvLine."Gen. Bus. Posting Group") and (recGenBusPostGrp."Sample / Test Equipment" = recGenBusPostGrp."sample / test equipment"::" ") then
+                    Error(lText001, recSalesInvLine.FieldCaption(Type), recSalesInvLine.TableCaption(), Rec.FieldCaption(Rec."IC Partner Ref. Type"), Rec.TableCaption());
     end;
 
-    local procedure ">> Codeunit 1"()
-    begin
-    end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', false, false)]
     local procedure OnAfterCompanyOpen()
     var
-        JobQueueMonitor: Codeunit "Job Queue Monitor";
-        ZGT: Codeunit "Zyxel General Tools";
+
         ServicePointManager: dotnet ServicePointManager;
         SecurityProtocolType: dotnet SecurityProtocolType;
     begin
-        // We don´t need that anymore. 18-07-24 ZY-LD 
-        // if not ZGT.ItalianServer and not ZGT.TurkishServer() then
-        //     if currentclienttype <> ClientType::SOAP then
-        //         JobQueueMonitor.Monitor(GuiAllowed());  // 13-05-20 ZY-LD 005
-        ServicePointManager.SecurityProtocol := SecurityProtocolType.Tls12;  // 30-09-22 ZY-LD 016
+        ServicePointManager.SecurityProtocol := SecurityProtocolType.Tls12;
 
         // Change default document layout on standard reports
         UpdateReportLayoutSelection(Report::"Purchase - Invoice", './Layouts/PurchaseInvoiceZyxel.rdlc');
@@ -357,19 +209,17 @@ codeunit 50087 "Zyxel General Event"
     var
         SI: Codeunit "Single Instance";
     begin
-        SI.UseOfReport(3, ReportID, 1);  // 16-10-20 ZY-LD 006
+        SI.UseOfReport(3, ReportID, 1);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeCompanyClose', '', false, false)]
     local procedure OnBeforeCompanyClose()
     var
         SI: Codeunit "Single Instance";
-        JobQueueMonitor: Codeunit "Job Queue Monitor";
+
     begin
-        if GuiAllowed() then begin
-            SI.SaveUseOfReport;  // 16-10-20 ZY-LD 006
-            //JobQueueMonitor.Monitor(GuiAllowed());  // 13-05-20 ZY-LD 005  18-07-24 ZY-LD 000 - We don´t need that anymore.
-        end;
+        if GuiAllowed() then
+            SI.SaveUseOfReport();
     end;
 
     local procedure UpdateReportLayoutSelection(ReportID: Integer; NewLayout: Text)
@@ -451,10 +301,8 @@ codeunit 50087 "Zyxel General Event"
         end;
     end;
 
-    local procedure ">> Codeunit 1140"()
-    begin
-    end;
 
+<<<<<<< HEAD
     // V26 >>
     // [EventSubscriber(ObjectType::Codeunit, Codeunit::"Change Log Management", 'OnBeforeInsertChangeLogEntry', '', false, false)]
     // local procedure ChangeLogManagement_OnBeforeInsertChangeLogEntry(var ChangeLogEntry: Record "Change Log Entry"; AlwaysLog: Boolean; var Handled: Boolean)
@@ -484,6 +332,22 @@ codeunit 50087 "Zyxel General Event"
     //     //<< 08-09-17 ZY-LD 001
     // end;
     // V26<<
+=======
+    /*[EventSubscriber(ObjectType::Codeunit, Codeunit::"Change Log Management", 'OnBeforeInsertChangeLogEntry', '', false, false)]
+    local procedure ChangeLogManagement_OnBeforeInsertChangeLogEntry(var ChangeLogEntry: Record "Change Log Entry"; AlwaysLog: Boolean; var Handled: Boolean)
+    var
+        SI: Codeunit "Single Instance";
+    begin
+        if SI.GetRecordRef().CurrentCompany() <> CompanyName() then
+            exit;
+        if SI.RejectChangeLog() then
+            exit;
+        if TempChangeLogSetupTable2."Omit Modify on Creation Day" then
+            if OmitModification(ChangeLogEntry."Table No.", SI.GetRecordRef()) then
+                Handled := true;
+    end; 
+    */
+>>>>>>> 111787a2f0c658073ec47c92c11d15db5a9839d3
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Change Log Management", 'OnBeforeLogInsertion', '', false, false)]
     local procedure ChangeLogManagement_OnBeforeLogInsertion(var RecRef: RecordRef)
@@ -528,26 +392,25 @@ codeunit 50087 "Zyxel General Event"
     var
         TempChangeLogEntry: Record "Change Log Entry" temporary;
         ChangeLogEntry: Record "Change Log Entry";
-        KeyRef1: KeyRef;
         KeyFldRef: FieldRef;
+        KeyRef1: KeyRef;
         i: Integer;
     begin
-        //>> 08-09-17 ZY-LD 001
         // Try to find the insert record in the Change Log Table
         TempChangeLogEntry.SetFilter("Date and Time", '%1..%2', CreateDateTime(Today(), 0T), CreateDateTime(ToDay(), 235959T));
         TempChangeLogEntry.SetRange("Table No.", TableNumber);
         TempChangeLogEntry.SetRange("Type of Change", TempChangeLogEntry."Type of Change"::Insertion);
         KeyRef1 := RecRef.KEYINDEX(1);
-        for i := 1 to KeyRef1.FIELDCOUNT do begin
+        for i := 1 to KeyRef1.FIELDCOUNT() do begin
             KeyFldRef := KeyRef1.FIELDINDEX(i);
 
             case i of
                 1:
-                    TempChangeLogEntry.SetRange("Primary Key Field 1 Value", Format(KeyFldRef.VALUE, 0, 9));
+                    TempChangeLogEntry.SetRange("Primary Key Field 1 Value", Format(KeyFldRef.VALUE(), 0, 9));
                 2:
-                    TempChangeLogEntry.SetRange("Primary Key Field 2 Value", Format(KeyFldRef.VALUE, 0, 9));
+                    TempChangeLogEntry.SetRange("Primary Key Field 2 Value", Format(KeyFldRef.VALUE(), 0, 9));
                 3:
-                    TempChangeLogEntry.SetRange("Primary Key Field 3 Value", Format(KeyFldRef.VALUE, 0, 9));
+                    TempChangeLogEntry.SetRange("Primary Key Field 3 Value", Format(KeyFldRef.VALUE(), 0, 9));
             end;
         end;
         if not TempChangeLogEntry.FindFirst() then begin
@@ -555,16 +418,16 @@ codeunit 50087 "Zyxel General Event"
             ChangeLogEntry.SetRange("Table No.", TableNumber);
             ChangeLogEntry.SetRange("Type of Change", ChangeLogEntry."Type of Change"::Insertion);
             KeyRef1 := RecRef.KEYINDEX(1);
-            for i := 1 to KeyRef1.FIELDCOUNT do begin
+            for i := 1 to KeyRef1.FIELDCOUNT() do begin
                 KeyFldRef := KeyRef1.FIELDINDEX(i);
 
                 case i of
                     1:
-                        ChangeLogEntry.SetRange("Primary Key Field 1 Value", Format(KeyFldRef.VALUE, 0, 9));
+                        ChangeLogEntry.SetRange("Primary Key Field 1 Value", Format(KeyFldRef.VALUE(), 0, 9));
                     2:
-                        ChangeLogEntry.SetRange("Primary Key Field 2 Value", Format(KeyFldRef.VALUE, 0, 9));
+                        ChangeLogEntry.SetRange("Primary Key Field 2 Value", Format(KeyFldRef.VALUE(), 0, 9));
                     3:
-                        ChangeLogEntry.SetRange("Primary Key Field 3 Value", Format(KeyFldRef.VALUE, 0, 9));
+                        ChangeLogEntry.SetRange("Primary Key Field 3 Value", Format(KeyFldRef.VALUE(), 0, 9));
                 end;
             end;
             if ChangeLogEntry.FindFirst() then begin
@@ -575,17 +438,15 @@ codeunit 50087 "Zyxel General Event"
                 exit(false);
         end else
             exit(true);
-        //<< 08-09-17 ZY-LD 001
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Custom Layout Reporting", 'OnBeforeRunReportWithCustomReportSelection', '', false, false)]
     local procedure CustomLayoutReporting_OnBeforeRunReportWithCustomReportSelection(var OutputType: Option Print,Preview,PDF,Email,Excel,Word,XML; var CustomReportSelection: Record "Custom Report Selection"; var EmailPrintIfEmailIsMissing: Boolean; var ReportID: Integer)
     var
-        SingleInstance: Codeunit "Single Instance";
         recCust: Record Customer;
-        PrevOutputType: Integer;
+        SingleInstance: Codeunit "Single Instance";
+
     begin
-        //>> 16-10-18 ZY-LD 001
         if not (OutputType = 99) then
             SingleInstance.SetOutputType(OutputType)
         else
@@ -597,12 +458,11 @@ codeunit 50087 "Zyxel General Event"
         then begin
             recCust.Get(CustomReportSelection."Source No.");
             if not recCust."E-Mail Statement" then
-                if recCust."Print Statements" and EmailPrintIfEmailIsMissing then  // 03-12-19 ZY-LD 003
+                if recCust."Print Statements" and EmailPrintIfEmailIsMissing then
                     OutputType := OutputType::Print
                 else
-                    OutputType := 99;  // 03-12-19 ZY-LD 003
+                    OutputType := 99;
         end;
-        //<< 16-10-18 ZY-LD 001
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Format Address", 'OnBeforeSalesInvShipTo', '', false, false)]
@@ -616,24 +476,22 @@ codeunit 50087 "Zyxel General Event"
     begin
         Handled := true;
         with SalesInvHeader do begin
-            //>> 10-08-18 ZY-LD 001
-            if ZGT.IsRhq then
+            if ZGT.IsRhq() then
                 if not recCountryShipDay.Get(SalesInvHeader."Ship-to Country/Region Code") then
-                    Clear(recCountryShipDay);  // 05-11-18 ZY-LD 001
+                    Clear(recCountryShipDay);
             if (recCountryShipDay."Ship-To Code" <> '') and
-               (SalesInvHeader."Sales Order Type" = SalesInvHeader."Sales Order Type"::Normal)  // 16-10-19 ZY-LD 002
+               (SalesInvHeader."Sales Order Type" = SalesInvHeader."Sales Order Type"::Normal)
             then begin
                 recShiptoAdd.Get(SalesInvHeader."Bill-to Customer No.", recCountryShipDay."Ship-To Code");
                 FormatAddr.FormatAddr(
                   AddrArray, recShiptoAdd.Name, recShiptoAdd."Name 2", recShiptoAdd.Contact, recShiptoAdd.Address, recShiptoAdd."Address 2",
                   recShiptoAdd.City, recShiptoAdd."Post Code", recShiptoAdd.County, recShiptoAdd."Country/Region Code");
-            end else  //<< 10-08-18 ZY-LD 001
-                      //>> 11-11-22 ZY-LD 004
+            end else
                 if "eCommerce Order" then
                     FormatAddr.FormatAddr(
                       AddrArray, '', '', '', '', '',
                       "Ship-to City", "Ship-to Post Code", "Ship-to County", "Ship-to Country/Region Code")
-                else  //<< 11-11-22 ZY-LD 004
+                else
                     FormatAddr.FormatAddr(
                       AddrArray, "Ship-to Name", "Ship-to Name 2", "Ship-to Contact", "Ship-to Address", "Ship-to Address 2",
                       "Ship-to City", "Ship-to Post Code", "Ship-to County", "Ship-to Country/Region Code");
@@ -647,7 +505,7 @@ codeunit 50087 "Zyxel General Event"
                     Result := true;
                     exit;
                 end;
-        end;  // 10-08-18 ZY-LD 001
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::ReportManagement, 'OnAfterSubstituteReport', '', false, false)]
@@ -674,15 +532,10 @@ codeunit 50087 "Zyxel General Event"
                 NewReportId := Report::"Customer - Summary Aging ZX";
             Report::"Statement":
                 NewReportId := Report::"Statement ZX";
-            //>> 02-04-24 ZY-LD 017
-            //            Report::"Standard Statement":
-            //                NewReportId := Report::"Standard Statement Zyxel";
 
-            //<< 02-04-24 ZY-LD 017                
-            else begin
+            else
                 if SubtiRep.get(ReportId) then
                     NewReportId := SubtiRep."New Report Id";
-            end;
         end;
     end;
 

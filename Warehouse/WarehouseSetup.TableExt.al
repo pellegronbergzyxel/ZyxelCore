@@ -76,7 +76,10 @@ tableextension 50216 WarehouseSetupZX extends "Warehouse Setup"
         field(50014; "Calculated ETA Calculation"; DateFormula) //08-09-2025 BK #525482
         {
             Caption = 'Calculated ETA Calculation';
-
+        }
+        field(50015; "Expected Receipt Calculation"; DateFormula) //08-09-2025 BK #525482
+        {
+            Caption = 'Expected Receipt Calculation';
         }
     }
 

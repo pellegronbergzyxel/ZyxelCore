@@ -173,13 +173,18 @@ pageextension 50119 ItemCardZX extends "Item Card"
                     //<< 19-02-20 ZY-LD 025
                 end;
             }
+            field(NonInventoryPostingGroup; Rec.NonInventoryPostingGroup) //17-09-2025 BK #506594
+            {
+                ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the value of the Non-Inventory PostingGroup field, when posting Cost.';
+            }
         }
         addafter("Unit Cost")
         {
             field("Allow Unit Cost is Zero"; Rec."Allow Unit Cost is Zero")
             {
                 ApplicationArea = Basic, Suite;
-                ToolTip = 'Specifies that it´s allowed to post an item without unit cost value.';
+                ToolTip = 'Specifies that it is allowed to post an item without unit cost value.';
             }
         }
         #endregion

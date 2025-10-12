@@ -716,10 +716,16 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
                         END;
                     end else begin //08-09-2025 BK #525482
                         IF FORMAT(recWhseSetup."Expected Shipment Period") <> '' THEN BEGIN
-                            IF recUnshipPurchder."ETA Date" <> 0D THEN
-                                recUnshipPurchder."Expected receipt date" := CALCDATE(recWhseSetup."Expected Shipment Period", recUnshipPurchder."ETA Date")
+                            IF recUnshipPurchder."ETD Date" <> 0D THEN
+                                recUnshipPurchder."ETA Date" := CALCDATE(recWhseSetup."Expected Shipment Period", recUnshipPurchder."ETD Date")
                             ELSE
-                                recUnshipPurchder."Expected receipt date" := 0D;
+                                recUnshipPurchder."ETA Date" := 0D;
+
+                            IF recUnshipPurchder."ETA Date" <> 0D THEN
+                                if format(recWhseSetup."Expected Receipt Calculation") <> '' then
+                                    recUnshipPurchder."Expected receipt date" := CALCDATe(recWhseSetup."Expected Receipt Calculation", recUnshipPurchder."ETA Date")
+                                ELSE
+                                    recUnshipPurchder."Expected receipt date" := 0D;
                             recUnshipPurchder.MODIFY(TRUE);
                         end;
                     end;

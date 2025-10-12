@@ -53,13 +53,19 @@ pageextension 50258 WarehouseSetupZX extends "Warehouse Setup"
                 field("Expected Shipment Period"; Rec."Expected Shipment Period")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'If the field is filled, we will add the period to "Estimated Time of Departure (ETD)" and into the field "Expected Receipt Date". If "ETD-Date" is empty we will use "Estimated Time of Arrival (ETA)" for the calculation instead.';
+                    ToolTip = 'If the field is filled, we will add the period to "Estimated Time of Departure (ETD)" and into the field "Expected Receipt Date"/"ETA". If "ETD-Date" is empty we will use "Estimated Time of Arrival (ETA)" for the calculation instead.';
                 }
-                field("Expected Receipt Calculation"; Rec."Calculated ETA Calculation") //08-09-2025 BK #525482
+                field("Calculated ETA Calculation"; Rec."Calculated ETA Calculation") //08-09-2025 BK #525482
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'If the field is filled, we will add the period to "Calculated ETA" and into the field "Expected Receipt Date".';
                 }
+                field("Expected Receipt Calculation"; Rec."Expected Receipt Calculation") //08-09-2025 BK #525482
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'If the field is filled, we will add the period to "ETA" and get Expected Receipt Date.';
+                }
+
             }
         }
     }
