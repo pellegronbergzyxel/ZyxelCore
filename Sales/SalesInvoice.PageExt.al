@@ -83,15 +83,7 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
                 SetActions();
             end;
         }
-        addbefore("VAT Bus. Posting Group")
-        {
-            field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
-            {
-                ApplicationArea = Basic, Suite;
-                ToolTip = 'Specifies the general business posting group for the sales invoice.';
-                Importance = Additional;
-            }
-        }
+
         modify("Customer Posting Group")
         {
             Editable = true;
@@ -122,14 +114,7 @@ pageextension 50127 SalesInvoiceZX extends "Sales Invoice"
                 ToolTip = 'Specifies whether to send an email with the sales invoice.';
             }
         }
-        addafter("Ship-to Name")
-        {
-            field("Ship-to Name 2"; Rec."Ship-to Name 2")
-            {
-                ApplicationArea = Basic, Suite;
-                ToolTip = 'Specifies the second line of the ship-to name.';
-            }
-        }
+
         addafter("Ship-to Post Code")
         {
             field("Ship-to E-Mail"; Rec."Ship-to E-Mail")

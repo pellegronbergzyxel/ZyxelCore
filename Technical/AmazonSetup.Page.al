@@ -120,7 +120,14 @@ page 50133 "Amazon setup list"
                 {
                     ApplicationArea = All;
                 }
-
+                field(URL_Get_RCT; Rec.URL_Get_RCT)
+                {
+                    ApplicationArea = All;
+                }
+                field(applicationID; Rec.applicationID)
+                {
+                    ApplicationArea = All;
+                }
 
             }
         }
@@ -257,6 +264,28 @@ page 50133 "Amazon setup list"
                     //end;
 
 
+                end;
+            }
+            action(testRescticted)
+            {
+                caption = 'test createRestrictedDataToken';
+                Image = GetSourceDoc;
+                ApplicationArea = all;
+
+                trigger OnAction()
+                var
+                    amazonhelper: codeunit AmazonHelper;
+                    tempMsg: text;
+                    rdataElements: list of [text];
+                begin
+                    // /orders/v0/orders
+                    rdataElements.add('shippingLabels');
+                    rdataElements.add('sellingParty');
+                    rdataElements.add('shipFromParty');
+                    rdataElements.add('labelData');
+                    if rec.testmode then
+                        if amazonhelper.getrestrictedDataToken(rec.code, 'GET', '/vendor/directFulfillment/shipping/2021-12-28/shippingLabels', rdataElements, tempMsg) then
+                            message('%1', tempMsg);
                 end;
             }
 

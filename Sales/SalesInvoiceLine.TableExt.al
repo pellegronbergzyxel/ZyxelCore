@@ -21,12 +21,7 @@ tableextension 50130 SalesInvoiceLineZX extends "Sales Invoice Line"
             FieldClass = FlowField;
             TableRelation = "Forecast Territory";
         }
-        field(50003; "Sell-to Customer Name"; Text[100])
-        {
-            CalcFormula = lookup("Sales Invoice Header"."Sell-to Customer Name" where("No." = field("Document No.")));
-            FieldClass = FlowField;
-            Caption = 'Sell-to Customer Name';
-        }
+
         field(50004; "Bill-to Country/Region"; Code[10])
         {
             CalcFormula = Lookup("Sales Invoice Header"."Bill-to Country/Region Code" where("No." = field("Document No.")));

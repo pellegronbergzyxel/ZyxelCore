@@ -2,8 +2,8 @@ Table 50025 "Warehouse Reason Code ZY"
 {
     Caption = 'Warehouse Reason Code';
     DataCaptionFields = "Code", Description;
-    DrillDownPageID = "Warehouse Reason Codes";
-    LookupPageID = "Warehouse Reason Codes";
+    DrillDownPageID = "Warehouse Reason Codes ZY";
+    LookupPageID = "Warehouse Reason Codes ZY";
 
     fields
     {

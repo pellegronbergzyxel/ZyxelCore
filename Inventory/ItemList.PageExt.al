@@ -253,12 +253,7 @@ pageextension 50120 ItemListZX extends "Item List"
         }
         addlast(Control1)
         {
-            field(GTIN; Rec.GTIN)
-            {
-                ApplicationArea = Basic, Suite;
-                Visible = false;
-                ToolTip = 'Specifies the Global Trade Item Number (GTIN) for the item. For example, the GTIN is used with bar codes to track items, and when sending and receiving documents electronically. The GTIN number typically contains a Universal Product Code (UPC), or European Article Number (EAN).';
-            }
+
             field(Amaz_ASIN; Rec.Amaz_ASIN)
             {
                 ApplicationArea = Basic, Suite;

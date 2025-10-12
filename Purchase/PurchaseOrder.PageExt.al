@@ -80,14 +80,6 @@ pageextension 50132 PurchaseOrderZX extends "Purchase Order"
                 ApplicationArea = Basic, Suite;
             }
         }
-        addafter("Ship-to Name")
-        {
-            field("Ship-to Name 2"; Rec."Ship-to Name 2")
-            {
-                ApplicationArea = Basic, Suite;
-                Importance = Additional;
-            }
-        }
         addafter("Ship-to Contact")
         {
             field("Ship-from Country/Region Code"; Rec."Ship-from Country/Region Code")

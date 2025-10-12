@@ -3154,16 +3154,18 @@ codeunit 50067 "Sales Header/Line Events"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse. Validate Source Line", 'OnBeforeSalesLineVerifyChange', '', false, false)]
-    local procedure OnBeforeSalesLineVerifyChange(var NewSalesLine: Record "Sales Line"; var OldSalesLine: Record "Sales Line"; var IsHandled: Boolean)
-    var
-        SI: Codeunit "Single Instance";
-    begin
+    // V26>>
+    // [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse. Validate Source Line", 'OnBeforeSalesLineVerifyChange', '', false, false)]
+    // local procedure OnBeforeSalesLineVerifyChange(var NewSalesLine: Record "Sales Line"; var OldSalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    // var
+    //     SI: Codeunit "Single Instance";
+    // begin
 
-        if SI.GetValidateFromPage then
-            IsHandled := true;
+    //     if SI.GetValidateFromPage then
+    //         IsHandled := true;
 
-    end;
+    // end;
+    // V26<<
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnSetShipToCustomerAddressFieldsFromShipToAddrOnAfterCalcShouldCopyLocationCode, '', false, false)]
     local procedure "Sales Header_OnSetShipToCustomerAddressFieldsFromShipToAddrOnAfterCalcShouldCopyLocationCode"(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; ShipToAddress: Record "Ship-to Address"; var ShouldCopyLocationCode: Boolean)

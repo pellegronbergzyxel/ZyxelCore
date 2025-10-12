@@ -2,15 +2,7 @@ pageextension 50122 ItemLedgerEntriesZX extends "Item Ledger Entries"
 {
     layout
     {
-        addafter("Source Type")
-        {
-            field("Source Description"; Rec."Source Description")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Source Description';
-                Visible = false;
-            }
-        }
+
         addafter("Cost Amount (Non-Invtbl.)(ACY)")
         {
             field("Cost Posted to G/L"; Rec."Cost Posted to G/L")

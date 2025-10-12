@@ -4,11 +4,7 @@ pageextension 50315 "PostedSalesInvoiceLine" extends "Posted Sales Invoice Lines
     {
         addafter("Sell-to Customer No.")
         {
-            field("Sell-to Customer Name"; Rec."Sell-to Customer Name")
-            {
-                ApplicationArea = All;
-                Tooltip = 'Specifies the name of the Sell-to Customer of the Posted Sales Invoice';
-            }
+
             field("Bill-to Country/Region"; Rec."Bill-to Country/Region")
             {
                 ApplicationArea = All;
