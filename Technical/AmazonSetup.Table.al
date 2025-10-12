@@ -79,7 +79,7 @@ table 50090 "Amazon Setup"
         }
         field(20; testmode; boolean)
         {
-            Caption = 'Amazon import running in testmode';
+            Caption = 'testmode';
         }
         field(21; URL_packingSlips_order; text[200])
         {
@@ -127,6 +127,14 @@ table 50090 "Amazon Setup"
         {
             Caption = 'Location Code';
             TableRelation = Location;
+        }
+        field(31; URL_Get_RCT; text[200])
+        {
+            caption = 'URL Get restricted Token';
+        }
+        field(32; applicationID; Text[100])
+        {
+            caption = 'Application ID';
         }
     }
     keys

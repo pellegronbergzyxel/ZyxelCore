@@ -463,7 +463,7 @@ codeunit 50080 "Sales Post Events"
                     until recSaleLine.Next() = 0;
             end;
 
-            SI.SetRejectChangeLog(true);
+            //SI.SetRejectChangeLog(true);
         end;
 
     end;
@@ -663,10 +663,11 @@ codeunit 50080 "Sales Post Events"
                         NLtoDKPosting.NLtoDKRevChargePosted(SalesHeader."NL to DK Reverse Chg. Doc No.", SalesHeader."Document Type");
                     end;
             end;
-
-            SI.SetAllowToDeleteAddItem(false);
-            SI.SetRejectChangeLog(false);
-            SI.SetSkipVerifyOnInventory(false);
+            // V26 >>
+            // SI.SetAllowToDeleteAddItem(false);
+            // SI.SetRejectChangeLog(false);
+            // SI.SetSkipVerifyOnInventory(false);
+            // V26 <<
         end;
 
     end;

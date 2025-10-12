@@ -59,15 +59,7 @@ pageextension 50150 PostedSalesCreditMemoZX extends "Posted Sales Credit Memo"
                 ApplicationArea = Basic, Suite;
             }
         }
-        addlast(General)
-        {
-            field("Sell-to Customer No."; Rec."Sell-to Customer No.")
-            {
-                ApplicationArea = Basic, Suite;
-                Visible = false;
-            }
 
-        }
     }
 
     actions

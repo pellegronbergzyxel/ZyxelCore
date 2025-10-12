@@ -395,11 +395,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                     ToolTip = 'Specifies the Skip Posting Group Validation';
                 }
             }
-            field(Priority; Rec.Priority)
-            {
-                ApplicationArea = Basic, Suite;
-                ToolTip = 'Specifies the Priority';
-            }
+
         }
         addafter("Prepayment %")
         {

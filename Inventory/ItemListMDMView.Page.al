@@ -607,17 +607,6 @@ page 50165 "Item List MDM View"
                     Visible = false;
                     Tooltip = 'Specifies RMA alternative Item No.';
                 }
-#if not CLEAN23
-                field("Coupled to CRM"; Rec."Coupled to CRM")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies that the item is coupled to a product in Dynamics 365 Sales.';
-                    Visible = false;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by flow field Coupled to Dataverse';
-                    ObsoleteTag = '23.0';
-                }
-#endif
                 field("Coupled to Dataverse"; Rec."Coupled to Dataverse")
                 {
                     ApplicationArea = All;

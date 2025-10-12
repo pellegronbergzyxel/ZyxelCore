@@ -228,14 +228,7 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                 Visible = EiCardVisible;
             }
         }
-        addbefore("VAT Bus. Posting Group")
-        {
-            field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
-            {
-                ApplicationArea = Basic, Suite;
-                Importance = Additional;
-            }
-        }
+
         modify("VAT Registration No.")
         {
             ApplicationArea = Basic, Suite;

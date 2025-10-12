@@ -85,14 +85,7 @@ pageextension 50148 PostedSalesInvoiceZX extends "Posted Sales Invoice"
                 Editable = false;
             }
         }
-        addlast(General)
-        {
-            field("Sell-to Customer No."; Rec."Sell-to Customer No.")
-            {
-                ApplicationArea = Basic, Suite;
-                Visible = false;
-            }
-        }
+
     }
 
     actions

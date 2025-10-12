@@ -22,14 +22,7 @@ pageextension 50128 SalesCreditMemoZX extends "Sales Credit Memo"
                 Importance = Additional;
             }
         }
-        addafter("Prices Including VAT")
-        {
-            field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
-            {
-                ApplicationArea = Basic, Suite;
-                Importance = Additional;
-            }
-        }
+
         modify("VAT Registration No.")
         {
             ApplicationArea = Basic, Suite;

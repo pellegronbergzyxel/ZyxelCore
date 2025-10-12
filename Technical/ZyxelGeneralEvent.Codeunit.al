@@ -302,6 +302,37 @@ codeunit 50087 "Zyxel General Event"
     end;
 
 
+<<<<<<< HEAD
+    // V26 >>
+    // [EventSubscriber(ObjectType::Codeunit, Codeunit::"Change Log Management", 'OnBeforeInsertChangeLogEntry', '', false, false)]
+    // local procedure ChangeLogManagement_OnBeforeInsertChangeLogEntry(var ChangeLogEntry: Record "Change Log Entry"; AlwaysLog: Boolean; var Handled: Boolean)
+    // var
+    //     SI: Codeunit "Single Instance";
+    // begin
+    //     //>> 24-04-18 ZY-LD 002
+    //     if SI.GetRecordRef().CurrentCompany <> CompanyName then
+    //         exit;
+    //     if SI.RejectChangeLog then
+    //         exit;
+    //     //<< 24-04-18 ZY-LD 002
+
+    //     //>> 08-09-17 001 ZY-LD
+    //     if (ChangeLogEntry."Table No." = Database::Customer) and (ChangeLogEntry."Field No." in [55026, 55028, 54]) or
+    //        (ChangeLogEntry."Table No." = Database::"G/L Account") and (ChangeLogEntry."Field No." in [26]) or
+    //        (ChangeLogEntry."Table No." = Database::Item) and (ChangeLogEntry."Field No." in [30, 62, 55008, 55014, 55015, 55016, 55017]) or
+    //        (ChangeLogEntry."Table No." = Database::Vendor) and (ChangeLogEntry."Field No." in [54])
+    //     then
+    //         Handled := true;
+    //     //<< 08-09-17 001 ZY-LD
+
+    //     //>> 08-09-17 ZY-LD 001
+    //     if TempChangeLogSetupTable2."Omit Modify on Creation Day" then
+    //         if OmitModification(ChangeLogEntry."Table No.", SI.GetRecordRef()) then
+    //             Handled := true;
+    //     //<< 08-09-17 ZY-LD 001
+    // end;
+    // V26<<
+=======
     /*[EventSubscriber(ObjectType::Codeunit, Codeunit::"Change Log Management", 'OnBeforeInsertChangeLogEntry', '', false, false)]
     local procedure ChangeLogManagement_OnBeforeInsertChangeLogEntry(var ChangeLogEntry: Record "Change Log Entry"; AlwaysLog: Boolean; var Handled: Boolean)
     var
@@ -316,6 +347,7 @@ codeunit 50087 "Zyxel General Event"
                 Handled := true;
     end; 
     */
+>>>>>>> 111787a2f0c658073ec47c92c11d15db5a9839d3
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Change Log Management", 'OnBeforeLogInsertion', '', false, false)]
     local procedure ChangeLogManagement_OnBeforeLogInsertion(var RecRef: RecordRef)
@@ -348,12 +380,13 @@ codeunit 50087 "Zyxel General Event"
     begin
         SI.SetRecordRef(RecRef);
     end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Change Log Management", 'OnAfterGetDatabaseTableTriggerSetup', '', false, false)]
-    local procedure OnAfterGetDatabaseTableTriggerSetup(TempChangeLogSetupTable: Record "Change Log Setup (Table)" temporary; var LogInsert: Boolean; var LogModify: Boolean; var LogDelete: Boolean; var LogRename: Boolean);
-    begin
-        TempChangeLogSetupTable2 := TempChangeLogSetupTable; //TODO Ensure this called for every request, so it has the correct value
-    end;
+    // V26 >>
+    // [EventSubscriber(ObjectType::Codeunit, Codeunit::"Change Log Management", 'OnAfterGetDatabaseTableTriggerSetup', '', false, false)]
+    // local procedure OnAfterGetDatabaseTableTriggerSetup(TempChangeLogSetupTable: Record "Change Log Setup (Table)" temporary; var LogInsert: Boolean; var LogModify: Boolean; var LogDelete: Boolean; var LogRename: Boolean);
+    // begin
+    //     TempChangeLogSetupTable2 := TempChangeLogSetupTable; //TODO Ensure this called for every request, so it has the correct value
+    // end;
+    // V26 >>
 
     local procedure OmitModification(TableNumber: Integer; RecRef: RecordRef): Boolean;
     var
@@ -481,11 +514,6 @@ codeunit 50087 "Zyxel General Event"
         SubtiRep: Record "Substitute Report";
     begin
         case ReportId of
-#pragma warning disable AL0432
-            Report::"Adjust Exchange Rates":
-
-#pragma warning restore AL0432
-                NewReportId := Report::"Exch. Rate Adjustment Zyxel";
             Report::"Exch. Rate Adjustment":
                 NewReportId := Report::"Exch. Rate Adjustment Zyxel";
             Report::"VAT- VIES Declaration Tax Auth":

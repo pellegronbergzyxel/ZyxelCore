@@ -2,21 +2,13 @@ pageextension 50265 SalesReturnOrderZX extends "Sales Return Order"
 {
     layout
     {
-        addafter("Prices Including VAT")
-        {
-            field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
-            {
-                ApplicationArea = Basic, Suite;
-                Importance = Additional;
-            }
-        }
+
         addafter("VAT Bus. Posting Group")
         {
             field("Ship-to VAT"; Rec."Ship-to VAT")
             {
                 ApplicationArea = Basic, Suite;
                 Importance = Additional;
-                //Visible = VATRegistrationNoSellToVisible;  // 12-02-24 ZY-LD 000
             }
             field("VAT Registration No. Zyxel"; Rec."VAT Registration No. Zyxel")
             {
@@ -24,14 +16,7 @@ pageextension 50265 SalesReturnOrderZX extends "Sales Return Order"
                 Importance = Additional;
             }
         }
-        addafter("Ship-to Name")
-        {
-            field("Ship-to Name 2"; Rec."Ship-to Name 2")
-            {
-                ApplicationArea = Basic, Suite;
-                Importance = Additional;
-            }
-        }
+
     }
 
     actions

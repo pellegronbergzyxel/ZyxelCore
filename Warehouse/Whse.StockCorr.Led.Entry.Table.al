@@ -34,7 +34,7 @@ Table 50015 "Whse. Stock Corr. Led. Entry"
         field(7; "Reason Code"; Code[10])
         {
             Caption = 'Reason Code';
-            TableRelation = "Warehouse Reason Code";
+            TableRelation = "Warehouse Reason Code ZY";
         }
         field(8; "System Date"; DateTime)
         {
@@ -96,7 +96,7 @@ Table 50015 "Whse. Stock Corr. Led. Entry"
         }
         field(101; "Reason Description"; Text[50])
         {
-            CalcFormula = lookup("Warehouse Reason Code".Description where(Code = field("Reason Code")));
+            CalcFormula = lookup("Warehouse Reason Code ZY".Description where(Code = field("Reason Code")));
             Caption = 'Reason Description';
             Editable = false;
             FieldClass = FlowField;

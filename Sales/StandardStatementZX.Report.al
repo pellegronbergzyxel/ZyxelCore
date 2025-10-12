@@ -180,10 +180,10 @@ report 50062 "Standard Statement Zyxel"
                 column(CurrReportPageNoCaption; CurrReportPageNoCaptionLbl)
                 {
                 }
-                column(CompanyLegalOffice; CompanyInfo.GetLegalOffice())
+                column(CompanyLegalOffice; 'CompanyInfo.GetLegalOffice()')
                 {
                 }
-                column(CompanyLegalOffice_Lbl; CompanyInfo.GetLegalOfficeLbl())
+                column(CompanyLegalOffice_Lbl; 'CompanyInfo.GetLegalOfficeLbl()')
                 {
                 }
                 dataitem(CurrencyLoop; "Integer")

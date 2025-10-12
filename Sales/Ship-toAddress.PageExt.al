@@ -2,14 +2,7 @@ pageextension 50169 ShipToAddressZX extends "Ship-to Address"
 {
     layout
     {
-        addafter(Name)
-        {
-            field("Name 2"; Rec."Name 2")
-            {
-                ApplicationArea = Basic, Suite;
-                Visible = false;
-            }
-        }
+
         addafter(Contact)
         {
             field("Search Name"; Rec."Search Name")
