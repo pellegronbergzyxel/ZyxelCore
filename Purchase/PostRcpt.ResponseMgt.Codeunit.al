@@ -287,9 +287,8 @@ Codeunit 50088 "Post Rcpt. Response Mgt."
             recRespLine.SetRange(Open, true);
             recRespLine.SetRange("Invoice No.", precRespLine."Invoice No.");  // 19-05-22 ZY-LD 019
             recRespLine.SetAutocalcFields("Real Source Order No.", "Real Source Order Line No.", "Invoice No.");
+            recRespLine.ModifyAll("Error Text", '');
             if recRespLine.FindSet(true) then begin
-                recRespLine.ModifyAll("Error Text", '');
-
                 repeat
                     // Handle records here
                     // Find out if the line has been previous posted
