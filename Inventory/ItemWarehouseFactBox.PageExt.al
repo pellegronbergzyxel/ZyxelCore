@@ -5,42 +5,52 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
         Modify("No.")
         {
             Visible = false;
+            ToolTip = 'Specifies the unique number that identifies the item.';
         }
         Modify("Identifier Code")
         {
             Visible = false;
+            ToolTip = 'Specifies the identifier code for the item, such as a barcode or RFID tag.';
         }
         Modify("Base Unit of Measure")
         {
             Visible = false;
+            ToolTip = 'Specifies the base unit of measure for the item, such as pieces, kilograms, or liters.';
         }
         Modify("Put-away Unit of Measure Code")
         {
             Visible = false;
+            ToolTip = 'Specifies the unit of measure used when putting away the item in inventory.';
         }
         Modify("Purch. Unit of Measure")
         {
             Visible = false;
+            ToolTip = 'Specifies the unit of measure used when purchasing the item from a vendor.';
         }
         Modify("Item Tracking Code")
         {
             Visible = false;
+            ToolTip = 'Specifies the item tracking method for the item, such as serial numbers or lot numbers.';
         }
         Modify("Special Equipment Code")
         {
             Visible = false;
+            ToolTip = 'Specifies any special equipment required to handle or store the item, such as refrigeration or hazardous material handling.';
         }
         Modify("Last Phys. Invt. Date")
         {
             Visible = false;
+            ToolTip = 'Specifies the date when the last physical inventory was taken for the item.';
         }
         Modify(NetWeight)
         {
             Visible = false;
+            ToolTip = 'Specifies the net weight of the item, excluding any packaging or containers.';
         }
         Modify("Warehouse Class Code")
         {
             Visible = false;
+            ToolTip = 'Specifies the warehouse class for the item, which determines how the item is stored and handled in the warehouse.';
         }
         addfirst(content)
         {
@@ -51,42 +61,51 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
                 Importance = Promoted;
                 Visible = false;
                 HideValue = IsNonInventoriable;
+                ToolTip = 'Specifies the quantity of the item that is currently in inventory at the specified location.';
             }
             field("Total Inventory"; Rec."Total Inventory")
             {
                 ApplicationArea = Basic, Suite;
                 HideValue = IsNonInventoriable;
+                ToolTip = 'Specifies the total quantity of the item in inventory across all locations.';
             }
             group(EU2)
             {
                 Caption = 'EU2';
                 Visible = EU2GroupVisible;
+
                 field(InventoryEU2; Rec.Inventory)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Qty. On-Hand';
                     DecimalPlaces = 0 : 0;
                     HideValue = IsNonInventoriable;
+                    ToolTip = 'Specifies the quantity of the item that is currently in inventory at the specified location.';
                 }
                 field("Qty. on Sales OrderEU2"; Rec."Qty. on Sales Order Total")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the total quantity of the item that is on sales orders.';
                 }
                 field("Qty. on Sales Order ConfirmedEU2"; Rec."Qty. on Sales Order Conf.Total")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the total quantity of the item that is on confirmed sales orders.';
                 }
                 field("Qty. on Delivery Document"; Rec."Qty. on Delivery Document")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the total quantity of the item that is on delivery documents.';
                 }
                 field("Trans. Ord. Shipment (Qty.)EU2"; Rec."Trans. Ord. Shipment (Qty.)")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the quantity of the item that is allocated for transfer order shipments.';
                 }
                 field("Tr. Or. Ship (Qty.) ConfirmedEU2"; Rec."Tr. Or. Ship (Qty.) Confirmed")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the quantity of the item that is confirmed for transfer order shipments.';
                 }
                 field("CalcAvailableStock(TRUE)"; Rec.CalcAvailableStock(true))
                 {
@@ -106,26 +125,32 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
                     Caption = 'Qty. On-Hand';
                     DecimalPlaces = 0 : 0;
                     HideValue = IsNonInventoriable;
+                    ToolTip = 'Specifies the quantity of the item that is currently in inventory at the specified location.';
                 }
                 field("Qty. on Sales OrderVCK"; Rec."Qty. on Sales Order Total")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the total quantity of the item that is on sales orders.';
                 }
                 field("Qty. on Sales Order ConfirmedVCK"; Rec."Qty. on Sales Order Confirmed")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the total quantity of the item that is on confirmed sales orders.';
                 }
                 field("Qty. on Delivery DocumentVCK"; Rec."Qty. on Delivery Document")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the total quantity of the item that is on delivery documents.';
                 }
                 field("Trans. Ord. Shipment (Qty.)VCK"; Rec."Trans. Ord. Shipment (Qty.)")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the quantity of the item that is allocated for transfer order shipments.';
                 }
                 field("Tr. Or. Ship (Qty.) ConfirmedVCK"; Rec."Tr. Or. Ship (Qty.) Confirmed")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the quantity of the item that is confirmed for transfer order shipments.';
                 }
                 field("Qty. Stock for Sales"; Rec.CalcAvailableStock(true))
                 {
@@ -142,24 +167,29 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
                 field("Marked Picking Date"; Rec."Marked Picking Date")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the date when the item was marked for picking.';
                 }
                 field("Unconfirmed Picking Date"; Rec."Unconfirmed Picking Date")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the date when the item was picked but not yet confirmed.';
                 }
                 field("Confirmed Picking Date"; Rec."Confirmed Picking Date")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the date when the item picking was confirmed.';
                 }
             }
             group(HQ)
             {
                 Caption = 'HQ';
+
                 field("recItemHQ.""Qty. on Purch. Order ZX"""; recItemHQ."Qty. on Purch. Order ZX")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Qty. on Purch. Order';
                     DecimalPlaces = 0 : 0;
+                    ToolTip = 'Specifies the total quantity of the item that is on purchase orders.';
 
                     trigger OnDrillDown()
                     begin
@@ -171,19 +201,12 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Goods in Transit';
                     DecimalPlaces = 0 : 0;
+                    ToolTip = 'Specifies the quantity of the item that is currently in transit from the vendor to the warehouse.';
 
                     //trigger OnLookup(var Text: Text): Boolean
                     trigger OnDrillDown()
                     begin
-                        OnLookUpGoodsInTransit(0);  // 25-11-20 ZY-LD 006
-
-                        // //>> 15-11-18 ZY-LD 002
-                        // recGoodsInTrans.SETRANGE("Item No.","No.");
-                        // //recGoodsInTrans.SETFILTER("Buy-from Vendor No.",'<>%1',recPurchSetup."EMEA Vendor No.");  // 08-07-19 ZY-LD 004
-                        // recGoodsInTrans.SETFILTER("Buy-from Vendor No.",VendorEvent.GetFilterZyxelVendors(0));  // 08-07-19 ZY-LD 004
-                        // recGoodsInTrans.SETRANGE("Order Type",recGoodsInTrans."Order Type"::"Purchase Order");  // 22-04-20 ZY-LD 005
-                        // PAGE.RUNMODAL(PAGE::"VCK Container Details",recGoodsInTrans);
-                        // //<< 15-11-18 ZY-LD 002
+                        OnLookUpGoodsInTransit(0);
                     end;
                 }
                 field("recItemHQ.""HQ Unshipped Purchase Order"""; recItemHQ."HQ Unshipped Purchase Order")
@@ -192,10 +215,11 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
                     Caption = 'Unshipped Quantity';
                     DecimalPlaces = 0 : 0;
                     StyleExpr = UnshippedQtyStyle;
+                    ToolTip = 'Specifies the quantity of the item that has been ordered but not yet shipped by the vendor.';
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownUnshippedQuantity(0);  // 08-07-19 ZY-LD 004
+                        DrillDownUnshippedQuantity(0);
                     end;
                 }
             }
@@ -207,10 +231,11 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Qty. on Purch. Order';
                     DecimalPlaces = 0 : 0;
+                    ToolTip = 'Specifies the total quantity of the item that is on purchase orders.';
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownPurchaseOrderLine(1);  // 08-07-19 ZY-LD 004
+                        DrillDownPurchaseOrderLine(1);
                     end;
                 }
                 field(GoodsInTransit2; recItemEmea."Qty. on Shipping Detail" - recItemEmea."Qty. on Ship. Detail Received")
@@ -218,22 +243,11 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Goods in Transit';
                     DecimalPlaces = 0 : 0;
+                    ToolTip = 'Specifies the quantity of the item that is currently in transit from the vendor to the warehouse.';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //>> 25-11-20 ZY-LD 006
-                        OnLookUpGoodsInTransit(1);  // 25-11-20 ZY-LD 006
-                        /*
-                        //>> 15-11-18 ZY-LD 002
-                        recGoodsInTrans.SETRANGE("Item No.","No.");
-                        //recGoodsInTrans.SETRANGE("Buy-from Vendor No.",recPurchSetup."EMEA Vendor No.");  // 08-07-19 ZY-LD 004
-                        recGoodsInTrans.SETFILTER("Buy-from Vendor No.",VendorEvent.GetFilterZyxelVendors(1));  // 08-07-19 ZY-LD 004
-                        recGoodsInTrans.SETRANGE("Order Type",recGoodsInTrans."Order Type"::"Purchase Order");  // 22-04-20 ZY-LD 005
-                        PAGE.RUNMODAL(PAGE::"VCK Container Details",recGoodsInTrans);
-                        //<< 15-11-18 ZY-LD 002
-                        */
-                        //<< 25-11-20 ZY-LD 006
-
+                        OnLookUpGoodsInTransit(1);
                     end;
                 }
                 field("HQ Unshipped Purchase Order2"; recItemEmea."HQ Unshipped Purchase Order")
@@ -242,10 +256,11 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
                     Caption = 'Unshipped Quantity';
                     DecimalPlaces = 0 : 0;
                     StyleExpr = UnshippedQtyStyle;
+                    ToolTip = 'Specifies the quantity of the item that has been ordered but not yet shipped by the vendor.';
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownUnshippedQuantity(1);  // 08-07-19 ZY-LD 004
+                        DrillDownUnshippedQuantity(1);
                     end;
                 }
             }
@@ -257,17 +272,20 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
                     ApplicationArea = Basic, Suite;
                     DecimalPlaces = 0 : 0;
                     Visible = false;
+                    ToolTip = 'Specifies the total quantity of the item that is on receipt lines.';
                 }
                 field("Qty. in Transit"; Rec."Qty. in Transit")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Transfer Order in Transit';
                     DecimalPlaces = 0 : 0;
+                    ToolTip = 'Specifies the total quantity of the item that is currently in transit due to transfer orders.';
                 }
                 field("Trans. Ord. Shipment (Qty.)"; Rec."Trans. Ord. Shipment (Qty.)")
                 {
                     ApplicationArea = Basic, Suite;
                     DecimalPlaces = 0 : 0;
+                    ToolTip = 'Specifies the quantity of the item that is allocated for transfer order shipments.';
                 }
             }
         }
@@ -275,31 +293,25 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
 
     trigger OnOpenPage()
     begin
-        //>> 05-07-19 ZY-LD 003
-        if ZGT.IsRhq then begin
+        if ZGT.IsRhq() then begin
             recHQSetup.FindFirst();
             recHQSetup.TestField("SBU Filter Channel");
 
             recInvSetup.Get();
             recInvSetup.TestField("AIT Location Code");
-            //SETRANGE("Location Filter",recInvSetup."AIT Location Code");  // 25-11-20 ZY-LD 006
-            //SETRANGE("Location Filter",ItemLogisticEvent.GetMainWarehouseLocation);  // 25-11-20 ZY-LD 006  // 01-06-22 ZY-LD 009
-            recPurchSetup.Get();  // 08-07-19 ZY-LD 004
-            if ZGT.IsZNetCompany then begin
+            recPurchSetup.Get();
+            if ZGT.IsZNetCompany() then begin
                 recPurchSetup.TestField("EShop Vendor No. CH");
-                Rec.SetRange("Buy-from Vendor No. Filter", recPurchSetup."EShop Vendor No. CH");  // 08-07-19 ZY-LD 004
+                Rec.SetRange("Buy-from Vendor No. Filter", recPurchSetup."EShop Vendor No. CH");
             end else begin
                 recPurchSetup.TestField("EShop Vendor No.");
-                Rec.SetRange("Buy-from Vendor No. Filter", recPurchSetup."EShop Vendor No.");  // 08-07-19 ZY-LD 004
+                Rec.SetRange("Buy-from Vendor No. Filter", recPurchSetup."EShop Vendor No.");
             end;
         end;
-        //VCKZNETGroupVisible := recInvSetup."AIT Location Code" = 'VCK ZNET';  // 25-11-20 ZY-LD 006
-        VCKZNETGroupVisible := ZGT.IsZNetCompany;  // 25-11-20 ZY-LD 006
-        //EU2GroupVisible := recInvSetup."AIT Location Code" = 'EU2';  // 25-11-20 ZY-LD 006
-        EU2GroupVisible := ZGT.IsZComCompany;  // 25-11-20 ZY-LD 006
-        //<< 05-07-19 ZY-LD 003
 
-        //PickingDateVisible := ZGT.UserIsLogistics;  // 27-08-21 ZY-LD 007
+        VCKZNETGroupVisible := ZGT.IsZNetCompany();
+        EU2GroupVisible := ZGT.IsZComCompany();
+
         if UserSetup.Get(UserId()) then
             PickingDateVisible := UserSetup."Show Picking Date"
         else
@@ -308,58 +320,50 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
 
     trigger OnAfterGetRecord()
     begin
-        SetActions();  // 05-07-19 ZY-LD 003
+        SetActions();
 
-        //>> 08-07-19 ZY-LD 004
-        //recItemHQ.SETFILTER("Buy-from Vendor No. Filter",'<>%1',recPurchSetup."EMEA Vendor No.");
-        recItemHQ.SetFilter("Buy-from Vendor No. Filter", VendorEvent.GetFilterZyxelVendors(1, true));  // 25-11-20 ZY-LD 006
+
+        recItemHQ.SetFilter("Buy-from Vendor No. Filter", VendorEvent.GetFilterZyxelVendors(1, true));
         recItemHQ.SetAutoCalcFields("Qty. on Purch. Order ZX", "Qty. on Shipping Detail", "Qty. on Ship. Detail Received", "HQ Unshipped Purchase Order");
         recItemHQ.Get(Rec."No.");
 
-        //recItemEmea.SETRANGE("Buy-from Vendor No. Filter",recPurchSetup."EMEA Vendor No.");
-        recItemEmea.SetFilter("Buy-from Vendor No. Filter", '%1', VendorEvent.GetFilterZyxelVendors(1, false));  // 25-11-20 ZY-LD 006
+        recItemEmea.SetFilter("Buy-from Vendor No. Filter", '%1', VendorEvent.GetFilterZyxelVendors(1, false));
         recItemEmea.SetAutoCalcFields("Qty. on Purch. Order ZX", "Qty. on Shipping Detail", "Qty. on Ship. Detail Received", "HQ Unshipped Purchase Order");
         recItemEmea.Get(Rec."No.");
-        //recItemEmea.SETFILTER("Buy-from Vendor No. Filter",VendorEvent.GetFilterZyxelVendors(0,TRUE));  // 25-11-20 ZY-LD 006
-        //recItemEmea.CALCFIELDS("Qty. on Purch. Order");  // 25-11-20 ZY-LD 006
 
-        //<< 08-07-19 ZY-LD 004
     end;
 
     var
-        xxxx: Page "Item List";
+
         recItemHQ: Record Item;
         recItemEmea: Record Item;
         UserSetup: Record "User Setup";
-        UnshippedQtyStyle: Text;
+
         recInvSetup: Record "Inventory Setup";
         recHQSetup: Record "Headquarter Setup";
         recPurchSetup: Record "Purchases & Payables Setup";
+        ZGT: Codeunit "ZyXEL General Tools";
+        VendorEvent: Codeunit "Vendor Event";
         EU2GroupVisible: Boolean;
         VCKZNETGroupVisible: Boolean;
         HQGroupVisible: Boolean;
         EMEAGroupVisible: Boolean;
         PickingDateVisible: Boolean;
-        IsInventoriable: Boolean;
         IsNonInventoriable: Boolean;
-        ZGT: Codeunit "ZyXEL General Tools";
-        EMEAVendorNo: Code[20];
-        VendorEvent: Codeunit "Vendor Event";
-        ItemLogisticEvent: Codeunit "Item / Logistic Events";
+        IsInventoriable: Boolean;
+        UnshippedQtyStyle: Text;
+
 
     local procedure SetActions()
     begin
-        //>> 06-09-18 ZY-LD 001
         if Rec."Qty. on Purch. Order ZX" - (Rec."Qty. on Shipping Detail" - Rec."Qty. on Ship. Detail Received") <> Rec."HQ Unshipped Purchase Order" then
             UnshippedQtyStyle := 'Unfavorable'
         else
             UnshippedQtyStyle := 'StandardAccent';
-        //<< 06-09-18 ZY-LD 001
 
-        //>> 05-07-19 ZY-LD 003
         HQGroupVisible := false;
         EMEAGroupVisible := false;
-        if ZGT.IsZNetCompany then begin  // ZNet
+        if ZGT.IsZNetCompany() then begin  // ZNet
             if StrPos(recHQSetup."SBU Filter Channel", Rec.SBU) <> 0 then
                 HQGroupVisible := true
             else
@@ -372,7 +376,6 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
                 EMEAGroupVisible := true
             else
                 HQGroupVisible := true;
-        //<< 05-07-19 ZY-LD 003
 
         EnableControls();
     end;
@@ -381,25 +384,24 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
     var
         recPurchLine: Record "Purchase Line";
     begin
-        //>> 08-07-19 ZY-LD 004
         recPurchLine.SetRange("Document Type", recPurchLine."document type"::Order);
         recPurchLine.SetRange(Type, recPurchLine.Type::Item);
         recPurchLine.SetRange("No.", Rec."No.");
         recPurchLine.SetFilter("Outstanding Quantity", '<>0');
-        //>> 25-11-20 ZY-LD 006
+
         if Type = Type::HQ then
             recPurchLine.SetFilter("Buy-from Vendor No.", VendorEvent.GetFilterZyxelVendors(Type::EMEA, true))
         else
             recPurchLine.SetFilter("Buy-from Vendor No.", VendorEvent.GetFilterZyxelVendors(Type, false));
-        //<< 25-11-20 ZY-LD 006
+
         Page.RunModal(Page::"Purchase Lines", recPurchLine);
-        //<< 08-07-19 ZY-LD 004
+
     end;
 
     local procedure DrillDownUnshippedQuantity(Type: Option HQ,EMEA)
     var
         recUnshipPurchOrder: Record "Unshipped Purchase Order";
-        PurchLine: Record "Purchase Line";
+
     begin
         // Rolled back to old unshipped.
         recUnshipPurchOrder.SETRANGE("Item No.", Rec."No.");
@@ -409,15 +411,7 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
             recUnshipPurchOrder.SETFILTER("Buy-from Vendor No.", VendorEvent.GetFilterZyxelVendors(Type, FALSE));
         PAGE.RUNMODAL(PAGE::"Unshipped Purchase Order", recUnshipPurchOrder);
 
-        /*PurchLine.SetRange("Document Type", PurchLine."Document Type"::Order);
-        PurchLine.SetRange(Type, PurchLine.Type::Item);
-        PurchLine.SetRange("No.", Rec."No.");
-        PurchLine.SetFilter(OriginalLineNo, '<>0');
-        if Type = Type::HQ then
-            PurchLine.SetFilter("Buy-from Vendor No.", VendorEvent.GetFilterZyxelVendors(Type::EMEA, true))
-        else
-            PurchLine.SetFilter("Buy-from Vendor No.", VendorEvent.GetFilterZyxelVendors(Type, false));
-        Page.RunModal(Page::"Purchase Lines", PurchLine);*/
+
     end;
 
     local procedure OnLookUpGoodsInTransit(Type: Option HQ,EMEA)
@@ -425,10 +419,8 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
         recGoodsInTrans: Record "VCK Shipping Detail";
         recGoodsInTransTmp: Record "VCK Shipping Detail" temporary;
         recUserSetup: Record "User Setup";
-        ZGT: Codeunit "ZyXEL General Tools";
         NewEntryNo: Integer;
     begin
-        //>> 25-11-20 ZY-LD 006
         recGoodsInTrans.SetRange("Item No.", Rec."No.");
         if Type = Type::HQ then
             recGoodsInTrans.SetFilter("Buy-from Vendor No.", VendorEvent.GetFilterZyxelVendors(Type::EMEA, true))
@@ -436,7 +428,6 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
             recGoodsInTrans.SetFilter("Buy-from Vendor No.", VendorEvent.GetFilterZyxelVendors(Type, false));
         recGoodsInTrans.SetRange("Order Type", recGoodsInTrans."order type"::"Purchase Order");
 
-        //>> 09-06-22 ZY-LD 010
         if not recUserSetup.Get(UserId()) or
           (recUserSetup."Show Goods in Transit as" = recUserSetup."show goods in transit as"::Merged)
         then begin
@@ -466,15 +457,16 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
                         recGoodsInTransTmp.ETD := recGoodsInTrans.ETD;
                         recGoodsInTransTmp."Expected Receipt Date" := recGoodsInTrans."Expected Receipt Date";
                         recGoodsInTransTmp."Shipping Method" := recGoodsInTrans."Shipping Method";
+                        //13-10-2025 BK #525482
+                        recGoodsInTransTmp."Calculated ETA Date" := recGoodsInTrans."Calculated ETA Date";
                         recGoodsInTransTmp.Insert();
                     end;
                 until recGoodsInTrans.Next() = 0;
 
             recGoodsInTransTmp.Reset();
             Page.RunModal(Page::"VCK Container Details ETA", recGoodsInTransTmp);
-        end else  //<< 09-06-22 ZY-LD 010
+        end else
             Page.RunModal(Page::"VCK Container Details", recGoodsInTrans);
-        //<< 25-11-20 ZY-LD 006
     end;
 
     local procedure EnableControls()
@@ -485,6 +477,6 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
 
     procedure SetLocationFilter(LocationCode: Code[20])
     begin
-        Rec."Location Filter" := LocationCode;
+        Rec."Location Filter" := copystr(LocationCode, 1, 10);
     end;
 }

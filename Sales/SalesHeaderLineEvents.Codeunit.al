@@ -3185,4 +3185,15 @@ codeunit 50067 "Sales Header/Line Events"
         // 15-05-2025 BK #493054
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse. Validate Source Line", OnBeforeVerifyFieldNotChanged, '', false, false)]
+    local procedure "Whse. Validate Source Line_OnBeforeVerifyFieldNotChanged"(NewRecRef: RecordRef; OldRecRef: RecordRef; FieldNumber: Integer; var IsHandled: Boolean)
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        //14-10-2025 BK #533171
+        if (NewRecRef.Number = Database::"Sales Line") and (FieldNumber = SalesLine.FieldNo("Shipment Date")) then
+            IsHandled := true;
+    end;
+
+
 }
