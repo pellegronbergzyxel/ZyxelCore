@@ -285,9 +285,9 @@ Codeunit 50088 "Post Rcpt. Response Mgt."
             recRespLine.SetRange("Source Order No.", precRespLine."Source Order No.");
             recRespLine.SetRange("Real Source Order No.", precRespLine."Real Source Order No.");
             recRespLine.SetRange(Open, true);
-            recRespLine.SetRange("Invoice No.", precRespLine."Invoice No.");  // 19-05-22 ZY-LD 019
+            recRespLine.SetRange("Invoice No.", precRespLine."Invoice No.");
             recRespLine.SetAutocalcFields("Real Source Order No.", "Real Source Order Line No.", "Invoice No.");
-            recRespLine.ModifyAll("Error Text", '');
+            recRespLine.ModifyAll("Error Text", ''); //15-10-25 BK #Upgrade 26 Issue
             if recRespLine.FindSet(true) then begin
                 repeat
                     // Handle records here
@@ -451,8 +451,8 @@ Codeunit 50088 "Post Rcpt. Response Mgt."
             recRespLine.SetRange(Open, true);
             recRespLine.SetRange(Location, ItemLogisticEvent.GetMainWarehouseLocation()); //We will only post main warehouse locations.
             recRespLine.SetAutocalcFields("Real Source Order No.", "Real Source Order Line No.");
+            recRespLine.ModifyAll("Error Text", ''); //15-10-25 BK #Upgrade 26 Issue
             if recRespLine.FindSet(true) then begin
-                recRespLine.ModifyAll("Error Text", '');
                 repeat
                     // Handle records here
                     // Find out if the line has been previous posted
@@ -884,8 +884,8 @@ Codeunit 50088 "Post Rcpt. Response Mgt."
             recRespLine.SetRange("Real Source Order No.", precRespLine."Real Source Order No.");
             recRespLine.SetRange(Open, true);
             recRespLine.SetAutocalcFields("Real Source Order No.", "Real Source Order Line No.", "Invoice No.");
+            recRespLine.ModifyAll("Error Text", ''); //15-10-25 BK #Upgrade 26 Issue
             if recRespLine.FindSet(true) then begin
-                recRespLine.ModifyAll("Error Text", '');
 
                 repeat
                     // Handle records here
@@ -1076,8 +1076,8 @@ Codeunit 50088 "Post Rcpt. Response Mgt."
             recRespLine.SetRange("Real Source Order No.", precRespLine."Real Source Order No.");
             recRespLine.SetRange("Open - Shipment", true);
             recRespLine.SetAutocalcFields("Real Source Order No.", "Real Source Order Line No.", "Invoice No.");
+            recRespLine.ModifyAll("Error Text", ''); //15-10-25 BK #Upgrade 26 Issue
             if recRespLine.FindSet(true) then begin
-                recRespLine.ModifyAll("Error Text", '');
 
                 repeat
                     // Handle records here

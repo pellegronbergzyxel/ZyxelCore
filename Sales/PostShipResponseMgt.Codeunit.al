@@ -354,9 +354,8 @@ codeunit 50089 "Post Ship Response Mgt."
             recRespLine.SetRange("Customer Order No.", precRespLine."Customer Order No.");
             recRespLine.SetRange("Delivery Document Line Posted", false);
             recRespLine.SetRange(Open, true);
+            recRespLine.ModifyAll("Error Text", ''); //15-10-25 BK #Upgrade 26 Issue
             if recRespLine.FindSet(true) then begin
-                recRespLine.ModifyAll("Error Text", '');
-
                 repeat
                     // Handle records here
                     // Find out if the line has been previous posted
@@ -610,9 +609,8 @@ codeunit 50089 "Post Ship Response Mgt."
             recRespLine.SetRange("Customer Order No.", precRespLine."Customer Order No.");
             recRespLine.SetRange("Delivery Document Line Posted", false);
             recRespLine.SetRange(Open, true);
+            recRespLine.ModifyAll("Error Text", ''); //15-10-25 BK #Upgrade 26 Issue
             if recRespLine.FindSet(true) then begin
-                recRespLine.ModifyAll("Error Text", '');
-
                 repeat
                     // Handle records here
                     // Find out if the line has been previous posted
@@ -782,9 +780,8 @@ codeunit 50089 "Post Ship Response Mgt."
             recRespLine.SetRange("Sales Order No.", precRespLine."Sales Order No.");
             recRespLine.SetRange("Customer Order No.", precRespLine."Customer Order No.");
             recRespLine.SetRange("Open - Receipt", true);
+            recRespLine.ModifyAll("Error Text", ''); //15-10-25 BK #Upgrade 26 Issue
             if recRespLine.FindSet(true) then begin
-                recRespLine.ModifyAll("Error Text", '');
-
                 repeat
                     // Handle records here
                     // Find out if the line has been previous posted
