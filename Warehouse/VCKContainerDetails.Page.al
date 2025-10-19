@@ -444,16 +444,14 @@ Page 50101 "VCK Container Details"
 
     trigger OnModifyRecord(): Boolean
     begin
-        if Rec."Data Received Created" <> 0DT then
-            if not Confirm(Text003, false) then
-                Error(Text002);
+        if ZGT.IsZNetCompany() then //16-10-2025 BK #533597
+            if Rec."Data Received Created" <> 0DT then
+                if not Confirm(Text003, false) then
+                    Error(Text002);
     end;
 
     trigger OnOpenPage()
     begin
-        if UserId() = 'jkral' then
-            CurrPage.Editable := true;
-
         SetActions();
 
         if ZGT.IsZComCompany() then

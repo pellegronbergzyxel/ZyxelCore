@@ -85,11 +85,13 @@ XmlPort 50032 "HQ ContainerDetail"
 
     procedure GetData(var pContainerDetail: Record "VCK Shipping Detail" temporary)
     var
+        Location: Record Location;
+        zgt: Codeunit "ZyXEL General Tools";
         lText001: label '"%1" is blank on: %2: %3, %4: %5, %6: %7. Container details has not been imported.';
     begin
         if "VCK Shipping Detail".FindSet then
             repeat
-                //>> 23-04-20 ZY-LD 001
+
                 if ("VCK Shipping Detail"."Container No." = '') and
                    ("VCK Shipping Detail"."Bill of Lading No." = '')
                 then
@@ -98,9 +100,18 @@ XmlPort 50032 "HQ ContainerDetail"
                       "VCK Shipping Detail".FieldCaption("Invoice No."), "VCK Shipping Detail"."Invoice No.",
                       "VCK Shipping Detail".FieldName("Purchase Order No."), "VCK Shipping Detail"."Purchase Order No.",
                       "VCK Shipping Detail".FieldName("Purchase Order Line No."), "VCK Shipping Detail"."Purchase Order Line No.");
-                //<< 23-04-20 ZY-LD 001
 
                 pContainerDetail := "VCK Shipping Detail";
+                //16-10-2025 BK #533597
+                IF "VCK Shipping Detail".Location <> '' THEN
+                    IF Location.get("VCK Shipping Detail".Location) THEN
+                        pContainerDetail."Main Warehouse" := Location."Main Warehouse";
+                //16-10-2025 BK #533597
+
+                //16-10-2025 BK #533597
+                if "VCK Shipping Detail".ETD <> 0D then
+                    if ZGT.IsZComCompany() then
+                        pContainerDetail.Validate(ETD);
                 pContainerDetail.Insert;
             until "VCK Shipping Detail".Next() = 0;
     end;

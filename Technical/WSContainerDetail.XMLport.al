@@ -65,7 +65,10 @@ XmlPort 50069 "WS Container Detail"
                 begin
                     EntryNo += 1;
                     "VCK Shipping Detail"."Entry No." := EntryNo;
-
+                    //16-10-2025 BK #533597
+                    IF "VCK Shipping Detail".ETA <> 0D THEN
+                        IF ZGT.IsZComCompany() THEN
+                            "VCK Shipping Detail".Validate(ETD);
                 end;
             }
         }
@@ -158,6 +161,10 @@ XmlPort 50069 "WS Container Detail"
                 "VCK Shipping Detail".Quantity := recSalesLine.Quantity;
                 "VCK Shipping Detail".ETA := Today + NoOfDays;
                 "VCK Shipping Detail".ETD := Today;
+                //16-10-25 BK #533598
+                if "VCK Shipping Detail".ETD <> 0D then
+                    if ZGT.IsZComCompany() then
+                        "VCK Shipping Detail".Validate(ETD);
                 "VCK Shipping Detail"."Order No." := recSalesLine."Document No.";
                 "VCK Shipping Detail"."Order Type" := "VCK Shipping Detail"."order type"::"Sales Return Order";
                 "VCK Shipping Detail".Location := recSalesLine."Location Code";
@@ -203,8 +210,6 @@ XmlPort 50069 "WS Container Detail"
                 "VCK Shipping Detail".Quantity := recPurchLine.Quantity;
                 "VCK Shipping Detail".ETA := recPurchLine.ETA;
                 "VCK Shipping Detail".ETD := recPurchLine."ETD Date";
-                if ZGT.IsZComCompany() then
-                    "VCK Shipping Detail".Validate(ETD); //26-09-2025 BK #525482
                 if "VCK Shipping Detail".ETD = 0D then
                     "VCK Shipping Detail".ETD := "VCK Shipping Detail".ETA;
                 "VCK Shipping Detail"."Order No." := recPurchLine."Document No.";
@@ -217,6 +222,12 @@ XmlPort 50069 "WS Container Detail"
                 "VCK Shipping Detail"."Expected Receipt Date" := recPurchLine."Expected Receipt Date";
                 recPurchHead.Get(recPurchHead."document type"::Order, pPurchOrderNo);
                 "VCK Shipping Detail"."Shipping Method" := recPurchHead."Shipment Method Code";
+
+                //26-09-2025 BK #525482 
+                if "VCK Shipping Detail".ETD <> 0D then
+                    if ZGT.IsZComCompany() then
+                        "VCK Shipping Detail".Validate(ETD);
+
                 "VCK Shipping Detail".Insert;
             until recPurchLine.Next() = 0;
         exit(true);
@@ -276,6 +287,7 @@ XmlPort 50069 "WS Container Detail"
     procedure GetData(var pContainerDetail: Record "VCK Shipping Detail" temporary)
     var
         recInvSetup: Record "Inventory Setup";
+        Location: Record Location;
         lText001: label 'The "Item No." %1 is not an acceptable number.';
     begin
         if "VCK Shipping Detail".FindSet then begin
@@ -289,6 +301,10 @@ XmlPort 50069 "WS Container Detail"
 
                 if pContainerDetail.Location = '' then
                     pContainerDetail.Location := recInvSetup."AIT Location Code";
+                //16-10-2025 BK #533597
+                if pContainerDetail.Location <> '' then
+                    if Location.Get(pContainerDetail.Location) then
+                        pContainerDetail."Main Warehouse" := Location."Main Warehouse";
 
                 pContainerDetail.Insert;
             until "VCK Shipping Detail".Next() = 0;

@@ -249,6 +249,10 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
 
                 ContainerDetailRec."Data Received Created" := CDT;
                 ContainerDetailRec.Validate("Original ETA Date", ContainerDetailRec.ETA);
+                //16-10-2025 BK #533597
+                IF ContainerDetailRec.ETA <> 0D THEN
+                    ContainerDetailRec.Validate(ContainerDetailRec.ETD);
+
                 ContainerDetailRec.Insert(true);
 
                 WebServiceLogEntry."Quantity Inserted" += 1;

@@ -366,6 +366,12 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
                     WhseInbLine.Quantity := Pol.Quantity;
                     WhseInbLine.ETA := Pol."Expected Receipt Date";
                     WhseInbLine.ETD := Pol."Expected Receipt Date";
+
+                    //16-10-2025 BK #533597
+                    if WhseInbLine.ETD <> 0D then
+                        if zgt.IsZComCompany() then
+                            WhseInbLine.Validate(ETD);
+
                     WhseInbLine."Expected Receipt Date" := Pol."Expected Receipt Date";
 
                     //01-07-025 BK #511511

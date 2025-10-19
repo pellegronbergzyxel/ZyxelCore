@@ -104,6 +104,18 @@ Table 50046 "VCK Shipping Detail"
             Caption = 'Shipping Method Code / Incoterms';
             Description = 'PAB 1.0';
             TableRelation = "Shipment Method";
+
+            trigger OnValidate() //16-10-2025 BK #532924
+            var
+                ZGT: Codeunit "Zyxel General Tools";
+                WarehouseSetup: Record "Warehouse Setup";
+                ShipmentMethodrec: Record "Shipment Method";
+
+            begin
+                if zgt.IsZComCompany() then
+                    if ETD <> 0D then
+                        Validate(ETD);
+            end;
         }
         field(11; "Order No."; Code[30])
         {
