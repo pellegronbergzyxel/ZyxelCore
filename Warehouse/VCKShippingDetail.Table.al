@@ -70,13 +70,18 @@ Table 50046 "VCK Shipping Detail"
             Description = 'PAB 1.0';
 
             trigger OnValidate()
-            begin
-                if ETA <> 0D then
-                    "Previous ETA Date" := xRec.ETA;
+            var
+                ZGT: Codeunit "Zyxel General Tools";
 
-                "Expected Shipping Days" := ETA - ETD;
-                if (xRec.ETA <> 0D) and ("Expected Receipt Date" <> 0D) then
-                    Validate("Expected Receipt Date", CalcDate('+' + Format("Expected Receipt Date" - xRec.ETA) + 'D', ETA));
+            begin
+                If zgt.IsZNetCompany() then begin //20-10-2025 BK #532924 
+                    if ETA <> 0D then
+                        "Previous ETA Date" := xRec.ETA;
+
+                    "Expected Shipping Days" := ETA - ETD;
+                    if (xRec.ETA <> 0D) and ("Expected Receipt Date" <> 0D) then
+                        Validate("Expected Receipt Date", CalcDate('+' + Format("Expected Receipt Date" - xRec.ETA) + 'D', ETA));
+                End;
             end;
         }
         field(9; ETD; Date)

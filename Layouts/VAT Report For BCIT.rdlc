@@ -63,7 +63,71 @@ End Function
   <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
-      <Fields />
+      <Fields>
+        <Field Name="PostingDate">
+          <DataField>PostingDate</DataField>
+        </Field>
+        <Field Name="DocumentDate">
+          <DataField>DocumentDate</DataField>
+        </Field>
+        <Field Name="DocumentType">
+          <DataField>DocumentType</DataField>
+        </Field>
+        <Field Name="DocumentNo">
+          <DataField>DocumentNo</DataField>
+        </Field>
+        <Field Name="ExternalDocumentNo">
+          <DataField>ExternalDocumentNo</DataField>
+        </Field>
+        <Field Name="SourceName">
+          <DataField>SourceName</DataField>
+        </Field>
+        <Field Name="VATIdentifier">
+          <DataField>VATIdentifier</DataField>
+        </Field>
+        <Field Name="VATPercent">
+          <DataField>VATPercent</DataField>
+        </Field>
+        <Field Name="VATPercentFormat">
+          <DataField>VATPercentFormat</DataField>
+        </Field>
+        <Field Name="DeductibleBase">
+          <DataField>DeductibleBase</DataField>
+        </Field>
+        <Field Name="DeductibleBaseFormat">
+          <DataField>DeductibleBaseFormat</DataField>
+        </Field>
+        <Field Name="DeductibleAmount">
+          <DataField>DeductibleAmount</DataField>
+        </Field>
+        <Field Name="DeductibleAmountFormat">
+          <DataField>DeductibleAmountFormat</DataField>
+        </Field>
+        <Field Name="NonDeductibleBase">
+          <DataField>NonDeductibleBase</DataField>
+        </Field>
+        <Field Name="NonDeductibleBaseFormat">
+          <DataField>NonDeductibleBaseFormat</DataField>
+        </Field>
+        <Field Name="NonDeductibleAmount">
+          <DataField>NonDeductibleAmount</DataField>
+        </Field>
+        <Field Name="NonDeductibleAmountFormat">
+          <DataField>NonDeductibleAmountFormat</DataField>
+        </Field>
+        <Field Name="DocumentTotal">
+          <DataField>DocumentTotal</DataField>
+        </Field>
+        <Field Name="DocumentTotalFormat">
+          <DataField>DocumentTotalFormat</DataField>
+        </Field>
+        <Field Name="VATRegistrationNo">
+          <DataField>VATRegistrationNo</DataField>
+        </Field>
+        <Field Name="CurrencyCode">
+          <DataField>CurrencyCode</DataField>
+        </Field>
+      </Fields>
       <Query>
         <DataSourceName>DataSource</DataSourceName>
         <CommandText />
