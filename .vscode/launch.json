@@ -130,8 +130,8 @@
             "schemaUpdateMode": "Synchronize",
             //"schemaUpdateMode": "ForceSync",
             "dependencyPublishingOption": "Ignore",
-            "startupCompany": "ZNet DK"
-            //"startupCompany": "ZyND DK"
+            //"startupCompany": "ZNet DK"
+            "startupCompany": "ZyND DK"
         },
         {
             "name": "Zyxel IT",

@@ -1,13 +1,6 @@
 Report 50066 "Sales - Invoice TR"
 {
-    // 001. 31-10-17 ZY-LD Country of Region is added after the Terrif Code.
-    // 001. 10-01-18 ZY-LD Changed from Sell-to TO Ship-to.
-    // 002. 16-02-18 ZY-LD 2018021410000151 - In Turkey we will not show discount.
-    // 003. 07-03-18 ZY-LD 2018030210000215 - Total quantity must be shown on the Turkish invoice.
-    // 004. 06-06-19 ZY-LD P0213 - New setup for VAT Registration No. Zyxel.
-    // 005. 09-08-21 ZY-LD 2021070210000087 - Position on External document No.
-    // 006. 31-05-22 ZY-LD 2022053010000106 - "External Document No." and "Tarriff No." is only shown on items.
-    // 007. 10-06-22 ZY-LD 2022061010000099 - "EU 3-Party Trade".
+
     DefaultLayout = RDLC;
     RDLCLayout = './Layouts/Sales - Invoice TR.rdlc';
 
@@ -482,7 +475,7 @@ Report 50066 "Sales - Invoice TR"
                         column(TotalInclVATText_SalesInvLine; TotalInclVATText)
                         {
                         }
-                        column(VATAmtText_SalesInvLine; VATAmountLine.VATAmountText)
+                        column(VATAmtText_SalesInvLine; VATAmountLine.VATAmountText())
                         {
                         }
                         column(DocNo_SalesInvLine; "Sales Invoice Line"."Document No.")
@@ -612,17 +605,17 @@ Report 50066 "Sales - Invoice TR"
                         dataitem(AsmLoop; "Integer")
                         {
                             DataItemTableView = sorting(Number);
-                            column(TempPostedAsmLineNo; BlanksForIndent + TempPostedAsmLine."No.")
+                            column(TempPostedAsmLineNo; BlanksForIndent() + TempPostedAsmLine."No.")
                             {
                             }
                             column(TempPostedAsmLineQuantity; TempPostedAsmLine.Quantity)
                             {
                                 DecimalPlaces = 0 : 5;
                             }
-                            column(TempPostedAsmLineDesc; BlanksForIndent + TempPostedAsmLine.Description)
+                            column(TempPostedAsmLineDesc; BlanksForIndent() + TempPostedAsmLine.Description)
                             {
                             }
-                            column(TempPostAsmLineVartCode; BlanksForIndent + TempPostedAsmLine."Variant Code")
+                            column(TempPostAsmLineVartCode; BlanksForIndent() + TempPostedAsmLine."Variant Code")
                             {
                             }
                             column(TempPostedAsmLineUOM; GetUOMText(TempPostedAsmLine."Unit of Measure Code"))
@@ -634,9 +627,9 @@ Report 50066 "Sales - Invoice TR"
                                 ItemTranslation: Record "Item Translation";
                             begin
                                 if AsmLoop.Number = 1 then
-                                    TempPostedAsmLine.FindSet
+                                    TempPostedAsmLine.FindSet()
                                 else
-                                    TempPostedAsmLine.Next;
+                                    TempPostedAsmLine.Next();
 
                                 if ItemTranslation.Get(TempPostedAsmLine."No.",
                                      TempPostedAsmLine."Variant Code",
@@ -650,7 +643,7 @@ Report 50066 "Sales - Invoice TR"
                                 Clear(TempPostedAsmLine);
                                 if not DisplayAssemblyInformation then
                                     CurrReport.Break();
-                                CollectAsmInformation;
+                                CollectAsmInformation();
                                 Clear(TempPostedAsmLine);
                                 AsmLoop.SetRange(AsmLoop.Number, 1, TempPostedAsmLine.Count);
                             end;
@@ -660,7 +653,7 @@ Report 50066 "Sales - Invoice TR"
                         begin
                             PostedShipmentDate := 0D;
                             if "Sales Invoice Line".Quantity <> 0 then
-                                PostedShipmentDate := FindPostedShipmentDate;
+                                PostedShipmentDate := FindPostedShipmentDate();
 
                             if ("Sales Invoice Line".Type = "Sales Invoice Line".Type::"G/L Account") and (not ShowInternalInfo) then
                                 "Sales Invoice Line"."No." := '';
@@ -681,6 +674,7 @@ Report 50066 "Sales - Invoice TR"
 
                             TotalSubTotal += "Sales Invoice Line"."Line Amount";
                             TotalInvDiscAmount -= "Sales Invoice Line"."Inv. Discount Amount";
+                            TotalLineDiscAmount -= "Sales Invoice Line"."Line Discount Amount"; //28-10-25 BK #529913
                             TotalAmount += "Sales Invoice Line".Amount;
                             TotalAmountVAT += "Sales Invoice Line"."Amount Including VAT" - "Sales Invoice Line".Amount;
                             TotalAmountInclVAT += "Sales Invoice Line"."Amount Including VAT";
@@ -804,6 +798,19 @@ Report 50066 "Sales - Invoice TR"
                         {
                             AutoFormatExpression = "Sales Invoice Header"."Currency Code";
                             AutoFormatType = 1;
+                        }
+                        column(TotalLineDiscAmount; TotalLineDiscAmount) //28-10-25 BK #529913
+                        {
+                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatType = 1;
+                        }
+                        column(BruttoTotalbl; BruttoTotalbl) //28-10-25 BK #529913
+                        {
+
+                        }
+                        column(DiscountAmountLbl; DiscountAmountLbl) //28-10-25 BK #529913
+                        {
+
                         }
 
                         trigger OnAfterGetRecord()
@@ -961,6 +968,7 @@ Report 50066 "Sales - Invoice TR"
 
                     TotalSubTotal := 0;
                     TotalInvDiscAmount := 0;
+                    TotalLineDiscAmount := 0; //28-10-25 BK #529913
                     TotalAmount := 0;
                     TotalAmountVAT := 0;
                     TotalAmountInclVAT := 0;
@@ -1310,6 +1318,7 @@ Report 50066 "Sales - Invoice TR"
         TotalAmountInclVAT: Decimal;
         TotalAmountVAT: Decimal;
         TotalInvDiscAmount: Decimal;
+        TotalLineDiscAmount: Decimal; //28-10-25 BK #529913
         TotalPaymentDiscOnVAT: Decimal;
         [InDataSet]
         LogInteractionEnable: Boolean;
@@ -1348,6 +1357,8 @@ Report 50066 "Sales - Invoice TR"
         VATIdentifierCaptionLbl: label 'VAT Identifier';
         HomePageCaptionCap: label 'Home Page';
         EMailCaptionLbl: label 'E-Mail';
+        BruttoTotalbl: label 'Total without discounts';
+        DiscountAmountLbl: label 'Discount';
         DisplayAdditionalFeeNote: Boolean;
         sellcust: Record Customer;
         SellVATID: Text[20];

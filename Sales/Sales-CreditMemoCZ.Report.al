@@ -1,11 +1,5 @@
 Report 50020 "Sales - Credit Memo CZ"
 {
-    // 001 20-10-17 ZY-LD Changed the width of the Bill-To address.
-    // 002. 06-06-19 ZY-LD P0213 - New setup for VAT Registration No. Zyxel.
-    // 003. 09-08-21 ZY-LD 2021070210000087 - Position on External document No.
-    // 004. 14-01-22 ZY-LD 2022011010000062 - Recycling fee was missing on Cr. Memo.
-    // 005. 31-05-22 ZY-LD 2022053010000106 - "External Document No." and "Tarriff No." is only shown on items.
-    // 006. 10-06-22 ZY-LD 2022061010000099 - "EU 3-Party Trade".
     DefaultLayout = RDLC;
     RDLCLayout = './Layouts/Sales - Credit Memo CZ.rdlc';
 
@@ -86,7 +80,7 @@ Report 50020 "Sales - Credit Memo CZ"
                     column(CompanyInfo3Picture; CompanyInfo3.Picture)
                     {
                     }
-                    column(DocumentCaptionCopyText; StrSubstNo(DocumentCaption, CopyText))
+                    column(DocumentCaptionCopyText; StrSubstNo(DocumentCaption(), CopyText))
                     {
                     }
                     column(CustAddr1; CustAddr[1])
@@ -340,7 +334,7 @@ Report 50020 "Sales - Credit Memo CZ"
                         trigger OnAfterGetRecord()
                         begin
                             if DimensionLoop1.Number = 1 then begin
-                                if not DimSetEntry1.FindSet then
+                                if not DimSetEntry1.FindSet() then
                                     CurrReport.Break();
                             end else
                                 if not Continue then
@@ -349,14 +343,14 @@ Report 50020 "Sales - Credit Memo CZ"
                             Clear(DimText);
                             Continue := false;
                             repeat
-                                OldDimText := DimText;
+                                OldDimText := copystr(DimText, 1, 75);
                                 if DimText = '' then
-                                    DimText := StrSubstNo('%1 %2', DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code")
+                                    DimText := copystr(StrSubstNo('%1 %2', DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code"), 1, 120)
                                 else
-                                    DimText :=
+                                    DimText := copystr(
                                       StrSubstNo(
                                         '%1, %2 %3', DimText,
-                                        DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code");
+                                        DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code"), 1, 120);
                                 if StrLen(DimText) > MaxStrLen(OldDimText) then begin
                                     DimText := OldDimText;
                                     Continue := true;
@@ -378,7 +372,7 @@ Report 50020 "Sales - Credit Memo CZ"
                         DataItemTableView = sorting("Document No.", "Line No.") where("Hide Line" = const(false));
                         column(LineAmt_SalesInvLine; "Sales Cr.Memo Line"."Line Amount")
                         {
-                            AutoFormatExpression = GetCurrencyCode;
+                            AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 1;
                         }
                         column(Desc_SalesInvLine; "Sales Cr.Memo Line".Description)
@@ -395,7 +389,7 @@ Report 50020 "Sales - Credit Memo CZ"
                         }
                         column(UnitPrice_SalesInvLine; "Sales Cr.Memo Line"."Unit Price")
                         {
-                            AutoFormatExpression = GetCurrencyCode;
+                            AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 2;
                         }
                         column(Discount_SalesInvLine; "Sales Cr.Memo Line"."Line Discount %")
@@ -409,7 +403,7 @@ Report 50020 "Sales - Credit Memo CZ"
                         }
                         column(InvDiscLineAmt_SalesInvLine; -"Sales Cr.Memo Line"."Inv. Discount Amount")
                         {
-                            AutoFormatExpression = GetCurrencyCode;
+                            AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 1;
                         }
                         column(TotalSubTotal; TotalSubTotal)
@@ -427,7 +421,7 @@ Report 50020 "Sales - Credit Memo CZ"
                         }
                         column(Amount_SalesInvLine; "Sales Cr.Memo Line".Amount)
                         {
-                            AutoFormatExpression = GetCurrencyCode;
+                            AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 1;
                         }
                         column(TotalAmount; TotalAmount)
@@ -437,15 +431,15 @@ Report 50020 "Sales - Credit Memo CZ"
                         }
                         column(Amount_AmtInclVAT; "Sales Cr.Memo Line"."Amount Including VAT" - "Sales Cr.Memo Line".Amount)
                         {
-                            AutoFormatExpression = GetCurrencyCode;
+                            AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 1;
                         }
                         column(AmtInclVAT_SalesInvLine; "Sales Cr.Memo Line"."Amount Including VAT")
                         {
-                            AutoFormatExpression = GetCurrencyCode;
+                            AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 1;
                         }
-                        column(VATAmtLineVATAmtText; VATAmountLine.VATAmountText)
+                        column(VATAmtLineVATAmtText; VATAmountLine.VATAmountText())
                         {
                         }
                         column(LineAmtAfterInvDiscAmt; -("Sales Cr.Memo Line"."Line Amount" - "Sales Cr.Memo Line"."Inv. Discount Amount" - "Sales Cr.Memo Line"."Amount Including VAT"))
@@ -464,7 +458,7 @@ Report 50020 "Sales - Credit Memo CZ"
                         column(TotalInclVATText_SalesInvLine; TotalInclVATText)
                         {
                         }
-                        column(VATAmtText_SalesInvLine; VATAmountLine.VATAmountText)
+                        column(VATAmtText_SalesInvLine; VATAmountLine.VATAmountText())
                         {
                         }
                         column(DocNo_SalesInvLine; "Sales Cr.Memo Line"."Document No.")
@@ -537,7 +531,7 @@ Report 50020 "Sales - Credit Memo CZ"
                                 if "Sales Shipment Buffer".Number = 1 then
                                     SalesShipmentBuffer.Find('-')
                                 else
-                                    SalesShipmentBuffer.Next;
+                                    SalesShipmentBuffer.Next();
                             end;
 
                             trigger OnPreDataItem()
@@ -558,7 +552,7 @@ Report 50020 "Sales - Credit Memo CZ"
                             trigger OnAfterGetRecord()
                             begin
                                 if DimensionLoop2.Number = 1 then begin
-                                    if not DimSetEntry2.FindSet then
+                                    if not DimSetEntry2.FindSet() then
                                         CurrReport.Break();
                                 end else
                                     if not Continue then
@@ -567,14 +561,14 @@ Report 50020 "Sales - Credit Memo CZ"
                                 Clear(DimText);
                                 Continue := false;
                                 repeat
-                                    OldDimText := DimText;
+                                    OldDimText := copystr(DimText, 1, 75);
                                     if DimText = '' then
-                                        DimText := StrSubstNo('%1 %2', DimSetEntry2."Dimension Code", DimSetEntry2."Dimension Value Code")
+                                        DimText := copystr(StrSubstNo('%1 %2', DimSetEntry2."Dimension Code", DimSetEntry2."Dimension Value Code"), 1, 120)
                                     else
-                                        DimText :=
+                                        DimText := copystr(
                                           StrSubstNo(
                                             '%1, %2 %3', DimText,
-                                            DimSetEntry2."Dimension Code", DimSetEntry2."Dimension Value Code");
+                                            DimSetEntry2."Dimension Code", DimSetEntry2."Dimension Value Code"), 1, 120);
                                     if StrLen(DimText) > MaxStrLen(OldDimText) then begin
                                         DimText := OldDimText;
                                         Continue := true;
@@ -596,12 +590,12 @@ Report 50020 "Sales - Credit Memo CZ"
                         begin
                             PostedShipmentDate := 0D;
                             if "Sales Cr.Memo Line".Quantity <> 0 then
-                                PostedShipmentDate := FindPostedShipmentDate;
+                                PostedShipmentDate := FindPostedShipmentDate();
 
                             if ("Sales Cr.Memo Line".Type = "Sales Cr.Memo Line".Type::"G/L Account") and (not ShowInternalInfo) then
                                 "Sales Cr.Memo Line"."No." := '';
 
-                            VATAmountLine.Init;
+                            VATAmountLine.Init();
                             VATAmountLine."VAT Identifier" := "Sales Cr.Memo Line"."VAT Identifier";
                             VATAmountLine."VAT Calculation Type" := "Sales Cr.Memo Line"."VAT Calculation Type";
                             VATAmountLine."Tax Group Code" := "Sales Cr.Memo Line"."Tax Group Code";
@@ -613,7 +607,7 @@ Report 50020 "Sales - Credit Memo CZ"
                                 VATAmountLine."Inv. Disc. Base Amount" := "Sales Cr.Memo Line"."Line Amount";
                             VATAmountLine."Invoice Discount Amount" := "Sales Cr.Memo Line"."Inv. Discount Amount";
                             VATAmountLine."VAT Clause Code" := "Sales Cr.Memo Line"."VAT Clause Code";
-                            VATAmountLine.InsertLine;
+                            VATAmountLine.InsertLine();
 
                             TotalSubTotal += "Sales Cr.Memo Line"."Line Amount";
                             TotalInvDiscAmount -= "Sales Cr.Memo Line"."Inv. Discount Amount";
@@ -622,14 +616,11 @@ Report 50020 "Sales - Credit Memo CZ"
                             TotalAmountInclVAT += "Sales Cr.Memo Line"."Amount Including VAT";
                             TotalPaymentDiscOnVAT += -("Sales Cr.Memo Line"."Line Amount" - "Sales Cr.Memo Line"."Inv. Discount Amount" - "Sales Cr.Memo Line"."Amount Including VAT");
 
-                            //RD 1.0
-
-                            DescriptionWEEE := '';  //>> 14-01-22 ZY-LD 004
+                            DescriptionWEEE := '';
                             TarrifCode := '';
                             if ("Sales Cr.Memo Line".Type = "Sales Cr.Memo Line".Type::Item) and recItem.Get("Sales Cr.Memo Line"."No.") then begin
                                 TarrifCode := recItem."Tariff No.";
 
-                                //>> 14-01-22 ZY-LD 004
                                 if "Sales Cr.Memo Header"."Posting Date" >= 20210101D then begin
                                     recCountry.Get("Sales Cr.Memo Header"."Sell-to Country/Region Code");
                                     if recCountry."Recycling Fee per. Unit" <> 0 then begin
@@ -641,7 +632,6 @@ Report 50020 "Sales - Credit Memo CZ"
                                             recCountry."Recycling Fee Currency Code");
                                     end;
                                 end;
-                                //<< 14-01-22 ZY-LD 004
                             end;
 
                             if "Sales Cr.Memo Line".Type in ["Sales Cr.Memo Line".Type::"G/L Account", "Sales Cr.Memo Line".Type::Item] then
@@ -651,10 +641,9 @@ Report 50020 "Sales - Credit Memo CZ"
                                   "Sales Cr.Memo Line"."VAT Bus. Posting Group",
                                   "Sales Cr.Memo Line"."VAT Prod. Posting Group",
                                   "Sales Cr.Memo Line"."Sell-to Customer No.",
-                                  "Sales Cr.Memo Header"."EU 3-Party Trade",  // 10-06-22 ZY-LD 006
+                                  "Sales Cr.Memo Header"."EU 3-Party Trade",
                                   ArticleText);
 
-                            //>> 09-08-21 ZY-LD 003
                             ExternalDocumentNoLine := '';
                             if "Sales Cr.Memo Line"."External Document No." <> '' then
                                 ExternalDocumentNoLine := "Sales Cr.Memo Line"."External Document No."
@@ -662,14 +651,23 @@ Report 50020 "Sales - Credit Memo CZ"
                                 ExternalDocumentNoLine := "Sales Cr.Memo Header"."External Document No.";
                             if "Sales Cr.Memo Line"."External Document Position No." <> '' then
                                 ExternalDocumentNoLine += StrSubstNo(', Pos: %1', "Sales Cr.Memo Line"."External Document Position No.");
-                            //<< 09-08-21 ZY-LD 003
+
+                            //27-10-25 BK #506594
+                            if ("Sales Cr.Memo Line".Type = type::Item) and ("Sales Cr.Memo Line"."No." <> '') then
+                                if recItem.get("Sales Cr.Memo Line"."No.") then
+                                    if (recItem.NonInventoryPostingGroup <> '') and (recItem.Type = recItem.Type::"Non-Inventory") then begin
+                                        "Sales Cr.Memo Line".Quantity := 0;
+                                        "Sales Cr.Memo Line"."Line Discount %" := 0;
+                                        "Sales Cr.Memo Line"."Unit Price" := 0;
+                                        "Sales Cr.Memo Line"."Unit of Measure" := '';
+                                    end;
                         end;
 
                         trigger OnPreDataItem()
                         begin
-                            VATAmountLine.DeleteAll;
-                            SalesShipmentBuffer.Reset;
-                            SalesShipmentBuffer.DeleteAll;
+                            VATAmountLine.DeleteAll();
+                            SalesShipmentBuffer.Reset();
+                            SalesShipmentBuffer.DeleteAll();
                             FirstValueEntryNo := 0;
                             MoreLines := "Sales Cr.Memo Line".Find('+');
                             while MoreLines and ("Sales Cr.Memo Line".Description = '') and ("Sales Cr.Memo Line"."No." = '') and ("Sales Cr.Memo Line".Quantity = 0) and ("Sales Cr.Memo Line".Amount = 0) do
@@ -684,7 +682,7 @@ Report 50020 "Sales - Credit Memo CZ"
                         DataItemTableView = sorting(Number);
                         column(VATAmtLineVATBase; VATAmountLine."VAT Base")
                         {
-                            AutoFormatExpression = "Sales Cr.Memo Line".GetCurrencyCode;
+                            AutoFormatExpression = "Sales Cr.Memo Line".GetCurrencyCode();
                             AutoFormatType = 1;
                         }
                         column(VATAmtLineVATAmt; VATAmountLine."VAT Amount")
@@ -760,7 +758,7 @@ Report 50020 "Sales - Credit Memo CZ"
 
                         trigger OnPreDataItem()
                         begin
-                            VATCounter.SetRange(VATCounter.Number, 1, VATAmountLine.Count);
+                            VATCounter.SetRange(VATCounter.Number, 1, VATAmountLine.Count());
                         end;
                     }
                     dataitem(VATClauseEntryCounter; "Integer")
@@ -797,14 +795,14 @@ Report 50020 "Sales - Credit Memo CZ"
                         begin
                             VATAmountLine.GetLine(VATClauseEntryCounter.Number);
                             if not VATClause.Get(VATAmountLine."VAT Clause Code") then
-                                CurrReport.Skip;
+                                CurrReport.Skip();
                             VATClause.TranslateDescription("Sales Cr.Memo Header"."Language Code");
                         end;
 
                         trigger OnPreDataItem()
                         begin
                             Clear(VATClause);
-                            VATClauseEntryCounter.SetRange(VATClauseEntryCounter.Number, 1, VATAmountLine.Count);
+                            VATClauseEntryCounter.SetRange(VATClauseEntryCounter.Number, 1, VATAmountLine.Count());
                         end;
                     }
                     dataitem(VatCounterLCY; "Integer")
@@ -852,7 +850,7 @@ Report 50020 "Sales - Credit Memo CZ"
                             then
                                 CurrReport.Break();
 
-                            VatCounterLCY.SetRange(VatCounterLCY.Number, 1, VATAmountLine.Count);
+                            VatCounterLCY.SetRange(VatCounterLCY.Number, 1, VATAmountLine.Count());
 
                             if GLSetup."LCY Code" = '' then
                                 VALSpecLCYHeader := Text007 + Text008
@@ -890,8 +888,8 @@ Report 50020 "Sales - Credit Memo CZ"
                                 CurrReport.Break();
 
                             if LineFee.Number = 1 then begin
-                                if not TempLineFeeNoteOnReportHist.FindSet then
-                                    CurrReport.Break
+                                if not TempLineFeeNoteOnReportHist.FindSet() then
+                                    CurrReport.Break()
                             end else
                                 if TempLineFeeNoteOnReportHist.Next() = 0 then
                                     CurrReport.Break();
@@ -916,7 +914,7 @@ Report 50020 "Sales - Credit Memo CZ"
 
                 trigger OnPostDataItem()
                 begin
-                    if not CurrReport.Preview then
+                    if not CurrReport.Preview() then
                         SalesCrMemoCountPrinted.Run("Sales Cr.Memo Header");
                 end;
 
@@ -935,7 +933,7 @@ Report 50020 "Sales - Credit Memo CZ"
             begin
                 CurrReport.Language := LanguageCU.GetLanguageIdOrDefault("Sales Cr.Memo Header"."Language Code");
 
-                CompanyInfo.Get;
+                CompanyInfo.Get();
 
                 if RespCenter.Get("Sales Cr.Memo Header"."Responsibility Center") then begin
                     FormatAddr.RespCenter(CompanyAddr, RespCenter);
@@ -949,9 +947,9 @@ Report 50020 "Sales - Credit Memo CZ"
                 if "Sales Cr.Memo Header"."Return Order No." = '' then
                     ReturnOrderNoText := ''
                 else
-                    ReturnOrderNoText := "Sales Cr.Memo Header".FieldCaption("Sales Cr.Memo Header"."Return Order No.");
+                    ReturnOrderNoText := copystr("Sales Cr.Memo Header".FieldCaption("Sales Cr.Memo Header"."Return Order No."), 1, 80);
                 if "Sales Cr.Memo Header"."Salesperson Code" = '' then begin
-                    SalesPurchPerson.Init;
+                    SalesPurchPerson.Init();
                     SalesPersonText := '';
                 end else begin
                     SalesPurchPerson.Get("Sales Cr.Memo Header"."Salesperson Code");
@@ -960,11 +958,11 @@ Report 50020 "Sales - Credit Memo CZ"
                 if "Sales Cr.Memo Header"."Your Reference" = '' then
                     ReferenceText := ''
                 else
-                    ReferenceText := "Sales Cr.Memo Header".FieldCaption("Sales Cr.Memo Header"."Your Reference");
+                    ReferenceText := copystr("Sales Cr.Memo Header".FieldCaption("Sales Cr.Memo Header"."Your Reference"), 1, 80);
                 if "Sales Cr.Memo Header"."VAT Registration No." = '' then
                     VATNoText := ''
                 else
-                    VATNoText := "Sales Cr.Memo Header".FieldCaption("Sales Cr.Memo Header"."VAT Registration No.");
+                    VATNoText := copystr("Sales Cr.Memo Header".FieldCaption("Sales Cr.Memo Header"."VAT Registration No."), 1, 80);
                 if "Sales Cr.Memo Header"."Currency Code" = '' then begin
                     GLSetup.TestField("LCY Code");
                     TotalText := StrSubstNo(Text001, GLSetup."LCY Code");
@@ -988,7 +986,7 @@ Report 50020 "Sales - Credit Memo CZ"
                         ShowShippingAddr := true;
 
                 if LogInteraction then
-                    if not CurrReport.Preview then
+                    if not CurrReport.Preview() then
                         if "Sales Cr.Memo Header"."Bill-to Contact No." <> '' then
                             SegManagement.LogDocument(
                               6, "Sales Cr.Memo Header"."No.", 0, 0, Database::Contact, "Sales Cr.Memo Header"."Bill-to Contact No.", "Sales Cr.Memo Header"."Salesperson Code",
@@ -1004,15 +1002,12 @@ Report 50020 "Sales - Credit Memo CZ"
                 else
                     sellcust.Get("Sales Cr.Memo Header"."Sell-to Customer No.");
 
-                //RD001
                 SellVATID := sellcust."VAT Registration No.";
 
-                //>> 06-06-19 ZY-LD 002
                 if "Sales Cr.Memo Header"."Company VAT Registration Code" <> '' then
                     CompVATRegNo := "Sales Cr.Memo Header"."Company VAT Registration Code"
                 else
                     CompVATRegNo := CompanyInfo."VAT Registration No.";
-                //<< 06-06-19 ZY-LD 002
 
 
                 if "Sales Cr.Memo Header"."Currency Factor" = 0 then
@@ -1039,27 +1034,32 @@ Report 50020 "Sales - Credit Memo CZ"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'No. of Copies';
+                        ToolTip = 'Specifies the number of copies to print.';
                     }
                     field(ShowInternalInfo; ShowInternalInfo)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Show Internal Information';
+                        ToolTip = 'Specifies whether internal information, such as item numbers for G/L accounts, is shown on the report.';
                     }
                     field(LogInteraction; LogInteraction)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Log Interaction';
+                        ToolTip = 'Specifies whether to log this report as an interaction in the system.';
                         Enabled = LogInteractionEnable;
                     }
                     field(DisplayAsmInformation; DisplayAssemblyInformation)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Show Assembly Components';
+                        ToolTip = 'Specifies whether assembly component information is shown on the report.';
                     }
                     field(DisplayAdditionalFeeNote; DisplayAdditionalFeeNote)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Show Additional Fee Note';
+                        ToolTip = 'Specifies whether additional fee notes are shown on the report.';
                     }
                 }
             }
@@ -1076,7 +1076,7 @@ Report 50020 "Sales - Credit Memo CZ"
 
         trigger OnOpenPage()
         begin
-            InitLogInteraction;
+            InitLogInteraction();
             LogInteractionEnable := LogInteraction;
         end;
     }
@@ -1108,24 +1108,24 @@ Report 50020 "Sales - Credit Memo CZ"
 
     trigger OnInitReport()
     begin
-        GLSetup.Get;
-        CompanyInfo.Get;
-        SalesSetup.Get;
-        CompanyInfo.VerifyAndSetPaymentInfo;
+        GLSetup.Get();
+        CompanyInfo.Get();
+        SalesSetup.Get();
+        CompanyInfo.VerifyAndSetPaymentInfo();
         case SalesSetup."Logo Position on Documents" of
             SalesSetup."logo position on documents"::Left:
                 begin
-                    CompanyInfo3.Get;
+                    CompanyInfo3.Get();
                     CompanyInfo3.CalcFields(Picture);
                 end;
             SalesSetup."logo position on documents"::Center:
                 begin
-                    CompanyInfo1.Get;
+                    CompanyInfo1.Get();
                     CompanyInfo1.CalcFields(Picture);
                 end;
             SalesSetup."logo position on documents"::Right:
                 begin
-                    CompanyInfo2.Get;
+                    CompanyInfo2.Get();
                     CompanyInfo2.CalcFields(Picture);
                 end;
         end;
@@ -1134,18 +1134,11 @@ Report 50020 "Sales - Credit Memo CZ"
     trigger OnPreReport()
     begin
         if not CurrReport.UseRequestPage then
-            InitLogInteraction;
+            InitLogInteraction();
     end;
 
     var
-        Text000: label 'Salesperson';
-        Text001: label 'Total %1';
-        Text002: label 'Total %1 Incl. VAT';
-        Text003: label 'COPY';
-        Text004: label 'Sales - Invoice %1';
-        Text005: label 'Sales - Credit Memo %1';
-        PageCaptionCap: label 'Page %1 of %2';
-        Text006: label 'Total %1 Excl. VAT';
+
         GLSetup: Record "General Ledger Setup";
         ShipmentMethod: Record "Shipment Method";
         PaymentTerms: Record "Payment Terms";
@@ -1160,21 +1153,22 @@ Report 50020 "Sales - Credit Memo CZ"
         DimSetEntry1: Record "Dimension Set Entry";
         DimSetEntry2: Record "Dimension Set Entry";
         RespCenter: Record "Responsibility Center";
-        LanguageCU: Codeunit Language;
         CurrExchRate: Record "Currency Exchange Rate";
-        TempPostedAsmLine: Record "Posted Assembly Line" temporary;
+        SalesShipmentBuffer: Record "Sales Shipment Buffer" temporary;
         VATClause: Record "VAT Clause";
+        sellcust: Record Customer;
         TempLineFeeNoteOnReportHist: Record "Line Fee Note on Report Hist." temporary;
         recCountry: Record "Country/Region";
+        recItem: Record Item;
+        LanguageCU: Codeunit Language;
         SalesCrMemoCountPrinted: Codeunit "Sales Cr. Memo-Printed";
         FormatAddr: Codeunit "Format Address";
         SegManagement: Codeunit SegManagement;
-        SalesShipmentBuffer: Record "Sales Shipment Buffer" temporary;
+        ReportEvent: Codeunit "Report Event";
         PostedShipmentDate: Date;
         CustAddr: array[8] of Text[50];
         ShipToAddr: array[8] of Text[50];
         CompanyAddr: array[8] of Text[50];
-        OrderNoText: Text[80];
         SalesPersonText: Text[30];
         VATNoText: Text[80];
         ReferenceText: Text[80];
@@ -1196,13 +1190,8 @@ Report 50020 "Sales - Credit Memo CZ"
         LogInteraction: Boolean;
         VALVATBaseLCY: Decimal;
         VALVATAmountLCY: Decimal;
-        VALSpecLCYHeader: Text[80];
-        Text007: label 'VAT Amount Specification in ';
-        Text008: label 'Local Currency';
-        VALExchRate: Text[50];
-        Text009: label 'Exchange rate: %1/%2';
         CalculatedExchRate: Decimal;
-        Text010: label 'Sales - Prepayment Invoice %1';
+        VALSpecLCYHeader: Text[80];
         OutputNo: Integer;
         TotalSubTotal: Decimal;
         TotalAmount: Decimal;
@@ -1213,6 +1202,31 @@ Report 50020 "Sales - Credit Memo CZ"
         [InDataSet]
         LogInteractionEnable: Boolean;
         DisplayAssemblyInformation: Boolean;
+        VALExchRate: Text[50];
+        DisplayAdditionalFeeNote: Boolean;
+        SellVATID: Text[20];
+        TarrifCode: Text[30];
+        ReturnOrderNoText: Text[80];
+        AppliedToText: Text;
+        CZKexchr: Decimal;
+        VATAmountLineBase: Decimal;
+        VATAmountLineVATAmount: Decimal;
+        CompVATRegNo: Code[20];
+        ArticleText: Text;
+        ExternalDocumentNoLine: Text;
+        DescriptionWEEE: Text;
+
+        Text007: label 'VAT Amount Specification in ';
+        Text008: label 'Local Currency';
+        Text009: label 'Exchange rate: %1/%2';
+        Text000: label 'Salesperson';
+        Text001: label 'Total %1';
+        Text002: label 'Total %1 Incl. VAT';
+        Text003: label 'COPY';
+        Text004: label 'Sales - Invoice %1';
+        Text005: label 'Sales - Credit Memo %1';
+        PageCaptionCap: label 'Page %1 of %2';
+        Text006: label 'Total %1 Excl. VAT';
         Text011: label 'Sales - Prepmt. Credit Memo %1';
         CompanyInfoPhoneNoCaptionLbl: label 'Phone No.';
         CompanyInfoVATRegNoCptnLbl: label 'VAT Reg. No.';
@@ -1247,21 +1261,6 @@ Report 50020 "Sales - Credit Memo CZ"
         VATIdentifierCaptionLbl: label 'VAT Identifier';
         HomePageCaptionCap: label 'Home Page';
         EMailCaptionLbl: label 'E-Mail';
-        DisplayAdditionalFeeNote: Boolean;
-        sellcust: Record Customer;
-        SellVATID: Text[20];
-        recItem: Record Item;
-        TarrifCode: Text[30];
-        ReturnOrderNoText: Text[80];
-        AppliedToText: Text;
-        CZKexchr: Decimal;
-        VATAmountLineBase: Decimal;
-        VATAmountLineVATAmount: Decimal;
-        CompVATRegNo: Code[20];
-        ArticleText: Text;
-        ReportEvent: Codeunit "Report Event";
-        ExternalDocumentNoLine: Text;
-        DescriptionWEEE: Text;
         zText001: label 'Recycling fee %1 %3 (%2 %3 per unit ex. VAT)';
 
 
@@ -1292,7 +1291,7 @@ Report 50020 "Sales - Credit Memo CZ"
                 exit(0D);
         end;
 
-        SalesShipmentBuffer.Reset;
+        SalesShipmentBuffer.Reset();
         SalesShipmentBuffer.SetRange("Document No.", "Sales Cr.Memo Line"."Document No.");
         SalesShipmentBuffer.SetRange("Line No.", "Sales Cr.Memo Line"."Line No.");
 
@@ -1301,12 +1300,12 @@ Report 50020 "Sales - Credit Memo CZ"
             if SalesShipmentBuffer.Next() = 0 then begin
                 SalesShipmentBuffer.Get(
                   SalesShipmentBuffer2."Document No.", SalesShipmentBuffer2."Line No.", SalesShipmentBuffer2."Entry No.");
-                SalesShipmentBuffer.Delete;
+                SalesShipmentBuffer.Delete();
                 exit(SalesShipmentBuffer2."Posting Date");
             end;
             SalesShipmentBuffer.CalcSums(Quantity);
             if SalesShipmentBuffer.Quantity <> "Sales Cr.Memo Line".Quantity then begin
-                SalesShipmentBuffer.DeleteAll;
+                SalesShipmentBuffer.DeleteAll();
                 exit("Sales Cr.Memo Header"."Posting Date");
             end;
         end else
@@ -1422,12 +1421,12 @@ Report 50020 "Sales - Credit Memo CZ"
         SalesShipmentBuffer.SetRange("Posting Date", PostingDate);
         if SalesShipmentBuffer.Find('-') then begin
             SalesShipmentBuffer.Quantity := SalesShipmentBuffer.Quantity - QtyOnShipment;
-            SalesShipmentBuffer.Modify;
+            SalesShipmentBuffer.Modify();
             exit;
         end;
 
         begin
-            SalesShipmentBuffer.Init;
+            SalesShipmentBuffer.Init();
             SalesShipmentBuffer."Document No." := SalesCrMemoLine."Document No.";
             SalesShipmentBuffer."Line No." := SalesCrMemoLine."Line No.";
             SalesShipmentBuffer."Entry No." := NextEntryNo;
@@ -1435,7 +1434,7 @@ Report 50020 "Sales - Credit Memo CZ"
             SalesShipmentBuffer."No." := SalesCrMemoLine."No.";
             SalesShipmentBuffer.Quantity := -QtyOnShipment;
             SalesShipmentBuffer."Posting Date" := PostingDate;
-            SalesShipmentBuffer.Insert;
+            SalesShipmentBuffer.Insert();
             NextEntryNo := NextEntryNo + 1
         end;
     end;

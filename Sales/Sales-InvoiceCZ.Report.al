@@ -1,14 +1,6 @@
 report 50015 "Sales - Invoice CZ"
 {
-    // 001 20-10-17 ZY-LD Changed the width of the Bill-To address.
-    // 002. 06-06-19 ZY-LD P0213 - New setup for VAT Registration No. Zyxel.
-    // 003. 09-07-20 ZY-LD P0455 - Shipment Method caption is changed to Incoterms, and "Ship-to City is added".
-    // 004. 11-12-20 ZY-LD 2020121010000091 - Incoterms city can be different.
-    // 005. 29-12-20 ZY-LD 2020122210000111 - Hard coded VAT Registration No. is exchanged with CompanyInfoVATRegNo and hard coded business mandatory is exchanged with variable text.
-    // 006. 09-08-21 ZY-LD 2021070210000087 - Position on External document No.
-    // 007. 20-10-21 ZY-LD 2021101910000058 - Recycling Fee is added on the line as a text.
-    // 008. 31-05-22 ZY-LD 2022053010000106 - "External Document No." and "Tarriff No." is only shown on items.
-    // 009. 10-06-22 ZY-LD 2022061010000099 - "EU 3-Party Trade".
+
     DefaultLayout = RDLC;
     RDLCLayout = './Layouts/Sales - Invoice CZ.rdlc';
 
@@ -95,7 +87,7 @@ report 50015 "Sales - Invoice CZ"
                     column(CompanyInfo3Picture; CompanyInfo3.Picture)
                     {
                     }
-                    column(DocumentCaptionCopyText; StrSubstNo(DocumentCaption, CopyText))
+                    column(DocumentCaptionCopyText; StrSubstNo(DocumentCaption(), CopyText))
                     {
                     }
                     column(CustAddr1; CustAddr[1])
@@ -388,14 +380,14 @@ report 50015 "Sales - Invoice CZ"
                             Clear(DimText);
                             Continue := false;
                             repeat
-                                OldDimText := DimText;
+                                OldDimText := copystr(DimText, 1, 75);
                                 if DimText = '' then
                                     DimText := StrSubstNo('%1 %2', DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code")
                                 else
-                                    DimText :=
+                                    DimText := copystr(
                                       StrSubstNo(
                                         '%1, %2 %3', DimText,
-                                        DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code");
+                                        DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code"), 1, 120);
                                 if StrLen(DimText) > MaxStrLen(OldDimText) then begin
                                     DimText := OldDimText;
                                     Continue := true;
@@ -417,7 +409,7 @@ report 50015 "Sales - Invoice CZ"
                         DataItemTableView = sorting("Document No.", "Line No.") where("Hide Line" = const(false));
                         column(LineAmt_SalesInvLine; "Sales Invoice Line"."Line Amount")
                         {
-                            AutoFormatExpression = GetCurrencyCode;
+                            AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 1;
                         }
                         column(Desc_SalesInvLine; "Sales Invoice Line".Description)
@@ -434,7 +426,7 @@ report 50015 "Sales - Invoice CZ"
                         }
                         column(UnitPrice_SalesInvLine; "Sales Invoice Line"."Unit Price")
                         {
-                            AutoFormatExpression = GetCurrencyCode;
+                            AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 2;
                         }
                         column(Discount_SalesInvLine; "Sales Invoice Line"."Line Discount %")
@@ -448,7 +440,7 @@ report 50015 "Sales - Invoice CZ"
                         }
                         column(InvDiscLineAmt_SalesInvLine; -"Sales Invoice Line"."Inv. Discount Amount")
                         {
-                            AutoFormatExpression = GetCurrencyCode;
+                            AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 1;
                         }
                         column(TotalSubTotal; TotalSubTotal)
@@ -466,7 +458,7 @@ report 50015 "Sales - Invoice CZ"
                         }
                         column(Amount_SalesInvLine; "Sales Invoice Line".Amount)
                         {
-                            AutoFormatExpression = GetCurrencyCode;
+                            AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 1;
                         }
                         column(TotalAmount; TotalAmount)
@@ -476,15 +468,15 @@ report 50015 "Sales - Invoice CZ"
                         }
                         column(Amount_AmtInclVAT; "Sales Invoice Line"."Amount Including VAT" - "Sales Invoice Line".Amount)
                         {
-                            AutoFormatExpression = GetCurrencyCode;
+                            AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 1;
                         }
                         column(AmtInclVAT_SalesInvLine; "Sales Invoice Line"."Amount Including VAT")
                         {
-                            AutoFormatExpression = GetCurrencyCode;
+                            AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 1;
                         }
-                        column(VATAmtLineVATAmtText; VATAmountLine.VATAmountText)
+                        column(VATAmtLineVATAmtText; VATAmountLine.VATAmountText())
                         {
                         }
                         column(LineAmtAfterInvDiscAmt; -("Sales Invoice Line"."Line Amount" - "Sales Invoice Line"."Inv. Discount Amount" - "Sales Invoice Line"."Amount Including VAT"))
@@ -503,7 +495,7 @@ report 50015 "Sales - Invoice CZ"
                         column(TotalInclVATText_SalesInvLine; TotalInclVATText)
                         {
                         }
-                        column(VATAmtText_SalesInvLine; VATAmountLine.VATAmountText)
+                        column(VATAmtText_SalesInvLine; VATAmountLine.VATAmountText())
                         {
                         }
                         column(DocNo_SalesInvLine; "Sales Invoice Line"."Document No.")
@@ -576,7 +568,7 @@ report 50015 "Sales - Invoice CZ"
                                 if "Sales Shipment Buffer".Number = 1 then
                                     SalesShipmentBuffer.Find('-')
                                 else
-                                    SalesShipmentBuffer.Next;
+                                    SalesShipmentBuffer.Next();
                             end;
 
                             trigger OnPreDataItem()
@@ -609,14 +601,14 @@ report 50015 "Sales - Invoice CZ"
                                 Clear(DimText);
                                 Continue := false;
                                 repeat
-                                    OldDimText := DimText;
+                                    OldDimText := copystr(DimText, 1, 75);
                                     if DimText = '' then
                                         DimText := StrSubstNo('%1 %2', DimSetEntry2."Dimension Code", DimSetEntry2."Dimension Value Code")
                                     else
-                                        DimText :=
+                                        DimText := copystr(
                                           StrSubstNo(
                                             '%1, %2 %3', DimText,
-                                            DimSetEntry2."Dimension Code", DimSetEntry2."Dimension Value Code");
+                                            DimSetEntry2."Dimension Code", DimSetEntry2."Dimension Value Code"), 1, 120);
                                     if StrLen(DimText) > MaxStrLen(OldDimText) then begin
                                         DimText := OldDimText;
                                         Continue := true;
@@ -636,17 +628,17 @@ report 50015 "Sales - Invoice CZ"
                         dataitem(AsmLoop; "Integer")
                         {
                             DataItemTableView = sorting(Number);
-                            column(TempPostedAsmLineNo; BlanksForIndent + TempPostedAsmLine."No.")
+                            column(TempPostedAsmLineNo; BlanksForIndent() + TempPostedAsmLine."No.")
                             {
                             }
                             column(TempPostedAsmLineQuantity; TempPostedAsmLine.Quantity)
                             {
                                 DecimalPlaces = 0 : 5;
                             }
-                            column(TempPostedAsmLineDesc; BlanksForIndent + TempPostedAsmLine.Description)
+                            column(TempPostedAsmLineDesc; BlanksForIndent() + TempPostedAsmLine.Description)
                             {
                             }
-                            column(TempPostAsmLineVartCode; BlanksForIndent + TempPostedAsmLine."Variant Code")
+                            column(TempPostAsmLineVartCode; BlanksForIndent() + TempPostedAsmLine."Variant Code")
                             {
                             }
                             column(TempPostedAsmLineUOM; GetUOMText(TempPostedAsmLine."Unit of Measure Code"))
@@ -660,7 +652,7 @@ report 50015 "Sales - Invoice CZ"
                                 if AsmLoop.Number = 1 then
                                     TempPostedAsmLine.FindSet()
                                 else
-                                    TempPostedAsmLine.Next;
+                                    TempPostedAsmLine.Next();
 
                                 if ItemTranslation.Get(TempPostedAsmLine."No.",
                                      TempPostedAsmLine."Variant Code",
@@ -674,7 +666,7 @@ report 50015 "Sales - Invoice CZ"
                                 Clear(TempPostedAsmLine);
                                 if not DisplayAssemblyInformation then
                                     CurrReport.Break();
-                                CollectAsmInformation;
+                                CollectAsmInformation();
                                 Clear(TempPostedAsmLine);
                                 AsmLoop.SetRange(AsmLoop.Number, 1, TempPostedAsmLine.Count());
                             end;
@@ -684,7 +676,7 @@ report 50015 "Sales - Invoice CZ"
                         begin
                             PostedShipmentDate := 0D;
                             if "Sales Invoice Line".Quantity <> 0 then
-                                PostedShipmentDate := FindPostedShipmentDate;
+                                PostedShipmentDate := FindPostedShipmentDate();
 
                             if ("Sales Invoice Line".Type = "Sales Invoice Line".Type::"G/L Account") and (not ShowInternalInfo) then
                                 "Sales Invoice Line"."No." := '';
@@ -701,7 +693,7 @@ report 50015 "Sales - Invoice CZ"
                                 VATAmountLine."Inv. Disc. Base Amount" := "Sales Invoice Line"."Line Amount";
                             VATAmountLine."Invoice Discount Amount" := "Sales Invoice Line"."Inv. Discount Amount";
                             VATAmountLine."VAT Clause Code" := "Sales Invoice Line"."VAT Clause Code";
-                            VATAmountLine.InsertLine;
+                            VATAmountLine.InsertLine();
 
                             TotalSubTotal += "Sales Invoice Line"."Line Amount";
                             TotalInvDiscAmount -= "Sales Invoice Line"."Inv. Discount Amount";
@@ -715,7 +707,6 @@ report 50015 "Sales - Invoice CZ"
                             if ("Sales Invoice Line".Type = "Sales Invoice Line".Type::Item) and recItem.Get("Sales Invoice Line"."No.") then begin
                                 TarrifCode := recItem."Tariff No.";
 
-                                //>> 20-10-21 ZY-LD 007
                                 if "Sales Invoice Header"."Posting Date" >= 20210101D then begin
                                     recCountry.Get("Sales Invoice Header"."Ship-to Country/Region Code");
                                     if recCountry."Recycling Fee per. Unit" <> 0 then begin
@@ -727,7 +718,7 @@ report 50015 "Sales - Invoice CZ"
                                             recCountry."Recycling Fee Currency Code");
                                     end;
                                 end;
-                                //<< 20-10-21 ZY-LD 007
+
                             end;
 
                             if "Sales Invoice Line".Type in ["Sales Invoice Line".Type::"G/L Account", "Sales Invoice Line".Type::Item] then
@@ -737,10 +728,9 @@ report 50015 "Sales - Invoice CZ"
                                   "Sales Invoice Line"."VAT Bus. Posting Group",
                                   "Sales Invoice Line"."VAT Prod. Posting Group",
                                   "Sales Invoice Line"."Sell-to Customer No.",
-                                  "Sales Invoice Header"."EU 3-Party Trade",  // 10-06-22 ZY-LD 009
+                                  "Sales Invoice Header"."EU 3-Party Trade",
                                   ArticleText);
 
-                            //>> 09-08-21 ZY-LD 006
                             ExternalDocumentNoLine := '';
                             if "Sales Invoice Line"."External Document No." <> '' then
                                 ExternalDocumentNoLine := "Sales Invoice Line"."External Document No."
@@ -748,7 +738,16 @@ report 50015 "Sales - Invoice CZ"
                                 ExternalDocumentNoLine := "Sales Invoice Header"."External Document No.";
                             if "Sales Invoice Line"."External Document Position No." <> '' then
                                 ExternalDocumentNoLine += StrSubstNo(', Pos: %1', "Sales Invoice Line"."External Document Position No.");
-                            //<< 09-08-21 ZY-LD 006
+
+                            //27-10-25 BK #506594
+                            if ("Sales Invoice Line".Type = type::Item) and ("Sales Invoice Line"."No." <> '') then
+                                if recItem.get("Sales Invoice Line"."No.") then
+                                    if (recItem.NonInventoryPostingGroup <> '') and (recItem.Type = recItem.Type::"Non-Inventory") then begin
+                                        "Sales Invoice Line".Quantity := 0;
+                                        "Sales Invoice Line"."Line Discount %" := 0;
+                                        "Sales Invoice Line"."Unit Price" := 0;
+                                        "Sales Invoice Line"."Unit of Measure" := '';
+                                    end;
                         end;
 
                         trigger OnPreDataItem()
@@ -770,7 +769,7 @@ report 50015 "Sales - Invoice CZ"
                         DataItemTableView = sorting(Number);
                         column(VATAmtLineVATBase; VATAmountLine."VAT Base")
                         {
-                            AutoFormatExpression = "Sales Invoice Line".GetCurrencyCode;
+                            AutoFormatExpression = "Sales Invoice Line".GetCurrencyCode();
                             AutoFormatType = 1;
                         }
                         column(VATAmtLineVATAmt; VATAmountLine."VAT Amount")
@@ -978,7 +977,7 @@ report 50015 "Sales - Invoice CZ"
 
                             if LineFee.Number = 1 then begin
                                 if not TempLineFeeNoteOnReportHist.FindSet() then
-                                    CurrReport.Break
+                                    CurrReport.Break()
                             end else
                                 if TempLineFeeNoteOnReportHist.Next() = 0 then
                                     CurrReport.Break();
@@ -1034,7 +1033,7 @@ report 50015 "Sales - Invoice CZ"
                 if "Sales Invoice Header"."Order No." = '' then
                     OrderNoText := ''
                 else
-                    OrderNoText := "Sales Invoice Header".FieldCaption("Sales Invoice Header"."Order No.");
+                    OrderNoText := copystr("Sales Invoice Header".FieldCaption("Sales Invoice Header"."Order No."), 1, 80);
                 if "Sales Invoice Header"."Salesperson Code" = '' then begin
                     SalesPurchPerson.Init();
                     SalesPersonText := '';
@@ -1045,11 +1044,11 @@ report 50015 "Sales - Invoice CZ"
                 if "Sales Invoice Header"."Your Reference" = '' then
                     ReferenceText := ''
                 else
-                    ReferenceText := "Sales Invoice Header".FieldCaption("Sales Invoice Header"."Your Reference");
+                    ReferenceText := copystr("Sales Invoice Header".FieldCaption("Sales Invoice Header"."Your Reference"), 1, 80);
                 if "Sales Invoice Header"."VAT Registration No." = '' then
                     VATNoText := ''
                 else
-                    VATNoText := "Sales Invoice Header".FieldCaption("Sales Invoice Header"."VAT Registration No.");
+                    VATNoText := copystr("Sales Invoice Header".FieldCaption("Sales Invoice Header"."VAT Registration No."), 1, 80);
                 if "Sales Invoice Header"."Currency Code" = '' then begin
                     GLSetup.TestField("LCY Code");
                     TotalText := StrSubstNo(Text001, GLSetup."LCY Code");
@@ -1098,7 +1097,7 @@ report 50015 "Sales - Invoice CZ"
                 GetLineFeeNoteOnReportHist("Sales Invoice Header"."No.");
 
                 if LogInteraction then
-                    if not CurrReport.Preview() then begin
+                    if not CurrReport.Preview() then
                         if "Sales Invoice Header"."Bill-to Contact No." <> '' then
                             SegManagement.LogDocument(
                               4, "Sales Invoice Header"."No.", 0, 0, Database::Contact, "Sales Invoice Header"."Bill-to Contact No.", "Sales Invoice Header"."Salesperson Code",
@@ -1107,7 +1106,6 @@ report 50015 "Sales - Invoice CZ"
                             SegManagement.LogDocument(
                               4, "Sales Invoice Header"."No.", 0, 0, Database::Customer, "Sales Invoice Header"."Bill-to Customer No.", "Sales Invoice Header"."Salesperson Code",
                               "Sales Invoice Header"."Campaign No.", "Sales Invoice Header"."Posting Description", '');
-                    end;
 
 
                 if "Sales Invoice Header"."Sell-to Customer No." = "Sales Invoice Header"."Bill-to Customer No." then
@@ -1127,11 +1125,11 @@ report 50015 "Sales - Invoice CZ"
                 LineText[6] := '';
                 LineText[7] := '';
                 LineText[8] := '';
-                if SalesSetup."Use Sell-to text code filter" then begin
-                    InvoiceText.SetRange(InvoiceText."Customer No.", "Sales Invoice Header"."Sell-to Customer No.");
-                end else begin
+                if SalesSetup."Use Sell-to text code filter" then
+                    InvoiceText.SetRange(InvoiceText."Customer No.", "Sales Invoice Header"."Sell-to Customer No.")
+                else
                     InvoiceText.SetRange(InvoiceText."Customer No.", "Sales Invoice Header"."Bill-to Customer No.");
-                end;
+
                 InvoiceText.SetRange(InvoiceText.Location, "Sales Invoice Header"."Location Code");
                 InvoiceText.SetFilter("Sales Order Type", '%1', "Sales Invoice Header"."Sales Order Type");
                 InvoiceText.SetFilter("Text ID", '>%1', '');
@@ -1147,28 +1145,22 @@ report 50015 "Sales - Invoice CZ"
                     end;
                 end;
 
-                //>> 06-06-19 ZY-LD 002
+
                 if "Sales Invoice Header"."Company VAT Registration Code" <> '' then
                     CompVATRegNo := "Sales Invoice Header"."Company VAT Registration Code"
-                else  //<< 06-06-19 ZY-LD 002
+                else
                     if "Sales Invoice Header"."VAT Registration Code" <> '' then begin
                         VATRegistrationRec.Get("Sales Invoice Header"."VAT Registration Code");
                         CompVATRegNo := VATRegistrationRec."VAT registration No";
                     end else
                         CompVATRegNo := CompanyInfo."VAT Registration No.";
-                //RD 1.0
 
                 if "Sales Invoice Header"."Currency Factor" = 0 then
                     CZKexchr := 1 else
                     CZKexchr := 1 / "Sales Invoice Header"."Currency Factor";
 
                 recBankAcc.SetCurrentkey("Currency Code", "Country/Region Code");
-                /*
-                if ("Sales Invoice Header"."Currency Code" = '') or ("Sales Invoice Header"."Currency Code" = GLSetup."LCY Code") then
-                    recBankAcc.SetFilter("Currency Code", '%1|%2', '', GLSetup."LCY Code")
-                else
-                    recBankAcc.SetRange("Currency Code", "Sales Invoice Header"."Currency Code");
-                */
+
                 if ("Currency Code" = GLSetup."LCY Code") or ("Currency Code" = '') then
                     recBankAcc.SetFilter("Currency Code", '%1', '')
                 else
@@ -1206,27 +1198,32 @@ report 50015 "Sales - Invoice CZ"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'No. of Copies';
+                        ToolTip = 'Specifies the number of copies to print.';
                     }
                     field(ShowInternalInfo; ShowInternalInfo)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Show Internal Information';
+                        ToolTip = 'Specifies whether to show internal G/L account information on the invoice.';
                     }
                     field(LogInteraction; LogInteraction)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Log Interaction';
+                        ToolTip = 'Specifies whether to log this printing as an interaction for the customer or contact.';
                         Enabled = LogInteractionEnable;
                     }
                     field(DisplayAsmInformation; DisplayAssemblyInformation)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Show Assembly Components';
+                        ToolTip = 'Specifies whether to show assembly component information on the invoice.';
                     }
                     field(DisplayAdditionalFeeNote; DisplayAdditionalFeeNote)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Show Additional Fee Note';
+                        ToolTip = 'Specifies whether to show additional fee notes on the invoice.';
                     }
                 }
             }
@@ -1243,7 +1240,7 @@ report 50015 "Sales - Invoice CZ"
 
         trigger OnOpenPage()
         begin
-            InitLogInteraction;
+            InitLogInteraction();
             LogInteractionEnable := LogInteraction;
         end;
     }
@@ -1282,7 +1279,7 @@ report 50015 "Sales - Invoice CZ"
         GLSetup.Get();
         CompanyInfo.Get();
         SalesSetup.Get();
-        CompanyInfo.VerifyAndSetPaymentInfo;
+        CompanyInfo.VerifyAndSetPaymentInfo();
         case SalesSetup."Logo Position on Documents" of
             SalesSetup."logo position on documents"::Left:
                 begin
@@ -1305,17 +1302,11 @@ report 50015 "Sales - Invoice CZ"
     trigger OnPreReport()
     begin
         if not CurrReport.UseRequestPage() then
-            InitLogInteraction;
+            InitLogInteraction();
     end;
 
     var
-        Text000: Label 'Salesperson';
-        Text001: Label 'Total %1';
-        Text002: Label 'Total %1 Incl. VAT';
-        Text003: Label 'COPY';
-        Text004: Label 'Sales - Invoice %1';
-        PageCaptionCap: Label 'Page %1 of %2';
-        Text006: Label 'Total %1 Excl. VAT';
+
         GLSetup: Record "General Ledger Setup";
         ShipmentMethod: Record "Shipment Method";
         PaymentTerms: Record "Payment Terms";
@@ -1330,15 +1321,24 @@ report 50015 "Sales - Invoice CZ"
         DimSetEntry1: Record "Dimension Set Entry";
         DimSetEntry2: Record "Dimension Set Entry";
         RespCenter: Record "Responsibility Center";
-        LanguageCU: Codeunit Language;
         CurrExchRate: Record "Currency Exchange Rate";
-        TempPostedAsmLine: Record "Posted Assembly Line" temporary;
+        InvoiceText: Record "Customer Invoice Texts";
+        InvoiceLineText: Record "Invoice Line Text";
         VATClause: Record "VAT Clause";
+        recItem: Record Item;
+        TempPostedAsmLine: Record "Posted Assembly Line" temporary;
         TempLineFeeNoteOnReportHist: Record "Line Fee Note on Report Hist." temporary;
+        SalesShipmentBuffer: Record "Sales Shipment Buffer" temporary;
+        sellcust: Record Customer;
+        VATRegistrationRec: Record "IC Vendors";
+        recLocation: Record Location;
+        recCountry: Record "Country/Region";
+        recBankAcc: Record "Bank Account";
         SalesInvCountPrinted: Codeunit "Sales Inv.-Printed";
         FormatAddr: Codeunit "Format Address";
         SegManagement: Codeunit SegManagement;
-        SalesShipmentBuffer: Record "Sales Shipment Buffer" temporary;
+        ReportEvent: Codeunit "Report Event";
+        LanguageCU: Codeunit Language;
         PostedShipmentDate: Date;
         CustAddr: array[8] of Text[50];
         ShipToAddr: array[8] of Text[50];
@@ -1366,12 +1366,7 @@ report 50015 "Sales - Invoice CZ"
         VALVATBaseLCY: Decimal;
         VALVATAmountLCY: Decimal;
         VALSpecLCYHeader: Text[80];
-        Text007: Label 'VAT Amount Specification in ';
-        Text008: Label 'Local Currency';
         VALExchRate: Text[50];
-        Text009: Label 'Exchange rate: %1/%2';
-        CalculatedExchRate: Decimal;
-        Text010: Label 'Sales - Prepayment Invoice %1';
         OutputNo: Integer;
         TotalSubTotal: Decimal;
         TotalAmount: Decimal;
@@ -1382,6 +1377,29 @@ report 50015 "Sales - Invoice CZ"
         [InDataSet]
         LogInteractionEnable: Boolean;
         DisplayAssemblyInformation: Boolean;
+        DisplayAdditionalFeeNote: Boolean;
+        SellVATID: Text[20];
+        TarrifCode: Text[30];
+        LineText: array[8] of Text[80];
+        CompVATRegNo: Text[50];
+        CZKexchr: Decimal;
+        VATAmountLineBase: Decimal;
+        VATAmountLineVATAmount: Decimal;
+        RegistrationNo: Text[50];
+        DocumentDate: Date;
+        ArticleText: Text;
+        ExternalDocumentNoLine: Text;
+        DescriptionWEEE: Text;
+        Text009: Label 'Exchange rate: %1/%2';
+        CalculatedExchRate: Decimal;
+        Text010: Label 'Sales - Prepayment Invoice %1';
+        Text000: Label 'Salesperson';
+        Text001: Label 'Total %1';
+        Text002: Label 'Total %1 Incl. VAT';
+        Text003: Label 'COPY';
+        Text004: Label 'Sales - Invoice %1';
+        PageCaptionCap: Label 'Page %1 of %2';
+        Text006: Label 'Total %1 Excl. VAT';
         CompanyInfoPhoneNoCaptionLbl: Label 'Phone No.';
         CompanyInfoVATRegNoCptnLbl: Label 'VAT Reg. No.';
         CompanyInfoGiroNoCaptionLbl: Label 'Giro No.';
@@ -1415,34 +1433,9 @@ report 50015 "Sales - Invoice CZ"
         VATIdentifierCaptionLbl: Label 'VAT Identifier';
         HomePageCaptionCap: Label 'Home Page';
         EMailCaptionLbl: Label 'E-Mail';
-        DisplayAdditionalFeeNote: Boolean;
-        sellcust: Record Customer;
-        SellVATID: Text[20];
-        recItem: Record Item;
-        TarrifCode: Text[30];
-        InvoiceText: Record "Customer Invoice Texts";
-        InvoiceLineText: Record "Invoice Line Text";
-        LineText: array[8] of Text[80];
-        VATRegistrationRec: Record "IC Vendors";
-        CompVATRegNo: Text[50];
-        CurrencyFactor: Decimal;
-        CurrencyExchangeRate: Record "Currency Exchange Rate";
-        CZKexchr: Decimal;
-        gteVATBase: Text[30];
-        gteVATAmount: Text[30];
-        VATAmountLineBase: Decimal;
-        VATAmountLineVATAmount: Decimal;
-        RD001: Label 'Exchange rate applied CZK 1%';
-        RegistrationNo: Text[50];
-        DocumentDate: Date;
-        recLocation: Record Location;
-        ArticleText: Text;
-        ReportEvent: Codeunit "Report Event";
-        ExternalDocumentNoLine: Text;
+        Text007: Label 'VAT Amount Specification in ';
+        Text008: Label 'Local Currency';
         zText001: Label 'Recycling fee %1 %3 (%2 %3 per unit ex. VAT)';
-        DescriptionWEEE: Text;
-        recCountry: Record "Country/Region";
-        recBankAcc: Record "Bank Account";
         Text50003: Label 'There can only be one "%1" within the filters "%2".\\You can dedicate a specific bank account for printing on the sales invoice by ticking off the filed "%3" on the bank account card.';
 
 
@@ -1703,7 +1696,7 @@ report 50015 "Sales - Invoice CZ"
     begin
         if not UnitOfMeasure.Get(UOMCode) then
             exit(UOMCode);
-        exit(UnitOfMeasure.Description);
+        exit(copystr(UnitOfMeasure.Description, 1, 10));
     end;
 
 
@@ -1736,7 +1729,7 @@ report 50015 "Sales - Invoice CZ"
                 TempLineFeeNoteOnReportHist.Insert();
             until LineFeeNoteOnReportHist.Next() = 0;
         end else begin
-            LineFeeNoteOnReportHist.SetRange("Language Code", LanguageCU.GetLanguageCode(GlobalLanguage));
+            LineFeeNoteOnReportHist.SetRange("Language Code", LanguageCU.GetLanguageCode(GlobalLanguage()));
             if LineFeeNoteOnReportHist.FindSet() then
                 repeat
                     TempLineFeeNoteOnReportHist.Init();

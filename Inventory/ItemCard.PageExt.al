@@ -10,25 +10,30 @@ pageextension 50119 ItemCardZX extends "Item Card"
                 ApplicationArea = Basic, Suite;
                 Caption = 'HQ Model Description';
                 Importance = Additional;
+                ToolTip = 'Specifies the value of the HQ Model Description field.';
             }
 
             field(Status; Rec.Status)
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the value of the Status field.';
             }
             field("Successor Item No."; Rec."Successor Item No.")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the value of the Successor Item No. field.';
             }
             field("RMA Alternative Item No."; Rec."RMA Alternative Item No.")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = ZNetRHQVisible;
+                ToolTip = 'Specifies the value of the RMA Alternative Item No. field.';
             }
         }
         modify("Service Item Group")
         {
             Visible = false;
+            ToolTip = 'Specifies the value of the Service Item Group field.';
         }
         addafter("Automatic Ext. Texts")
         {
@@ -138,6 +143,8 @@ pageextension 50119 ItemCardZX extends "Item Card"
         {
             field("Min. Carton Qty. Enabled"; Rec."Min. Carton Qty. Enabled")
             {
+                Caption = 'Min. Carton Qty. Enabled';
+                ToolTip = 'Specifies if the Min. Carton Qty. is enabled for the item.';
             }
             group(ReturnOrder)
             {
@@ -261,7 +268,7 @@ pageextension 50119 ItemCardZX extends "Item Card"
             field(Amaz_ASIN; Rec.Amaz_ASIN)
             {
                 ApplicationArea = Basic, Suite;
-
+                ToolTip = 'Specifies the value of the Amazon ASIN field.';
             }
             field("UN Code"; Rec."UN Code")
             {
@@ -483,11 +490,13 @@ pageextension 50119 ItemCardZX extends "Item Card"
             {
                 ApplicationArea = Basic, Suite;
                 Editable = PLMSUpdateEditable;
+                ToolTip = 'Specifies the value of the Last Buy Date field.';
             }
             field("Lifecycle Phase"; Rec."Lifecycle Phase")
             {
                 ApplicationArea = Basic, Suite;
                 Editable = PLMSUpdateEditable;
+                ToolTip = 'Specifies the value of the Lifecycle Phase field.';
             }
         }
         modify(Replenishment_Production)
@@ -522,7 +531,7 @@ pageextension 50119 ItemCardZX extends "Item Card"
                 ToolTip = 'Specifies the value of the No Tariff No. field.';
                 trigger OnValidate()
                 begin
-                    SetActions();  // 09-04-18 ZY-LD 016
+                    SetActions();
                 end;
             }
         }
@@ -717,6 +726,12 @@ pageextension 50119 ItemCardZX extends "Item Card"
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the value of the RMA Vendor Cost field.';
                     }
+                    field("RMA Reserved Quantity"; Rec."RMA Reserved Quantity") //23-10-2025 BK #517106
+                    {
+                        ApplicationArea = Basic, Suite;
+                        DecimalPlaces = 0 : 0;
+                        ToolTip = 'Specifies the value of the RMA Reserved Quantity field.';
+                    }
                 }
             }
             group(Chemical)
@@ -744,9 +759,10 @@ pageextension 50119 ItemCardZX extends "Item Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'The obligation to submit a SCIP notification covers all articles placed on the EU market containing a substance of very high concern on the Candidate List in a concentration above 0.1 % w/w.';
                 }
-                field("SCIP No."; Rec.GetScipNo)  // 18-04-24 ZY-LD 000
+                field("SCIP No."; Rec.GetScipNo())
                 {
                     ApplicationArea = Basic, Suite;
+                    Caption = 'SCIP No.';
                     ToolTip = 'SCIP is the database for information on Substances of Concern In articles as such or in complex objects (Products) established under the Waste Framework Directive (WFD).';
                     Editable = false;
 
@@ -862,11 +878,13 @@ pageextension 50119 ItemCardZX extends "Item Card"
                 PromotedCategory = Process;
                 RunObject = Page "Additional Item List";
                 RunPageLink = "Item No." = field("No.");
+                ToolTip = 'Shows a list of additional items related to the current item.';
             }
             Action("Block Customer")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Block Customer';
+                ToolTip = 'Shows a list of customers blocked for the current item.';
                 Image = Stop;
                 RunObject = Page "Item/Customer Relation";
                 RunPageLink = "Customer No." = field("No.");
@@ -875,6 +893,7 @@ pageextension 50119 ItemCardZX extends "Item Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Chemical Tax Reduction Rate';
+                ToolTip = 'Shows the chemical tax reduction rates for the current item.';
                 Image = TaxPayment;
                 RunObject = Page "Chemical Tax Rates";
             }
@@ -885,6 +904,7 @@ pageextension 50119 ItemCardZX extends "Item Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Additional Items';
+                ToolTip = 'Shows a list of additional items related to the current item.';
                 Image = Item;
                 Promoted = true;
                 PromotedCategory = Process;
@@ -898,6 +918,7 @@ pageextension 50119 ItemCardZX extends "Item Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Whse. Ledger Entries';
+                ToolTip = 'Shows the warehouse item ledger entries for the current item.';
                 Image = Warehouse;
                 RunObject = Page "Whse. Item Ledger Entry";
                 RunPageLink = "Item No." = field("No.");
@@ -907,6 +928,7 @@ pageextension 50119 ItemCardZX extends "Item Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Item Forecast Entries';
+                ToolTip = 'Shows the item forecast entries for the current item.';
                 Image = Forecast;
                 RunObject = Page "Item Budget Entries";
                 RunPageLink = "Item No." = field("No.");
@@ -918,6 +940,7 @@ pageextension 50119 ItemCardZX extends "Item Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Change Log';
+                ToolTip = 'Shows the change log entries for the current item.';
                 Image = ChangeLog;
                 Promoted = true;
                 PromotedCategory = Process;
@@ -934,6 +957,7 @@ pageextension 50119 ItemCardZX extends "Item Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Serial No. Entries';
+                ToolTip = 'Shows the serial number entries for the current item.';
                 Image = SerialNo;
                 RunObject = Page "VCK Delivery Document SNos";
                 RunPageLink = "Item No." = field("No.");
@@ -944,6 +968,7 @@ pageextension 50119 ItemCardZX extends "Item Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'RMA';
+                ToolTip = 'Shows the RMA entries for the current item.';
                 Image = Entries;
                 RunObject = Page "RMA Entries";
                 RunPageLink = "Item No." = field("No.");
@@ -955,6 +980,7 @@ pageextension 50119 ItemCardZX extends "Item Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Start Picking Date pr. Country';
+                ToolTip = 'Shows the start picking date per country for the current item.';
                 Image = CalculateShipment;
                 RunObject = Page "Item Picking Date pr. Country";
                 RunPageLink = "Item No." = field("No.");
@@ -970,6 +996,8 @@ pageextension 50119 ItemCardZX extends "Item Card"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Rework BOM';
+                    ToolTip = 'Shows the Rework BOM for the current item.';
+                    image = BOM;
                     RunObject = Page "Rework BOM";
                     RunPageLink = "Parent Item No." = field("No.");
                 }
@@ -981,6 +1009,7 @@ pageextension 50119 ItemCardZX extends "Item Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Item - Chemical Tax Reduction Rate';
+                ToolTip = 'Generates a report of chemical tax reduction rates for items.';
                 Image = "Report";
                 RunObject = Report "Item - Chemical Tax Red. Rate";
             }
@@ -999,33 +1028,31 @@ pageextension 50119 ItemCardZX extends "Item Card"
 
     trigger OnAfterGetRecord()
     begin
-        SetActions();  // 15-02-18 ZY-LD 014
-        Rec.CalcFields("Actual FOB Price");  // 19-02-20 ZY-LD 025
+        SetActions();
+        Rec.CalcFields("Actual FOB Price");
     end;
 
     trigger OnClosePage()
     begin
-        //>> 28-04-18 ZY-LD 017
         if ChangesHasBeenMade then
-            ZyWebSrvMgt.ReplicateItems('', Rec."No.", false, false);  // 23-10-18 ZY-LD 019  // 07-01-19 ZY-LD
-                                                                      //ReplicateItems.ReplicateItem(Rec);  // 23-10-18 ZY-LD 019
-                                                                      //<< 28-04-18 ZY-LD 017
-        SI.SetRejectChangeLog(false);  // 25-04-18 ZY-LD 018
+            ZyWebSrvMgt.ReplicateItems('', Rec."No.", false, false);
+
+        SI.SetRejectChangeLog(false);
     end;
 
     trigger OnDeleteRecord(): Boolean
     begin
-        ChangesHasBeenMade := true;  // 28-04-18 ZY-LD 017
+        ChangesHasBeenMade := true;
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        ChangesHasBeenMade := true;  // 28-04-18 ZY-LD 017
+        ChangesHasBeenMade := true;
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
-        ChangesHasBeenMade := true;  // 28-04-18 ZY-LD 017
+        ChangesHasBeenMade := true;
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -1034,57 +1061,58 @@ pageextension 50119 ItemCardZX extends "Item Card"
     begin
         Rec."Minimum Order Quantity" := 1; //moved from InitValue
 
-        EnablePlanningControls;
-        EnableCostingControls;
-        //ZL111005A+
+        EnablePlanningControls();
+        EnableCostingControls();
+
         InvtSetup.Get();
-        if (InvtSetup."Default Item Disc. Group" <> '') then begin
+        if (InvtSetup."Default Item Disc. Group" <> '') then
             Rec."Item Disc. Group" := InvtSetup."Default Item Disc. Group";
-        end;
+
         AdditionalItemEnable := Rec."Add Additional Item";
         NonZyxelLicVendEnable := Rec."Non ZyXEL License";
-        //ZL111005A-
+
     end;
 
     trigger OnAfterGetCurrRecord()
     begin
-        //>> 28-10-21 ZY-LD 017
         if ChangesHasBeenMade then begin
             ZyWebSrvMgt.ReplicateItems('', Rec."No.", false, false);
             ChangesHasBeenMade := false;
         end;
-        //<< 28-10-21 ZY-LD 017
     end;
 
     trigger OnOpenPage()
     begin
-        //15-51643 -
         AdditionalItemEnable := true;
         NonZyxelLicVendEnable := true;
         BlockonsalesorderEnable := true;
         InactiveEnable := true;
-        //15-51643 +
 
-        SetActions();  // 15-02-18 ZY-LD 014
-        SI.SetRejectChangeLog(false);  // 25-04-18 ZY-LD 018
-        Rec.SetFilter("Tax Reduction Rate Date Filter", '..%1', WORKDATE);  // 02-03-22 ZY-LD 028
+        SetActions();
+        SI.SetRejectChangeLog(false);
+        Rec.SetFilter("Tax Reduction Rate Date Filter", '..%1', WORKDATE());
 
-        //>> 19-02-20 ZY-LD 025
-        if ZGT.IsRhq then begin
+        if ZGT.IsRhq() then begin
             recVendZCom.SetRange("SBU Company", recVendZCom."SBU Company"::"ZCom HQ");
             recVendZCom.FindFirst();
             recVendZNet.SetRange("SBU Company", recVendZNet."SBU Company"::"ZNet HQ");
             recVendZNet.FindFirst();
             Rec.SetFilter("Vendor No. Filter", '%1|%2', recVendZCom."No.", recVendZNet."No.");
-            Rec.SetFilter("Date Filter Act. FOB Pr. Start", '..%1', TODAY);
-            Rec.SetFilter("Date Filter Act. FOB Pr. End", '%1|%2..', 0D, TODAY);
+            Rec.SetFilter("Date Filter Act. FOB Pr. Start", '..%1', TODAY());
+            Rec.SetFilter("Date Filter Act. FOB Pr. End", '%1|%2..', 0D, TODAY());
             Rec.CalcFields("Actual FOB Price");
         end;
-        //<< 19-02-20 ZY-LD 025
     end;
 
     var
-        TxtInfo001: Label 'Additional Items are added to delivery documents free of charge and do not deplete stock.';
+        recVendZCom: Record Vendor;
+        recVendZNet: Record Vendor;
+        recPurchPrice: Record "Price List Line";
+        ZGT: Codeunit "ZyXEL General Tools";
+        SI: Codeunit "Single Instance";
+        ZyWebSrvMgt: Codeunit "Zyxel Web Service Management";
+
+
         [InDataSet]
         AdditionalItemEnable: Boolean;
         [InDataSet]
@@ -1092,17 +1120,9 @@ pageextension 50119 ItemCardZX extends "Item Card"
         [InDataSet]
         BlockonsalesorderEnable: Boolean;
         InactiveEnable: Boolean;
-        TxtInfo002: Label 'Additional Items are added to the sales order and deplete stock.';
         PLMSUpdateEditable: Boolean;
         TariffNoEditable: Boolean;
-        ZGT: Codeunit "ZyXEL General Tools";
         ChangesHasBeenMade: Boolean;
-        SI: Codeunit "Single Instance";
-        ZyWebSrvMgt: Codeunit "Zyxel Web Service Management";
-        recVendZCom: Record Vendor;
-        recVendZNet: Record Vendor;
-        PurchasePricesPage: Page "Price List Lines";
-        recPurchPrice: Record "Price List Line";
         MDMBufferEditable: Boolean;
         ShowPreventEmptyVolumeDefaultYes: Boolean;
         ShowPreventEmptyVolumeDefaultNo: Boolean;
@@ -1114,38 +1134,33 @@ pageextension 50119 ItemCardZX extends "Item Card"
         recUserSetup: Record "User Setup";
         InventorySetup: Record "Inventory Setup";
     begin
-        //15-51643 -
         AdditionalItemEnable := Rec."Add Additional Item";
         NonZyxelLicVendEnable := Rec."Non ZyXEL License";
         if not recUserSetup.Get(UserId()) then
             Clear(recUserSetup);
         BlockonsalesorderEnable := recUserSetup."Can Block Items";
         InactiveEnable := recUserSetup."Can Block Items";
-        //15-51643 +
 
-        if ZGT.IsRhq then begin
-            //>> 24-03-23 ZY-LD 029
+        if ZGT.IsRhq() then begin
             if Rec."Update PLMS from Item No." <> '' then
                 PLMSUpdateEditable := false
-            else  //<< 24-03-23 ZY-LD 029
+            else
                 PLMSUpdateEditable := Rec."No PLMS Update";
 
-            //>> 24-03-23 ZY-LD 029
             UpdatePlmsFromItemNoEditable := PLMSUpdateEditable;
             if Rec."Update PLMS from Item No." <> '' then
                 UpdatePlmsFromItemNoEditable := true;
-            //<< 24-03-23 ZY-LD 029
         end else
             PLMSUpdateEditable := false;
 
-        TariffNoEditable := not Rec."No Tariff Code";  // 09-04-18 ZY-LD 016
+        TariffNoEditable := not Rec."No Tariff Code";
 
-        MDMBufferEditable := (UserId() = Rec.MDM) or (UserId() = Rec.SCM) or recUserSetup.SCM;  // 25-11-21 ZY-LD 027
+        MDMBufferEditable := (UserId() = Rec.MDM) or (UserId() = Rec.SCM) or recUserSetup.SCM;
 
         InventorySetup.Get();
         ShowPreventEmptyVolumeDefaultYes := InventorySetup."Prevent Empty Volume";
         ShowPreventEmptyVolumeDefaultNo := not ShowPreventEmptyVolumeDefaultYes;
 
-        ZNetRHQVisible := ZGT.IsRhq AND ZGT.IsZNetCompany;
+        ZNetRHQVisible := ZGT.IsRhq() AND ZGT.IsZNetCompany();
     end;
 }

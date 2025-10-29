@@ -34,7 +34,7 @@ tableextension 50114 ItemZX extends Item
             Description = '28-10-21 ZY-LD 037';
             TableRelation = SBU.Code where(Type = const("Statistics Category"));
         }
-        field(50003; "Not Returnable"; Boolean)  // 22-08-24 ZY-LD 000
+        field(50003; "Not Returnable"; Boolean)
         {
             Caption = 'Return Order - Not Returnable';
             InitValue = true;
@@ -468,7 +468,7 @@ tableextension 50114 ItemZX extends Item
             Editable = false;
             FieldClass = FlowField;
         }
-        field(50055; "Block on Sales Order Reason"; Text[30])  // 18-03-24 ZY-LD 000
+        field(50055; "Block on Sales Order Reason"; Text[30])
         {
             Caption = 'Block on Sales Order Reason';
         }
@@ -1105,12 +1105,6 @@ tableextension 50114 ItemZX extends Item
             CalcFormula = sum("Unshipped Purchase Order".Quantity where("Item No." = field("No."),
                                                                         "Buy-from Vendor No." = field("Buy-from Vendor No. Filter"),
                                                                         "Location Code" = field("Location Filter")));
-            /*CalcFormula = sum("Purchase Line".Quantity where("Document Type" = const(Order),
-                                                             Type = const(Item),
-                                                             "No." = field("No."),
-                                                             OriginalLineNo = filter(<> 0),
-                                                             "Buy-from Vendor No." = field("Buy-from Vendor No. Filter"),
-                                                             "Location Code" = field("Location Filter")));*/
             Caption = 'HQ Unshipped Purchase Order';
             Description = 'PAB 1.0';
             Editable = false;
@@ -1336,6 +1330,11 @@ tableextension 50114 ItemZX extends Item
             Description = 'ZY2.1';
             TableRelation = "Inventory Posting Group";
         }
+        field(62531; "RMA Reserved Quantity"; Decimal) //23-10-2025 BK #517106
+        {
+            Caption = 'RMA Reserved Quantity';
+            Description = 'ZY2.1';
+        }
     }
 
     keys
@@ -1357,41 +1356,28 @@ tableextension 50114 ItemZX extends Item
 
     procedure CalcAvailableStock(Confirmed: Boolean): Decimal
     begin
-        //>> 05-07-19 ZY-LD 015
         if Confirmed then begin
             Rec.CalcFields(
               Rec.Inventory,
               Rec."Qty. on Sales Order Confirmed",
-              Rec."Tr. Or. Ship (Qty.) Confirmed");  // 23-10-19 ZY-LD 019  // 29-12-20 ZY-LD 030
-            exit(Rec.Inventory - Rec."Qty. on Sales Order Confirmed" - Rec."Tr. Or. Ship (Qty.) Confirmed");  // 23-10-19 ZY-LD 019  // 29-12-20 ZY-LD 030
+              Rec."Tr. Or. Ship (Qty.) Confirmed");
+            exit(Rec.Inventory - Rec."Qty. on Sales Order Confirmed" - Rec."Tr. Or. Ship (Qty.) Confirmed" - rec."RMA Reserved Quantity");  //24-10-2025 BK #517106
         end else begin
             Rec.CalcFields(
               Rec.Inventory,
               Rec."Qty. on Sales Order",
-              Rec."Trans. Ord. Shipment (Qty.)");  // 23-10-19 ZY-LD 019
-            exit(Rec.Inventory - Rec."Qty. on Sales Order" - Rec."Trans. Ord. Shipment (Qty.)");  // 23-10-19 ZY-LD 019
+              Rec."Trans. Ord. Shipment (Qty.)");
+            exit(Rec.Inventory - Rec."Qty. on Sales Order" - Rec."Trans. Ord. Shipment (Qty.)" - rec."RMA Reserved Quantity");  //24-10-2025 BK #517106
         end;
-        //<< 05-07-19 ZY-LD 015
+
     end;
 
     procedure SetLocationFilterOnMainWarehouse()
     var
-        recInvSetup: Record "Inventory Setup";
-        ZGT: Codeunit "ZyXEL General Tools";
         ItemLogisticEvent: Codeunit "Item / Logistic Events";
     begin
-        //>> 05-07-19 ZY-LD 015
-        //IF ZGT.IsRhq THEN BEGIN  // 12-08-22 ZY-LD 043 - We wil also set the filter in subs.
-        //>> 03-06-22 ZY-LD 043
-        /*recInvSetup.GET;
-        recInvSetup.TESTFIELD("AIT Location Code");
-        SETRANGE("Location Filter",recInvSetup."AIT Location Code");*/
         if Rec.GetFilter(Rec."Location Filter") = '' then
-            Rec.SetRange(Rec."Location Filter", ItemLogisticEvent.GetMainWarehouseLocation);
-        //<< 03-06-22 ZY-LD 043
-        //END;
-        //<< 05-07-19 ZY-LD 015
-
+            Rec.SetRange(Rec."Location Filter", ItemLogisticEvent.GetMainWarehouseLocation());
     end;
 
     procedure TransferPlmsFields()
@@ -1464,14 +1450,11 @@ tableextension 50114 ItemZX extends Item
         if itemno = '' then
             exit(0);
 
-        if item.get(itemno) then begin
+        if item.get(itemno) then
             exit(item."Total Qty. per Carton");
-        end;
 
         exit(0);
 
     end;
 
-    var
-        HqDimension: Enum "HQ Dimension";
 }

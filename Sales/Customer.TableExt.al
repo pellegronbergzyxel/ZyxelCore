@@ -359,7 +359,7 @@ tableextension 50110 CustomerZX extends Customer
             Caption = 'Fiscal Code';
             Description = '25-05-23 ZY-LD 046';
         }
-        field(50068; "NL to DK Rev. Charge"; Boolean)  // 13-03-24 ZY-LD 000
+        field(50068; "NL to DK Rev. Charge"; Boolean)
         {
             Caption = 'NL to DK Reverse Charge';
         }
@@ -387,8 +387,6 @@ tableextension 50110 CustomerZX extends Customer
             caption = 'Amazon party id';
             Description = 'Amazon party id';
         }
-
-
 
         field(55025; "Creation Date"; Date)
         {
@@ -567,6 +565,11 @@ tableextension 50110 CustomerZX extends Customer
         {
             Caption = 'Backlog Email Address';
             ExtendedDatatype = EMail;
+            DataClassification = CustomerContent;
+        }
+        Field(67016; "Last Customer credit Check"; Date) //24-10-25 BK #529592 
+        {
+            Caption = 'Last Customer Credit Check';
             DataClassification = CustomerContent;
         }
     }

@@ -540,6 +540,11 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the KYC Last Checked';
                 }
+                field("Last Customer credit Check"; Rec."Last Customer credit Check") //24-10-2025 BK #529592
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Last Customer credit Check';
+                }
                 field(Category; Rec.Category)
                 {
                     ApplicationArea = Basic, Suite;
@@ -901,10 +906,9 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
         if ChangeHasBeenMade then
             ZyWebSrvMgt.ReplicateCustomers('', Rec."No.", false);
 
-        if ZGT.IsRhq() then begin
+        if ZGT.IsRhq() then
             if Rec."Global Dimension 1 Code" = '' then
                 Error(ZyText001, Rec.FieldCaption("Global Dimension 1 Code"));
-        end;
     end;
 
     trigger OnAfterGetRecord()
@@ -991,7 +995,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
             SelectedFieldsEditable := UserSetup."User Type" = UserSetup."User Type"::"Accounting Manager";
 
 
-        IsZNet := ZGT.IsZNetCompany;
+        IsZNet := ZGT.IsZNetCompany();
         IsZNet := false;
 
         AddPostSetupMainVisible := ZGT.IsRhq();

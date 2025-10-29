@@ -152,6 +152,13 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the quantity of the item that is confirmed for transfer order shipments.';
                 }
+                field("RMA Reserved Quantity"; Rec."RMA Reserved Quantity") //23-10-2025 BK #517106
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'RMA Reserved Qty';
+                    DecimalPlaces = 0 : 0;
+                    ToolTip = 'Specifies the safety stock quantity for the item to prevent stockouts.';
+                }
                 field("Qty. Stock for Sales"; Rec.CalcAvailableStock(true))
                 {
                     ApplicationArea = Basic, Suite;
@@ -159,6 +166,7 @@ pageextension 50293 ItemWarehouseFactBoxZX extends "Item Warehouse FactBox"
                     DecimalPlaces = 0 : 0;
                     ToolTip = '"Qty. Stock for Sales" = "Qty. On-Hand" - "Qty. on Sales Order Confirmed" - "Trans. Ord. Shipment (Qty.)"';
                 }
+
             }
             group("Picking Dates")
             {

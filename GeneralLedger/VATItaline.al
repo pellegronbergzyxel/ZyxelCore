@@ -4,6 +4,7 @@ Report 50096 "VAT Report For BCIT"
     DefaultLayout = RDLC;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = Basic, Suite;
+    Extensible = true;
 
     RDLCLayout = './Layouts/VAT Report For BCIT.rdlc';
     //WordLayout = './Layouts/VAT Report For BCIT.docx';
@@ -18,7 +19,15 @@ Report 50096 "VAT Report For BCIT"
             {
 
             }
+            column(PostingDateLb; FieldCaption("Posting Date"))
+            {
+
+            }
             column(DocumentDate; "Document Date")
+            {
+
+            }
+            column(DocumentDateLB; FieldCaption("Document Date"))
             {
 
             }
@@ -26,11 +35,23 @@ Report 50096 "VAT Report For BCIT"
             {
 
             }
+            column(DocumentTypeLB; FieldCaption("Document Type"))
+            {
+
+            }
             column(DocumentNo; "Document No.")
             {
 
             }
+            column(DocumentNoLb; FieldCaption("Document No."))
+            {
+
+            }
             column(ExternalDocumentNo; "External Document No.")
+            {
+
+            }
+            column(ExternalDocumentNoLb; FieldCaption("External Document No."))
             {
 
             }
@@ -42,6 +63,7 @@ Report 50096 "VAT Report For BCIT"
             {
 
             }
+
             column(VATPercent; VATPercent)
             {
 
@@ -74,6 +96,50 @@ Report 50096 "VAT Report For BCIT"
             {
 
             }
+            column(EntryNo; "Entry No.")
+            {
+
+            }
+            dataitem(PageLoop; "Integer")
+            {
+                DataItemTableView = sorting(Number) where(Number = const(1));
+                column(HomePage; CompanyInfo."Post Code")
+                {
+                }
+                column(EMail; CompanyInfo."E-Mail")
+                {
+                }
+                column(CompanyInfoName; CompanyInfo.Name)
+                {
+                }
+                column(CompanyInfoAddress; CompanyInfo.Address)
+                {
+                }
+                column(CompanyInfoAddress2; CompanyInfo."Address 2")
+                {
+                }
+                column(CompanyInfoCity; CompanyInfo.City)
+                {
+                }
+                column(DocumentCaptionCopyText; companyInfo."VAT Registration No.")
+                {
+                }
+                column(ReporName; ReportName)
+                {
+                }
+                column(VATPCTLabel; VATPCTLabel)
+                {
+
+                }
+                column(ReportTypeFilter; ReportTypeFilter)
+                {
+
+                }
+                column(CurrencycodeLabel; CurrencycodeLabel)
+                {
+
+                }
+            }
 
             trigger OnPreDataItem()
             begin
@@ -81,6 +147,10 @@ Report 50096 "VAT Report For BCIT"
                 TotalAmount := 0;
                 VATEntry.SETRANGE("Country/Region Code", CountryCode);
                 VATEntry.SETRANGE(Type, ReportType);
+                if ReportType = ReportType::Purchase then
+                    ReportTypeFilter := 'VAT Register Purchase Register'
+                else
+                    ReportTypeFilter := 'VAT Register Sales Register';
 
             end;
 
@@ -121,11 +191,64 @@ Report 50096 "VAT Report For BCIT"
                 end;
 
                 TotalAmount := Base + Amount;
+                UpdateGrandTotal(VATEntry);
 
                 if Exceloptions then
                     MakeExcelLine();
             end;
 
+            trigger OnPostDataItem()
+            begin
+                TempPostBuffer.Reset();
+                if TempPostBuffer.FindSet() then
+                    repeat
+                        PostBuffer := TempPostBuffer;
+                        PostBuffer.Insert();
+                    until TempPostBuffer.Next() = 0;
+
+            end;
+
+        }
+        dataitem(PostBuffer; "Invoice Posting Buffer")
+        {
+            column(GroupID; PostBuffer."Group ID")
+            {
+                caption = 'Group ID';
+            }
+            column("VatBusGroup"; PostBuffer."VAT Bus. Posting Group")
+            {
+
+            }
+            column("VatProdGroup"; PostBuffer."VAT Prod. Posting Group")
+            {
+
+            }
+            column("VatBaseBeforePmtDisc"; PostBuffer."VAT Base Before Pmt. Disc.")
+            {
+
+            }
+            column("VatAmount"; PostBuffer."VAT Amount")
+            {
+
+            }
+            column("NonDeductibleVatBase"; PostBuffer."Non-Deductible VAT Base")
+            {
+
+            }
+            column("NonDeductibleVatAmount"; PostBuffer."Non-Deductible VAT Amount")
+            {
+
+            }
+            trigger OnPreDataItem()
+            begin
+                PostBuffer.SETCURRENTKEY("Group ID");
+                PostBuffer.SETFILTER("Group ID", '<>%1', '');
+            end;
+
+            trigger OnAfterGetRecord()
+            begin
+                //if PostBuffer.next() <> 0 then;
+            end;
         }
     }
     requestpage
@@ -170,15 +293,17 @@ Report 50096 "VAT Report For BCIT"
         trigger OnOpenPage()
         begin
             CountryCode := CountryLabel;
+            CompanyInfo.Get();
+            ReportName := 'VAT Report For BCIT';
         end;
     }
 
     trigger OnPreReport()
     begin
-        IF NOT Exceloptions then
-            exit;
+        IF Exceloptions then
+            MakeExcelHead();
 
-        MakeExcelHead();
+        Clear(TempPostBuffer);
     end;
 
     trigger OnPostReport()
@@ -186,6 +311,7 @@ Report 50096 "VAT Report For BCIT"
         IF NOT Exceloptions then
             exit;
 
+        MakeTotalExcelLine();
         CreateExcelbook();
     end;
 
@@ -231,7 +357,7 @@ Report 50096 "VAT Report For BCIT"
         TempExcelBuf.AddColumn(SourceName, false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
         TempExcelBuf.AddColumn(VATPercent, false, '', false, false, false, '#,##0.00', TempExcelBuf."cell type"::Number);
         TempExcelBuf.AddColumn(VATEntry.Base, false, '', false, false, false, '#,##0.00', TempExcelBuf."cell type"::Number);
-        TempExcelBuf.AddColumn(VATEntry.Amount, false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
+        TempExcelBuf.AddColumn(VATEntry.Amount, false, '', false, false, false, '#,##0.00', TempExcelBuf."cell type"::Number);
         TempExcelBuf.AddColumn(VATEntry."Non-Deductible VAT Base", false, '', false, false, false, '#,##0.00', TempExcelBuf."cell type"::Number);
         TempExcelBuf.AddColumn(VATEntry."Non-Deductible VAT Amount", false, '', false, false, false, '#,##0.00', TempExcelBuf."cell type"::Number);
         TempExcelBuf.AddColumn(VATEntry."VAT Bus. Posting Group", false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
@@ -242,28 +368,34 @@ Report 50096 "VAT Report For BCIT"
         TempExcelBuf.NewRow();
     end;
 
+
     procedure MakeTotalExcelLine()
     begin
-        IF TempVatEntry2.FindSet() then
+        TempExcelBuf.NewRow();
+        TempExcelbuf.AddColumn('Total pr. Groups', false, '', true, false, false, '', TempExcelBuf."cell type"::Text);
+        TempExcelBuf.NewRow();
+        TempPostBuffer.SetRange("VAT Bus. Posting Group");
+        TempPostBuffer.SetRange("VAT Prod. Posting Group");
+        IF TempPostBuffer.FindSet() then
             repeat
-                TempExcelBuf.AddColumn(TempVatEntry2."VAT Bus. Posting Group", false, '', false, false, false, '', TempExcelBuf."cell type"::Date);
-                TempExcelBuf.AddColumn(TempVatEntry2."VAT Prod. Posting Group", false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
+                TempExcelBuf.AddColumn(TempPostBuffer."VAT Bus. Posting Group", false, '', true, false, false, '', TempExcelBuf."cell type"::Date);
+                TempExcelBuf.AddColumn(TempPostBuffer."VAT Prod. Posting Group", false, '', true, false, false, '', TempExcelBuf."cell type"::Text);
                 TempExcelBuf.AddColumn('', false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
                 tempExcelBuf.AddColumn('', false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
                 TempExcelBuf.AddColumn('', false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
                 TempExcelBuf.AddColumn('', false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
                 TempExcelBuf.AddColumn('', false, '', false, false, false, '#,##0.00', TempExcelBuf."cell type"::Number);
-                TempExcelBuf.AddColumn(TempVatEntry2.Base, false, '', false, false, false, '#,##0.00', TempExcelBuf."cell type"::Number);
-                TempExcelBuf.AddColumn(TempVatEntry2.Amount, false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
-                TempExcelBuf.AddColumn(TempVatEntry2."Non-Deductible VAT Base", false, '', false, false, false, '#,##0.00', TempExcelBuf."cell type"::Number);
-                TempExcelBuf.AddColumn(TempVatEntry2."Non-Deductible VAT Amount", false, '', false, false, false, '#,##0.00', TempExcelBuf."cell type"::Number);
+                TempExcelBuf.AddColumn(TempPostBuffer."VAT Base Before Pmt. Disc.", false, '', false, false, false, '#,##0.00', TempExcelBuf."cell type"::Number);
+                TempExcelBuf.AddColumn(TempPostBuffer."VAT Amount", false, '', false, false, false, '#,##0.00', TempExcelBuf."cell type"::Number);
+                TempExcelBuf.AddColumn(TempPostBuffer."Non-Deductible VAT Base", false, '', false, false, false, '#,##0.00', TempExcelBuf."cell type"::Number);
+                TempExcelBuf.AddColumn(TempPostBuffer."Non-Deductible VAT Amount", false, '', false, false, false, '#,##0.00', TempExcelBuf."cell type"::Number);
                 TempExcelBuf.AddColumn('', false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
                 TempExcelBuf.AddColumn('', false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
-                tempExcelBuf.AddColumn(TotalAmount, false, '', false, false, false, '#,##0.00', TempExcelBuf."cell type"::Number);
-                TempExcelBuf.AddColumn(VATEntry."VAT Registration No.", false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
-                TempExcelBuf.AddColumn(VATEntry."Source Currency Code", false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
+                tempExcelBuf.AddColumn(TempPostBuffer."VAT Base Before Pmt. Disc." + TempPostBuffer."VAT Amount", false, '', false, false, false, '#,##0.00', TempExcelBuf."cell type"::Number);
+                TempExcelBuf.AddColumn('', false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
+                TempExcelBuf.AddColumn('', false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
                 TempExcelBuf.NewRow();
-            until TempVatEntry2.Next() = 0;
+            until TempPostBuffer.Next() = 0;
     end;
 
     procedure CreateExcelbook()
@@ -280,25 +412,28 @@ Report 50096 "VAT Report For BCIT"
     procedure UpdateGrandTotal(VATEntry: Record "VAT Entry")
     begin
 
-        TempVatEntry2.setrange("VAT Bus. Posting Group", VATEntry."VAT Bus. Posting Group");
-        TempVatEntry2.setrange("VAT Prod. Posting Group", VATEntry."VAT Prod. Posting Group");
-        if TempVatEntry2.findset then
-            repeat
-                TempVatEntry2.Base += TempVatEntry2.Base + VATEntry.Base;
-                TempVatEntry2.Amount += TempVatEntry2.Amount + VATEntry.Amount;
-                TempVatEntry2.Modify();
-            until TempVatEntry2.next() = 0
-        else begin
-            TempVatEntry2.init();
-            TempVatEntry2."VAT Bus. Posting Group" := VATEntry."VAT Bus. Posting Group";
-            TempVatEntry2."VAT Prod. Posting Group" := VATEntry."VAT Prod. Posting Group";
-            TempVatEntry2.Base := VATEntry.Base;
-            TempVatEntry2.Amount := VATEntry.Amount;
-            TempVatEntry2.insert();
+        TempPostBuffer.setrange("VAT Bus. Posting Group", VATEntry."VAT Bus. Posting Group");
+        TempPostBuffer.setrange("VAT Prod. Posting Group", VATEntry."VAT Prod. Posting Group");
+        if TempPostBuffer.findfirst then begin
+            TempPostBuffer."VAT Base Before Pmt. Disc." += VATEntry.Base;
+            TempPostBuffer."VAT Amount" += VATEntry.Amount;
+            TempPostBuffer."Non-Deductible VAT Base" += VATEntry."Non-Deductible VAT Base";
+            TempPostBuffer."Non-Deductible VAT Amount" += VATEntry."Non-Deductible VAT Amount";
+            TempPostBuffer.Modify();
+        end else begin
+            TempPostBuffer.init();
+            TempPostBuffer."Group ID" := VATEntry."VAT Bus. Posting Group" + VATEntry."VAT Prod. Posting Group";
+            TempPostBuffer."VAT Bus. Posting Group" := VATEntry."VAT Bus. Posting Group";
+            TempPostBuffer."VAT Prod. Posting Group" := VATEntry."VAT Prod. Posting Group";
+            TempPostBuffer."VAT Base Before Pmt. Disc." := VATEntry.Base;
+            TempPostBuffer."VAT Amount" := VATEntry.Amount;
+            TempPostBuffer."Non-Deductible VAT Base" := VATEntry."Non-Deductible VAT Base";
+            TempPostBuffer."Non-Deductible VAT Amount" := VATEntry."Non-Deductible VAT Amount";
+            TempPostBuffer.insert();
         end;
     end;
 
-    protected var
+    var
         Vendor: Record Vendor;
         Customer: Record Customer;
         PostedPurchaseInvoice: Record "Purch. Inv. Header";
@@ -307,10 +442,15 @@ Report 50096 "VAT Report For BCIT"
         PostedSalesCreditMemo: Record "Sales Cr.Memo Header";
         VatPostingSetup: Record "VAT Posting Setup";
         TempExcelbuf: Record "Excel Buffer" temporary;
-        TempVatEntry2: Record "VAT Entry" temporary;
+        TempPostBuffer: Record "Invoice Posting Buffer" temporary;
+        CompanyInfo: Record "Company Information";
+
+
         VATPercent: Decimal;
         CountryCode: Code[10];
         SourceName: Text[100];
+        ReportName: text[100];
+        ReportTypeFilter: text[100];
         TotalBase: Decimal;
         TotalAmount: Decimal;
 
@@ -324,6 +464,7 @@ Report 50096 "VAT Report For BCIT"
         Text002: Label 'VAT Entries';
         ReportTypeLabel: Label 'Report Type';
         DateFilterLabel: Label 'Datefilter';
+        CurrencycodeLabel: Label 'Cur.';
 
 
 
