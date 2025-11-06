@@ -328,7 +328,8 @@ codeunit 50091 "Item / Logistic Events"
         MarginApp: Record "Margin Approval";
         SalesDocType: Enum "Sales Document Type";
     begin
-        // If the margin is not approved, then we can´t validate the price book.
+        // If the margin is not approved, then we can´t validate the price book. 
+        //30-10-2025 BK #MarginApproval
         IsHandled :=
             not MarginApp.MarginApproved(
                 MarginApp."Source Type"::"Price Book",

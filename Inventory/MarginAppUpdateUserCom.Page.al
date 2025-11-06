@@ -1,5 +1,6 @@
 page 50140 "Margin App. Update User Com."
 {
+    //30-10-2025 BK #MarginApproval
     ApplicationArea = Basic, Suite;
     Caption = 'Margin App. Update User Comment';
     ShowFilter = false;
@@ -7,9 +8,6 @@ page 50140 "Margin App. Update User Com."
     SourceTable = "Margin Approval";
     InsertAllowed = false;
     DeleteAllowed = false;
-
-
-
 
     layout
     {

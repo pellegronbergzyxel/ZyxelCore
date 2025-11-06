@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Zyxel TESTEMEA",
+            "name": "Zyxel TESTEMEA ZCom",
             "type": "al",
             "request": "launch",
             "server": "http://ZyEU-D365BC02.zyeu.zyxel.eu",
@@ -16,11 +16,32 @@
             "enableLongRunningSqlStatements": true,
             "enableSqlInformationDebugger": true,
             "environmentType": "OnPrem",
-                     // "tenant": "default",
+            // "tenant": "default",
             //"primaryTenantDomain": "89443d20-e988-4407-a3c1-0c80570fb401",
             "schemaUpdateMode": "ForceSync",
-            //"startupCompany": "ZNet DK"
             "startupCompany": "ZyND DK"
+            //"startupCompany": "ZyND ES"
+        },
+        {
+            "name": "Zyxel TESTEMEA ZNet",
+            "type": "al",
+            "request": "launch",
+            "server": "http://ZyEU-D365BC02.zyeu.zyxel.eu",
+            "port": 7049,
+            "serverInstance": "TESTEMEA",
+            "authentication": "AAD",
+            "startupObjectId": 1140,
+            "startupObjectType": "Page",
+            "breakOnError": "All",
+            "launchBrowser": true,
+            "enableLongRunningSqlStatements": true,
+            "enableSqlInformationDebugger": true,
+            "environmentType": "OnPrem",
+            // "tenant": "default",
+            //"primaryTenantDomain": "89443d20-e988-4407-a3c1-0c80570fb401",
+            "schemaUpdateMode": "ForceSync",
+            "startupCompany": "ZNet DK"
+            //"startupCompany": "ZNet ES"
         },
         {
             "name": "Zyxel EMEA (Attach Debugging)",
@@ -111,7 +132,7 @@
             "breakOnNext": "WebServiceClient"
         },
         {
-            "name": "Zyxel EMEA",
+            "name": "Zyxel EMEA ZCom",
             "type": "al",
             "request": "launch",
             "server": "http://ZyEU-D365BC02.zyeu.zyxel.eu",
@@ -133,6 +154,29 @@
             //"startupCompany": "ZNet DK"
             "startupCompany": "ZyND DK"
         },
+        /*{
+            "name": "Zyxel EMEA ZNet",
+            "type": "al",
+            "request": "launch",
+            "server": "http://ZyEU-D365BC02.zyeu.zyxel.eu",
+            "port": 7049,
+            "serverInstance": "EMEA",
+            "authentication": "AAD",
+            "startupObjectId": 22,
+            "startupObjectType": "Page",
+            "breakOnError": true,
+            "launchBrowser": true,
+            "enableLongRunningSqlStatements": true,
+            "enableSqlInformationDebugger": true,
+            "environmentType": "OnPrem",
+            "tenant": "default",
+            "primaryTenantDomain": "89443d20-e988-4407-a3c1-0c80570fb401",
+            "schemaUpdateMode": "Synchronize",
+            //"schemaUpdateMode": "ForceSync",
+            "dependencyPublishingOption": "Ignore",
+            "startupCompany": "ZNet DK"
+            //"startupCompany": "ZyND DK"
+        },
         {
             "name": "Zyxel IT",
             "type": "al",
@@ -153,7 +197,7 @@
             "schemaUpdateMode": "Synchronize",
             //"schemaUpdateMode": "ForceSync",
             "startupCompany": "ZyND IT"
-        },
+        }*/,
         {
             "name": "Zyxel@VisionPeople (W1)",
             "type": "al",

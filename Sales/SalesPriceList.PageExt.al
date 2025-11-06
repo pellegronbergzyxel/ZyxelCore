@@ -16,6 +16,7 @@ pageextension 50018 "Sales Price List" extends "Sales Price List"
         MarginApp: Record "Margin Approval";
         PriceListHead: Record "Price List Header";
     begin
+        //30-10-2025 BK #MarginApproval
         MarginApprovalVisible := MarginApp.MarginApprovalActive();
 
         VeryfyLinesEnabled := true;

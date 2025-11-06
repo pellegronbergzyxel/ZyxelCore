@@ -1,5 +1,6 @@
 page 50134 "Margin Approval FactBox"
 {
+    //30-10-2025 BK #MarginApproval
     ApplicationArea = Basic, Suite;
     Caption = 'Margin Approval Comment FactBox';
     PageType = CardPart;
@@ -28,6 +29,7 @@ page 50134 "Margin Approval FactBox"
                 group(user)
                 {
                     Caption = 'User';
+
                     field(UserComment; UserComment)
                     {
                         ApplicationArea = Basic, Suite;
@@ -55,6 +57,7 @@ page 50134 "Margin Approval FactBox"
                 Caption = 'Enter User Comment';
                 Image = Comment;
                 Enabled = EnterUserCommentEnabled;
+                ToolTip = 'Allows the user to enter a comment regarding the margin approval request.';
 
                 trigger OnAction()
                 begin

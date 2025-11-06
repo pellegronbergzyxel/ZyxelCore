@@ -459,10 +459,9 @@ Table 66004 "Ship Response Header"
         if recZyFileMgt.Get("File Management Entry No.") then begin
             CalcFields(Open);
             if Open then begin
-                //>> 09-01-20 ZY-LD 002
                 if not GuiAllowed or
                    Confirm(Text001)
-                then begin  //<< 09-01-20 ZY-LD 002
+                then begin
                     recZyFileMgt.Open := true;
                     recZyFileMgt.Modify;
                 end;

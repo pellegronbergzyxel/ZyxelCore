@@ -7,14 +7,17 @@ pageextension 50185 SalesReceivablesSetupZX extends "Sales & Receivables Setup"
             field("Use Sell-to text code filter"; Rec."Use Sell-to text code filter")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies whether to use the Sell-to Customer Text Code filter when creating sales documents from templates. When this field is selected, only templates with a matching Sell-to Customer Text Code will be available for selection.';
             }
             field("Zero Unit cost on Sales line"; Rec."Zero Unit cost on Sales line")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies whether to allow zero unit cost on sales lines. When this field is selected, users can enter sales lines with a unit cost of zero.';
             }
             field("Customer No. on Sister Company"; Rec."Customer No. on Sister Company")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the customer number to be used for transactions involving sister companies. This customer number will be used when processing sales and receivables transactions between sister companies within the organization.';
             }
         }
         addafter("Background Posting")
@@ -27,7 +30,7 @@ pageextension 50185 SalesReceivablesSetupZX extends "Sales & Receivables Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies which date field the sales price calculation is based on.';
                 }
-                field("Margin Approval"; Rec."Margin Approval")
+                field("Margin Approval"; Rec."Margin Approval") //30-10-2025 BK #MarginApproval
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the new prices entered in the price book or changed prices on sales order or sales invoice must be sent for approval in headquarter.';
@@ -35,10 +38,12 @@ pageextension 50185 SalesReceivablesSetupZX extends "Sales & Receivables Setup"
                 field("Full Pallet / Carton Ordering"; Rec."Full Pallet / Carton Ordering")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies whether to enforce full pallet or carton ordering on sales orders. When this field is selected, users must order items in full pallet or carton quantities as defined in the item setup.';
                 }
                 field("Sales Order Type Mandatory"; Rec."Sales Order Type Mandatory")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies whether the Sales Order Type field is mandatory when creating sales orders. When this field is selected, users must specify a Sales Order Type for each sales order.';
                 }
 
                 field("Del. Doc. Creation Calculation"; Rec."Del. Doc. Creation Calculation")
@@ -50,10 +55,12 @@ pageextension 50185 SalesReceivablesSetupZX extends "Sales & Receivables Setup"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'VCK Location';
+                    ToolTip = 'Specifies the location code used for All-In Logistics (VCK) operations. This location code will be used for inventory management and order fulfillment processes related to All-In Logistics services.';
                 }
                 field("Calculate Shipment Date"; Rec."Calculate Shipment Date")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies whether to automatically calculate the "Shipment Date" on the sales order header based on the "Requested Delivery Date" and other factors such as lead times and availability.';
                 }
                 field("Default Shipment Date"; Rec."Default Shipment Date")
                 {
@@ -68,6 +75,7 @@ pageextension 50185 SalesReceivablesSetupZX extends "Sales & Receivables Setup"
                 field("Calc. Local VAT for Currency"; Rec."Calc. Local VAT for Currency")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies whether to calculate local VAT based on the currency of the transaction. When this field is selected, local VAT will be calculated according to the currency used in the sales document.';
                 }
                 group(BacklogCmtUnderMinAmount)
                 {
@@ -90,12 +98,14 @@ pageextension 50185 SalesReceivablesSetupZX extends "Sales & Receivables Setup"
                     field("EiCard Automation Enabled"; Rec."EiCard Automation Enabled")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies whether EiCard automation is enabled for sales and receivables processes. When this field is selected, EiCard functionalities will be available for use in relevant transactions.';
                     }
                     group("Delivery Documents")
                     {
                         field("Delivery Days to Add"; Rec."Delivery Days to Add")
                         {
                             ApplicationArea = Basic, Suite;
+                            ToolTip = 'Specifies the number of delivery days to add when calculating the expected delivery date for sales orders and invoices processed through EiCard.';
                         }
                     }
                 }
@@ -104,30 +114,37 @@ pageextension 50185 SalesReceivablesSetupZX extends "Sales & Receivables Setup"
                     field("LMR Item Journal Batch Name"; Rec."LMR Item Journal Batch Name")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies the name of the item journal batch used for Let Me Repair (LMR) processes. This batch is used to track and manage item journals related to LMR activities.';
                     }
                     field("LMR Item Journal Template Name"; Rec."LMR Item Journal Template Name")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies the name of the item journal template used for Let Me Repair (LMR) processes. This template provides a predefined structure for item journals related to LMR activities.';
                     }
                     field("LMR Gen. Prod. Posting Group"; Rec."LMR Gen. Prod. Posting Group")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies the general product posting group used for Let Me Repair (LMR) processes. This posting group determines how LMR-related transactions are recorded in the general ledger.';
                     }
                     field("LMR Division"; Rec."LMR Division")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies the division associated with Let Me Repair (LMR) processes. This division is used to categorize and manage LMR-related activities within the organization.';
                     }
                     field("LMR Department"; Rec."LMR Department")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies the department associated with Let Me Repair (LMR) processes. This department is used to categorize and manage LMR-related activities within the organization.';
                     }
                     field("LMR Value Bin"; Rec."LMR Value Bin")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies the value bin used for Let Me Repair (LMR) processes. This bin is used to store and manage items related to LMR activities.';
                     }
                     field("LMR Country Code"; Rec."LMR Country Code")
                     {
                         ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies the country code associated with Let Me Repair (LMR) processes. This country code is used to manage LMR-related activities in compliance with local regulations and requirements.';
                     }
                 }
                 group(NLtoDK)

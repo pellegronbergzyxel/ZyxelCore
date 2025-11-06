@@ -61,7 +61,7 @@ tableextension 50226 PriceListLineZX extends "Price List Line"
                 SalesPrice.Validate("Unit Price", SalesPriceTmp."Unit Price");
                 if SalesPrice.Insert(true) then begin
                     SalesSetup.get;
-                    if not SalesSetup."Margin Approval" then begin
+                    if not SalesSetup."Margin Approval" then begin //30-10-2025 BK #MarginApproval
                         if PriceListHeader.Get(SalesPrice."Price List Code") and (PriceListHeader.Status = PriceListHeader.Status::Active) then
                             PriceListMgt.ActivateDraftLines(PriceListHeader);
                     end else

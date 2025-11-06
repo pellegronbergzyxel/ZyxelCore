@@ -1,5 +1,6 @@
 table 50071 "Margin Approval"
 {
+    //30-10-2025 BK #MarginApproval          
     Caption = 'Margin Approval';
     DataClassification = ToBeClassified;
     Permissions = tabledata "Margin Approval" = rmd;
@@ -34,7 +35,7 @@ table 50071 "Margin Approval"
             var
                 MarginApp: Record "Margin Approval";
             begin
-                "Status Date" := CurrentDateTime;
+                "Status Date" := CurrentDateTime();
 
                 if Status = Status::Approved then begin
                     MarginApp.SetRange("Approved by Entry No.", "Entry No.");
@@ -44,7 +45,7 @@ table 50071 "Margin Approval"
                             MarginApp."Status Date" := "Status Date";
                             MarginApp."Below Margin" := "Below Margin";
                             MarginApp."Approved/Rejected by" := "Approved/Rejected by";
-                        until MarginApp.Next = 0;
+                        until MarginApp.Next() = 0;
                 end
             end;
         }
@@ -137,7 +138,7 @@ table 50071 "Margin Approval"
     var
         MargenApp: Record "Margin Approval";
     begin
-        Rec."User Name" := UserId;
+        Rec."User Name" := Copystr(UserId, 1, 50);
 
         if "Entry No." = 0 then
             if MargenApp.FindLast() then
@@ -149,11 +150,10 @@ table 50071 "Margin Approval"
     procedure ApproveSalesLine(var SalesLine: Record "Sales Line")
     var
         SalesHeader: Record "Sales Header";
-        PriceLine: Record "Price List Line";
+        //PriceLine: Record "Price List Line";
         MarginApp: Record "Margin Approval";
         PriceChangeType: Option Less,Equal,Higher;
     begin
-        //>> 10-07-24 ZY-LD 149
         if MarginApprovalActive() then begin
             If (SalesLine."Document Type" IN [SalesLine."Document Type"::Order, SalesLine."Document Type"::Invoice]) and
                (SalesLine.Type = SalesLine.Type::Item) and
@@ -205,7 +205,7 @@ table 50071 "Margin Approval"
                                 if MarginApp."Unit Price" <> 0 then begin
                                     MarginApp.Delete(true);
                                     ApproveSalesLine2(SalesLine);
-                                    if MarginApp.FindFirst and (MarginApp."Original Unit Price" = 0) then begin
+                                    if MarginApp.FindFirst() and (MarginApp."Original Unit Price" = 0) then begin
                                         MarginApp."Original Unit Price" := MarginApp."Unit Price";
                                         MarginApp.Modify(true);
                                     end;
@@ -215,7 +215,6 @@ table 50071 "Margin Approval"
                 end;
             end;
         end;
-        //<< 10-07-24 ZY-LD 149
     end;
 
     local procedure ApproveSalesLine2(var SalesLine: Record "Sales Line")
@@ -281,7 +280,31 @@ table 50071 "Margin Approval"
                 MarginApp.Insert(true);
             end;
 
-            rValue := MarginApp.Status = MarginApp.Status::Approved;
+        end;
+    end;
+
+    procedure MarginApprovedSetup(pSourcetype: Enum "Margin Approval Type"; pDocumentType: Enum "Sales Document Type"; pSourceNo: Code[20]; pSourceLineNo: Integer; pCustNo: Code[20]; pItemNo: Code[20]; pCurrCode: Code[20]; pUnitPrice: Decimal; pEntryNo: Integer) rValue: Boolean
+    var
+        MarginApp: Record "Margin Approval";
+        MarginApp2: Record "Margin Approval";
+    begin
+        MarginApp.SetRange("Source Type", pSourceType);
+        MarginApp.SetRange("Source No.", pSourceNo);
+        MarginApp.SetRange("Source Line No.", pSourceLineNo);
+        if not MarginApp.FindFirst() then begin
+            MarginApp.Init();
+            MarginApp.Validate("Source Type", pSourcetype);
+            MarginApp.Validate("Sales Document Type", pDocumentType);
+            MarginApp.Validate("Source No.", pSourceNo);
+            MarginApp.Validate("Source Line No.", pSourceLineNo);
+            MarginApp.Validate("Customer No.", pCustNo);
+            MarginApp.Validate("Item No.", pItemNo);
+            MarginApp.Validate("Unit Price", pUnitPrice);
+            MarginApp.Validate(Status, MarginApp.Status::Approved);
+            MarginApp."Approved/Rejected by" := '';
+            If Not MarginApp.Insert(true) then
+                MarginApp.modify;
+
         end;
     end;
 
@@ -289,7 +312,7 @@ table 50071 "Margin Approval"
     var
         SalesSetup: Record "Sales & Receivables Setup";
     begin
-        SalesSetup.get;
+        SalesSetup.get();
         exit(SalesSetup."Margin Approval");
     end;
 
@@ -313,17 +336,17 @@ table 50071 "Margin Approval"
         SalesDocType: Enum "Sales Document Type";
         lText001: Label 'Do you want to set margin "Status = Approved" for %1 price list lines?';
     begin
-        SalesSetup.get;
+        SalesSetup.get();
         PriceLine.SetRange("Price Type", PriceLine."Price Type"::Sale);
         PriceLine.SetRange("Price List Code", SalesSetup."Default Price List Code");
         PriceLine.SetFilter("Ending Date", '%1|%2..', 0D, today);
-        if PriceLine.FindSet() then begin
-            If confirm(lText001, false, PriceLine.Count) then begin
-                ZGT.OpenProgressWindow('', PriceLine.Count);
+        if PriceLine.FindSet() then
+            If confirm(lText001, false, PriceLine.Count()) then begin
+                ZGT.OpenProgressWindow('', PriceLine.Count());
                 repeat
                     ZGT.UpdateProgressWindow(format(PriceLine."Line No."), 0, true);
 
-                    MarginApp.MarginApproved(
+                    MarginApp.MarginApprovedSetup(
                         MarginApp."Source Type"::"Price Book",
                         SalesDocType::Quote,  // Used for sales document
                         PriceLine."Price List Code",
@@ -333,18 +356,9 @@ table 50071 "Margin Approval"
                         PriceLine."Currency Code",
                         PriceLine."Unit Price",
                         0);
-
-                    MarginApp.SetRange("Source Type", MarginApp."Source Type"::"Price Book");
-                    MarginApp.SetRange("Source No.", PriceLine."Price List Code");
-                    MarginApp.SetRange("Source Line No.", PriceLine."Line No.");
-                    MarginApp.FindFirst();
-                    MarginApp.Status := MarginApp.Status::Approved;
-                    MarginApp."Approved/Rejected by" := '';
-                    MarginApp.Modify;
-                until PriceLine.Next = 0;
+                until PriceLine.Next() = 0;
                 ZGT.CloseProgressWindow();
             end;
-        end;
     end;
 
     procedure SetComment(CommentType: Option User,Approver; NewComment: Text)

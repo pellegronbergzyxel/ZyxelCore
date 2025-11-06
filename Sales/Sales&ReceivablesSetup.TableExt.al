@@ -151,12 +151,12 @@ tableextension 50155 SalesReceivablesSetupZX extends "Sales & Receivables Setup"
             Description = '28-01-22 ZY-LD 006';
             TableRelation = Currency;
         }
-        field(50032; "Skip Salesperson Dimension"; Boolean)  // 10-06-24 ZY-LD 000
+        field(50032; "Skip Salesperson Dimension"; Boolean)
         {
             Caption = 'Skip Salesperson Dimension';
             Description = 'The field can be deleted. It´s not in use.';
         }
-        field(50033; "Margin Approval"; Boolean)  // 20-06-24 ZY-LD 000
+        field(50033; "Margin Approval"; Boolean)  //30-10-25 BK #MarginApproval
         {
             Caption = 'Margin Approval';
         }
@@ -184,7 +184,7 @@ tableextension 50155 SalesReceivablesSetupZX extends "Sales & Receivables Setup"
         {
             Caption = 'Run NL to DK Posting';
         }
-        field(50039; "Calc. Sales Price Based on"; Option)  // 13-09-24 ZY-LD 000
+        field(50039; "Calc. Sales Price Based on"; Option)
         {
             Caption = 'Calc. Sales Price Based on';
             OptionMembers = "Document Date","Requested Delivery Date";
@@ -207,19 +207,6 @@ tableextension 50155 SalesReceivablesSetupZX extends "Sales & Receivables Setup"
         {
             Caption = 'Sales Order Type Mandatory';
             Description = 'Tectura Taiwan';
-
-            trigger OnValidate()
-            var
-                LEMSG000: Label 'Sales Order Type can not be change!';
-                LocationRec: Record Location;
-                LEMSG001: Label 'Sales Order Type %1 can not match with Location %2!';
-                LEMSG002: Label 'Location %1 not exist!';
-                LEMSG003: Label 'Can not find default location for Sales Order Type %1!';
-                SOLine: Record "Sales Line";
-                Item: Record Item;
-                LEMSG004: Label 'Item %1 is not match %2!';
-            begin
-            end;
         }
         field(62018; "Use Sell-to text code filter"; Boolean)
         {
