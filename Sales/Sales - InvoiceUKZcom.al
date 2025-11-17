@@ -660,8 +660,6 @@ report 50108 "Sales - Invoice UK ZCom"
                             TotalAmountInclVAT += "Sales Invoice Line"."Amount Including VAT";
                             TotalPaymentDiscOnVAT += -("Sales Invoice Line"."Line Amount" - "Sales Invoice Line"."Inv. Discount Amount" - "Sales Invoice Line"."Amount Including VAT");
 
-                            //RD 1.0
-
 
                             TarrifCode := '';
                             recItem.SetFilter("No.", "Sales Invoice Line"."No.");
@@ -676,10 +674,10 @@ report 50108 "Sales - Invoice UK ZCom"
                                   "Sales Invoice Line"."VAT Bus. Posting Group",
                                   "Sales Invoice Line"."VAT Prod. Posting Group",
                                   "Sales Invoice Line"."Sell-to Customer No.",
-                                  "Sales Invoice Header"."EU 3-Party Trade",  // 10-06-22 ZY-LD 007
+                                  "Sales Invoice Header"."EU 3-Party Trade",
                                   ArticleText);
 
-                            //>> 09-08-21 ZY-LD 004
+
                             ExternalDocumentNoLine := '';
                             if "Sales Invoice Line"."External Document No." <> '' then
                                 ExternalDocumentNoLine := "Sales Invoice Line"."External Document No."
@@ -687,7 +685,6 @@ report 50108 "Sales - Invoice UK ZCom"
                                 ExternalDocumentNoLine := "Sales Invoice Header"."External Document No.";
                             if "Sales Invoice Line"."External Document Position No." <> '' then
                                 ExternalDocumentNoLine += StrSubstNo(', Pos: %1', "Sales Invoice Line"."External Document Position No.");
-                            //<< 09-08-21 ZY-LD 004
                         end;
 
                         trigger OnPreDataItem()
@@ -769,7 +766,6 @@ report 50108 "Sales - Invoice UK ZCom"
                         begin
                             VATAmountLine.GetLine(VATCounter.Number);
 
-                            //>> 08-02-22 ZY-LD 013
                             if "Sales Invoice Header"."Currency Code" = '' then
                                 CurrencyCode := GLSetup."LCY Code"
                             else
@@ -795,7 +791,6 @@ report 50108 "Sales - Invoice UK ZCom"
 
                             if VATAmountLine."VAT Amount" <> 0 then
                                 ExchRate := Round(CalculatedVATAmount / VATAmountLine."VAT Amount", 0.00001);
-                            //<< 08-02-22 ZY-LD 013
                         end;
 
                         trigger OnPreDataItem()
@@ -985,7 +980,6 @@ report 50108 "Sales - Invoice UK ZCom"
             begin
                 CurrReport.Language := LanguageCU.GetLanguageIdOrDefault("Sales Invoice Header"."Language Code");
 
-                //>> 08-02-22 ZY-LD 013
                 if recIntCompPurch.Get("Sales Invoice Header"."Intercompany Purchase") then begin
                     if recIntCompPurch."Read Comp. Info from Company" <> '' then begin
                         CompanyInfo.ChangeCompany(recIntCompPurch."Read Comp. Info from Company");
@@ -993,7 +987,6 @@ report 50108 "Sales - Invoice UK ZCom"
                     end;
                 end else
                     Clear(recIntCompPurch);
-                //<< 08-02-22 ZY-LD 013
 
                 if RespCenter.Get("Sales Invoice Header"."Responsibility Center") then begin
                     FormatAddr.RespCenter(CompanyAddr, RespCenter);
@@ -1046,7 +1039,6 @@ report 50108 "Sales - Invoice UK ZCom"
                     ShipmentMethod.Init()
                 else begin
                     if ShipmentMethod.Get("Sales Invoice Header"."Shipment Method Code") then
-                        //>> 11-12-20 ZY-LD 003
                         case ShipmentMethod."Read Incoterms City From" of
                             ShipmentMethod."read incoterms city from"::"Ship-to City":
                                 begin
@@ -1059,7 +1051,6 @@ report 50108 "Sales - Invoice UK ZCom"
                                         ShipmentMethod.Description := StrSubstNo('%1 %2', "Sales Invoice Header"."Shipment Method Code", recLocation.City);
                                 end;
                         end;
-                    //<< 11-12-20 ZY-LD 003
                 end;
                 FormatAddr.SalesInvShipTo(ShipToAddr, CustAddr, "Sales Invoice Header");
                 ShowShippingAddr := "Sales Invoice Header"."Sell-to Customer No." <> "Sales Invoice Header"."Bill-to Customer No.";
@@ -1087,7 +1078,6 @@ report 50108 "Sales - Invoice UK ZCom"
                 else
                     sellcust.Get("Sales Invoice Header"."Sell-to Customer No.");
 
-                //RD001
                 SellVATID := sellcust."VAT Registration No.";
                 LineText[1] := '';
                 LineText[2] := '';
@@ -1117,10 +1107,9 @@ report 50108 "Sales - Invoice UK ZCom"
                     end;
                 end;
 
-                //>> 06-06-19 ZY-LD 001
                 if "Sales Invoice Header"."Company VAT Registration Code" <> '' then
                     CompVATRegNo := "Sales Invoice Header"."Company VAT Registration Code"
-                else  //<< 06-06-19 ZY-LD 001
+                else
                     if "Sales Invoice Header"."VAT Registration Code" <> '' then begin
                         VATRegistrationRec.Get("Sales Invoice Header"."VAT Registration Code");
                         CompVATRegNo := VATRegistrationRec."VAT registration No";
@@ -1129,13 +1118,6 @@ report 50108 "Sales - Invoice UK ZCom"
 
                 ArticleText := '';
 
-                //>> 21-01-22 ZY-LD 005
-                /*
-                if "Sales Invoice Header"."Currency Code" = GLSetup."LCY Code" then
-                    recBankAcc.SetFilter("Currency Code", '%1|%2', "Sales Invoice Header"."Currency Code", '')
-                else
-                    recBankAcc.SetRange("Currency Code", "Sales Invoice Header"."Currency Code");
-                */
                 if ("Currency Code" = GLSetup."LCY Code") or ("Currency Code" = '') then
                     recBankAcc.SetFilter("Currency Code", '%1', '')
                 else
@@ -1156,7 +1138,6 @@ report 50108 "Sales - Invoice UK ZCom"
                 recBankAcc.TestField("SWIFT Code");
                 recBankAcc.TestField("Bank Account No.");
                 recBankAcc.TestField(Iban);
-                //<< 21-01-22 ZY-LD 005
             end;
         }
     }
