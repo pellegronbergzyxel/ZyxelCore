@@ -1372,7 +1372,7 @@ codeunit 50067 "Sales Header/Line Events"
         lText002: Label 'Minimum Carton Ordering Policy want to make an adjustment.\\Quantity: %1\New Quantity: %2\\Do you want to make this adjustment?';
     begin
 
-        if not SI.GetHideSalesDialog then
+        if not SI.GetHideSalesDialog and GuiAllowed then
             if (Rec."Document Type" in [Rec."document type"::Order, Rec."document type"::Invoice]) and
                (Rec.Type = Rec.Type::Item) and
                (Rec."No." <> '')

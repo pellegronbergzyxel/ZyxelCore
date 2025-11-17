@@ -35,4 +35,15 @@ tableextension 50176 ICPartnerZX extends "IC Partner"
 
         }
     }
+
+
+    procedure IsTR(IcCode: code[20]): Boolean
+    var
+        ICPartner: record "IC Partner";
+    begin
+        if ICPartner.get(IcCode) then
+            if ICPartner."Inbox Details".Contains('TR') then
+                exit(TRUE);
+        exit(FALSE);
+    end;
 }

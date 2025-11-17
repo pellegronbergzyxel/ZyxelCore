@@ -13,6 +13,15 @@ Page 50267 "Posted Sales Cr. Memo Line Lis"
         {
             repeater(Group)
             {
+                field("Posting Date"; Rec."Posting Date")
+                {
+                    ApplicationArea = Basic, Suite;
+                }
+                field("Document Date"; Rec."Document Date")
+                {
+                    Visible = false;
+                    ApplicationArea = Basic, Suite;
+                }
                 field("Sell-to Customer No."; Rec."Sell-to Customer No.")
                 {
                     ApplicationArea = Basic, Suite;

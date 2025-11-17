@@ -276,6 +276,10 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
                     PartnerInboxPurchHeader := TempInboxPurchHeader;
                     PartnerInboxPurchHeader."Buy-from Vendor No." := PartnerICPartner."Vendor No.";
                     PartnerInboxPurchHeader."Pay-to Vendor No." := PartnerICPartner."Vendor No.";
+                    if PartnerICPartner.IsTR(CurrentPartner.Code) then begin
+                        PartnerInboxPurchHeader."Ship-to Address" := copystr(PartnerInboxPurchHeader."Ship-to Address", 1, 50);
+                        PartnerInboxPurchHeader."Ship-to name" := copystr(PartnerInboxPurchHeader."Ship-to Name", 1, 50);
+                    end;
                     //>> 09-02-21 ZY-LD 004
                     /*//>> 24-10-17 ZY-LD 001
                     //>> 21-02-18 ZY-LD 002
@@ -300,6 +304,9 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
             if TempInboxPurchLine.Find('-') then
                 repeat
                     PartnerInboxPurchLine := TempInboxPurchLine;
+                    if PartnerICPartner.IsTR(CurrentPartner.Code) then begin
+                        TempInboxPurchLine.Description := copystr(TempInboxPurchLine.Description, 1, 50);
+                    end;
                     PartnerInboxPurchLine.Insert();
                 until TempInboxPurchLine.Next() = 0;
 
@@ -309,6 +316,10 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
                     PartnerInboxSalesHeader := TempInboxSalesHeader;
                     PartnerInboxSalesHeader."Sell-to Customer No." := PartnerICPartner."Customer No.";
                     PartnerInboxSalesHeader."Bill-to Customer No." := PartnerICPartner."Customer No.";
+                    if PartnerICPartner.IsTR(PartnerICPartner.Code) then begin
+                        PartnerInboxSalesHeader."Ship-to name" := copystr(PartnerInboxSalesHeader."Ship-to Name", 1, 50);
+                        PartnerInboxSalesHeader."Ship-to Address" := copystr(PartnerInboxSalesHeader."Ship-to Address", 1, 50);
+                    end;
                     OnBeforePartnerInboxSalesHeaderInsert(PartnerInboxSalesHeader, CurrentPartner, TempInboxSalesHeader);
                     PartnerInboxSalesHeader.Insert();
                 until TempInboxSalesHeader.Next() = 0;
@@ -317,6 +328,9 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
             if TempInboxSalesLine.Find('-') then
                 repeat
                     PartnerInboxSalesLine := TempInboxSalesLine;
+                    if PartnerICPartner.IsTR(CurrentPartner.Code) then begin
+                        PartnerInboxSalesLine.Description := copystr(PartnerInboxSalesLine.Description, 1, 50);
+                    end;
                     PartnerInboxSalesLine.Insert();
                 until TempInboxSalesLine.Next() = 0;
 
@@ -352,6 +366,11 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
                     PartnerInboxPurchHeader := TempInboxPurchHeader;
                     PartnerInboxPurchHeader."Buy-from Vendor No." := PartnerICPartner."Vendor No.";
                     PartnerInboxPurchHeader."Pay-to Vendor No." := PartnerICPartner."Vendor No.";
+                    if PartnerICPartner.IsTR(CurrentPartner.Code) then begin
+                        PartnerInboxPurchHeader."Ship-to Address" := copystr(PartnerInboxPurchHeader."Ship-to Address", 1, 50);
+                        PartnerInboxPurchHeader."Ship-to Name" := copystr(PartnerInboxPurchHeader."Ship-to Name", 1, 50);
+                    end;
+
                     WSICInboxPurchHead.SetICInboxPurchHead(PartnerInboxPurchHeader);
                 until TempInboxPurchHeader.Next() = 0;
 
