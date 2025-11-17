@@ -10,6 +10,8 @@ XmlPort 50057 "Read Stock Level Request"
     UseDefaultNamespace = false;
     UseRequestPage = false;
 
+
+
     schema
     {
         textelement(InventoryRequestResponse)
@@ -19,6 +21,9 @@ XmlPort 50057 "Read Stock Level Request"
                 tableelement("VCK Inventory"; "VCK Inventory")
                 {
                     XmlName = 'Item';
+                    // error with missing location+warehause >>
+                    AutoSave = false;
+                    // error with missing location+warehause <<
                     textelement(Index)
                     {
                     }
@@ -31,10 +36,12 @@ XmlPort 50057 "Read Stock Level Request"
                     }
                     textelement(Description)
                     {
+                        MinOccurs = Zero;
                     }
                     fieldelement(Warehouse; "VCK Inventory".Warehouse)
                     {
                         FieldValidate = no;
+                        MinOccurs = Zero;
                     }
                     fieldelement(Location; "VCK Inventory".Location)
                     {
@@ -56,6 +63,10 @@ XmlPort 50057 "Read Stock Level Request"
                     begin
                         //"VCK Inventory"."Time Stamp" := SystemDT;
                         "VCK Inventory"."Time Stamp" := CreateDatetime(WhseDate, 0T);
+                        // error with missing location+warehause >>
+                        if ("VCK Inventory".Location <> '') and ("VCK Inventory".Warehouse <> '') then
+                            "VCK Inventory".insert(true);
+                        // error with missing location+warehause >>                            
                     end;
                 }
             }
@@ -84,6 +95,8 @@ XmlPort 50057 "Read Stock Level Request"
         DD: Integer;
         MM: Integer;
         YYYY: Integer;
+
+        QuantityOnHandInteger: integer;
 
 
     procedure Init(NewWarehouseDate: Date)

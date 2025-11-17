@@ -58,6 +58,7 @@ Codeunit 50099 "VCK Download and  Import Doc."
 
                     //>> 05-04-22 ZY-LD 004
                     FilenameXml := recZyFileMgt.Filename;
+                    FilenameXml := DelChr(FilenameXml, '=', 'NULL');
                     FilenameXml := CopyStr(FilenameXml, StrPos(FilenameXml, '_'), StrLen(FilenameXml));
                     FilenameXml := DelChr(FilenameXml, '=', '_');
                     Evaluate(YYYY, CopyStr(FilenameXml, 1, 4));

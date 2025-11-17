@@ -2,14 +2,18 @@
   "id": "e654e9a7-b3cf-49f4-90ee-4863f48e374a",
   "name": "Zyxel Core",
   "publisher": "Vision People A/S",
-  "version": "1.26.4.27",
+<<<<<<< HEAD
+  "version": "1.26.4.28",
+=======
+  "version": "1.26.4.28",
+>>>>>>> ad0fb7997f5bab0db78c625798c47939ecde9769
   "brief": "",
   "description": "Zyxel core: EMEA,IT",
   "privacyStatement": "",
   "EULA": "",
   "help": "",
   "url": "",
-  "logo": "",
+   "logo": "",
   "dependencies": [ 
     {
       "id": "70912191-3c4c-49fc-a1de-bc6ea1ac9da6",

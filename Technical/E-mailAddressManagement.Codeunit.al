@@ -126,9 +126,10 @@ codeunit 50074 "E-mail Address Management"
         Clear(EmailConnector);
         Clear(EmailAccounts);
         EmailConnector := EmailConn::SMTP;
-        EmailConnector.GetAccounts(EmailAccounts);
+        if EmailAccounts.count = 0 then //onlu first getaccounts
+            EmailConnector.GetAccounts(EmailAccounts);
         EmailAccounts.SetRange("Email Address", FromEmail);
-        EmailAccounts.FindFirst();
+        IF EmailAccounts.FindFirst() then;
     end;
 
     procedure CreateEmailWithBodytext(pCode: Code[10]; pBodyText: Text; pLanguage: Code[10])
