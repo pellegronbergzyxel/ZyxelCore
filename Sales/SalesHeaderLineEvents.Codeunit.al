@@ -21,11 +21,8 @@ codeunit 50067 "Sales Header/Line Events"
     end;
 
     var
-        //ZGT: Codeunit "ZyXEL General Tools";
-        //SI: Codeunit "Single Instance";
         EmailAddMgt: Codeunit "E-mail Address Management";
         Text001: Label '"%1" %2 is not a valid date.';
-    //Text002: Label '\\Please contact navsupport@zyxel.eu to find a solution.';
 
 
     //>> Sales Header
@@ -1051,7 +1048,7 @@ codeunit 50067 "Sales Header/Line Events"
         lUser: Record User;
         ZGT: Codeunit "ZyXEL General Tools";
     begin
-        if ZGT.IsZNetCompany then begin
+        if ZGT.IsZNetCompany() then begin
             // If the sales person on the customer is still employed, then it's used
             if "pSale/PurchCode" <> '' then begin
                 lUserSetup.SetRange("Salespers./Purch. Code", "pSale/PurchCode");
@@ -1159,12 +1156,13 @@ codeunit 50067 "Sales Header/Line Events"
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterDeleteEvent', '', false, false)]
     local procedure OnAfterDeleteSalesLine(var Rec: Record "Sales Line"; RunTrigger: Boolean)
     var
-        lText001: Label 'The line has been sent to the warehouse so the line can not be deleted. Set the quantity to zero instead.';
         recWhseIndbHead: Record "Warehouse Inbound Header";
         recWhseIndbLine: Record "VCK Shipping Detail";
         recPickDateConf: Record "Picking Date Confirmed";
         recAddEicardOrderInfo: Record "Add. Eicard Order Info";
         MarginApp: Record "Margin Approval";
+
+        lText001: Label 'The line has been sent to the warehouse so the line can not be deleted. Set the quantity to zero instead.';
     begin
         if not Rec.IsTemporary then begin
             if rec."Warehouse Inbound No." <> '' then
@@ -1172,7 +1170,7 @@ codeunit 50067 "Sales Header/Line Events"
                     recWhseIndbLine.SetRange("Order Type", recWhseIndbLine."order type"::"Sales Return Order");
                     recWhseIndbLine.SetRange("Purchase Order No.", Rec."Document No.");
                     recWhseIndbLine.SetRange("Purchase Order Line No.", Rec."Line No.");
-                    if recWhseIndbLine.FindFirst() then begin
+                    if recWhseIndbLine.FindFirst() then
                         if recWhseIndbLine."Document No." <> '' then begin
                             if recWhseIndbHead.Get(recWhseIndbLine."Document No.") then
                                 if recWhseIndbHead."Warehouse Status" < recWhseIndbHead."warehouse status"::"On Stock" then
@@ -1180,7 +1178,6 @@ codeunit 50067 "Sales Header/Line Events"
                         end else
                             if not recWhseIndbLine.Archive then
                                 recWhseIndbLine.Delete(true);
-                    end;
                 end;
 
             if Rec."Document Type" = Rec."document type"::Order then
@@ -1231,13 +1228,13 @@ codeunit 50067 "Sales Header/Line Events"
             if (recSalesHead."Sales Order Type" = recSalesHead."Sales Order Type"::Eicard) and
                (recSalesHead."Eicard Type" = recSalesHead."Eicard Type"::eCommerce)
             then begin
-                PrevValue := SI.SkipErrorOnBlockOnOrder;
+                PrevValue := SI.SkipErrorOnBlockOnOrder();
                 SI.SetSkipErrorOnBlockOnOrder(true);
             end;
 
             recItem.Get(Rec."No.");
             recSalesHead.Get(Rec."Document Type", Rec."Document No.");
-            if not SI.SkipErrorOnBlockOnOrder then
+            if not SI.SkipErrorOnBlockOnOrder() then
                 if recItem."Block on Sales Order" then
                     Error(lText006, Rec."No.");
 
@@ -1683,6 +1680,14 @@ codeunit 50067 "Sales Header/Line Events"
         DelDocLine: Record "VCK Delivery Document Line";
         SalesLine: Record "Sales Line";
         MarginApp: Record "Margin Approval";
+        purchaseSetup: Record "Purchases & Payables Setup";
+        generalLedgerSetup: Record "General Ledger Setup";
+        vendor: Record Vendor;
+        PriceListLine: Record "Price List Line";
+        Currency: Record Currency;
+        SalesHeader: Record "Sales Header";
+        CurrExchRate: Record "Currency Exchange Rate";
+        ZGT: Codeunit "ZyXEL General Tools";
         MarginAppType: Enum "Margin Approval Type";
     begin
         if Rec."Document Type" = Rec."Document Type"::Order then begin
@@ -1717,6 +1722,37 @@ codeunit 50067 "Sales Header/Line Events"
                 end;
             end;
         end;
+
+        //18-11-25 BK #524237
+        if ZGT.IsZComCompany() then
+            if (Rec.Type = Rec.Type::Item) and (Rec."Unit Cost" = 0) then begin
+                IF (rec."No." <> '') then begin
+                    purchaseSetup.Get();
+                    generalLedgerSetup.Get();
+                    if purchaseSetup.CostPriceVendorno <> '' then begin
+                        vendor.Get(purchaseSetup.CostPriceVendorno);
+                        PriceListLine.setrange(PriceListLine."Asset Type", PriceListLine."Asset Type"::Item);
+                        PriceListLine.setrange(PriceListLine."Asset No.", rec."No.");
+                        PriceListLine.SetRange(PriceListLine."Amount Type", PriceListLine."Amount Type"::Price);
+                        PriceListLine.setrange(PriceListLine."Price Type", PriceListLine."Price Type"::Purchase);
+                        PriceListLine.setrange(PriceListLine."Currency Code", generalLedgerSetup."LCY Code");
+                        PriceListLine.setrange(PriceListLine.Status, PriceListLine.Status::Active);
+                        PriceListLine.setrange(PriceListLine."Assign-to No.", vendor."No.");
+                        if PriceListLine.FindFirst() then
+                            if PriceListLine."Direct Unit Cost" <> 0 then Begin
+                                rec.Validate("Unit Cost (LCY)", PriceListLine."Direct Unit Cost" * rec."Qty. per Unit of Measure");
+
+                                SalesHeader.get(Rec."Document Type", Rec."Document No.");
+                                if SalesHeader."Currency Code" <> '' then begin
+                                    Currency.TestField("Unit-Amount Rounding Precision");
+                                    rec."Unit Cost" := Round(CurrExchRate.ExchangeAmtLCYToFCY(rec.GetDate(), SalesHeader."Currency Code",
+                                                             rec."Unit Cost (LCY)", SalesHeader."Currency Factor"), Currency."Unit-Amount Rounding Precision")
+                                end else
+                                    rec."Unit Cost" := rec."Unit Cost (LCY)";
+                            End;
+                    end;
+                end;
+            end;
 
         if (Rec.Type = Rec.Type::Item) and ((Rec."Unit Price" <> 0) or (Rec."Unit Price" <> 0)) then
             case Rec."Document Type" of

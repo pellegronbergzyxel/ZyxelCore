@@ -5,142 +5,18 @@ tableextension 50156 PurchasesPayablesSetupZX extends "Purchases & Payables Setu
         field(50000; "Company Code"; Text[30])
         {
             Description = 'ZY1.0 - Auto Item Journal';
-
-            trigger OnValidate()
-            var
-                Company: Record Company;
-            begin
-                /*
-                //ZY1.0 <<
-                TESTFIELD("Live Company");
-                IF CompanyName() <> "Live Company" THEN ERROR(Text000,"Live Company");
-                IF ("Company Code" <> xRec."Company Code") AND ("Company Code" <> '') THEN
-                 IF NOT Company.GET("Company Code") THEN
-                  ERROR(Text003,"Company Code");
-                //ZY1.0 <<
-                */
-            end;
         }
         field(50001; "Template Name"; Code[10])
         {
             Description = 'ZY1.0 - Auto Item Journal';
-
-            trigger OnLookup()
-            var
-                LocalItemJnlTemplate: Record "Item Journal Template";
-            begin
-                /*
-                //ZY1.0 >>
-                TESTFIELD("Company Code");
-                LocalItemJnlTemplate.RESET;
-                LocalItemJnlTemplate.CHANGECOMPANY("Company Code");
-                IF PAGE.RUNMODAL(0,LocalItemJnlTemplate) = ACTION::LookupOK THEN
-                  "Template Name" := LocalItemJnlTemplate.Name;
-                
-                //ZY1.0 <<
-                */
-            end;
-
-            trigger OnValidate()
-            var
-                LocalItemJnlTemplate: Record "Item Journal Template";
-            begin
-                /*
-                //ZY1.0 >>
-                TESTFIELD("Company Code");
-                IF ("Template Name" <> xRec."Template Name") AND ("Template Name" <> '') THEN BEGIN
-                  LocalItemJnlTemplate.RESET;
-                  LocalItemJnlTemplate.CHANGECOMPANY("Company Code");
-                  IF NOT LocalItemJnlTemplate.GET("Template Name") THEN
-                   ERROR(Text002,"Company Code");
-                END;
-                //ZY1.0 <<
-                */
-            end;
         }
         field(50002; "Batch Name"; Code[10])
         {
             Description = 'ZY1.0 - Auto Item Journal';
-
-            trigger OnLookup()
-            var
-                LclItemJournalBatch: Record "Item Journal Batch";
-            begin
-                /*
-                //ZY1.0 >>
-                TESTFIELD("Company Code");
-                TESTFIELD("Template Name");
-                LclItemJournalBatch.RESET;
-                LclItemJournalBatch.CHANGECOMPANY("Company Code");
-                LclItemJournalBatch.SETRANGE(LclItemJournalBatch."Journal Template Name","Template Name");
-                IF PAGE.RUNMODAL(0,LclItemJournalBatch) = ACTION::LookupOK THEN
-                 "Batch Name" := LclItemJournalBatch.Name;
-                //ZY1.0 <<
-                */
-            end;
-
-            trigger OnValidate()
-            var
-                LclItemJournalBatch: Record "Item Journal Batch";
-                InventorySetup: Record "Inventory Setup";
-            begin
-                /*
-                //ZY1.0 >>
-                TESTFIELD("Company Code");
-                TESTFIELD("Template Name");
-                IF ("Batch Name" <> xRec."Batch Name") AND ("Batch Name" <> '') THEN BEGIN
-                  LclItemJournalBatch.RESET;
-                  LclItemJournalBatch.CHANGECOMPANY("Company Code");
-                  IF NOT LclItemJournalBatch.GET("Template Name","Batch Name") THEN
-                   ERROR(Text004,"Company Code");
-                 InventorySetup.CHANGECOMPANY("Company Code");
-                 IF InventorySetup.GET THEN BEGIN
-                  InventorySetup."Auto Transfer Template Name" := "Template Name";
-                  InventorySetup."Auto Transfer Batch Name" := "Batch Name";
-                  InventorySetup.MODIFY;
-                 END;
-                END;
-                //ZY1.0 <<
-                */
-            end;
         }
         field(50003; "In-Transit Location"; Code[10])
         {
             Description = 'ZY1.0 - Auto Item Journal';
-
-            trigger OnLookup()
-            var
-                LclLocation: Record Location;
-            begin
-                /*
-                //ZY1.0 >>
-                TESTFIELD("Company Code");
-                LclLocation.RESET;
-                LclLocation.CHANGECOMPANY("Company Code");
-                LclLocation.SETRANGE(LclLocation."Use As In-Transit",TRUE);
-                IF PAGE.RUNMODAL(0,LclLocation) = ACTION::LookupOK THEN
-                 "In-Transit Location" := LclLocation.Code;
-                //ZY1.0 <<
-                */
-            end;
-
-            trigger OnValidate()
-            var
-                LclLocation: Record Location;
-            begin
-                /*
-                //ZY1.0 >>
-                IF ("In-Transit Location" <> xRec."In-Transit Location") AND ("In-Transit Location" <> '') THEN BEGIN
-                  TESTFIELD("Company Code");
-                  LclLocation.RESET;
-                  LclLocation.CHANGECOMPANY("Company Code");
-                  LclLocation.SETRANGE(LclLocation."Use As In-Transit",TRUE);
-                  LclLocation.SETRANGE(Code,"In-Transit Location");
-                  IF NOT LclLocation.FINDFIRST THEN ERROR(Text005,"In-Transit Location");
-                END;
-                //ZY1.0 <<
-                */
-            end;
         }
         field(50004; "Concur Vendor Nos."; Code[10])
         {
@@ -166,34 +42,10 @@ tableextension 50156 PurchasesPayablesSetupZX extends "Purchases & Payables Setu
         {
             Description = 'ZY2.0 - Auto Purchase Journal';
 
-            trigger OnLookup()
-            var
-                LocalItemJnlTemplate: Record "Item Journal Template";
-            begin
-            end;
-
-            trigger OnValidate()
-            var
-                LocalItemJnlTemplate: Record "Item Journal Template";
-            begin
-            end;
         }
         field(50009; "PurchJnl Batch Name"; Code[10])
         {
             Description = 'ZY2.0 - Auto Purchase Journal';
-
-            trigger OnLookup()
-            var
-                LclItemJournalBatch: Record "Item Journal Batch";
-            begin
-            end;
-
-            trigger OnValidate()
-            var
-                LclItemJournalBatch: Record "Item Journal Batch";
-                InventorySetup: Record "Inventory Setup";
-            begin
-            end;
         }
         field(50010; "Vendor No. in RHQ"; Code[20])
         {
@@ -341,27 +193,23 @@ tableextension 50156 PurchasesPayablesSetupZX extends "Purchases & Payables Setu
         field(50040; "SBU Filter CH"; Code[50])
         {
             Caption = 'SBU Filter CH';
-            Description = '15-02-19 ZY-LD 002';
             TableRelation = SBU.Code where(Type = const(SBU));
             ValidateTableRelation = false;
         }
         field(50041; "SBU Filter SP"; Code[50])
         {
             Caption = 'SBU Filter SP';
-            Description = '15-02-19 ZY-LD 002';
             TableRelation = SBU.Code where(Type = const(SBU));
             ValidateTableRelation = false;
         }
         field(50042; "EiCard Vendor No. CH"; Code[20])
         {
             Caption = 'EiCard Vendor No. CH';
-            Description = '31-03-19 ZY-LD 003';
             TableRelation = Vendor."No.";
         }
         field(50043; "EMEA Vendor No."; Code[20])
         {
             Caption = 'EMEA Vendor No.';
-            Description = '08-07-19 ZY-LD 004';
             TableRelation = Vendor;
         }
         field(50044; "NL to DK Vendor No."; Code[20])
@@ -388,14 +236,12 @@ tableextension 50156 PurchasesPayablesSetupZX extends "Purchases & Payables Setu
         {
             Caption = 'Allow location change on purchase lines';
         }
+        field(50050; CostPriceVendorno; Code[20]) //18-11-2025 BK #524237
+        {
+            Caption = 'Cost Price Vendor No.';
+            Description = 'Vendor No. for cost price, used when cost price is 0 on sales order.';
+            TableRelation = Vendor."No.";
+        }
     }
-
-    var
-        Text000: Label 'Information can only be entered in %1 Company.';
-        Text002: Label 'Item Journal Template Name does not exist in %1';
-        Text003: Label 'Company %1 does not exist.';
-        Text004: Label 'Item Journal Batch Name does not exist in %1';
-        Text005: Label 'In-Transit location %1 does not exist.';
-
 
 }

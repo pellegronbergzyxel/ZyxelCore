@@ -44,6 +44,48 @@
             //"startupCompany": "ZNet ES"
         },
         {
+            "name": "Zyxel TESTIT",
+            "type": "al",
+            "request": "launch",
+            "server": "http://ZyEU-D365BC02.zyeu.zyxel.eu",
+            "port": 7049,
+            "serverInstance": "TESTIT",
+            "authentication": "AAD",
+            "startupObjectId": 18,
+            "startupObjectType": "Page",
+            "breakOnError": true,
+            "launchBrowser": true,
+            "enableLongRunningSqlStatements": true,
+            "enableSqlInformationDebugger": true,
+            "environmentType": "OnPrem",
+            "tenant": "default",
+            "primaryTenantDomain": "89443d20-e988-4407-a3c1-0c80570fb401",
+            //"schemaUpdateMode": "Synchronize",
+            "schemaUpdateMode": "ForceSync",
+            "startupCompany": "ZyND IT"
+        },
+        {
+            "name": "Zyxel TESTTR",
+            "type": "al",
+            "request": "launch",
+            "server": "http://172.28.12.205",
+            "port": 8080,
+            "serverInstance": "BC_TR_TEST",
+            "authentication": "AAD",
+            "startupObjectId": 18,
+            "startupObjectType": "Page",
+            "breakOnError": true,
+            "launchBrowser": true,
+            "enableLongRunningSqlStatements": true,
+            "enableSqlInformationDebugger": true,
+            "environmentType": "OnPrem",
+            "tenant": "default",
+            //"primaryTenantDomain": "h89443d20-e988-4407-a3c1-0c80570fb401",
+            //"schemaUpdateMode": "Synchronize",
+            "schemaUpdateMode": "ForceSync",
+            "startupCompany": "ZyND IT"
+        },
+        {
             "name": "Zyxel EMEA (Attach Debugging)",
             "type": "al",
             "request": "attach",
@@ -86,27 +128,6 @@
             //"startupCompany": "ZyND DK"
         },
         {
-            "name": "Zyxel TESTIT",
-            "type": "al",
-            "request": "launch",
-            "server": "http://ZyEU-D365BC02.zyeu.zyxel.eu",
-            "port": 7049,
-            "serverInstance": "TESTIT",
-            "authentication": "AAD",
-            "startupObjectId": 18,
-            "startupObjectType": "Page",
-            "breakOnError": true,
-            "launchBrowser": true,
-            "enableLongRunningSqlStatements": true,
-            "enableSqlInformationDebugger": true,
-            "environmentType": "OnPrem",
-            "tenant": "default",
-            "primaryTenantDomain": "89443d20-e988-4407-a3c1-0c80570fb401",
-            //"schemaUpdateMode": "Synchronize",
-            "schemaUpdateMode": "ForceSync",
-            "startupCompany": "ZyND IT"
-        },
-        {
             //Login with the same user that is used in the web service call. Use "zyeu\bcservice" for internal and "zyeu\hqwebservice" for HQ.
             //Use Ctrl+Shift+P and select AL: Clear credentials cache (If you need to login with another web service user.)
             "name": "Zyxel WEB SERVICE (Attach Debugging)",
@@ -131,7 +152,7 @@
             //"breakOnNext": "WebClient"
             "breakOnNext": "WebServiceClient"
         },
-        {//*
+        /*{
             "name": "Zyxel EMEA ZCom",
             "type": "al",
             "request": "launch",
@@ -177,7 +198,7 @@
             "startupCompany": "ZNet DK"
             //"startupCompany": "ZyND DK"
         },
-        //*/
+        */
         {
             "name": "Zyxel IT",
             "type": "al",

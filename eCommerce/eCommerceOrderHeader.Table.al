@@ -765,7 +765,7 @@ table 50103 "eCommerce Order Header"
             THEN
                 IF "Sell-to Type" = "Sell-to Type"::Consumer THEN BEGIN
                     AmzMarketPlace.get("Marketplace ID"); // 08-09-2025 BK #522911
-                    IF ("Tax Amount" = 0) AND (NOT "Prices Including VAT") and (NOT AmzMarketPlace."No Comsuner VAT Check") THEN // 08-09-2025 BK #522911
+                    IF ("Tax Amount" = 0) AND (NOT "Prices Including VAT") and (NOT AmzMarketPlace."No Comsuner VAT Check") and (Not "Give Away Order") THEN // 08-09-2025 BK #522911 & #536092
                         "Error Description" := STRSUBSTNO(lText029, FIELDCAPTION("Tax Amount"));
                 END ELSE
                     IF ("Ship From Country" = "Ship To Country") AND ("Tax Amount" = 0) AND (NOT "Prices Including VAT") THEN BEGIN
