@@ -1,33 +1,5 @@
 Codeunit 50070 "Customer Events"
 {
-    // 001. 21-03-18 ZY-LD 2018011010000196 - Print Statement is set.
-    // 002. 16-08-18 ZY-LD 2018081610000289 - Automatic creation of Territory countries.
-    // 003. 20-08-18 ZY-LD 2018082010000182 - Territory Code and Country/Region Code.
-    // 004. 02-11-18 ZY-LD 2018103110000111 - Extra fields for replication.
-    // 005. 06-11-18 ZY-LD 2018060810000271 - Update E-mail as invoice e-mail.
-    // 006. 13-11-18 ZY-LD 0062018111310000028 - Rewritten the code.
-    // 007. 26-11-18 ZY-LD 0072018111910000071 - Territory Code.
-    // 008. 26-11-18 ZY-LD 000 - Update invoice and credit memo e-mail address.
-    // 009. 27-05-19 ZY-LD P0213 - Force replication on customers.
-    // 010. 26-08-19 ZY-LD 000 - Validate EiCard address.
-    // 011. 25-09-19 ZY-LD P0309 - New field.
-    // 012. 06-11-19 ZY-LD P0332 - Validation of e-mail and set "Post Eicard Invoice Automatic".
-    // 013. 03-02-20 ZY-LD 000 - Block price group.
-    // 014. 09-07-20 ZY-LD P0455 - Transfer "Shipment Method Code" from customer at creation.
-    // 015. 23-09-20 ZY-LD P0479 - Create contact on insert.
-    // 016. 12-10-20 ZY-LD 000 - Code moved from table 18.
-    // 017. 11-11-20 ZY-LD P0517 - Validation of e-mail.
-    // 018. 17-11-20 ZY-LD P0499 - Init Value for ZNet.
-    // 019. 29-01-21 ZY-LD 2021012810000165 - "Combine Shipments" is set default for both companies.
-    // 020. 03-02-21 ZY-LD P0557 - Sample setup.
-    // 021. 08-02-21 ZY-LD 2021011510000162 - Show page.
-    // 022. 03-08-21 ZY-LD 000 - Reminder for updating sales orders.
-    // 023. 18-08-21 ZY-LD 2021081710000128 - We need the country code here too.
-    // 024. 03-03-22 ZY-LD 2022020410000063 - Set "E-mail Deliv. Note at Release" to TRUE.
-    // 025. 03-02-23 ZY-LD 000 - We have seen active ship-to addresses been deleted.
-    // 026. 20-11-23 ZY-LD 000 - If "Report ID" is zero, it will use the report selection to find the report.
-    // 027. 22-07-24 ZY-LD 000 - Update sales order with the new code.
-
     trigger OnRun()
     begin
     end;
@@ -45,16 +17,13 @@ Codeunit 50070 "Customer Events"
     begin
         begin
             if ZGT.IsRhq then begin
-                //>> 06-11-19 ZY-LD 012
-                if ZGT.IsZNetCompany then begin  // 29-01-21 ZY-LD 019
+                if ZGT.IsZNetCompany then begin
                     Rec."Post EiCard Invoice Automatic" := Rec."post eicard invoice automatic"::"Yes (when purchase invoice is posted)";
-                    //"Combine Shipments" := TRUE;  // 29-01-21 ZY-LD 019
-                    Rec."Minimum Order Value Enabled" := true;  // 17-11-20 ZY-LD 018
-                    Rec."E-mail Deliv. Note at Release" := true;  // 03-03-22 ZY-LD 024
+                    Rec."Minimum Order Value Enabled" := true;
+                    Rec."E-mail Deliv. Note at Release" := true;
                 end;
-                //<< 06-11-19 ZY-LD 012
 
-                Rec."Combine Shipments" := true;  // 29-01-21 ZY-LD 019
+                Rec."Combine Shipments" := true;
             end;
         end;
     end;
@@ -65,12 +34,10 @@ Codeunit 50070 "Customer Events"
         lText001: label '"%1" is blank. Do you want continue?';
         lText002: label 'Modification is stopped.';
     begin
-        //>> 16-08-18 ZY-LD 002
         if ZGT.IsRhq and GuiAllowed then
             if Rec."Territory Code" = '' then
                 if not Confirm(lText001, false, Rec.FieldCaption(Rec."Territory Code")) then
                     Error(lText002);
-        //<< 16-08-18 ZY-LD 002
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterInsertEvent', '', false, false)]
@@ -79,13 +46,11 @@ Codeunit 50070 "Customer Events"
         recCust: Record Customer;
     begin
         begin
-            //>> 23-09-20 ZY-LD 015
             if not Rec.IsTemporary then
                 if ZGT.IsRhq then begin
                     recCust.SetRange("No.", Rec."No.");
                     Report.RunModal(Report::"Create Conts. from Customers", false, false, recCust);
                 end;
-            //<< 23-09-20 ZY-LD 015
         end;
     end;
 
@@ -135,7 +100,6 @@ Codeunit 50070 "Customer Events"
         SalesHead: Record "Sales Header";
         lText001: Label 'Do you want to update "%1" on %2 sales order(s) with unshipped lines?';
     begin
-        //>> 22-07-24 ZY-LD 027
         if (Rec."Payment Terms Code" <> '') and (Rec."Payment Terms Code" <> xRec."Payment Terms Code") then begin
             SalesHead.SetRange("Document Type", SalesHead."Document Type"::Order);
             SalesHead.SetRange("Sell-to Customer No.", Rec."No.");
@@ -151,79 +115,78 @@ Codeunit 50070 "Customer Events"
                     SalesHead.SetHideValidationDialog(false);
                 end;
         end
-        //<< 22-07-24 ZY-LD 027
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'E-Mail', false, false)]
     local procedure OnBeforeValidateEmail(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."E-Mail" := ZGT.ValidateEmailAdd(Rec."E-Mail");  // 06-11-19 ZY-LD 012
+        Rec."E-Mail" := ZGT.ValidateEmailAdd(Rec."E-Mail");
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'Notification E-Mail', false, false)]
     local procedure OnBeforeValidateNotificationEmail(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."E-Mail" := ZGT.ValidateEmailAdd(Rec."E-Mail");  // 06-11-19 ZY-LD 012
+        Rec."E-Mail" := ZGT.ValidateEmailAdd(Rec."E-Mail");
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'Confirmation E-Mail', false, false)]
     local procedure OnBeforeValidateConfirmationEmail(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."E-Mail" := ZGT.ValidateEmailAdd(Rec."E-Mail");  // 06-11-19 ZY-LD 012
+        Rec."E-Mail" := ZGT.ValidateEmailAdd(Rec."E-Mail");
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'EiCard Email Address', false, false)]
     local procedure OnBeforeValidateEiCardEmailAddress(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."EiCard Email Address" := ZGT.ValidateEmailAdd(Rec."EiCard Email Address");  // 26-08-19 ZY-LD 010
+        Rec."EiCard Email Address" := ZGT.ValidateEmailAdd(Rec."EiCard Email Address");
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'EiCard Email Address1', false, false)]
     local procedure OnBeforeValidateEiCardEmailAddress1(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."EiCard Email Address1" := ZGT.ValidateEmailAdd(Rec."EiCard Email Address1");  // 26-08-19 ZY-LD 010
+        Rec."EiCard Email Address1" := ZGT.ValidateEmailAdd(Rec."EiCard Email Address1");
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'EiCard Email Address2', false, false)]
     local procedure OnBeforeValidateEiCardEmailAddress2(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."EiCard Email Address2" := ZGT.ValidateEmailAdd(Rec."EiCard Email Address2");  // 26-08-19 ZY-LD 010
+        Rec."EiCard Email Address2" := ZGT.ValidateEmailAdd(Rec."EiCard Email Address2");
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'EiCard Email Address3', false, false)]
     local procedure OnBeforeValidateEiCardEmailAddress3(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."EiCard Email Address3" := ZGT.ValidateEmailAdd(Rec."EiCard Email Address3");  // 26-08-19 ZY-LD 010
+        Rec."EiCard Email Address3" := ZGT.ValidateEmailAdd(Rec."EiCard Email Address3");
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'EiCard Email Address4', false, false)]
     local procedure OnBeforeValidateEiCardEmailAddress4(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."EiCard Email Address4" := ZGT.ValidateEmailAdd(Rec."EiCard Email Address4");  // 26-08-19 ZY-LD 010
+        Rec."EiCard Email Address4" := ZGT.ValidateEmailAdd(Rec."EiCard Email Address4");
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'E-mail for Order Scanning', false, false)]
     local procedure OnBeforeValidateEmailForOrderScanning(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."E-mail for Order Scanning" := ZGT.ValidateEmailAdd(Rec."E-mail for Order Scanning");  // 11-11-20 ZY-LD 017
+        Rec."E-mail for Order Scanning" := ZGT.ValidateEmailAdd(Rec."E-mail for Order Scanning");
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'Gen. Bus. Posting Group', false, false)]
     local procedure OnAfterValidateGenBusPostingGroup(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        UpdateSalesOrder(Rec, xRec);  // 03-08-21 ZY-LD 022
+        UpdateSalesOrder(Rec, xRec);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'VAT Bus. Posting Group', false, false)]
     local procedure OnAfterValidateVATBusPostingGroup(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        UpdateSalesOrder(Rec, xRec);  // 03-08-21 ZY-LD 022
+        UpdateSalesOrder(Rec, xRec);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'Customer Posting Group', false, false)]
     local procedure OnAfterValidateCustomerPostingGroup(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        UpdateSalesOrder(Rec, xRec);  // 03-08-21 ZY-LD 022
+        UpdateSalesOrder(Rec, xRec);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'Customer Price Group', false, false)]
@@ -233,29 +196,25 @@ Codeunit 50070 "Customer Events"
         lText001: label '"%1" %2 is blocked.';
     begin
         begin
-            //>> 03-02-20 ZY-LD 013
             if recCustPriceGrp.Get(Rec."Customer Price Group") and recCustPriceGrp.Blocked then
                 Error(lText001, Rec.FieldCaption(Rec."Customer Price Group"), Rec."Customer Price Group");
-            //<< 03-02-20 ZY-LD 013
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'Bill-to Customer No.', false, false)]
     local procedure OnAfterValidateBillToCustomerNo(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec.Validate(Rec."E-mail Sales Documents");  // 25-09-19 ZY-LD 011
+        Rec.Validate(Rec."E-mail Sales Documents");
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'E-mail Sales Documents', false, false)]
     local procedure OnAfterValidateEmailSalesDocuments(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
         begin
-            //>> 25-09-19 ZY-LD 011
             if (Rec."No." <> Rec."Bill-to Customer No.") and
                (Rec."Bill-to Customer No." <> '')
             then
                 Rec."E-mail Sales Documents" := false;
-            //<< 25-09-19 ZY-LD 011
         end;
     end;
 
@@ -263,7 +222,7 @@ Codeunit 50070 "Customer Events"
     local procedure OnAfterValidateEmailStatement(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
         begin
-            Rec."Print Statements" := Rec."E-Mail Statement";  // 21-03-18 ZY-LD 001
+            Rec."Print Statements" := Rec."E-Mail Statement";
         end;
     end;
 
@@ -278,41 +237,15 @@ Codeunit 50070 "Customer Events"
         DifferentForecastCodes: Boolean;
         lText001: label '"%1" does not exist for "%2".';
     begin
-        //>> 13-11-18 ZY-LD 006
-        //>> 20-08-18 ZY-LD 003
         begin
-            //>> 26-11-18 ZY-LD 007
             Rec."Forecast Territory" := '';
             if recForeTerrCountry.Get(Rec."Territory Code", CopyStr(Rec."Global Dimension 1 Code", 1, 2)) then begin
                 Rec."Forecast Territory" := recForeTerrCountry."Forecast Territory Code";
-                //>> 06-11-19 ZY-LD 012
                 recForeTerr.Get(Rec."Forecast Territory");
                 Rec."Automatic Invoice Handling" := recForeTerr."Automatic Invoice Handling";
-                //<< 06-11-19 ZY-LD 012
             end;
 
-            //  recForeTerrCountry.SETRANGE("Territory Code","Territory Code");
-            //  IF recForeTerrCountry.FINDSET THEN BEGIN
-            //    REPEAT
-            //      IF (PrevForecastCode <> recForeTerrCountry."Forecast Territory Code") AND
-            //         (PrevForecastCode <> '')
-            //      THEN
-            //        DifferentForecastCodes := TRUE;
-            //
-            //      PrevForecastCode := recForeTerrCountry."Forecast Territory Code";
-            //    UNTIL recForeTerrCountry.Next() = 0;
-            //
-            //    IF DifferentForecastCodes THEN BEGIN
-            //      IF PAGE.RUNMODAL(PAGE::"Forecast Territory Countries",recForeTerrCountry) = ACTION::LookupOK THEN
-            //        VALIDATE("Forecast Territory",recForeTerrCountry."Forecast Territory Code");
-            //    END ELSE
-            //      VALIDATE("Forecast Territory",recForeTerrCountry."Forecast Territory Code");
-            //  END ELSE
-            //    ERROR(lText001,recForeTerrCountry.TABLECAPTION,"Territory Code");
-            //<< 26-11-18 ZY-LD 007
         end;
-        //<< 20-08-18 ZY-LD 003
-        //<< 13-11-18 ZY-LD 006
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'Country/Region Code', false, false)]
@@ -323,7 +256,6 @@ Codeunit 50070 "Customer Events"
         recTerritory: Record Territory;
         lText003: label 'Modification is stopped.';
     begin
-        //>> 20-08-18 ZY-LD 003
         if ZGT.IsRhq and GuiAllowed then
             if Rec."Territory Code" = '' then begin
                 if recTerritory.Get(Rec."Country/Region Code") then
@@ -335,7 +267,6 @@ Codeunit 50070 "Customer Events"
                 if xRec."Country/Region Code" = Rec."Territory Code" then
                     if Confirm(lText001, false, Rec.FieldCaption(Rec."Territory Code"), Rec."Territory Code", Rec."Country/Region Code") then
                         Rec.Validate(Rec."Territory Code", Rec."Country/Region Code");
-        //<< 20-08-18 ZY-LD 003
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'E-Mail', false, false)]
@@ -345,7 +276,6 @@ Codeunit 50070 "Customer Events"
         CustomrepMgt: Codeunit "Custom Report Management";
     begin
         begin
-            //>> 26-11-18 ZY-LD 008
             if xRec."E-Mail" = CustomrepMgt.GetEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::Reminder, Rec."E-Mail") then
                 CustomrepMgt.UpdateEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::Reminder, Rec."E-Mail");
             if xRec."E-Mail" = CustomrepMgt.GetEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::"C.Statement", Rec."E-Mail") then
@@ -354,7 +284,6 @@ Codeunit 50070 "Customer Events"
                 CustomrepMgt.UpdateEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::"S.Invoice", Rec."E-Mail");
             if xRec."E-Mail" = CustomrepMgt.GetEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::"S.Cr.Memo", Rec."E-Mail") then
                 CustomrepMgt.UpdateEmailAddress(Database::Customer, Rec."No.", CustomReportSelection.Usage::"S.Cr.Memo", Rec."E-Mail");
-            //<< 26-11-18 ZY-LD 008
         end;
     end;
 
@@ -363,7 +292,7 @@ Codeunit 50070 "Customer Events"
     var
         VATRegNoFormat: Record "VAT Registration No. Format";
     begin
-        VATRegNoFormat.Test(Rec."VAT ID", Rec."Country/Region Code", Rec."No.", Database::Customer);  // 12-10-20 ZY-LD 016
+        VATRegNoFormat.Test(Rec."VAT ID", Rec."Country/Region Code", Rec."No.", Database::Customer);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterModifyEvent', '', false, false)]
@@ -379,7 +308,6 @@ Codeunit 50070 "Customer Events"
         recIcPartner: Record "IC Partner";
         recDataforRep: Record "Data for Replication";
     begin
-        //>> 02-11-18 ZY-LD 004
         if Rec."No." <> Rec."Bill-to Customer No." then
             if recBillToCust.Get(Rec."Bill-to Customer No.") then
                 if recIcPartner.Get(recBillToCust."IC Partner Code") then begin
@@ -387,7 +315,6 @@ Codeunit 50070 "Customer Events"
                     recDataforRep.SetRange("Company Name", recIcPartner."Inbox Details");
                     Page.RunModal(Page::"Data for Replication List", recDataforRep);
                 end;
-        //<< 02-11-18 ZY-LD 004
     end;
     #endregion
 
@@ -396,7 +323,6 @@ Codeunit 50070 "Customer Events"
         recSalesHead: Record "Sales Header";
         lText001: label 'Please remember to update posting groups on %1 existing sales order(s).';
     begin
-        //>> 03-08-21 ZY-LD 022
         if (Rec."Gen. Bus. Posting Group" <> xRec."Gen. Bus. Posting Group") or
            (Rec."VAT Bus. Posting Group" <> xRec."VAT Bus. Posting Group") or
            (Rec."Customer Posting Group" <> xRec."Customer Posting Group")
@@ -408,7 +334,6 @@ Codeunit 50070 "Customer Events"
             if not recSalesHead.IsEmpty then
                 Message(lText001, recSalesHead.Count);
         end;
-        //<< 03-08-21 ZY-LD 022
     end;
 
     //>> Cust. Ledger Entry
@@ -508,7 +433,6 @@ Codeunit 50070 "Customer Events"
         recInvSetup: Record "Inventory Setup";
     begin
         begin
-            //>> 09-07-20 ZY-LD 014
             if GuiAllowed and not Rec.IsTemporary then begin
                 if recCust.Get(Rec."Customer No.") then
                     Rec.Validate(Rec."Shipment Method Code", recCust."Shipment Method Code");
@@ -517,7 +441,6 @@ Codeunit 50070 "Customer Events"
                 if recInvSetup."AIT Location Code" <> '' then
                     Rec.Validate(Rec."Location Code", recInvSetup."AIT Location Code");
             end;
-            //<< 09-07-20 ZY-LD 014
         end;
     end;
 
@@ -529,12 +452,10 @@ Codeunit 50070 "Customer Events"
         recCust: Record Customer;
     begin
         begin
-            //>> 03-02-23 ZY-LD 025
             recSalesHead.SetRange("Sell-to Customer No.", Rec."Customer No.");
             recSalesHead.SetRange("Ship-to Code", Rec.Code);
             if recSalesHead.FindFirst then
                 Error(lText001, Rec.TableCaption, Rec.Code, recSalesHead."Document Type", recSalesHead."No.");
-            //<< 03-02-23 ZY-LD 025
         end;
     end;
 
@@ -582,32 +503,27 @@ Codeunit 50070 "Customer Events"
     [EventSubscriber(ObjectType::Table, Database::"Custom Report Selection", 'OnBeforeInsertEvent', '', false, false)]
     local procedure OnBeforeInsertCustomReportSelection(var Rec: Record "Custom Report Selection")
     begin
-        //>> 20-11-23 ZY-LD 026
         if Rec."Report ID" = 0 then
             Rec."Report ID" := 1;
-        //<< 20-11-23 ZY-LD 026            
+
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Custom Report Selection", 'OnAfterInsertEvent', '', false, false)]
     local procedure OnAfterInsertCustomReportSelection(var Rec: Record "Custom Report Selection")
     begin
-        //>> 20-11-23 ZY-LD 026
         if Rec."Report ID" = 1 then begin
             Rec."Report ID" := 0;
             Rec.Modify();
         end;
-        //<< 20-11-23 ZY-LD 026
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Custom Report Selection", 'OnAfterModifyEvent', '', false, false)]
     local procedure OnAfterModifyCustomReportSelection(var Rec: Record "Custom Report Selection")
     begin
-        //>> 20-11-23 ZY-LD 026
         if Rec."Report ID" = 1 then begin
             Rec."Report ID" := 0;
             Rec.Modify();
         end;
-        //<< 20-11-23 ZY-LD 026
     end;
 
     local procedure ">> Default Dimension"()
@@ -617,13 +533,13 @@ Codeunit 50070 "Customer Events"
     [EventSubscriber(Objecttype::Page, 540, 'OnInsertRecordEvent', '', false, false)]
     local procedure OnAfterInsertPage540(var Rec: Record "Default Dimension"; BelowxRec: Boolean; var xRec: Record "Default Dimension"; var AllowInsert: Boolean)
     begin
-        ValidateTerritoryCode(Rec);  // 26-11-18 ZY-LD 007
+        ValidateTerritoryCode(Rec);
     end;
 
     [EventSubscriber(Objecttype::Page, 540, 'OnModifyRecordEvent', '', false, false)]
     local procedure OnAfterModifyPage540(var Rec: Record "Default Dimension"; var xRec: Record "Default Dimension"; var AllowModify: Boolean)
     begin
-        ValidateTerritoryCode(Rec);  // 26-11-18 ZY-LD 007
+        ValidateTerritoryCode(Rec);
     end;
 
     [EventSubscriber(Objecttype::Page, 540, 'OnDeleteRecordEvent', '', false, false)]
@@ -632,7 +548,6 @@ Codeunit 50070 "Customer Events"
         recGenSetup: Record "General Ledger Setup";
         recCust: Record Customer;
     begin
-        //>> 26-11-18 ZY-LD 007
         begin
             recGenSetup.Get;
             if (Rec."Table ID" = Database::Customer) and (Rec."Dimension Code" = recGenSetup."Global Dimension 1 Code") then
@@ -641,7 +556,6 @@ Codeunit 50070 "Customer Events"
                     recCust.Modify(true);
                 end;
         end;
-        //<< 26-11-18 ZY-LD 007
     end;
 
     local procedure ValidateTerritoryCode(var Rec: Record "Default Dimension")
@@ -649,7 +563,6 @@ Codeunit 50070 "Customer Events"
         recGenSetup: Record "General Ledger Setup";
         recCust: Record Customer;
     begin
-        //>> 26-11-18 ZY-LD 007
         begin
             recGenSetup.Get;
             if (Rec."Table ID" = Database::Customer) and (Rec."Dimension Code" = recGenSetup."Global Dimension 1 Code") then
@@ -659,7 +572,6 @@ Codeunit 50070 "Customer Events"
                     recCust.Modify(true);
                 end;
         end;
-        //<< 26-11-18 ZY-LD 007
     end;
 
     local procedure ">> Functions"()
@@ -671,11 +583,9 @@ Codeunit 50070 "Customer Events"
         recCustPostGrpSetup: Record "Add. Cust. Posting Grp. Setup";
     begin
         begin
-            //>> 03-02-21 ZY-LD 020
             recCustPostGrpSetup.SetFilter("Country/Region Code", GetCustPostGrpSetupCountryFilter(Rec));
             recCustPostGrpSetup.SetFilter("Customer No.", '%1|%2', Rec."No.", '');
             Page.Run(Page::"Add. Bill-to Cust. Setup", recCustPostGrpSetup);
-            //<< 03-02-21 ZY-LD 020
         end;
     end;
 
@@ -684,15 +594,12 @@ Codeunit 50070 "Customer Events"
         recCustPostGrpSetup: Record "Add. Cust. Posting Grp. Setup";
     begin
         begin
-            //>> 03-02-21 ZY-LD 020
             recCustPostGrpSetup.FilterGroup(2);
             recCustPostGrpSetup.SetRange("Company Type", pCompanyType);
             recCustPostGrpSetup.FilterGroup(0);
 
             recCustPostGrpSetup.SetFilter("Country/Region Code", GetCustPostGrpSetupCountryFilter(Rec));
-            //recCustPostGrpSetup.SetFilter("Customer No.", '%1|%2', Rec."No.", '');  // 24-09-24 ZY-LD 000 - Removed, because it must be possible to setup local customers from the subsidary.
             Page.Run(Page::"Add. Cust. Posting Grp. Setup", recCustPostGrpSetup);
-            //<< 03-02-21 ZY-LD 020
         end;
     end;
 
@@ -702,11 +609,9 @@ Codeunit 50070 "Customer Events"
         recVATRegNoLocation: Record "VAT Reg. No. pr. Location";
     begin
         begin
-            //>> 03-02-21 ZY-LD 020
             recVATRegNoLocation.SetFilter("Ship-to Customer Country Code", '%1|%2', GetCustPostGrpSetupCountryFilter(Rec), '');
             recVATRegNoLocation.SetFilter("Sell-to Customer No.", '%1|%2', Rec."No.", '');
             Page.Run(Page::"VAT Reg. No. pr. Locations", recVATRegNoLocation);
-            //<< 03-02-21 ZY-LD 020
         end;
     end;
 
@@ -717,7 +622,6 @@ Codeunit 50070 "Customer Events"
         recAddCustPostGrpSetup: Record "Add. Cust. Posting Grp. Setup";
     begin
         begin
-            //>> 03-02-21 ZY-LD 020
             if Rec."Country/Region Code" <> '' then
                 rValue := Rec."Country/Region Code" + '|';
 
@@ -729,9 +633,8 @@ Codeunit 50070 "Customer Events"
                     if StrPos(rValue, recShiptoAdd."Country/Region Code") = 0 then
                         rValue += recShiptoAdd."Country/Region Code" + '|';
                 until recShiptoAdd.Next() = 0;
-            //<< 03-02-21 ZY-LD 020
 
-            //>> 18-08-21 ZY-LD 023
+
             recAddCustPostGrpSetup.SetRange("Customer No.", Rec."No.");
             if recAddCustPostGrpSetup.FindSet then
                 repeat
@@ -742,7 +645,7 @@ Codeunit 50070 "Customer Events"
                             if StrPos(rValue, recAddCustPostGrpSetup."Country/Region Code") = 0 then
                                 rValue += recAddCustPostGrpSetup."Country/Region Code" + '|';
                 until recAddCustPostGrpSetup.Next() = 0;
-            //<< 18-08-21 ZY-LD 023
+
 
             rValue := DelChr(rValue, '>', '|');
         end;
@@ -788,16 +691,16 @@ Codeunit 50070 "Customer Events"
         IsHandled: Boolean;
         NewPrintOnlyOpenEntries: Boolean;
     begin
-        NewPrintEntriesDue := TRUE;  // 16-10-18 ZY-LD 001
+        NewPrintEntriesDue := TRUE;
         NewPrintAllHavingEntry := false;
         NewPrintAllHavingBal := true;
         NewPrintReversedEntries := false;
         NewPrintUnappliedEntries := false;
-        NewIncludeAgingBand := TRUE;  // 16-10-18 ZY-LD 001
+        NewIncludeAgingBand := TRUE;
         NewPeriodLength := '<1M+CM>';
         NewDateChoice := DateChoice::"Due Date";
         NewLogInteraction := true;
-        NewPrintOnlyOpenEntries := TRUE;  // 16-10-18 ZY-LD 001
+        NewPrintOnlyOpenEntries := TRUE;
 
         NewStartDate := AccountingPeriodMgt.FindFiscalYear(WorkDate());
         NewEndDate := WorkDate();
@@ -806,9 +709,18 @@ Codeunit 50070 "Customer Events"
           NewPrintEntriesDue, NewPrintAllHavingEntry, NewPrintAllHavingBal, NewPrintReversedEntries,
           NewPrintUnappliedEntries, NewIncludeAgingBand, NewPeriodLength, NewDateChoice,
           NewLogInteraction, NewStartDate, NewEndDate,
-          NewPrintOnlyOpenEntries);  // 16-10-18 ZY-LD 001
+          NewPrintOnlyOpenEntries);
         CustomerStatementReport.UseRequestPage(UseRequestPage);
         CustomerStatementReport.Run();
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Report Selections", OnEnqueueMailingJobOnBeforeRunJobQueueEnqueue, '', false, false)]
+    local procedure "Report Selections_OnEnqueueMailingJobOnBeforeRunJobQueueEnqueue"(RecordIdToProcess: RecordId; ParameterString: Text; Description: Text; var JobQueueEntry: Record "Job Queue Entry"; var IsHandled: Boolean)
+    begin
+        //26-11-2025 BK #542415
+        if JobQueueEntry."Object ID to Run" = CODEUNIT::"Document-Mailing" then
+            IsHandled := true;
+    end;
+
 
 }
