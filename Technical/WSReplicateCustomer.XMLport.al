@@ -113,6 +113,11 @@ xmlport 50036 "WS Replicate Customer"
                     MinOccurs = Zero;
                     MaxOccurs = Once;
                 }
+                fieldelement(OrderDeskResponsible; Customer."Order Desk Resposible Code")
+                {
+                    MinOccurs = Zero; //24-11-2025 BK #528108
+                    MaxOccurs = Once;
+                }
                 fieldelement(ShipmentMethodCode; Customer."Shipment Method Code")
                 {
                     FieldValidate = yes;
@@ -1500,6 +1505,7 @@ xmlport 50036 "WS Replicate Customer"
         ToCust."Payment Terms Code" := Customer."Payment Terms Code";
         ToCust."Fin. Charge Terms Code" := Customer."Fin. Charge Terms Code";
         ToCust."Salesperson Code" := Customer."Salesperson Code";
+        ToCust."Order Desk Resposible Code" := Customer."Order Desk Resposible Code"; //24-11-2025 BK #528108
         ToCust."Shipment Method Code" := Customer."Shipment Method Code";
         ToCust."Shipping Agent Code" := Customer."Shipping Agent Code";
         ToCust."Place of Export" := Customer."Place of Export";

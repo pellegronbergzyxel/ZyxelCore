@@ -118,6 +118,7 @@ codeunit 50061 "Cleanup Jobeueu"
         ICOutboxTransaction: Record "IC Outbox Transaction";
         ICOutboxTransaction2: Record "IC Outbox Transaction";
         ICOutboxExport: Codeunit "IC Outbox Export";
+        HandledICOutboxTransaction: Record "Handled IC Outbox Trans.";
 
     Begin
         // Cancel order and return
@@ -142,5 +143,14 @@ codeunit 50061 "Cleanup Jobeueu"
             repeat
                 ICOutboxTransaction.delete(true);
             UNTIL ICOutboxTransaction.NEXT() = 0;
+
+        //26-11-2025 BK #541620
+        HandledICOutboxTransaction.SETFILTER("Document Type", '%1|%2', HandledICOutboxTransaction."Document Type"::Order, HandledICOutboxTransaction."Document Type"::"Return Order");
+        HandledICOutboxTransaction.setrange(Status, HandledICOutboxTransaction.Status::Cancelled);
+        IF HandledICOutboxTransaction.FINDSET() THEN
+            repeat
+                HandledICOutboxTransaction.delete(true);
+            UNTIL HandledICOutboxTransaction.NEXT() = 0;
+
     End;
 }
