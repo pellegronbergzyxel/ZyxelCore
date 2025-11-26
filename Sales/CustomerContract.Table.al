@@ -120,9 +120,16 @@ Table 50062 "Customer Contract"
         ClientFolder: Text;
         BaseFolderName: Text;
         lText001: label 'Filename "%1" already exists.';
+        NewStream: InsTream;
+        NewStream2: InsTream;
+        NewoStream: outsTream;
+        NewoStream2: outsTream;
+        serverFile: File;
     begin
         if "Folder and Filename" = '' then begin
             lCustContractSetup.Get;
+            TempBlob.CreateInStream(NewStream);
+            TempBlob.CreateOutStream(NewoStream);
             InputFilename := FileMgt.BLOBImportWithFilter(TempBlob, ImportTxt, Filename, StrSubstNo(FileDialogTxt, FilterTxt), FilterTxt);
             if InputFilename <> '' then begin
                 BaseFolderName := GetBaseFolderName;  // 07-02-20 ZY-LD 002
@@ -137,10 +144,15 @@ Table 50062 "Customer Contract"
                 //<< 06-01-20 ZY-LD 001
                 if FileMgt.ServerFileExists(OutputFilename) then
                     Error(lText001, OutputFilename);
-                FileMgt.CopyServerFile(InputFilename, OutputFilename, false);
-                FIleMgt.DeleteServerFile(InputFilename);
-                Status := Status::Uploaded;
-                Modify(true);
+                if serverFile.Create(OutputFilename) then begin
+                    serverFile.CreateOutStream(NewoStream2);
+                    CopyStream(NewoStream2, NewStream);
+                    //     FileMgt.CopyServerFile(InputFilename, OutputFilename, false);
+                    //   FIleMgt.DeleteServerFile(InputFilename);
+                    serverFile.Close();
+                    Status := Status::Uploaded;
+                    Modify(true);
+                end;
             end;
         end;
     end;
@@ -205,5 +217,44 @@ Table 50062 "Customer Contract"
     begin
         lContractTag.Tag := pTag;
         lContractTag.Insert;
+    end;
+
+
+    procedure downloadcontractFile()
+    var
+        lCustContractSetup: Record "Customer Contract Setup";
+        TempBlob: Codeunit "Temp Blob";
+        FileMgt: Codeunit "File Management";
+        lCustContract: Record "Customer Contract";
+        ImportTxt: label 'Insert HR File';
+        FileDialogTxt: label 'Attachments (%1)|%1', Comment = '%1=file types, such as *.txt or *.docx';
+        FilterTxt: label '*.jpg;*.jpeg;*.bmp;*.png;*.gif;*.tiff;*.tif;*.pdf;*.docx;*.doc;*.xlsx;*.xls;*.pptx;*.ppt;*.msg;*.xml;*.*', Locked = true;
+        Err001: label 'The content of the document could not be found in the database.';
+        InputFilename: Text;
+        OutputFilename: Text;
+        ClientFolder: Text;
+        BaseFolderName: Text;
+        lText001: label 'Filename "%1" already exists.';
+        NewStream: InsTream;
+        NewStream2: InsTream;
+        NewoStream: outsTream;
+        NewoStream2: outsTream;
+        serverFile: File;
+    begin
+        if rec."Folder and Filename" <> '' then begin
+            lCustContractSetup.Get;
+            TempBlob.CreateInStream(NewStream);
+            TempBlob.CreateOutStream(NewoStream);
+
+
+            BaseFolderName := GetBaseFolderName + Copystr(rec."Folder and Filename", 2);  // 07-02-20 ZY-LD 002
+            if FILE.Exists(BaseFolderName) then begin
+                serverFile.Open(BaseFolderName);
+                serverFile.CreateInStream(NewStream);
+                Filename := FileMgt.GetFileName(BaseFolderName);
+                if DownloadFromStream(NewStream, 'Export', '', 'All Files (*.*)|*.*', Filename) then
+                    message('fil downloaded')
+            end;
+        end;
     end;
 }

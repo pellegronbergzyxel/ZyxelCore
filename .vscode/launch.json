@@ -257,6 +257,23 @@
             "tenant": "default",
             "primaryTenantDomain": "e5a0c6ee-5a8a-4cb6-a7f8-df7eb242af01",
             "schemaUpdateMode": "ForceSync"
+        },
+         {
+            "name": "Zyxel TEST Trk 260",
+            "type": "al",
+            "request": "launch",
+            "server": "http://172.28.12.205/",
+            "port": 7049,
+            "serverInstance": "BC_TR_TEST",
+             "authentication": "Windows",
+            "startupObjectId": 1140,
+            "startupObjectType": "Page",
+            "launchBrowser": true,
+            "enableLongRunningSqlStatements": true,
+            "enableSqlInformationDebugger": true,
+            "environmentType": "OnPrem",
+            "schemaUpdateMode": "ForceSync",
+          //  "startupCompany": "ZyND IT"
         }
     ]
 }

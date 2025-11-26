@@ -162,6 +162,7 @@ page 50224 "Company Contracts"
 
                 trigger OnAction()
                 begin
+                    Rec.downloadcontractFile();
                     //FileMgt.DownloadHandler(GetFilename,Text001,FileMgt.GetClientDownloadFolder,'PDF(*.pdf)|*.pdf|All files(*.*)|*.*',FileMgt.GetFileName("Folder and Filename"));
                 end;
             }
