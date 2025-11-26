@@ -65,14 +65,14 @@
             "startupCompany": "ZyND IT"
         },
         {
-            "name": "Zyxel TESTTR",
+            "name": "Zyxel TEST TR 260",
             "type": "al",
             "request": "launch",
             "server": "http://172.28.12.205",
-            "port": 8080,
+            "port": 7049,
             "serverInstance": "BC_TR_TEST",
             "authentication": "AAD",
-            "startupObjectId": 18,
+            "startupObjectId": 1140,
             "startupObjectType": "Page",
             "breakOnError": true,
             "launchBrowser": true,
@@ -83,7 +83,7 @@
             //"primaryTenantDomain": "h89443d20-e988-4407-a3c1-0c80570fb401",
             //"schemaUpdateMode": "Synchronize",
             "schemaUpdateMode": "ForceSync",
-            "startupCompany": "ZyND IT"
+            "startupCompany": "ZYXELL"
         },
         {
             "name": "Zyxel EMEA (Attach Debugging)",
@@ -173,9 +173,9 @@
             //"schemaUpdateMode": "ForceSync",
             "dependencyPublishingOption": "Ignore",
             //"startupCompany": "ZNet DK"
-            "startupCompany": "ZyND DK"
+            "startupCompany": "ZyND SE"
         },
-        {
+        /*{
             "name": "Zyxel EMEA ZNet",
             "type": "al",
             "request": "launch",
@@ -198,7 +198,7 @@
             "startupCompany": "ZNet DK"
             //"startupCompany": "ZyND DK"
         },
-        */
+        
         {
             "name": "Zyxel IT",
             "type": "al",
@@ -220,6 +220,7 @@
             //"schemaUpdateMode": "ForceSync",
             "startupCompany": "ZyND IT"
         },
+        */
         {
             "name": "Zyxel@VisionPeople (W1)",
             "type": "al",
