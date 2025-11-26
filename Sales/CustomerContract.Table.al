@@ -245,9 +245,7 @@ Table 50062 "Customer Contract"
             lCustContractSetup.Get;
             TempBlob.CreateInStream(NewStream);
             TempBlob.CreateOutStream(NewoStream);
-
-
-            BaseFolderName := GetBaseFolderName + Copystr(rec."Folder and Filename", 2);  // 07-02-20 ZY-LD 002
+            BaseFolderName := GetBaseFolderName + Copystr(rec."Folder and Filename", 2);
             if FILE.Exists(BaseFolderName) then begin
                 serverFile.Open(BaseFolderName);
                 serverFile.CreateInStream(NewStream);
