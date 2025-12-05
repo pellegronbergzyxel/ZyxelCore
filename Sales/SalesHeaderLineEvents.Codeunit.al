@@ -1778,8 +1778,10 @@ codeunit 50067 "Sales Header/Line Events"
             Rec."Return Reason Code" := '';
         recGPPGroupRetReasonRelat.SetRange("Gen. Prod. Posting Group", Rec."Gen. Prod. Posting Group");
         recGPPGroupRetReasonRelat.SetRange(Mandatory, true);
-        if recGPPGroupRetReasonRelat.FindFirst() and recGPPGroupRetReasonRelat.FindFirst() then
-            Rec.Validate(Rec."Return Reason Code", recGPPGroupRetReasonRelat."Return Reason Code");
+        //01-12-2025 BK #542908
+        if recGPPGroupRetReasonRelat.FindFirst() then
+            if rec."Return Reason Code" <> recGPPGroupRetReasonRelat."Return Reason Code" then
+                Rec.Validate(Rec."Return Reason Code", recGPPGroupRetReasonRelat."Return Reason Code");
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterValidateEvent', 'Sell-to Customer No.', false, false)]

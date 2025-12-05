@@ -15,6 +15,7 @@ page 50224 "Company Contracts"
                 Caption = 'Options';
                 field(SearchText; SearchText)
                 {
+                    ToolTip = 'Specify the Enter Search String';
                     ApplicationArea = Basic, Suite;
                     Caption = 'Enter Search String';
 
@@ -68,44 +69,54 @@ page 50224 "Company Contracts"
                 Editable = false;
                 field(Status; Rec.Status)
                 {
+                    ToolTip = 'Specify the Status';
                     ApplicationArea = Basic, Suite;
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
+                    ToolTip = 'Specify the Customer No';
                     ApplicationArea = Basic, Suite;
                     Visible = false;
                 }
                 field("Customer Name"; Rec."Customer Name")
                 {
+                    ToolTip = 'Specify the Customer Name';
                     ApplicationArea = Basic, Suite;
                 }
                 field("Contact Person"; Rec."Contact Person")
                 {
+                    ToolTip = 'Specify the Contact Person';
                     ApplicationArea = Basic, Suite;
                 }
                 field("Customer Country Code"; Rec."Customer Country Code")
                 {
+                    ToolTip = 'Specify the Customer Country Code';
                     ApplicationArea = Basic, Suite;
                 }
                 field("Document No."; Rec."Document No.")
                 {
+                    ToolTip = 'Specify the Document No';
                     ApplicationArea = Basic, Suite;
                 }
                 field(Filename; Rec.Filename)
                 {
+                    ToolTip = 'Specify the Filename';
                     ApplicationArea = Basic, Suite;
                 }
                 field(Comment; Rec.Comment)
                 {
+                    ToolTip = 'Specify the Comment';
                     ApplicationArea = Basic, Suite;
                 }
                 field("Valid From"; Rec."Valid From")
                 {
+                    ToolTip = 'Specify the Valid From';
                     ApplicationArea = Basic, Suite;
                     Visible = false;
                 }
                 field("Valid To"; Rec."Valid To")
                 {
+                    ToolTip = 'Specify the Valid To';
                     ApplicationArea = Basic, Suite;
                     Visible = false;
                 }
@@ -163,8 +174,6 @@ page 50224 "Company Contracts"
                 trigger OnAction()
                 begin
                     Rec.downloadcontractFile();
-
-                    //FileMgt.DownloadHandler(GetFilename,Text001,FileMgt.GetClientDownloadFolder,'PDF(*.pdf)|*.pdf|All files(*.*)|*.*',FileMgt.GetFileName("Folder and Filename"));
                 end;
             }
         }
