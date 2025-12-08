@@ -739,10 +739,10 @@ report 50015 "Sales - Invoice CZ"
                             if "Sales Invoice Line"."External Document Position No." <> '' then
                                 ExternalDocumentNoLine += StrSubstNo(', Pos: %1', "Sales Invoice Line"."External Document Position No.");
 
-                            //27-10-25 BK #506594
+                            //27-10-25 BK #506594 desværre fixed Gen. post. group
                             if ("Sales Invoice Line".Type = type::Item) and ("Sales Invoice Line"."No." <> '') then
                                 if recItem.get("Sales Invoice Line"."No.") then
-                                    if (recItem.NonInventoryPostingGroup <> '') and (recItem.Type = recItem.Type::"Non-Inventory") then begin
+                                    if (recItem."Gen. Prod. Posting Group" = 'O_REBATE') and (recItem.Type = recItem.Type::"Non-Inventory") then begin
                                         "Sales Invoice Line".Quantity := 0;
                                         "Sales Invoice Line"."Line Discount %" := 0;
                                         "Sales Invoice Line"."Unit Price" := 0;

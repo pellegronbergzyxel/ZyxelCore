@@ -174,7 +174,7 @@
             "dependencyPublishingOption": "Ignore",
             //"startupCompany": "ZNet DK"
             "startupCompany": "ZyND SE"
-        },
+        },*/
         /*{
             "name": "Zyxel EMEA ZNet",
             "type": "al",
@@ -197,7 +197,7 @@
             "dependencyPublishingOption": "Ignore",
             "startupCompany": "ZNet DK"
             //"startupCompany": "ZyND DK"
-        },
+        },/*
         
         {
             "name": "Zyxel IT",

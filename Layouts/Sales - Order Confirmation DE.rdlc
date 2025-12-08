@@ -11,7 +11,7 @@
       <am:Name>MSRB</am:Name>
       <am:Version>15.1.30001.02</am:Version>
     </am:UpdatedBy>
-    <am:LastModifiedTimestamp>2025-11-28T11:02:09.1905860Z</am:LastModifiedTimestamp>
+    <am:LastModifiedTimestamp>2025-12-08T16:06:08.1936965Z</am:LastModifiedTimestamp>
   </am:AuthoringMetadata>
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -596,7 +596,7 @@
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>=First(Fields!Total_Sub_Total.Value, "DataSet_Result") +First(Fields!TotalInv_DiscAmt.Value, "DataSet_Result")</Value>
+                                      <Value>=Sum(Fields!VATAmtLineLineAmt.Value)</Value>
                                       <Style>
                                         <FontFamily>Segoe UI</FontFamily>
                                         <FontSize>8pt</FontSize>
