@@ -575,10 +575,14 @@ Codeunit 50070 "Customer Events"
     local procedure ShowVATRegistrationSetup(var Rec: Record Customer)
     var
         recVATRegNoLocation: Record "VAT Reg. No. pr. Location";
+        FilterValue: Text;
+        Labelblank: Label '''''';
 
     begin
-        begin
-            recVATRegNoLocation.SetFilter("Ship-to Customer Country Code", '%1|%2', GetCustPostGrpSetupCountryFilter(Rec), '');
+        begin //09-12-2025 BK #545230
+            FilterValue := Labelblank + '|';
+            filtervalue := FilterValue + GetCustPostGrpSetupCountryFilter(Rec);
+            recVATRegNoLocation.SetFilter("Ship-to Customer Country Code", FilterValue);
             recVATRegNoLocation.SetFilter("Sell-to Customer No.", '%1|%2', Rec."No.", '');
             Page.Run(Page::"VAT Reg. No. pr. Locations", recVATRegNoLocation);
         end;
@@ -687,8 +691,8 @@ Codeunit 50070 "Customer Events"
     begin
         //undgå at Document-Mailing codeunit køres via Job Queue - den gensender MANGE documenter til kunden igen.
         //26-11-2025 BK #542415
-        if JobQueueEntry."Object ID to Run" = CODEUNIT::"Document-Mailing" then
-            IsHandled := true;
+        //if JobQueueEntry."Object ID to Run" = CODEUNIT::"Document-Mailing" then
+        //    IsHandled := true;
     end;
 
 
