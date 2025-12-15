@@ -218,8 +218,7 @@
             "dependencyPublishingOption": "Ignore",
             "startupCompany": "ZNet DK"
             //"startupCompany": "ZyND DK"
-        },/*
-        
+        },        
         {
             "name": "Zyxel IT",
             "type": "al",
@@ -239,9 +238,9 @@
             "primaryTenantDomain": "89443d20-e988-4407-a3c1-0c80570fb401",
             "schemaUpdateMode": "Synchronize",
             //"schemaUpdateMode": "ForceSync",
-            "startupCompany": "ZyND IT"
-        },
-        */
+            //"startupCompany": "ZyND IT"
+            "startupCompany": "ZNET IT"
+        }*/,
         {
             "name": "Zyxel@VisionPeople (W1)",
             "type": "al",

@@ -327,6 +327,7 @@ Report 50096 "VAT Report For BCIT"
         TempExcelBuf.NewRow();
         TempExcelBuf.NewRow();
         TempExcelBuf.AddColumn(VATEntry.FieldCaption("Posting Date"), false, '', true, false, false, '', TempExcelBuf."cell type"::Text);
+        TempExcelBuf.AddColumn(VATEntry.FieldCaption("Document Date"), false, '', true, false, false, '', TempExcelBuf."cell type"::Text);
         TempExcelBuf.AddColumn(VATEntry.FieldCaption("Document No."), false, '', true, false, false, '', TempExcelBuf."cell type"::Text);
         TempExcelBuf.AddColumn(VATEntry.FieldCaption("Document Type"), false, '', true, false, false, '', TempExcelBuf."cell type"::Text);
         TempExcelBuf.AddColumn(VATEntry.FieldCaption("Document No."), false, '', true, false, false, '', TempExcelBuf."cell type"::Text);
@@ -350,6 +351,7 @@ Report 50096 "VAT Report For BCIT"
     procedure MakeExcelLine()
     begin
         TempExcelBuf.AddColumn(VATEntry."Posting Date", false, '', false, false, false, '', TempExcelBuf."cell type"::Date);
+        TempExcelBuf.AddColumn(VATEntry."Document Date", false, '', false, false, false, '', TempExcelBuf."cell type"::Date);
         TempExcelBuf.AddColumn(VATEntry."Document No.", false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
         TempExcelBuf.AddColumn(VATEntry."Document Type", false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
         tempExcelBuf.AddColumn(VATEntry."Document No.", false, '', false, false, false, '', TempExcelBuf."cell type"::Text);
