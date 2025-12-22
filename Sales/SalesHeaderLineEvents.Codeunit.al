@@ -707,6 +707,25 @@ codeunit 50067 "Sales Header/Line Events"
                     end;
     end;
 
+    //18-12-2025 BK #538155
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnBeforeValidateShipmentMethodCode, '', false, false)]
+    local procedure "Sales Header_OnBeforeValidateShipmentMethodCode"(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
+    var
+        ShipmentMethod: Record "Shipment Method";
+        Location: Record Location;
+        zgt: Codeunit "ZyXEL General Tools";
+        Label001: Label 'The selected Shipment Method "%1" is not valid for Sales Orders. Please select another Shipment Method.';
+    begin
+        if zgt.IsZComCompany() then
+            if SalesHeader."Location Code" <> '' then
+                if Location.Get(SalesHeader."Location Code") then
+                    if Location."Main Warehouse" then
+                        if SalesHeader."Shipment Method Code" <> '' then
+                            if ShipmentMethod.Get(SalesHeader."Shipment Method Code") then
+                                If Not ShipmentMethod."Valid Sales Order Incoterm" then
+                                    Error(Label001, ShipmentMethod.Code);
+    end;
+
 
     procedure CreateDimensionValueCode(var Rec: Record "Dimension Set Entry")
     var
@@ -1778,8 +1797,10 @@ codeunit 50067 "Sales Header/Line Events"
             Rec."Return Reason Code" := '';
         recGPPGroupRetReasonRelat.SetRange("Gen. Prod. Posting Group", Rec."Gen. Prod. Posting Group");
         recGPPGroupRetReasonRelat.SetRange(Mandatory, true);
-        if recGPPGroupRetReasonRelat.FindFirst() and recGPPGroupRetReasonRelat.FindFirst() then
-            Rec.Validate(Rec."Return Reason Code", recGPPGroupRetReasonRelat."Return Reason Code");
+        //01-12-2025 BK #542908
+        if recGPPGroupRetReasonRelat.FindFirst() then
+            if rec."Return Reason Code" <> recGPPGroupRetReasonRelat."Return Reason Code" then
+                Rec.Validate(Rec."Return Reason Code", recGPPGroupRetReasonRelat."Return Reason Code");
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterValidateEvent', 'Sell-to Customer No.', false, false)]
@@ -3230,6 +3251,16 @@ codeunit 50067 "Sales Header/Line Events"
         if (NewRecRef.Number = Database::"Sales Line") and (FieldNumber = SalesLine.FieldNo("Shipment Date")) then
             IsHandled := true;
     end;
+
+    //16-12-2025 BK #545962
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales Line - Price", OnAfterSetPrice, '', false, false)]
+    local procedure "Sales Line - Price_OnAfterSetPrice"(var SalesLine: Record "Sales Line"; PriceListLine: Record "Price List Line"; AmountType: Enum "Price Amount Type"; var SalesHeader: Record "Sales Header")
+    begin
+        If (SalesLine."Gen. Prod. Post. Grp. Type" = 1) and (SalesLine."Unit Price" = 0) then begin
+            SalesLine."Line Discount %" := 0;
+        end;
+    end;
+
 
 
 }

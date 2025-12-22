@@ -7,24 +7,19 @@ Codeunit 50070 "Customer Events"
     var
         ZGT: Codeunit "ZyXEL General Tools";
         ZyWebSrvMgt: Codeunit "Zyxel Web Service Management";
-        ModifyPage301: Boolean;
-        ModifyPage540: Boolean;
-        ModifyPage542: Boolean;
 
     #region Customer
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeInsertEvent', '', false, false)]
     local procedure OnBeforeInsertCustomer(var Rec: Record Customer; RunTrigger: Boolean)
     begin
-        begin
-            if ZGT.IsRhq then begin
-                if ZGT.IsZNetCompany then begin
-                    Rec."Post EiCard Invoice Automatic" := Rec."post eicard invoice automatic"::"Yes (when purchase invoice is posted)";
-                    Rec."Minimum Order Value Enabled" := true;
-                    Rec."E-mail Deliv. Note at Release" := true;
-                end;
-
-                Rec."Combine Shipments" := true;
+        if ZGT.IsRhq() then begin
+            if ZGT.IsZNetCompany() then begin
+                Rec."Post EiCard Invoice Automatic" := Rec."post eicard invoice automatic"::"Yes (when purchase invoice is posted)";
+                Rec."Minimum Order Value Enabled" := true;
+                Rec."E-mail Deliv. Note at Release" := true;
             end;
+
+            Rec."Combine Shipments" := true;
         end;
     end;
 
@@ -34,7 +29,7 @@ Codeunit 50070 "Customer Events"
         lText001: label '"%1" is blank. Do you want continue?';
         lText002: label 'Modification is stopped.';
     begin
-        if ZGT.IsRhq and GuiAllowed then
+        if ZGT.IsRhq() and GuiAllowed() then
             if Rec."Territory Code" = '' then
                 if not Confirm(lText001, false, Rec.FieldCaption(Rec."Territory Code")) then
                     Error(lText002);
@@ -45,13 +40,11 @@ Codeunit 50070 "Customer Events"
     var
         recCust: Record Customer;
     begin
-        begin
-            if not Rec.IsTemporary then
-                if ZGT.IsRhq then begin
-                    recCust.SetRange("No.", Rec."No.");
-                    Report.RunModal(Report::"Create Conts. from Customers", false, false, recCust);
-                end;
-        end;
+        if not Rec.IsTemporary() then
+            if ZGT.IsRhq() then begin
+                recCust.SetRange("No.", Rec."No.");
+                Report.RunModal(Report::"Create Conts. from Customers", false, false, recCust);
+            end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'Name', false, false)]
@@ -59,7 +52,7 @@ Codeunit 50070 "Customer Events"
     var
         recConvChar: Record "Convert Characters";
     begin
-        Rec.Name := recConvChar.ConvertCharacters(Rec.Name);
+        Rec.Name := copystr(recConvChar.ConvertCharacters(Rec.Name), 1, 100);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'Name 2', false, false)]
@@ -67,7 +60,7 @@ Codeunit 50070 "Customer Events"
     var
         recConvChar: Record "Convert Characters";
     begin
-        Rec."Name 2" := recConvChar.ConvertCharacters(Rec."Name 2");
+        Rec."Name 2" := copystr(recConvChar.ConvertCharacters(Rec."Name 2"), 1, 50);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'Address', false, false)]
@@ -75,7 +68,7 @@ Codeunit 50070 "Customer Events"
     var
         recConvChar: Record "Convert Characters";
     begin
-        Rec.Address := recConvChar.ConvertCharacters(Rec.Address);
+        Rec.Address := copystr(recConvChar.ConvertCharacters(Rec.Address), 1, 100);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'Address 2', false, false)]
@@ -83,7 +76,7 @@ Codeunit 50070 "Customer Events"
     var
         recConvChar: Record "Convert Characters";
     begin
-        Rec."Address 2" := recConvChar.ConvertCharacters(Rec."Address 2");
+        Rec."Address 2" := copystr(recConvChar.ConvertCharacters(Rec."Address 2"), 1, 50);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'City', false, false)]
@@ -91,7 +84,7 @@ Codeunit 50070 "Customer Events"
     var
         recConvChar: Record "Convert Characters";
     begin
-        Rec.City := recConvChar.ConvertCharacters(Rec.City);
+        Rec.City := copystr(recConvChar.ConvertCharacters(Rec.City), 1, 30);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'Payment Terms Code', false, false)]
@@ -120,55 +113,55 @@ Codeunit 50070 "Customer Events"
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'E-Mail', false, false)]
     local procedure OnBeforeValidateEmail(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."E-Mail" := ZGT.ValidateEmailAdd(Rec."E-Mail");
+        Rec."E-Mail" := copystr(ZGT.ValidateEmailAdd(Rec."E-Mail"), 1, 80);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'Notification E-Mail', false, false)]
     local procedure OnBeforeValidateNotificationEmail(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."E-Mail" := ZGT.ValidateEmailAdd(Rec."E-Mail");
+        Rec."E-Mail" := copystr(ZGT.ValidateEmailAdd(Rec."E-Mail"), 1, 80);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'Confirmation E-Mail', false, false)]
     local procedure OnBeforeValidateConfirmationEmail(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."E-Mail" := ZGT.ValidateEmailAdd(Rec."E-Mail");
+        Rec."E-Mail" := copystr(ZGT.ValidateEmailAdd(Rec."E-Mail"), 1, 80);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'EiCard Email Address', false, false)]
     local procedure OnBeforeValidateEiCardEmailAddress(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."EiCard Email Address" := ZGT.ValidateEmailAdd(Rec."EiCard Email Address");
+        Rec."EiCard Email Address" := copystr(ZGT.ValidateEmailAdd(Rec."EiCard Email Address"), 1, 50);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'EiCard Email Address1', false, false)]
     local procedure OnBeforeValidateEiCardEmailAddress1(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."EiCard Email Address1" := ZGT.ValidateEmailAdd(Rec."EiCard Email Address1");
+        Rec."EiCard Email Address1" := copystr(ZGT.ValidateEmailAdd(Rec."EiCard Email Address1"), 1, 50);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'EiCard Email Address2', false, false)]
     local procedure OnBeforeValidateEiCardEmailAddress2(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."EiCard Email Address2" := ZGT.ValidateEmailAdd(Rec."EiCard Email Address2");
+        Rec."EiCard Email Address2" := copystr(ZGT.ValidateEmailAdd(Rec."EiCard Email Address2"), 1, 50);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'EiCard Email Address3', false, false)]
     local procedure OnBeforeValidateEiCardEmailAddress3(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."EiCard Email Address3" := ZGT.ValidateEmailAdd(Rec."EiCard Email Address3");
+        Rec."EiCard Email Address3" := copystr(ZGT.ValidateEmailAdd(Rec."EiCard Email Address3"), 1, 50);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'EiCard Email Address4', false, false)]
     local procedure OnBeforeValidateEiCardEmailAddress4(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."EiCard Email Address4" := ZGT.ValidateEmailAdd(Rec."EiCard Email Address4");
+        Rec."EiCard Email Address4" := copystr(ZGT.ValidateEmailAdd(Rec."EiCard Email Address4"), 1, 50);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeValidateEvent', 'E-mail for Order Scanning', false, false)]
     local procedure OnBeforeValidateEmailForOrderScanning(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        Rec."E-mail for Order Scanning" := ZGT.ValidateEmailAdd(Rec."E-mail for Order Scanning");
+        Rec."E-mail for Order Scanning" := copystr(ZGT.ValidateEmailAdd(Rec."E-mail for Order Scanning"), 1, 30);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'Gen. Bus. Posting Group', false, false)]
@@ -195,10 +188,8 @@ Codeunit 50070 "Customer Events"
         recCustPriceGrp: Record "Customer Price Group";
         lText001: label '"%1" %2 is blocked.';
     begin
-        begin
-            if recCustPriceGrp.Get(Rec."Customer Price Group") and recCustPriceGrp.Blocked then
-                Error(lText001, Rec.FieldCaption(Rec."Customer Price Group"), Rec."Customer Price Group");
-        end;
+        if recCustPriceGrp.Get(Rec."Customer Price Group") and recCustPriceGrp.Blocked then
+            Error(lText001, Rec.FieldCaption(Rec."Customer Price Group"), Rec."Customer Price Group");
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'Bill-to Customer No.', false, false)]
@@ -210,20 +201,16 @@ Codeunit 50070 "Customer Events"
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'E-mail Sales Documents', false, false)]
     local procedure OnAfterValidateEmailSalesDocuments(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        begin
-            if (Rec."No." <> Rec."Bill-to Customer No.") and
-               (Rec."Bill-to Customer No." <> '')
-            then
-                Rec."E-mail Sales Documents" := false;
-        end;
+        if (Rec."No." <> Rec."Bill-to Customer No.") and
+            (Rec."Bill-to Customer No." <> '')
+        then
+            Rec."E-mail Sales Documents" := false;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'E-Mail Statement', false, false)]
     local procedure OnAfterValidateEmailStatement(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     begin
-        begin
-            Rec."Print Statements" := Rec."E-Mail Statement";
-        end;
+        Rec."Print Statements" := Rec."E-Mail Statement";
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'Territory Code', false, false)]
@@ -231,11 +218,7 @@ Codeunit 50070 "Customer Events"
     var
         recForeTerrCountry: Record "Forecast Territory Country";
         recForeTerr: Record "Forecast Territory";
-        recGenSetup: Record "General Ledger Setup";
-        recDefDim: Record "Default Dimension";
-        PrevForecastCode: Code[20];
-        DifferentForecastCodes: Boolean;
-        lText001: label '"%1" does not exist for "%2".';
+
     begin
         begin
             Rec."Forecast Territory" := '';
@@ -251,12 +234,12 @@ Codeunit 50070 "Customer Events"
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'Country/Region Code', false, false)]
     local procedure OnAfterValidateCountryRegionCode(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     var
+        recTerritory: Record Territory;
         lText001: label 'Do you want to change "%1" from "%2" to "%3"?';
         lText002: label '"%1" is not created as "%2". Do you want to continue?';
-        recTerritory: Record Territory;
         lText003: label 'Modification is stopped.';
     begin
-        if ZGT.IsRhq and GuiAllowed then
+        if ZGT.IsRhq() and GuiAllowed() then
             if Rec."Territory Code" = '' then begin
                 if recTerritory.Get(Rec."Country/Region Code") then
                     Rec.Validate(Rec."Territory Code", Rec."Country/Region Code")
@@ -422,25 +405,19 @@ Codeunit 50070 "Customer Events"
         ShowVATRegistrationSetup(Rec);
     end;
 
-    local procedure ">> Ship To Address"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Table, Database::"Ship-to Address", 'OnBeforeInsertEvent', '', false, false)]
     local procedure OnBeforeInsertShipToAdd(var Rec: Record "Ship-to Address"; RunTrigger: Boolean)
     var
         recCust: Record Customer;
         recInvSetup: Record "Inventory Setup";
     begin
-        begin
-            if GuiAllowed and not Rec.IsTemporary then begin
-                if recCust.Get(Rec."Customer No.") then
-                    Rec.Validate(Rec."Shipment Method Code", recCust."Shipment Method Code");
+        if GuiAllowed() and not Rec.IsTemporary() then begin
+            if recCust.Get(Rec."Customer No.") then
+                Rec.Validate(Rec."Shipment Method Code", recCust."Shipment Method Code");
 
-                recInvSetup.Get;
-                if recInvSetup."AIT Location Code" <> '' then
-                    Rec.Validate(Rec."Location Code", recInvSetup."AIT Location Code");
-            end;
+            recInvSetup.Get();
+            if recInvSetup."AIT Location Code" <> '' then
+                Rec.Validate(Rec."Location Code", recInvSetup."AIT Location Code");
         end;
     end;
 
@@ -449,13 +426,13 @@ Codeunit 50070 "Customer Events"
     var
         recSalesHead: Record "Sales Header";
         lText001: label '"%1" %2 is active on the "%3" %4.';
-        recCust: Record Customer;
+
     begin
         begin
             recSalesHead.SetRange("Sell-to Customer No.", Rec."Customer No.");
             recSalesHead.SetRange("Ship-to Code", Rec.Code);
-            if recSalesHead.FindFirst then
-                Error(lText001, Rec.TableCaption, Rec.Code, recSalesHead."Document Type", recSalesHead."No.");
+            if recSalesHead.FindFirst() then
+                Error(lText001, Rec.TableCaption(), Rec.Code, recSalesHead."Document Type", recSalesHead."No.");
         end;
     end;
 
@@ -464,7 +441,7 @@ Codeunit 50070 "Customer Events"
     var
         recConvChar: Record "Convert Characters";
     begin
-        Rec.Name := recConvChar.ConvertCharacters(Rec.Name);
+        Rec.Name := Copystr(recConvChar.ConvertCharacters(Rec.Name), 1, 100);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Ship-to Address", 'OnBeforeValidateEvent', 'Name 2', false, false)]
@@ -472,7 +449,7 @@ Codeunit 50070 "Customer Events"
     var
         recConvChar: Record "Convert Characters";
     begin
-        Rec."Name 2" := recConvChar.ConvertCharacters(Rec."Name 2");
+        Rec."Name 2" := Copystr(recConvChar.ConvertCharacters(Rec."Name 2"), 1, 50);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Ship-to Address", 'OnBeforeValidateEvent', 'Address', false, false)]
@@ -480,7 +457,7 @@ Codeunit 50070 "Customer Events"
     var
         recConvChar: Record "Convert Characters";
     begin
-        Rec.Address := recConvChar.ConvertCharacters(Rec.Address);
+        Rec.Address := Copystr(recConvChar.ConvertCharacters(Rec.Address), 1, 100);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Ship-to Address", 'OnBeforeValidateEvent', 'Address 2', false, false)]
@@ -488,7 +465,7 @@ Codeunit 50070 "Customer Events"
     var
         recConvChar: Record "Convert Characters";
     begin
-        Rec."Address 2" := recConvChar.ConvertCharacters(Rec."Address 2");
+        Rec."Address 2" := Copystr(recConvChar.ConvertCharacters(Rec."Address 2"), 1, 50);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Ship-to Address", 'OnBeforeValidateEvent', 'City', false, false)]
@@ -496,7 +473,7 @@ Codeunit 50070 "Customer Events"
     var
         recConvChar: Record "Convert Characters";
     begin
-        Rec.City := recConvChar.ConvertCharacters(Rec.City);
+        Rec.City := Copystr(recConvChar.ConvertCharacters(Rec.City), 1, 30);
     end;
 
     //>> Custom Report Selection
@@ -526,10 +503,6 @@ Codeunit 50070 "Customer Events"
         end;
     end;
 
-    local procedure ">> Default Dimension"()
-    begin
-    end;
-
     [EventSubscriber(Objecttype::Page, 540, 'OnInsertRecordEvent', '', false, false)]
     local procedure OnAfterInsertPage540(var Rec: Record "Default Dimension"; BelowxRec: Boolean; var xRec: Record "Default Dimension"; var AllowInsert: Boolean)
     begin
@@ -549,7 +522,7 @@ Codeunit 50070 "Customer Events"
         recCust: Record Customer;
     begin
         begin
-            recGenSetup.Get;
+            recGenSetup.Get();
             if (Rec."Table ID" = Database::Customer) and (Rec."Dimension Code" = recGenSetup."Global Dimension 1 Code") then
                 if recCust.Get(Rec."No.") then begin
                     recCust."Forecast Territory" := '';
@@ -564,7 +537,7 @@ Codeunit 50070 "Customer Events"
         recCust: Record Customer;
     begin
         begin
-            recGenSetup.Get;
+            recGenSetup.Get();
             if (Rec."Table ID" = Database::Customer) and (Rec."Dimension Code" = recGenSetup."Global Dimension 1 Code") then
                 if recCust.Get(Rec."No.") then begin
                     recCust."Global Dimension 1 Code" := Rec."Dimension Value Code";
@@ -572,10 +545,6 @@ Codeunit 50070 "Customer Events"
                     recCust.Modify(true);
                 end;
         end;
-    end;
-
-    local procedure ">> Functions"()
-    begin
     end;
 
     local procedure ShowCustBillToSetup(var Rec: Record Customer)
@@ -605,11 +574,15 @@ Codeunit 50070 "Customer Events"
 
     local procedure ShowVATRegistrationSetup(var Rec: Record Customer)
     var
-        recCustPostGrpSetup: Record "Add. Cust. Posting Grp. Setup";
         recVATRegNoLocation: Record "VAT Reg. No. pr. Location";
+        FilterValue: Text;
+        Labelblank: Label '''''';
+
     begin
-        begin
-            recVATRegNoLocation.SetFilter("Ship-to Customer Country Code", '%1|%2', GetCustPostGrpSetupCountryFilter(Rec), '');
+        begin //09-12-2025 BK #545230
+            FilterValue := Labelblank + '|';
+            filtervalue := FilterValue + GetCustPostGrpSetupCountryFilter(Rec);
+            recVATRegNoLocation.SetFilter("Ship-to Customer Country Code", FilterValue);
             recVATRegNoLocation.SetFilter("Sell-to Customer No.", '%1|%2', Rec."No.", '');
             Page.Run(Page::"VAT Reg. No. pr. Locations", recVATRegNoLocation);
         end;
@@ -628,7 +601,7 @@ Codeunit 50070 "Customer Events"
             recShiptoAdd.SetRange("Customer No.", Rec."No.");
             recShiptoAdd.SetFilter("Country/Region Code", '<>%1', '');
             recShiptoAdd.SetFilter("Last Used Date", '%1..', CalcDate('<-1Y>', Today));
-            if recShiptoAdd.FindSet then
+            if recShiptoAdd.FindSet() then
                 repeat
                     if StrPos(rValue, recShiptoAdd."Country/Region Code") = 0 then
                         rValue += recShiptoAdd."Country/Region Code" + '|';
@@ -636,7 +609,7 @@ Codeunit 50070 "Customer Events"
 
 
             recAddCustPostGrpSetup.SetRange("Customer No.", Rec."No.");
-            if recAddCustPostGrpSetup.FindSet then
+            if recAddCustPostGrpSetup.FindSet() then
                 repeat
                     if (recAddCustPostGrpSetup."Country/Region Code" = '') then
                         if recAddCustPostGrpSetup."Location Code in SUB" <> '' then
@@ -688,7 +661,6 @@ Codeunit 50070 "Customer Events"
         NewStartDate: Date;
         NewEndDate: Date;
         DateChoice: Option "Due Date","Posting Date";
-        IsHandled: Boolean;
         NewPrintOnlyOpenEntries: Boolean;
     begin
         NewPrintEntriesDue := TRUE;
@@ -717,9 +689,10 @@ Codeunit 50070 "Customer Events"
     [EventSubscriber(ObjectType::Table, Database::"Report Selections", OnEnqueueMailingJobOnBeforeRunJobQueueEnqueue, '', false, false)]
     local procedure "Report Selections_OnEnqueueMailingJobOnBeforeRunJobQueueEnqueue"(RecordIdToProcess: RecordId; ParameterString: Text; Description: Text; var JobQueueEntry: Record "Job Queue Entry"; var IsHandled: Boolean)
     begin
+        //undgå at Document-Mailing codeunit køres via Job Queue - den gensender MANGE documenter til kunden igen.
         //26-11-2025 BK #542415
-        if JobQueueEntry."Object ID to Run" = CODEUNIT::"Document-Mailing" then
-            IsHandled := true;
+        //if JobQueueEntry."Object ID to Run" = CODEUNIT::"Document-Mailing" then
+        //    IsHandled := true;
     end;
 
 

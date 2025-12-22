@@ -586,11 +586,6 @@ page 50165 "Item List MDM View"
                     Visible = false;
                     ToolTip = 'Specifies the value of the Qty Per Pallet field.';
                 }
-                /*field("SCIP No."; Rec."SCIP No.")  // 18-04-24 ZY-LD 000
-                {
-                    Visible = false;
-                    ToolTip = 'SCIP is the database for information on Substances of Concern In articles as such or in complex objects (Products) established under the Waste Framework Directive (WFD).';
-                }*/
                 field(ScipNo; Rec.GetScipNo)
                 {
                     Caption = 'SCIP No.';

@@ -1,13 +1,6 @@
 Report 50009 "Sales - Order Confirmation DE"
 {
-    // 001. 03-04-18 ZY-LD 2018032910000059 - Strange code but. If "Payment Terms Code" is changed on the sales order, we must use this code, otherwise it must code from the sell-to customer.
-    // 002. 14-10-20 ZY-LD 2020030210000103 - Added cross reference to the line.
-    // 003. 17-03-21 ZY-LD 2021031610000175 - German confirmations need the german company info. The hardcoded solution has been changed.
-    // 004. 02-04-20 ZY-LD 2020030210000103 - Added cross reference to the line.
-    // 005. 31-05-21 ZY-LD 2021052810000131 - Buttom text in ZNet.
-    // 006. 09-03-22 ZY-LD 2022030910000043 - Buttom text in ZCom.
-    // 007. 11-03-22 ZY-LD 2022031110000066 - Incoterms.
-    // 008. 01-11-23 ZY-LD 000 - Text changed due to request from Madlen.
+
     DefaultLayout = RDLC;
     RDLCLayout = './Layouts/Sales - Order Confirmation DE.rdlc';
 
@@ -327,14 +320,14 @@ Report 50009 "Sales - Order Confirmation DE"
                             Clear(DimText);
                             Continue := false;
                             repeat
-                                OldDimText := DimText;
+                                OldDimText := copystr(DimText, 1, 75);
                                 if DimText = '' then
-                                    DimText := StrSubstNo('%1 %2', DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code")
+                                    DimText := Copystr(StrSubstNo('%1 %2', DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code"), 1, 120)
                                 else
                                     DimText :=
-                                      StrSubstNo(
+                                      copystr(StrSubstNo(
                                         '%1, %2 %3', DimText,
-                                        DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code");
+                                        DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code"), 1, 120);
                                 if StrLen(DimText) > MaxStrLen(OldDimText) then begin
                                     DimText := OldDimText;
                                     Continue := true;
@@ -408,7 +401,7 @@ Report 50009 "Sales - Order Confirmation DE"
                         {
                             AutoFormatType = 1;
                         }
-                        column(VATAmtLineVATAmtText; VATAmountLine.VATAmountText)
+                        column(VATAmtLineVATAmtText; VATAmountLine.VATAmountText())
                         {
                         }
                         column(LineAmtAfterInvDiscAmt; -("Sales Line"."Line Amount" - "Sales Line"."Inv. Discount Amount" - "Sales Line"."Amount Including VAT"))
@@ -423,7 +416,7 @@ Report 50009 "Sales - Order Confirmation DE"
                         column(TotalInclVATText_SalesInvLine; TotalInclVATText)
                         {
                         }
-                        column(VATAmtText_SalesInvLine; VATAmountLine.VATAmountText)
+                        column(VATAmtText_SalesInvLine; VATAmountLine.VATAmountText())
                         {
                         }
                         column(DocNo_SalesInvLine; "Sales Line"."Document No.")
@@ -477,7 +470,7 @@ Report 50009 "Sales - Order Confirmation DE"
                         column(PrintRequestedDeliveryDate; PrintRequestedDeliveryDate)
                         {
                         }
-                        column(ExtDocNoSl; ExtDocNoSl)  // 21-08-24 ZY-LD 011
+                        column(ExtDocNoSl; ExtDocNoSl)
                         {
                         }
 
@@ -492,11 +485,10 @@ Report 50009 "Sales - Order Confirmation DE"
                             ShipmentDateLimit := CalcDate('<+2Y>', Today);
                             if (ShipmentDateLimit > "Sales Line"."Shipment Date") then begin
                                 DisplShipDate := Format("Sales Line"."Shipment Date");
-                                if ("Sales Line"."Shipment Date Confirmed") then begin
-                                    ConfirmText := 'Yes';
-                                end else begin
+                                if ("Sales Line"."Shipment Date Confirmed") then
+                                    ConfirmText := 'Yes'
+                                else
                                     ConfirmText := '';
-                                end;
                             end else begin
                                 DisplShipDate := ConfirmTxt;
                                 ConfirmText := ''
@@ -508,25 +500,21 @@ Report 50009 "Sales - Order Confirmation DE"
                             TotalSubTotal += "Sales Line"."Line Amount";
                             TotalInvDiscAmount += "Sales Line"."Line Discount Amount";
 
-                            //>> 23-06-21 ZY-LD 006
                             PrintRequestedDeliveryDate :=
                               SalesSetup."Print Req. Del. Date on O.Conf" and
                               ("Sales Line"."Requested Delivery Date" <> 0D) and
                               ("Sales Header"."Requested Delivery Date" <> "Sales Line"."Requested Delivery Date");
-                            //<< 23-06-21 ZY-LD 006
 
-                            //>> 21-08-24 ZY-LD 011
                             ExtDocNoSl := '';
                             if ("Sales Header"."External Document No." <> "Sales Line"."External Document No.") and
                                ("Sales Line"."External Document No." <> '')
                              then
                                 ExtDocNoSl := "Sales Line"."External Document No.";
-                            //<< 21-08-24 ZY-LD 011                                
                         end;
 
                         trigger OnPreDataItem()
                         begin
-                            //CurrReport.BREAK;
+
                         end;
                     }
                     dataitem(RoundLoop; "Integer")
@@ -619,7 +607,7 @@ Report 50009 "Sales - Order Confirmation DE"
                         column(TotalExclVATText; TotalExclVATText)
                         {
                         }
-                        column(VATAmtLineVATAmtText3; VATAmountLine.VATAmountText)
+                        column(VATAmtLineVATAmtText3; VATAmountLine.VATAmountText())
                         {
                         }
                         column(TotalInclVATText; TotalInclVATText)
@@ -678,7 +666,7 @@ Report 50009 "Sales - Order Confirmation DE"
                             trigger OnAfterGetRecord()
                             begin
                                 if DimensionLoop2.Number = 1 then begin
-                                    if not DimSetEntry2.FindSet then
+                                    if not DimSetEntry2.FindSet() then
                                         CurrReport.Break();
                                 end else
                                     if not Continue then
@@ -687,14 +675,14 @@ Report 50009 "Sales - Order Confirmation DE"
                                 Clear(DimText);
                                 Continue := false;
                                 repeat
-                                    OldDimText := DimText;
+                                    OldDimText := copystr(DimText, 1, 75);
                                     if DimText = '' then
-                                        DimText := StrSubstNo('%1 %2', DimSetEntry2."Dimension Code", DimSetEntry2."Dimension Value Code")
+                                        DimText := copystr(StrSubstNo('%1 %2', DimSetEntry2."Dimension Code", DimSetEntry2."Dimension Value Code"), 1, 120)
                                     else
                                         DimText :=
-                                          StrSubstNo(
+                                          copystr(StrSubstNo(
                                             '%1, %2 %3', DimText,
-                                            DimSetEntry2."Dimension Code", DimSetEntry2."Dimension Value Code");
+                                            DimSetEntry2."Dimension Code", DimSetEntry2."Dimension Value Code"), 1, 120);
                                     if StrLen(DimText) > MaxStrLen(OldDimText) then begin
                                         DimText := OldDimText;
                                         Continue := true;
@@ -717,10 +705,10 @@ Report 50009 "Sales - Order Confirmation DE"
                             column(AsmLineType; AsmLine.Type)
                             {
                             }
-                            column(AsmLineNo; BlanksForIndent + AsmLine."No.")
+                            column(AsmLineNo; BlanksForIndent() + AsmLine."No.")
                             {
                             }
-                            column(AsmLineDescription; BlanksForIndent + AsmLine.Description)
+                            column(AsmLineDescription; BlanksForIndent() + AsmLine.Description)
                             {
                             }
                             column(AsmLineQuantity; AsmLine.Quantity)
@@ -733,9 +721,9 @@ Report 50009 "Sales - Order Confirmation DE"
                             trigger OnAfterGetRecord()
                             begin
                                 if AsmLoop.Number = 1 then
-                                    AsmLine.FindSet
+                                    AsmLine.FindSet()
                                 else
-                                    AsmLine.Next;
+                                    AsmLine.Next();
                             end;
 
                             trigger OnPreDataItem()
@@ -746,7 +734,7 @@ Report 50009 "Sales - Order Confirmation DE"
                                     CurrReport.Break();
                                 AsmLine.SetRange("Document Type", AsmHeader."Document Type");
                                 AsmLine.SetRange("Document No.", AsmHeader."No.");
-                                AsmLoop.SetRange(AsmLoop.Number, 1, AsmLine.Count);
+                                AsmLoop.SetRange(AsmLoop.Number, 1, AsmLine.Count());
                             end;
                         }
 
@@ -755,7 +743,7 @@ Report 50009 "Sales - Order Confirmation DE"
                             if RoundLoop.Number = 1 then
                                 SalesLine.Find('-')
                             else
-                                SalesLine.Next;
+                                SalesLine.Next();
                             "Sales Line" := SalesLine;
                             if DisplayAssemblyInformation then
                                 AsmInfoExistsForLine := SalesLine.AsmToOrderExists(AsmHeader);
@@ -787,7 +775,7 @@ Report 50009 "Sales - Order Confirmation DE"
 
                         trigger OnPostDataItem()
                         begin
-                            SalesLine.DeleteAll;
+                            SalesLine.DeleteAll();
                         end;
 
                         trigger OnPreDataItem()
@@ -801,7 +789,7 @@ Report 50009 "Sales - Order Confirmation DE"
                             if not MoreLines then
                                 CurrReport.Break();
                             SalesLine.SetRange("Line No.", 0, SalesLine."Line No.");
-                            RoundLoop.SetRange(RoundLoop.Number, 1, SalesLine.Count);
+                            RoundLoop.SetRange(RoundLoop.Number, 1, SalesLine.Count());
                         end;
                     }
                     dataitem(VATCounter; "Integer")
@@ -861,7 +849,7 @@ Report 50009 "Sales - Order Confirmation DE"
 
                         trigger OnPreDataItem()
                         begin
-                            VATCounter.SetRange(VATCounter.Number, 1, VATAmountLine.Count);
+                            VATCounter.SetRange(VATCounter.Number, 1, VATAmountLine.Count());
                         end;
                     }
                     dataitem(VatCounterLCY; "Integer")
@@ -904,11 +892,11 @@ Report 50009 "Sales - Order Confirmation DE"
                         begin
                             if (not GLSetup."Print VAT specification in LCY") or
                                ("Sales Header"."Currency Code" = '') or
-                               (VATAmountLine.GetTotalVATAmount = 0)
+                               (VATAmountLine.GetTotalVATAmount() = 0)
                             then
                                 CurrReport.Break();
 
-                            VatCounterLCY.SetRange(VatCounterLCY.Number, 1, VATAmountLine.Count);
+                            VatCounterLCY.SetRange(VatCounterLCY.Number, 1, VATAmountLine.Count());
 
                             if GLSetup."LCY Code" = '' then
                                 VALSpecLCYHeader := Text007 + Text008
@@ -936,7 +924,7 @@ Report 50009 "Sales - Order Confirmation DE"
                         column(TotalExclVATText2; TotalExclVATText)
                         {
                         }
-                        column(PrepmtVATAmtLineVATAmtTxt; PrepmtVATAmountLine.VATAmountText)
+                        column(PrepmtVATAmtLineVATAmtTxt; PrepmtVATAmountLine.VATAmountText())
                         {
                         }
                         column(TotalInclVATText2; TotalInclVATText)
@@ -957,7 +945,7 @@ Report 50009 "Sales - Order Confirmation DE"
                             AutoFormatExpression = "Sales Header"."Currency Code";
                             AutoFormatType = 1;
                         }
-                        column(VATAmtLineVATAmtText2; VATAmountLine.VATAmountText)
+                        column(VATAmtLineVATAmtText2; VATAmountLine.VATAmountText())
                         {
                         }
                         column(PrepmtTotalAmountInclVAT; PrepmtTotalAmountInclVAT)
@@ -992,15 +980,15 @@ Report 50009 "Sales - Order Confirmation DE"
                                 Clear(DimText);
                                 Continue := false;
                                 repeat
-                                    OldDimText := DimText;
+                                    OldDimText := copystr(DimText, 1, 75);
                                     if DimText = '' then
                                         DimText :=
-                                          StrSubstNo('%1 %2', TempPrepmtDimSetEntry."Dimension Code", TempPrepmtDimSetEntry."Dimension Value Code")
+                                          Copystr(StrSubstNo('%1 %2', TempPrepmtDimSetEntry."Dimension Code", TempPrepmtDimSetEntry."Dimension Value Code"), 1, 120)
                                     else
                                         DimText :=
-                                          StrSubstNo(
+                                          copystr(StrSubstNo(
                                             '%1, %2 %3', DimText,
-                                            TempPrepmtDimSetEntry."Dimension Code", TempPrepmtDimSetEntry."Dimension Value Code");
+                                            TempPrepmtDimSetEntry."Dimension Code", TempPrepmtDimSetEntry."Dimension Value Code"), 1, 120);
                                     if StrLen(DimText) > MaxStrLen(OldDimText) then begin
                                         DimText := OldDimText;
                                         Continue := true;
@@ -1064,7 +1052,7 @@ Report 50009 "Sales - Order Confirmation DE"
 
                         trigger OnPreDataItem()
                         begin
-                            PrepmtVATCounter.SetRange(PrepmtVATCounter.Number, 1, PrepmtVATAmountLine.Count);
+                            PrepmtVATCounter.SetRange(PrepmtVATCounter.Number, 1, PrepmtVATAmountLine.Count());
                         end;
                     }
                     dataitem(PrepmtTotal; "Integer")
@@ -1085,37 +1073,38 @@ Report 50009 "Sales - Order Confirmation DE"
                 trigger OnAfterGetRecord()
                 var
                     PrepmtSalesLine: Record "Sales Line" temporary;
-                    SalesPost: Codeunit "Sales-Post";
                     TempSalesLine: Record "Sales Line" temporary;
+                    SalesPost: Codeunit "Sales-Post";
+
                 begin
                     Clear(SalesLine);
                     Clear(SalesPost);
-                    VATAmountLine.DeleteAll;
-                    SalesLine.DeleteAll;
+                    VATAmountLine.DeleteAll();
+                    SalesLine.DeleteAll();
                     SalesPost.GetSalesLines("Sales Header", SalesLine, 0);
                     SalesLine.CalcVATAmountLines(0, "Sales Header", SalesLine, VATAmountLine);
                     SalesLine.UpdateVATOnLines(0, "Sales Header", SalesLine, VATAmountLine);
-                    VATAmount := VATAmountLine.GetTotalVATAmount;
-                    VATBaseAmount := VATAmountLine.GetTotalVATBase;
+                    VATAmount := VATAmountLine.GetTotalVATAmount();
+                    VATBaseAmount := VATAmountLine.GetTotalVATBase();
                     VATDiscountAmount :=
                       VATAmountLine.GetTotalVATDiscount("Sales Header"."Currency Code", "Sales Header"."Prices Including VAT");
-                    TotalAmountInclVAT := VATAmountLine.GetTotalAmountInclVAT;
+                    TotalAmountInclVAT := VATAmountLine.GetTotalAmountInclVAT();
 
-                    PrepmtInvBuf.DeleteAll;
+                    PrepmtInvBuf.DeleteAll();
                     SalesPostPrepmt.GetSalesLines("Sales Header", 0, PrepmtSalesLine);
 
-                    if not PrepmtSalesLine.IsEmpty then begin
+                    if not PrepmtSalesLine.IsEmpty() then begin
                         SalesPostPrepmt.GetSalesLinesToDeduct("Sales Header", TempSalesLine);
-                        if not TempSalesLine.IsEmpty then
+                        if not TempSalesLine.IsEmpty() then
                             SalesPostPrepmt.CalcVATAmountLines("Sales Header", TempSalesLine, PrepmtVATAmountLineDeduct, 1);
                     end;
                     SalesPostPrepmt.CalcVATAmountLines("Sales Header", PrepmtSalesLine, PrepmtVATAmountLine, 0);
                     PrepmtVATAmountLine.DeductVATAmountLine(PrepmtVATAmountLineDeduct);
                     SalesPostPrepmt.UpdateVATOnLines("Sales Header", PrepmtSalesLine, PrepmtVATAmountLine, 0);
                     SalesPostPrepmt.BuildInvLineBuffer("Sales Header", PrepmtSalesLine, 0, PrepmtInvBuf);
-                    PrepmtVATAmount := PrepmtVATAmountLine.GetTotalVATAmount;
-                    PrepmtVATBaseAmount := PrepmtVATAmountLine.GetTotalVATBase;
-                    PrepmtTotalAmountInclVAT := PrepmtVATAmountLine.GetTotalAmountInclVAT;
+                    PrepmtVATAmount := PrepmtVATAmountLine.GetTotalVATAmount();
+                    PrepmtVATBaseAmount := PrepmtVATAmountLine.GetTotalVATBase();
+                    PrepmtTotalAmountInclVAT := PrepmtVATAmountLine.GetTotalAmountInclVAT();
 
                     if CopyLoop.Number > 1 then begin
                         CopyText := Text003;
@@ -1139,7 +1128,7 @@ Report 50009 "Sales - Order Confirmation DE"
                     if Print then
                         SalesCountPrinted.Run("Sales Header");
 
-                    TotalSubTotal := 0;
+                    TotalSubTotal := 0; //28-11-2025 BK #542848
                     TotalInvDiscAmount := 0;
                 end;
 
@@ -1154,21 +1143,9 @@ Report 50009 "Sales - Order Confirmation DE"
 
             trigger OnAfterGetRecord()
             begin
-                //>> 17-03-21 ZY-LD 003
-                /* This is code from before my start at Zyxel.
-                IF ("Sales Header"."Bill-to IC Partner Code" = 'IC2') OR ("Sales Header"."Bill-to IC Partner Code" = 'IC8') THEN BEGIN
-                   CompanyInfo.CHANGECOMPANY('ZyND DE');
-                   CompanyInfo.GET;
-                END ELSE BEGIN
-                   IF "Sales Header"."Bill-to IC Partner Code" = 'IC9' THEN BEGIN
-                     CompanyInfo.CHANGECOMPANY('Sphairon');
-                     CompanyInfo.GET;
-                   END;
-                END;
-                //CompanyInfo.GET;*/
                 if recICPartner.Get("Sales Header"."Bill-to IC Partner Code") and (recICPartner."Read Company Infor from Sub") then begin
                     CompanyInfo.ChangeCompany(recICPartner."Inbox Details");
-                    CompanyInfo.Get;
+                    CompanyInfo.Get();
                 end;
                 //<< 17-03-21 ZY-LD 003
                 CurrReport.Language := LanguageCU.GetLanguageIdOrDefault("Sales Header"."Language Code");
@@ -1192,46 +1169,45 @@ Report 50009 "Sales - Order Confirmation DE"
                 if "Sales Header"."Your Reference" = '' then
                     ReferenceText := ''
                 else
-                    ReferenceText := "Sales Header".FieldCaption("Sales Header"."Your Reference");
+                    ReferenceText := copystr("Sales Header".FieldCaption("Sales Header"."Your Reference"), 1, 75);
                 if "Sales Header"."VAT Registration No." = '' then
                     VATNoText := ''
                 else
-                    VATNoText := "Sales Header".FieldCaption("Sales Header"."VAT Registration No.");
+                    VATNoText := copystr("Sales Header".FieldCaption("Sales Header"."VAT Registration No."), 1, 80);
                 if "Sales Header"."Currency Code" = '' then begin
                     GLSetup.TestField("LCY Code");
-                    TotalText := StrSubstNo(Text001, GLSetup."LCY Code");
-                    TotalInclVATText := StrSubstNo(Text002, GLSetup."LCY Code");
-                    TotalExclVATText := StrSubstNo(Text006, GLSetup."LCY Code");
+                    TotalText := copystr(StrSubstNo(Text001, GLSetup."LCY Code"), 1, 50);
+                    TotalInclVATText := copystr(StrSubstNo(Text002, GLSetup."LCY Code"), 1, 50);
+                    TotalExclVATText := copystr(StrSubstNo(Text006, GLSetup."LCY Code"), 1, 50);
                 end else begin
-                    TotalText := StrSubstNo(Text001, "Sales Header"."Currency Code");
-                    TotalInclVATText := StrSubstNo(Text002, "Sales Header"."Currency Code");
-                    TotalExclVATText := StrSubstNo(Text006, "Sales Header"."Currency Code");
+                    TotalText := copystr(StrSubstNo(Text001, "Sales Header"."Currency Code"), 1, 50);
+                    TotalInclVATText := copystr(StrSubstNo(Text002, "Sales Header"."Currency Code"), 1, 50);
+                    TotalExclVATText := copystr(StrSubstNo(Text006, "Sales Header"."Currency Code"), 1, 50);
                 end;
                 FormatAddr.SalesHeaderSellTo(CustAddr, "Sales Header");
 
                 if "Sales Header"."Payment Terms Code" = '' then
-                    PaymentTerms.Init
+                    PaymentTerms.Init()
                 else begin
                     PaymentTerms.Get("Sales Header"."Payment Terms Code");
                     PaymentTerms.TranslateDescription(PaymentTerms, "Sales Header"."Language Code");
                 end;
                 if "Sales Header"."Prepmt. Payment Terms Code" = '' then
-                    PrepmtPaymentTerms.Init
+                    PrepmtPaymentTerms.Init()
                 else begin
                     PrepmtPaymentTerms.Get("Sales Header"."Prepmt. Payment Terms Code");
                     PrepmtPaymentTerms.TranslateDescription(PrepmtPaymentTerms, "Sales Header"."Language Code");
                 end;
                 if "Sales Header"."Prepmt. Payment Terms Code" = '' then
-                    PrepmtPaymentTerms.Init
+                    PrepmtPaymentTerms.Init()
                 else begin
                     PrepmtPaymentTerms.Get("Sales Header"."Prepmt. Payment Terms Code");
                     PrepmtPaymentTerms.TranslateDescription(PrepmtPaymentTerms, "Sales Header"."Language Code");
                 end;
                 if "Sales Header"."Shipment Method Code" = '' then
-                    ShipmentMethod.Init
+                    ShipmentMethod.Init()
                 else begin
                     ShipmentMethod.Get("Sales Header"."Shipment Method Code");
-                    //>> 11-03-22 ZY-LD 007
                     case ShipmentMethod."Read Incoterms City From" of
                         ShipmentMethod."read incoterms city from"::"Ship-to City":
                             begin
@@ -1244,7 +1220,6 @@ Report 50009 "Sales - Order Confirmation DE"
                                 ShipmentMethod.Description := StrSubstNo('%1 %2', "Sales Header"."Shipment Method Code", recLocation.City);
                             end;
                     end;
-                    //<< 11-03-22 ZY-LD 007
 
                 end;
 
@@ -1281,36 +1256,31 @@ Report 50009 "Sales - Order Confirmation DE"
 
                 //RD 1.0
                 SellVATID := SellCust."VAT Registration No.";
-                recBillCust.Get("Sales Header"."Bill-to Customer No.");  // 03-04-18 ZY-LD 001
-                if recBillCust."Payment Terms Code" = "Sales Header"."Payment Terms Code" then  // 03-04-18 ZY-LD 001
+                recBillCust.Get("Sales Header"."Bill-to Customer No.");
+                if recBillCust."Payment Terms Code" = "Sales Header"."Payment Terms Code" then
                     PaymentTerms.Get(SellCust."Payment Terms Code");
-                PayTerms := PaymentTerms.Description;
+                PayTerms := copystr(PaymentTerms.Description, 1, 50);
 
                 //RD 1.0
 
                 TarrifCode := '';
                 recItem.SetFilter("No.", "Sales Header"."No.");
-                if recItem.FindFirst then begin
+                if recItem.FindFirst() then
                     TarrifCode := recItem."Tariff No.";
-                end;
 
-                ButtomText := '';  // 09-03-22 ZY-LD 006
-                if PrintButtomText then begin  // 09-03-22 ZY-LD 006
-                                               //>> 31-05-21 ZY-LD 005
-                    if ZGT.IsZNetCompany then
+                ButtomText := '';
+                if PrintButtomText then begin
+                    if ZGT.IsZNetCompany() then
                         ButtomText := Text50001;
-                    //<< 31-05-21 ZY-LD 005
-                    //>> 09-03-22 ZY-LD 006
-                    if ZGT.IsZComCompany then
+                    if ZGT.IsZComCompany() then
                         ButtomText := Text50002;
-                    //<< 09-03-22 ZY-LD 006
                 end;
 
             end;
 
             trigger OnPreDataItem()
             begin
-                Print := Print or not CurrReport.Preview;
+                Print := Print or not CurrReport.Preview();
                 AsmInfoExistsForLine := false;
             end;
         }
@@ -1331,11 +1301,13 @@ Report 50009 "Sales - Order Confirmation DE"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Show Internal Information';
+                        ToolTip = 'Includes G/L account numbers and internal comments in the report.';
                     }
                     field(ArchiveDocument; ArchiveDocument)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Archive Document';
+                        ToolTip = 'Archives the sales order confirmation document when it is printed.';
 
                         trigger OnValidate()
                         begin
@@ -1348,6 +1320,7 @@ Report 50009 "Sales - Order Confirmation DE"
                         ApplicationArea = Basic, Suite;
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
+                        ToolTip = 'Logs the printing of the sales order confirmation document as an interaction for the customer.';
 
                         trigger OnValidate()
                         begin
@@ -1359,11 +1332,13 @@ Report 50009 "Sales - Order Confirmation DE"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Show Assembly Components';
+                        ToolTip = 'Includes assembly component lines in the sales order confirmation report.';
                     }
                     field(PrintButtomText; PrintButtomText)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Print Buttom Text';
+                        ToolTip = 'Includes predefined buttom text in the sales order confirmation report.';
                     }
                 }
             }
@@ -1391,8 +1366,7 @@ Report 50009 "Sales - Order Confirmation DE"
     {
         OrderConf = 'Auftragsbestätigung';
         ShipmentDate = 'Erwartetes Packdatum';
-        //ExternalDocument = 'Kunden Ref. Nr.:';  // 01-11-23 ZY-LD 008
-        ExternalDocument = 'Kundenbestellnummer';  // 01-11-23 ZY-LD 008 Externe Dok. Nr. 
+        ExternalDocument = 'Kundenbestellnummer';
         Salesperson = 'Verkäufer';
         PhoneNo = 'Telefon-Nr.:';
         Fax = 'Fax-Nr.:';
@@ -1419,33 +1393,135 @@ Report 50009 "Sales - Order Confirmation DE"
 
     trigger OnInitReport()
     begin
-        GLSetup.Get;
-        CompanyInfo.Get;
-        SalesSetup.Get;
-        CompanyInfo.VerifyAndSetPaymentInfo;
+        GLSetup.Get();
+        CompanyInfo.Get();
+        SalesSetup.Get();
+        CompanyInfo.VerifyAndSetPaymentInfo();
         case SalesSetup."Logo Position on Documents" of
             SalesSetup."logo position on documents"::Left:
                 begin
-                    CompanyInfo3.Get;
+                    CompanyInfo3.Get();
                     CompanyInfo3.CalcFields(Picture);
                 end;
             SalesSetup."logo position on documents"::Center:
                 begin
-                    CompanyInfo1.Get;
+                    CompanyInfo1.Get();
                     CompanyInfo1.CalcFields(Picture);
                 end;
             SalesSetup."logo position on documents"::Right:
                 begin
-                    CompanyInfo2.Get;
+                    CompanyInfo2.Get();
                     CompanyInfo2.CalcFields(Picture);
                 end;
         end;
 
-        PrintButtomText := ZGT.IsZNetCompany;  // 09-03-22 ZY-LD 006
+        PrintButtomText := ZGT.IsZNetCompany();
 
     end;
 
     var
+        GLSetup: Record "General Ledger Setup";
+        ShipmentMethod: Record "Shipment Method";
+        PaymentTerms: Record "Payment Terms";
+        PrepmtPaymentTerms: Record "Payment Terms";
+        SalesPurchPerson: Record "Salesperson/Purchaser";
+        CompanyInfo: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
+        CompanyInfo3: Record "Company Information";
+        SalesSetup: Record "Sales & Receivables Setup";
+        VATAmountLine: Record "VAT Amount Line" temporary;
+        PrepmtVATAmountLine: Record "VAT Amount Line" temporary;
+        PrepmtVATAmountLineDeduct: Record "VAT Amount Line" temporary;
+        SalesLine: Record "Sales Line" temporary;
+        DimSetEntry1: Record "Dimension Set Entry";
+        DimSetEntry2: Record "Dimension Set Entry";
+        TempPrepmtDimSetEntry: Record "Dimension Set Entry" temporary;
+        PrepmtInvBuf: Record "Prepayment Inv. Line Buffer" temporary;
+        RespCenter: Record "Responsibility Center";
+        CurrExchRate: Record "Currency Exchange Rate";
+        AsmHeader: Record "Assembly Header";
+        AsmLine: Record "Assembly Line";
+        recLocation: Record Location;
+        recICPartner: Record "IC Partner";
+        SellCust: Record Customer;
+        recBillCust: Record Customer;
+        recItem: Record Item;
+        LanguageCU: Codeunit Language;
+        SalesCountPrinted: Codeunit "Sales-Printed";
+        FormatAddr: Codeunit "Format Address";
+        SegManagement: Codeunit SegManagement;
+        ArchiveManagement: Codeunit ArchiveManagement;
+        SalesPostPrepmt: Codeunit "Sales-Post Prepayments";
+        DimMgt: Codeunit DimensionManagement;
+        ZGT: Codeunit "ZyXEL General Tools";
+        CustAddr: array[8] of Text[50];
+        ShipToAddr: array[8] of Text[50];
+        CompanyAddr: array[8] of Text[50];
+        SalesPersonText: Text;
+        VATNoText: Text[80];
+        ReferenceText: Text[80];
+        TotalText: Text[50];
+        TotalExclVATText: Text[50];
+        TotalInclVATText: Text[50];
+        MoreLines: Boolean;
+        NoOfCopies: Integer;
+        NoOfLoops: Integer;
+        CopyText: Text[30];
+        ShowShippingAddr: Boolean;
+        i: Integer;
+        DimText: Text[120];
+        OldDimText: Text[75];
+        ShowInternalInfo: Boolean;
+        Continue: Boolean;
+        ArchiveDocument: Boolean;
+        LogInteraction: Boolean;
+        VATAmount: Decimal;
+        VATBaseAmount: Decimal;
+        VATDiscountAmount: Decimal;
+        TotalAmountInclVAT: Decimal;
+        VALVATBaseLCY: Decimal;
+        VALVATAmountLCY: Decimal;
+        ExtDocNoSl: Code[100];
+        VALSpecLCYHeader: Text[80];
+        VALExchRate: Text[50];
+        PrepmtVATAmount: Decimal;
+        PrepmtVATBaseAmount: Decimal;
+        PrepmtTotalAmountInclVAT: Decimal;
+        PrepmtLineAmount: Decimal;
+        OutputNo: Integer;
+        NNCTotalLCY: Decimal;
+        NNCTotalExclVAT: Decimal;
+        NNCVATAmt: Decimal;
+        NNCTotalInclVAT: Decimal;
+        NNCPmtDiscOnVAT: Decimal;
+        NNCTotalInclVAT2: Decimal;
+        NNCVATAmt2: Decimal;
+        NNCTotalExclVAT2: Decimal;
+        NNCSalesLineLineAmt: Decimal;
+        NNCSalesLineInvDiscAmt: Decimal;
+        Print: Boolean;
+        [InDataSet]
+        ArchiveDocumentEnable: Boolean;
+        [InDataSet]
+        LogInteractionEnable: Boolean;
+        DisplayAssemblyInformation: Boolean;
+        AsmInfoExistsForLine: Boolean;
+        SellVATID: Text[20];
+        TarrifCode: Text[30];
+        OrigQty: Decimal;
+        DisplShipDate: Text[30];
+        ShipmentDateLimit: Date;
+        ConfirmText: Text[10];
+        ConfirmTxt: label 'TBA';
+        TotalSubTotal: Decimal;
+        TotalInvDiscAmount: Decimal;
+        PayTerms: Text[50];
+        ButtomText: Text;
+        PrintRequestedDeliveryDate: Boolean;
+        PrintButtomText: Boolean;
+        Text50001: label 'Alle u.g. Daten und Mengen sind nicht verbindlich und können geändert werden. Für Details bitte kontaktieren Sie Ihren Vertriebsmanager.';
+        Text50002: label 'Für den Fall, dass nach Vertragsschluss die vom Auftragnehmer zu zahlenden Netto-Einkaufspreise für die vertragsgegenständlichen Materialien (insbesondere Chips, Speicher, Lüfter, Kondensatoren, Wiederständen, Laser und Optiken) sowie Frachtkosten zum Zeitpunkt ihrer Lieferung um mehr als 10 Prozent steigen oder fallen sollten, hat jede der beiden Vertragsparteien das Recht, von der jeweils anderen den Eintritt in ergänzende Verhandlungen zu verlangen, mit dem Ziel, durch Vereinbarung eine angemessene Anpassung der vertraglich vereinbarten Preise für die betroffenen vertragsgegenständlichen Materialien an die aktuellen Lieferpreise herbeizuführen. Soweit keine Einigung zu Stande kommt haben beide Vertragsparteien das Recht des Rücktritts vom Vertrag.';
         Text000: label 'Salesperson';
         Text001: label 'Total %1';
         Text002: label 'Total %1 Incl. VAT';
@@ -1492,108 +1568,7 @@ Report 50009 "Sales - Order Confirmation DE"
         VATIdentifierCaptionLbl: label 'VAT Identifier';
         HomePageCaptionCap: label 'Home Page';
         EMailCaptionLbl: label 'E-Mail';
-        GLSetup: Record "General Ledger Setup";
-        ShipmentMethod: Record "Shipment Method";
-        PaymentTerms: Record "Payment Terms";
-        PrepmtPaymentTerms: Record "Payment Terms";
-        SalesPurchPerson: Record "Salesperson/Purchaser";
-        CompanyInfo: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
-        SalesSetup: Record "Sales & Receivables Setup";
-        VATAmountLine: Record "VAT Amount Line" temporary;
-        PrepmtVATAmountLine: Record "VAT Amount Line" temporary;
-        PrepmtVATAmountLineDeduct: Record "VAT Amount Line" temporary;
-        SalesLine: Record "Sales Line" temporary;
-        DimSetEntry1: Record "Dimension Set Entry";
-        DimSetEntry2: Record "Dimension Set Entry";
-        TempPrepmtDimSetEntry: Record "Dimension Set Entry" temporary;
-        PrepmtInvBuf: Record "Prepayment Inv. Line Buffer" temporary;
-        RespCenter: Record "Responsibility Center";
-        LanguageCU: Codeunit Language;
-        CurrExchRate: Record "Currency Exchange Rate";
-        AsmHeader: Record "Assembly Header";
-        AsmLine: Record "Assembly Line";
-        SalesCountPrinted: Codeunit "Sales-Printed";
-        FormatAddr: Codeunit "Format Address";
-        SegManagement: Codeunit SegManagement;
-        ArchiveManagement: Codeunit ArchiveManagement;
-        SalesPostPrepmt: Codeunit "Sales-Post Prepayments";
-        DimMgt: Codeunit DimensionManagement;
-        CustAddr: array[8] of Text[50];
-        ShipToAddr: array[8] of Text[50];
-        CompanyAddr: array[8] of Text[50];
-        SalesPersonText: Text;
-        VATNoText: Text[80];
-        ReferenceText: Text[80];
-        TotalText: Text[50];
-        TotalExclVATText: Text[50];
-        TotalInclVATText: Text[50];
-        MoreLines: Boolean;
-        NoOfCopies: Integer;
-        NoOfLoops: Integer;
-        CopyText: Text[30];
-        ShowShippingAddr: Boolean;
-        i: Integer;
-        DimText: Text[120];
-        OldDimText: Text[75];
-        ShowInternalInfo: Boolean;
-        Continue: Boolean;
-        ArchiveDocument: Boolean;
-        LogInteraction: Boolean;
-        VATAmount: Decimal;
-        VATBaseAmount: Decimal;
-        VATDiscountAmount: Decimal;
-        TotalAmountInclVAT: Decimal;
-        VALVATBaseLCY: Decimal;
-        VALVATAmountLCY: Decimal;
-        ExtDocNoSl: Code[100];  // 21-08-24 ZY-LD 009
-        VALSpecLCYHeader: Text[80];
-        VALExchRate: Text[50];
-        PrepmtVATAmount: Decimal;
-        PrepmtVATBaseAmount: Decimal;
-        PrepmtTotalAmountInclVAT: Decimal;
-        PrepmtLineAmount: Decimal;
-        OutputNo: Integer;
-        NNCTotalLCY: Decimal;
-        NNCTotalExclVAT: Decimal;
-        NNCVATAmt: Decimal;
-        NNCTotalInclVAT: Decimal;
-        NNCPmtDiscOnVAT: Decimal;
-        NNCTotalInclVAT2: Decimal;
-        NNCVATAmt2: Decimal;
-        NNCTotalExclVAT2: Decimal;
-        NNCSalesLineLineAmt: Decimal;
-        NNCSalesLineInvDiscAmt: Decimal;
-        Print: Boolean;
-        [InDataSet]
-        ArchiveDocumentEnable: Boolean;
-        [InDataSet]
-        LogInteractionEnable: Boolean;
-        DisplayAssemblyInformation: Boolean;
-        AsmInfoExistsForLine: Boolean;
-        SellCust: Record Customer;
-        recBillCust: Record Customer;
-        SellVATID: Text[20];
-        recItem: Record Item;
-        TarrifCode: Text[30];
-        OrigQty: Decimal;
-        DisplShipDate: Text[30];
-        ShipmentDateLimit: Date;
-        ConfirmText: Text[10];
-        ConfirmTxt: label 'TBA';
-        TotalSubTotal: Decimal;
-        TotalInvDiscAmount: Decimal;
-        PayTerms: Text[50];
-        recICPartner: Record "IC Partner";
-        Text50001: label 'Alle u.g. Daten und Mengen sind nicht verbindlich und können geändert werden. Für Details bitte kontaktieren Sie Ihren Vertriebsmanager.';
-        ButtomText: Text;
-        ZGT: Codeunit "ZyXEL General Tools";
-        PrintRequestedDeliveryDate: Boolean;
-        Text50002: label 'Für den Fall, dass nach Vertragsschluss die vom Auftragnehmer zu zahlenden Netto-Einkaufspreise für die vertragsgegenständlichen Materialien (insbesondere Chips, Speicher, Lüfter, Kondensatoren, Wiederständen, Laser und Optiken) sowie Frachtkosten zum Zeitpunkt ihrer Lieferung um mehr als 10 Prozent steigen oder fallen sollten, hat jede der beiden Vertragsparteien das Recht, von der jeweils anderen den Eintritt in ergänzende Verhandlungen zu verlangen, mit dem Ziel, durch Vereinbarung eine angemessene Anpassung der vertraglich vereinbarten Preise für die betroffenen vertragsgegenständlichen Materialien an die aktuellen Lieferpreise herbeizuführen. Soweit keine Einigung zu Stande kommt haben beide Vertragsparteien das Recht des Rücktritts vom Vertrag.';
-        PrintButtomText: Boolean;
-        recLocation: Record Location;
+
 
 
     procedure InitializeRequest(NoOfCopiesFrom: Integer; ShowInternalInfoFrom: Boolean; ArchiveDocumentFrom: Boolean; LogInteractionFrom: Boolean; PrintFrom: Boolean; DisplayAsmInfo: Boolean)
@@ -1612,7 +1587,7 @@ Report 50009 "Sales - Order Confirmation DE"
     begin
         if not UnitOfMeasure.Get(UOMCode) then
             exit(UOMCode);
-        exit(UnitOfMeasure.Description);
+        exit(copystr(UnitOfMeasure.Description, 1, 10));
     end;
 
 

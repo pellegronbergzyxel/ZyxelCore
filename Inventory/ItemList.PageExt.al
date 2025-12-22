@@ -163,6 +163,14 @@ pageextension 50120 ItemListZX extends "Item List"
                 Visible = false;
             }
         }
+        addafter("Net Weight")
+        {
+            field("End of Life Date"; Rec."End of Life Date") //04-12-2025 BK #544101
+            {
+                ApplicationArea = Basic, Suite;
+                Visible = false;
+            }
+        }
         modify("Created From Nonstock Item")
         {
             Visible = false;

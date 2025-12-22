@@ -28,6 +28,11 @@ pageextension 50106 ShipmentMethodsZX extends "Shipment Methods"
                 ApplicationArea = Basic, Suite;
                 ToolTip = 'Specifies the number of days for shipping. This value is used to calculate the Expected Receipt date on the shipping detail.';
             }
+            field(validSalesOrderIncoterm; Rec."Valid Sales Order Incoterm") //18-12-2025 BK #538155
+            {
+                ApplicationArea = Basic, Suite;
+                ToolTip = 'Indicates whether the Incoterm specified in the shipment method is valid for sales orders.';
+            }
         }
     }
 }

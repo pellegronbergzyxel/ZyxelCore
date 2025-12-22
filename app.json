@@ -2,7 +2,11 @@
   "id": "e654e9a7-b3cf-49f4-90ee-4863f48e374a",
   "name": "Zyxel Core",
   "publisher": "Vision People A/S",
+<<<<<<< HEAD
   "version": "1.26.6.12",
+=======
+  "version": "1.26.6.13",
+>>>>>>> 208d44bb8e476c5cbc49021cfa2725b7e20fdd85
   "brief": "",
   "description": "Zyxel core: EMEA,IT",
   "privacyStatement": "",
@@ -45,7 +49,7 @@
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "runtime": "11.0",
+  "runtime": "12.0",
   "features": [
     "NoImplicitWith"
   ],

@@ -11,7 +11,7 @@
       <am:Name>MSRB</am:Name>
       <am:Version>15.1.30001.02</am:Version>
     </am:UpdatedBy>
-    <am:LastModifiedTimestamp>2025-10-30T13:05:30.5823305Z</am:LastModifiedTimestamp>
+    <am:LastModifiedTimestamp>2025-12-15T09:54:35.4473388Z</am:LastModifiedTimestamp>
   </am:AuthoringMetadata>
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -591,7 +591,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=FORMAT(Fields!PostingDate.Value, "dd-mm-yyyy")</Value>
+                                  <Value>=FormatDateTime(Fields!PostingDate.Value, DateFormat.ShortDate)</Value>
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                   </Style>
@@ -615,6 +615,7 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <rd:Selected>true</rd:Selected>
                         <Textbox Name="DocumentDate">
                           <rd:DefaultName>DocumentDate</rd:DefaultName>
                           <CanGrow>true</CanGrow>
@@ -623,7 +624,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=format(Fields!DocumentDate.Value, "dd-mm-yyyy")</Value>
+                                  <Value>=FormatDateTime(Fields!DocumentDate.Value, DateFormat.ShortDate)</Value>
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                   </Style>

@@ -10,12 +10,20 @@ Codeunit 50045 "Process Sales Document E-mail"
             recAutoSetup.Get;
             if recAutoSetup.SendSalesDocByEmailAutoAllowed then
                 SendSalesInvoices(false);
+        end else begin //11-12-2025 BK #545456
+            if ServEnviron.TestEnvironment() then begin
+                recAutoSetup.Get;
+                if recAutoSetup.SendSalesDocByEmailAutoAllowed then
+                    SendSalesInvoices(false);
+            end;
         end;
+
     end;
 
     var
         recAutoSetup: Record "Automation Setup";
         SI: Codeunit "Single Instance";
+        ServEnviron: Record "Server Environment";
         EmailAddMgt: Codeunit "E-mail Address Management";
         FileMgt: Codeunit "File Management";
         ZGT: Codeunit "ZyXEL General Tools";
