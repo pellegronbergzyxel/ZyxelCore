@@ -46,6 +46,15 @@ Page 50324 "Posted HQ Invoice"
                     ApplicationArea = Basic, Suite;
                     Visible = false;
                 }
+                field("File Path"; Rec."File Path")
+                {
+                    ApplicationArea = Basic, Suite;
+                }
+                field(Filename; Rec.Filename)
+                {
+                    ApplicationArea = Basic, Suite;
+                }
+
             }
         }
         area(factboxes)
@@ -67,8 +76,13 @@ Page 50324 "Posted HQ Invoice"
                 PromotedIsBig = true;
 
                 trigger OnAction()
+                var
+                    zyxektool: codeunit "ZyXEL General Tools";
                 begin
-                    Hyperlink(Rec.GetFilename);
+                    //Hyperlink(Rec.GetFilename);
+                    zyxektool.downloadserverfil(rec.GetFilename());
+
+
                 end;
             }
             action("Show Posted Purchase Invoice")
