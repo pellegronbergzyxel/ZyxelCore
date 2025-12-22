@@ -22,10 +22,15 @@ tableextension 50105 ShipmentMethodZX extends "Shipment Method"
         }
         field(50005; "Default on Customs Invoice"; Boolean)
         {
+            Caption = 'Default on Customs Invoice';
         }
         field(50006; "Shipping Days"; DateFormula) //08-09-2025 BK #525482
         {
             Caption = 'Shipping Days';
+        }
+        field(50007; "Valid Sales Order Incoterm"; Boolean) //18-12-2025 BK #538155
+        {
+            Caption = 'Valid Sales Order Incoterm';
         }
     }
 }

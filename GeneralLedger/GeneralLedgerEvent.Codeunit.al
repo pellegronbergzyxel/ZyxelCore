@@ -78,12 +78,14 @@ codeunit 50085 "General Ledger Event"
     [EventSubscriber(ObjectType::Table, Database::"General Ledger Setup", 'OnAfterValidateEvent', 'Allow Posting From', false, false)]
     local procedure OnAfterValidateAllowPostingFrom(var Rec: Record "General Ledger Setup"; var xRec: Record "General Ledger Setup"; CurrFieldNo: Integer)
     begin
+        UpdateAllowedPosting(Rec); //16-12-2025 BK #545801
         UpdateUserSetup(Rec);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"General Ledger Setup", 'OnAfterValidateEvent', 'Allow Posting To', false, false)]
     local procedure OnAfterValidateAllowPostingTo(var Rec: Record "General Ledger Setup"; var xRec: Record "General Ledger Setup"; CurrFieldNo: Integer)
     begin
+        UpdateAllowedPosting(Rec);//16-12-2025 BK #545801
         UpdateUserSetup(Rec);
     end;
 
@@ -153,6 +155,29 @@ codeunit 50085 "General Ledger Event"
         CustomRepSelec.SetRange(Usage, ReportUsage);
         IsHandled := CustomRepSelec.FindFirst();
         EmailAddress := CustomRepSelec."Send To Email";
+    end;
+
+    //16-12-2025 BK #545801
+    local procedure UpdateAllowedPosting(var Rec: Record "General Ledger Setup")
+    var
+        VATSetup: Record "VAT Setup";
+
+        lText001: Label 'Do you want to update :\"%1" to "%2" and\"%3" to "%4"?';
+        lText003: Label 'Do you want to update :\"%1" to "%2"?';
+        lText002: Label 'VAT setup is updated.';
+    begin
+        if Confirm(lText001, false, Rec.FieldCaption(Rec."Allow VAT Posting From"), Rec."Allow Posting From", Rec.FieldCaption(Rec."Allow Vat Posting To"), Rec."Allow Posting To") then begin
+            rec."Allow VAT Posting From" := Rec."Allow Posting From";
+            rec."Allow VAT Posting To" := Rec."Allow Posting To";
+            VATSetup.Get();
+            VATSetup.Validate(VATSetup."Allow VAT Date From", Rec."Allow Posting From");
+            VATSetup.Validate(vatsetup."Allow VAT Date To", Rec."Allow Posting To");
+            VATSetup.Modify();
+            Message(lText002);
+        end;
+        if Confirm(lText003, false, Rec.FieldCaption(Rec."Allow Deferral Posting From"), Rec."Allow Posting From") then
+            rec."Allow Deferral Posting From" := Rec."Allow Posting From";
+
     end;
 
     local procedure UpdateUserSetup(var Rec: Record "General Ledger Setup")

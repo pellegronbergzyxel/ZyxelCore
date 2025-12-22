@@ -172,8 +172,8 @@
             //"breakOnNext":  "Background"
             //"breakOnNext": "WebClient"
             "breakOnNext": "WebServiceClient"
-        },
-        /*{
+        }, /*
+        {
             "name": "Zyxel EMEA ZCom",
             "type": "al",
             "request": "launch",
@@ -194,9 +194,10 @@
             //"schemaUpdateMode": "ForceSync",
             "dependencyPublishingOption": "Ignore",
             //"startupCompany": "ZNet DK"
-            "startupCompany": "ZyND SE"
-        },*/
-        /*{
+            "startupCompany": "ZyND DK"
+        }, */
+        
+        {
             "name": "Zyxel EMEA ZNet",
             "type": "al",
             "request": "launch",
@@ -218,8 +219,8 @@
             "dependencyPublishingOption": "Ignore",
             "startupCompany": "ZNet DK"
             //"startupCompany": "ZyND DK"
-        },        
-        {
+        },       
+        /*{
             "name": "Zyxel IT",
             "type": "al",
             "request": "launch",
@@ -240,7 +241,7 @@
             //"schemaUpdateMode": "ForceSync",
             //"startupCompany": "ZyND IT"
             "startupCompany": "ZNET IT"
-        }*/,
+        },*/
         {
             "name": "Zyxel@VisionPeople (W1)",
             "type": "al",
