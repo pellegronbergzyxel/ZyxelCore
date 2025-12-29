@@ -714,7 +714,7 @@ codeunit 50067 "Sales Header/Line Events"
         ShipmentMethod: Record "Shipment Method";
         Location: Record Location;
         zgt: Codeunit "ZyXEL General Tools";
-        Label001: Label 'The selected Shipment Method "%1" is not valid for Sales Orders. Please select another Shipment Method.';
+        Label001: Label 'The selected Shipment Method Code "%1" is not a correct Code for Sales Orders. Please select another.';
     begin
         if zgt.IsZComCompany() then
             if SalesHeader."Location Code" <> '' then
