@@ -26,6 +26,21 @@ codeunit 50085 "General Ledger Event"
         end;
     end;
 
+    //06-01-2026 BK #548627
+    [EventSubscriber(ObjectType::Table, Database::"G/L Account", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure GLAccountOnBeforeInsert(var Rec: Record "G/L Account"; RunTrigger: Boolean)
+    var
+        AskLabel: Label 'Are you sure you want to create a G/L Account?';
+        DeclineLabel: Label 'You have cancelled the creation of the G/L Account.';
+
+    begin
+        if not Confirm(AskLabel, false) then
+            Error(DeclineLabel);
+    end;
+
+
+
+
     [EventSubscriber(ObjectType::Table, Database::"G/L Entry", 'OnBeforeInsertEvent', '', false, false)]
     local procedure OnBeforeInsertGLEntry(var Rec: Record "G/L Entry"; RunTrigger: Boolean)
     var
@@ -236,19 +251,18 @@ codeunit 50085 "General Ledger Event"
         if GenJournalLine."Account No." <> '' then
             case GenJournalLine."Account Type" of
                 GenJournalLine."account type"::"G/L Account":
-                    begin
-                        if ((GenJournalLine."Gen. Bus. Posting Group" <> '') or (GenJournalLine."Gen. Prod. Posting Group" <> '') or
-                             (GenJournalLine."VAT Bus. Posting Group" <> '') or (GenJournalLine."VAT Prod. Posting Group" <> '')) and
-                           (GenJournalLine."Gen. Posting Type" = GenJournalLine."gen. posting type"::" ")
-                        then
-                            Error(
-                              lText001,
-                              GenJournalLine.FieldCaption(GenJournalLine."Gen. Bus. Posting Group"), GenJournalLine."Gen. Bus. Posting Group",
-                              GenJournalLine.FieldCaption(GenJournalLine."Gen. Prod. Posting Group"), GenJournalLine."Gen. Prod. Posting Group",
-                              GenJournalLine.FieldCaption(GenJournalLine."VAT Bus. Posting Group"), GenJournalLine."VAT Bus. Posting Group",
-                              GenJournalLine.FieldCaption(GenJournalLine."VAT Prod. Posting Group"), GenJournalLine."VAT Prod. Posting Group",
-                              GenJournalLine."Account No.");
-                    end;
+                    if ((GenJournalLine."Gen. Bus. Posting Group" <> '') or (GenJournalLine."Gen. Prod. Posting Group" <> '') or
+                         (GenJournalLine."VAT Bus. Posting Group" <> '') or (GenJournalLine."VAT Prod. Posting Group" <> '')) and
+                       (GenJournalLine."Gen. Posting Type" = GenJournalLine."gen. posting type"::" ")
+                    then
+                        Error(
+                          lText001,
+                          GenJournalLine.FieldCaption(GenJournalLine."Gen. Bus. Posting Group"), GenJournalLine."Gen. Bus. Posting Group",
+                          GenJournalLine.FieldCaption(GenJournalLine."Gen. Prod. Posting Group"), GenJournalLine."Gen. Prod. Posting Group",
+                          GenJournalLine.FieldCaption(GenJournalLine."VAT Bus. Posting Group"), GenJournalLine."VAT Bus. Posting Group",
+                          GenJournalLine.FieldCaption(GenJournalLine."VAT Prod. Posting Group"), GenJournalLine."VAT Prod. Posting Group",
+                          GenJournalLine."Account No.");
+
             end;
     end;
 

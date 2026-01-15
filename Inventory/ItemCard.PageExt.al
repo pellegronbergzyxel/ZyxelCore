@@ -414,6 +414,13 @@ pageextension 50119 ItemCardZX extends "Item Card"
                     ToolTip = 'Specifies the value of the Total Qty. per Carton field.';
                     Editable = PLMSUpdateEditable;
                 }
+                field("Empty Outer Carton Weight"; Rec."Empty Outer Carton Weight") //06-01-2026 BK #John in a mail
+                {
+                    Caption = 'Empty Outer Carton Weight (kg)';
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the value of the Empty Outer Carton Weight (kg) field.';
+                    Editable = PLMSUpdateEditable;
+                }
             }
             group(Carton2)
             {

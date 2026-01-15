@@ -1119,10 +1119,6 @@ codeunit 50067 "Sales Header/Line Events"
     var
         recWhseIndbLine: Record "VCK Shipping Detail";
         recWhseIndbHead: Record "Warehouse Inbound Header";
-        SI: Codeunit "Single Instance";
-        lText001: Label '"Delivery Document Line" is created on DD %1. Do you want to save the change?';
-        lText002: Label 'Change is cancled.';
-        lText003: Label 'You are not allowed to make changes when %1 is "%2" on the "Delivery Document Line". (%3)';
         lText004: Label 'The line is created as Warehouse Inbound.\Are you sure that you want to change the quantity?';
     begin
         if Rec."Document Type" = Rec."document type"::"Return Order" then
@@ -1230,10 +1226,8 @@ codeunit 50067 "Sales Header/Line Events"
     local procedure OnBeforeValidateSlNo(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
     var
         recItem: Record Item;
-        recVend: Record Vendor;
         recCustItemBlock: Record "Customer/Item Relation";
         recSalesHead: Record "Sales Header";
-        ItemLogisticEvent: Codeunit "Item / Logistic Events";
         SI: Codeunit "Single Instance";
         PrevValue: Boolean;
         lText001: Label 'You are not allowed to rename "%1". Delete the line, and create a new.';
@@ -1284,23 +1278,20 @@ codeunit 50067 "Sales Header/Line Events"
         recItem: Record Item;
         recSalesHead: Record "Sales Header";
         recVend: Record Vendor;
-        recItemUnitOfMes: Record "Item Unit of Measure";
         recGlAcc: Record "G/L Account";
         recPostGrpCtryLoc: Record "Post Grp. pr. Country / Loc.";
         SI: Codeunit "Single Instance";
-        lText001: Label 'Please enter "%1" on "%2" "%3", item no. "%4".\\The "%1" is generated on the customers server. Please contact the customer.';
         lText002: Label 'The license must be purchased by vendor %1 - %2.';
         lText003: Label 'The field "%1" must be filled on "%2" "%3". Please contact the Finance Department.';
         lText004: Label '"%1" is %2. Are you sure you want to use item no. %3?';
         lText005: Label 'Item No. %1 is inactive. Are you sure you want to continue?';
         lText006: Label 'Iten No. %1 is neither an EiCard or an "Non Zyxel License".';
         lText007: Label 'The item %1 is "End of Life".\\"%2"=%3,\"%4"=%5.';
-        lText008: Label 'For "Customer No." %1 you can only sell "Item No." %2 from "Location Code" %3.\See "%4".';
         lText009: Label 'The item is provided by an external supplier: %1';
         lText010: Label 'The item is marked as "%1", but no vendor number has been supplied';
         lText011: Label 'Item No. %1 does not match Sales Order Type %2.';
     begin
-        if Rec."Document Type" = Rec."document type"::Order then begin
+        if Rec."Document Type" = Rec."document type"::Order then
             if Rec.Type = Rec.Type::Item then begin
                 recItem.Get(Rec."No.");
 
@@ -1323,7 +1314,6 @@ codeunit 50067 "Sales Header/Line Events"
                     Rec."Shipment Date" := recSalesHead."Shipment Date";
                 end;
             end;
-        end;
         // 12-09-2025 BK #526671 - Remove SET code for TR drop shipment
 
         if (Rec.Type = Rec.Type::"G/L Account") and (Rec."IC Partner Reference" = '') and (Rec."No." <> '') then begin
@@ -1344,12 +1334,12 @@ codeunit 50067 "Sales Header/Line Events"
             end;
 
             recItem.Get(Rec."No.");
-            if (recItem."End of Life Date" <> 0D) and (recItem."End of Life Date" < Today) then
-                if (not SI.GetHideSalesDialog) and (not recSalesHead."eCommerce Order") then
+            if (recItem."End of Life Date" <> 0D) and (recItem."End of Life Date" < Today()) then
+                if (not SI.GetHideSalesDialog()) and (not recSalesHead."eCommerce Order") then
                     Message(lText004, recItem.FieldCaption("End of Life Date"), recItem."End of Life Date", Rec."No.");
 
             if recItem.Inactive then
-                if (not SI.GetHideSalesDialog) and (not recSalesHead."eCommerce Order") then
+                if (not SI.GetHideSalesDialog()) and (not recSalesHead."eCommerce Order") then
                     Message(lText005, Rec."No.");
 
             if Rec."Sales Order Type" = Rec."sales order type"::EICard then begin
@@ -1380,15 +1370,14 @@ codeunit 50067 "Sales Header/Line Events"
     var
         recSalesSetup: Record "Sales & Receivables Setup";
         recItem: Record Item;
-        recCust: Record Customer;
         SI: Codeunit "Single Instance";
         PrevQuantity: Decimal;
         NewQuantity: Decimal;
         lText001: Label '%1 is changed from %2 to %3\because "%4" on the item card has the value %5.';
         lText002: Label 'Minimum Carton Ordering Policy want to make an adjustment.\\Quantity: %1\New Quantity: %2\\Do you want to make this adjustment?';
     begin
-
-        if not SI.GetHideSalesDialog and GuiAllowed then
+        //08-01-2026 BK #533802
+        if not SI.GetHideSalesDialog() and GuiAllowed() then
             if (Rec."Document Type" in [Rec."document type"::Order, Rec."document type"::Invoice]) and
                (Rec.Type = Rec.Type::Item) and
                (Rec."No." <> '')
@@ -1399,31 +1388,48 @@ codeunit 50067 "Sales Header/Line Events"
                     Rec.Quantity := Round(Rec.Quantity, recItem."Order Multiple", '>');
                     Message(lText001, Rec.FieldCaption(Rec.Quantity), PrevQuantity, Rec.Quantity, recItem.FieldCaption("Order Multiple"), recItem."Order Multiple");
                 end;
-
-                recSalesSetup.Get;
-                if recSalesSetup."Full Pallet / Carton Ordering" then
-                    if recItem."Min. Carton Qty. Enabled" and
-                       (recItem."Number per carton" > 0) and
-                       (Rec.Quantity > 0) and
-                       (Rec."Sales Order Type" = Rec."sales order type"::Normal)
-                    then begin
-                        recCust.Get(Rec."Sell-to Customer No.");
-                        if recCust."Full Pallet Ordering Enabled" then begin
-                            case recCust."Full Pallet Ordering Rounding" of
-                                recCust."full pallet ordering rounding"::"Round Down":
-                                    NewQuantity := recItem."Number per carton" * ROUND((Rec.Quantity / recItem."Number per carton"), 1, '<');
-                                recCust."full pallet ordering rounding"::"Round Up":
-                                    NewQuantity := recItem."Number per carton" * ROUND((Rec.Quantity / recItem."Number per carton"), 1, '>');
-                            end;
-                            if NewQuantity = 0 then
-                                NewQuantity := recItem."Number per carton";
-
-                            if Rec.Quantity <> NewQuantity then
-                                if Confirm(lText002, true, Rec.Quantity, NewQuantity) then
-                                    Rec.Quantity := NewQuantity;
-                        end;
-                    end;
+                recSalesSetup.Get();
+                if recSalesSetup."Full Pallet / Carton Ordering" then Begin
+                    NewQuantity := CartonOrderingPolicySL(rec, recSalesSetup, recItem);
+                    //08-01-2026 BK #533802
+                    if (recItem."Min. Carton Qty. Enabled") and (recItem."Number per carton" > 0) and
+                       (Rec.Quantity > 0) and (Rec."Sales Order Type" = Rec."sales order type"::Normal) then
+                        if Rec.Quantity <> NewQuantity then
+                            if Confirm(lText002, true, Rec.Quantity, NewQuantity) then
+                                Rec.Quantity := NewQuantity;
+                end;
             end;
+    end;
+    //08-01-2026 BK #533802
+    procedure CartonOrderingPolicySL(var SalesLine: Record "Sales Line"; salesSetup: Record "Sales & Receivables Setup"; ItemR: Record Item) NewQuantity: Decimal
+    var
+        Cust: Record Customer;
+
+    begin
+        if (SalesLine."Document Type" in [SalesLine."document type"::Order, SalesLine."document type"::Invoice]) and
+           (SalesLine.Type = SalesLine.Type::Item) and (SalesLine."No." <> '') then begin
+            if SalesSetup."Full Pallet / Carton Ordering" then begin
+                if (ItemR."Min. Carton Qty. Enabled") and (ItemR."Number per carton" > 0) and
+                   (SalesLine.Quantity > 0) and (SalesLine."Sales Order Type" = SalesLine."sales order type"::Normal)
+                then begin
+                    Cust.Get(SalesLine."Sell-to Customer No.");
+                    if Cust."Full Pallet Ordering Enabled" then begin
+                        case Cust."Full Pallet Ordering Rounding" of
+                            Cust."full pallet ordering rounding"::"Round Down":
+                                NewQuantity := ItemR."Number per carton" * ROUND((SalesLine.Quantity / ItemR."Number per carton"), 1, '<');
+                            Cust."full pallet ordering rounding"::"Round Up":
+                                NewQuantity := ItemR."Number per carton" * ROUND((SalesLine.Quantity / ItemR."Number per carton"), 1, '>');
+                        end;
+                        if NewQuantity = 0 then
+                            NewQuantity := ItemR."Number per carton";
+                    end else
+                        NewQuantity := SalesLine.Quantity
+                end else
+                    NewQuantity := SalesLine.Quantity
+            end else
+                NewQuantity := SalesLine.Quantity
+        end;
+        exit(NewQuantity);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterValidateEvent', 'Location Code', false, false)]
@@ -1437,11 +1443,9 @@ codeunit 50067 "Sales Header/Line Events"
     var
         lText001: Label 'You are not allowed to remove "%1" from an additional item line.';
     begin
-        begin
-            // You are not allowed to remove hide line.
-            if xRec."Hide Line" and (Rec."Additional Item Line No." <> 0) then
-                Error(lText001, Rec.FieldCaption(Rec."Hide Line"));
-        end;
+        // You are not allowed to remove hide line.
+        if xRec."Hide Line" and (Rec."Additional Item Line No." <> 0) then
+            Error(lText001, Rec.FieldCaption(Rec."Hide Line"));
     end;
 
 
@@ -1450,14 +1454,12 @@ codeunit 50067 "Sales Header/Line Events"
     var
         sl: record "Sales Line";
     begin
-        begin
-            if CurrFieldNo = rec.FieldNo("Item Reference No.") then begin
-                sl.setrange("Document No.", rec."Document No.");
-                sl.setrange("Document Type", rec."Document Type");
-                sl.setrange("Overshipment Line No.", rec."Line No.");
-                if sl.FindSet() then
-                    rec.RemUnitPrice := rec."Unit Price";
-            end;
+        if CurrFieldNo = rec.FieldNo("Item Reference No.") then begin
+            sl.setrange("Document No.", rec."Document No.");
+            sl.setrange("Document Type", rec."Document Type");
+            sl.setrange("Overshipment Line No.", rec."Line No.");
+            if sl.FindSet() then
+                rec.RemUnitPrice := rec."Unit Price";
         end;
     end;
 
@@ -1465,8 +1467,8 @@ codeunit 50067 "Sales Header/Line Events"
     local procedure onAfterValidateSLItemReferenceNo(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
     var
         sl: record "Sales Line";
-    begin
 
+    begin
         if CurrFieldNo = rec.FieldNo("Item Reference No.") then begin
             if (rec.RemUnitPrice <> rec."Unit Price") then begin
                 sl.setrange("Document No.", rec."Document No.");
@@ -1474,7 +1476,6 @@ codeunit 50067 "Sales Header/Line Events"
                 sl.setrange("Overshipment Line No.", rec."Line No.");
                 if sl.FindSet() then
                     rec.validate("Unit Price", rec.RemUnitPrice);
-
             end;
 
             clear(rec.RemUnitPrice);
@@ -1517,11 +1518,10 @@ codeunit 50067 "Sales Header/Line Events"
         ZyXELVCKCreateDD: Codeunit "Delivery Document Management";
         PickDateConfMgt: Codeunit "Pick. Date Confirm Management";
         SI: Codeunit "Single Instance";
-        lText001: Label '"Warehouse Status" is %1 on "Delivery Document" %2.\Are you sure you want to unconfirm the line?';
         lText002: Label 'The margin has not been approved, so you are not allowed to confirm the line.';
     begin
-        if SI.GetValidateFromPage then begin
-            Rec.TestStatusOpen;
+        if SI.GetValidateFromPage() then begin
+            Rec.TestStatusOpen();
             if Rec."Shipment Date Confirmed" and (Rec.Type = Rec.Type::Item) and (Rec."Document No." <> '') then
                 if not PickDateConfMgt.PerformManuelConfirm2(1, '') then;
         end;
@@ -1536,7 +1536,7 @@ codeunit 50067 "Sales Header/Line Events"
                 end;
             end;
 
-        if MarginApp.MarginApprovalActive then begin
+        if MarginApp.MarginApprovalActive() then begin
             Cust.get(Rec."Sell-to Customer No.");
             if not Cust."Sample Account" then begin
                 Rec.Calcfields("Margin Approved");
@@ -1560,14 +1560,14 @@ codeunit 50067 "Sales Header/Line Events"
            (Rec.Type = Rec.Type::Item) and
            (Rec."Document No." <> '')
         then begin
-            if SI.GetUpdateShipmentDate then begin
+            if SI.GetUpdateShipmentDate() then begin
                 recSalesHead.Get(Rec."Document Type", Rec."Document No.");
                 Rec."Shipment Date" :=
                   DelDocMgt.CalcShipmentDate(
                     Rec."Sell-to Customer No.",
                     Rec."No.",
                     recSalesHead."Ship-to Country/Region Code",
-                    Rec."Shortcut Dimension 1 Code",
+                    Copystr(Rec."Shortcut Dimension 1 Code", 1, 10),
                     Rec."Shipment Date",
                     true);
             end;
@@ -1607,13 +1607,12 @@ codeunit 50067 "Sales Header/Line Events"
         if Rec."Return Reason Code" <> '' then begin
             case Rec."Document Type" of
                 Rec."document type"::"Return Order":
-                    begin
-                        if Rec."Return Reason Code" <> '' then begin
-                            ReturnReason.get(Rec."Return Reason Code");
-                            if not returnreason."Use on Sales Return Order" then
-                                Error(lText001, Rec.FieldCaption(Rec."Return Reason Code"), Rec."Return Reason Code", Rec."document type"::"Return Order");
-                        end;
+                    if Rec."Return Reason Code" <> '' then begin
+                        ReturnReason.get(Rec."Return Reason Code");
+                        if not returnreason."Use on Sales Return Order" then
+                            Error(lText001, Rec.FieldCaption(Rec."Return Reason Code"), Rec."Return Reason Code", Rec."document type"::"Return Order");
                     end;
+
                 Rec."document type"::"Credit Memo":
                     if Rec."Return Reason Code" = '1' then
                         if not Confirm(lText002, false, Rec.FieldCaption(Rec."Return Reason Code"), Rec."Return Reason Code", Rec."document type"::"Return Order") then
@@ -1679,13 +1678,12 @@ codeunit 50067 "Sales Header/Line Events"
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeValidateEvent', 'Unit Price', false, false)]
     local procedure OnBeforeValidateSLUnitPriceExclVAT(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
     var
-        recGenBusPostGrp: Record "Gen. Business Posting Group";
         ZGT: Codeunit "ZyXEL General Tools";
     begin
         UpdateUnitPrice(Rec, Xrec, CurrFieldNo, false);
 
         // This code can be removed, when sales to eCommerce is done direct from ZNet DK.
-        if ZGT.IsZNetCompany then
+        if ZGT.IsZNetCompany() then
             if (Rec."Sell-to Customer No." in ['200125', '200153']) and
                (Rec."Document Type" in [Rec."document type"::Order, Rec."document type"::Invoice]) and
                (not Rec."Hide Line")
@@ -1813,7 +1811,6 @@ codeunit 50067 "Sales Header/Line Events"
     local procedure OnAfterValidateSLQuantity(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
     var
         recDelDocLine: Record "VCK Delivery Document Line";
-        recItem: Record Item;
         lText001: Label 'Delivery Document %1 is released and sent to the warehouse.\If you change the quantity you have to advice the warehouse manually.\\Are you sure that you want change the quantity?';
         lText002: Label 'The quantity on the delivery document %1 i updated.';
         lText003: Label '\Please advice the warehouse about the change.';
@@ -2026,7 +2023,7 @@ codeunit 50067 "Sales Header/Line Events"
                         SalesLine."Sell-to Customer No.",
                         SalesLine."No.",
                         SalesHeader."Ship-to Country/Region Code",
-                        SalesLine."Shortcut Dimension 1 Code",
+                        copystr(SalesLine."Shortcut Dimension 1 Code", 1, 10),
                         SalesLine."Planned Shipment Date",
                         false);
         end;
@@ -2047,7 +2044,7 @@ codeunit 50067 "Sales Header/Line Events"
     local procedure SalesLine_OnAfterInitHeaderDefaults(var SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"; xSalesLine: Record "Sales Line")
     begin
         SalesLine."External Document No." := SalesHeader."External Document No.";
-        SalesLine."Ship-to Code" := GetShipToCodeForSalesLine(SalesHeader);
+        SalesLine."Ship-to Code" := copystr(GetShipToCodeForSalesLine(SalesHeader), 1, 10);
         SalesLine."Sales Order Type" := SalesHeader."Sales Order Type"; //RD
     end;
 
@@ -2101,10 +2098,11 @@ codeunit 50067 "Sales Header/Line Events"
 
     procedure OnAfterDeleteSalesLinePage(var Rec: Record "Sales Line")
     var
-        lText001: Label 'It is not allowed to delete an additional line.';
-        lText002: Label 'The sales line is created on delivery document %1. You must delete the delivery document line before you delete the sales line.';
+
         lSalesLine: Record "Sales Line";
         recDelDocLine: Record "VCK Delivery Document Line";
+        lText001: Label 'It is not allowed to delete an additional line.';
+        lText002: Label 'The sales line is created on delivery document %1. You must delete the delivery document line before you delete the sales line.';
         lText003: Label 'You are about to delete an additional line.\Do you want to continue?';
     begin
         // Additional item line must not be deleted seperatly
@@ -2144,10 +2142,6 @@ codeunit 50067 "Sales Header/Line Events"
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterInitOutstanding', '', false, false)]
     local procedure OnAfterInitOutstanding(var SalesLine: Record "Sales Line")
-    var
-        recSalesHead: Record "Sales Header";
-        recSalesSetup: Record "Sales & Receivables Setup";
-        ArchiveMgt: Codeunit ArchiveManagement;
     begin
         if SalesLine."Document Type" in [SalesLine."document type"::"Return Order", SalesLine."document type"::"Credit Memo"] then begin
             case SalesLine."Document Type" of
@@ -2245,12 +2239,12 @@ codeunit 50067 "Sales Header/Line Events"
         if ZGT.IsRhq() then begin
             recSalesSetup.Get();
             recSalesSetup.TestField("Customer No. on Sister Company");
-            if ZGT.IsZNetCompany then begin  // ZNet
+            if ZGT.IsZNetCompany() then begin  // ZNet
                 if SellToCustomerNo = recSalesSetup."Customer No. on Sister Company" then
-                    ZyWebServMgt.SendUnshippedQuantity(ZGT.GetSistersCompanyName(1), SellToCustomerNo)
+                    ZyWebServMgt.SendUnshippedQuantity(copystr(ZGT.GetSistersCompanyName(1), 1, 50), SellToCustomerNo)
             end else  // Zyxel
                 if SellToCustomerNo = recSalesSetup."Customer No. on Sister Company" then
-                    ZyWebServMgt.SendUnshippedQuantity(ZGT.GetSistersCompanyName(1), SellToCustomerNo);
+                    ZyWebServMgt.SendUnshippedQuantity(copystr(ZGT.GetSistersCompanyName(1), 1, 50), SellToCustomerNo);
         end;
     end;
 
@@ -2263,12 +2257,12 @@ codeunit 50067 "Sales Header/Line Events"
         if ZGT.IsRhq() then begin
             recSalesSetup.Get();
             recSalesSetup.TestField("Customer No. on Sister Company");
-            if ZGT.IsZNetCompany then begin  // ZNet
+            if ZGT.IsZNetCompany() then begin  // ZNet
                 if SellToCustomerNo = recSalesSetup."Customer No. on Sister Company" then
-                    ZyWebServMgt.SendContainerDetails(ZGT.GetSistersCompanyName(1), 0, SalesInvNo)
+                    ZyWebServMgt.SendContainerDetails(copystr(ZGT.GetSistersCompanyName(1), 1, 50), 0, SalesInvNo);
             end else  // Zyxel
                 if SellToCustomerNo = recSalesSetup."Customer No. on Sister Company" then
-                    ZyWebServMgt.SendContainerDetails(ZGT.GetSistersCompanyName(1), 0, SalesInvNo);
+                    ZyWebServMgt.SendContainerDetails(copystr(ZGT.GetSistersCompanyName(1), 1, 50), 0, SalesInvNo);
         end;
     end;
 
@@ -2278,7 +2272,6 @@ codeunit 50067 "Sales Header/Line Events"
         recWarehouse: Record Location;
         recSalesLine: Record "Sales Line";
         recDelDocLine: Record "VCK Delivery Document Line";
-        recItem: Record Item;
         PrevDelDocNo: Code[20];
     begin
         if not recWarehouse.Get(pLocationCode) then;
@@ -2312,7 +2305,7 @@ codeunit 50067 "Sales Header/Line Events"
                 until (recSalesLine.Next() = 0) or (not rValue);
 
                 recSalesLine.SetFilter("Item Type", '<>%1', "Item Type"::Inventory);
-                if recSalesLine.findfirst and (recSalesLine.Quantity <> recSalesLine."Quantity Shipped") then
+                if recSalesLine.findfirst() and (recSalesLine.Quantity <> recSalesLine."Quantity Shipped") then
                     rValue := true;
 
             end;
@@ -2335,7 +2328,7 @@ codeunit 50067 "Sales Header/Line Events"
                 recPurchPrice.SetFilter("Ending Date", '%1..|%2', Today, 0D);
 
                 for i := 1 to 3 do begin
-                    if ZGT.IsZComCompany then begin
+                    if ZGT.IsZComCompany() then begin
                         case i of
                             1:
                                 recVend.SetRange("SBU Company", recVend."sbu company"::"ZCom HQ");
@@ -2375,7 +2368,6 @@ codeunit 50067 "Sales Header/Line Events"
     var
         recPickDateConf: Record "Picking Date Confirmed";
         Modified: Boolean;
-        ItemLogisticEvents: Codeunit "Item / Logistic Events";
         ShortcutDimCode: array[8] of Code[20];
     begin
         if (Rec."Document Type" = Rec."document type"::Order) and (Rec."Sales Order Type" in [Rec."sales order type"::Normal, Rec."sales order type"::"Spec. Order"]) then
@@ -2449,18 +2441,12 @@ codeunit 50067 "Sales Header/Line Events"
     // Page - Sales Order"()
     [EventSubscriber(Objecttype::Page, 42, 'OnAfterActionEvent', 'Reopen', false, false)]
     local procedure OnAfterActionEventReOpen_Page42(var Rec: Record "Sales Header")
-    var
-        recWhseShipHead: Record "Warehouse Shipment Header";
-        recSalesLine: Record "Sales Line";
     begin
         OnAfterActionEventReOpen(Rec);
     end;
 
     [EventSubscriber(Objecttype::Page, 9305, 'OnAfterActionEvent', 'Reopen', false, false)]
     local procedure OnAfterActionEventReOpen_Page9305(var Rec: Record "Sales Header")
-    var
-        recWhseShipHead: Record "Warehouse Shipment Header";
-        recSalesLine: Record "Sales Line";
     begin
         OnAfterActionEventReOpen(Rec);
     end;
@@ -2487,28 +2473,20 @@ codeunit 50067 "Sales Header/Line Events"
 
     [EventSubscriber(Objecttype::Page, 42, 'OnAfterActionEvent', 'Release', false, false)]
     local procedure OnAfterActionEventRelease_Page42(var Rec: Record "Sales Header")
-    var
-        GetSourceDocInbound: Codeunit "Get Source Doc. Inbound";
-        GetSourceDocOutbound: Codeunit "Get Source Doc. Outbound";
     begin
-        OnAfterActionEventRelease(Rec);  // 06-08-21 ZY-LD 092
+        OnAfterActionEventRelease(Rec);
     end;
 
     [EventSubscriber(Objecttype::Page, 9305, 'OnAfterActionEvent', 'Release', false, false)]
     local procedure OnAfterActionEventRelease_Page9305(var Rec: Record "Sales Header")
-    var
-        GetSourceDocInbound: Codeunit "Get Source Doc. Inbound";
-        GetSourceDocOutbound: Codeunit "Get Source Doc. Outbound";
     begin
-        OnAfterActionEventRelease(Rec);  // 06-08-21 ZY-LD 092
+        OnAfterActionEventRelease(Rec);
     end;
 
     procedure OnAfterActionEventRelease(var Rec: Record "Sales Header")
     var
-        recSalesLine: Record "Sales Line";
-        recItem: Record Item;
-        GetSourceDocInbound: Codeunit "Get Source Doc. Inbound";
         GetSourceDocOutbound: Codeunit "Get Source Doc. Outbound";
+
     begin
         GetSourceDocOutbound.CreateFromSalesOrderHideDialog(Rec);
     end;
@@ -2518,7 +2496,7 @@ codeunit 50067 "Sales Header/Line Events"
     var
         SI: Codeunit "Single Instance";
     begin
-        if SI.GetDeleteSalesOrder then begin
+        if SI.GetDeleteSalesOrder() then begin
             Rec.Delete(true);
             SI.SetDeleteSalesOrder(false);
         end;
@@ -2528,15 +2506,15 @@ codeunit 50067 "Sales Header/Line Events"
     local procedure OnDeleteRecordEvent_Page42(var Rec: Record "Sales Header"; var AllowDelete: Boolean)
     var
         recEiCardQueue: Record "EiCard Queue";
-        lText001: Label 'The EiCard Links has been sent to the customer, and you are therefore not able to cancle the sales order.';
-        lText002: Label 'The EiCard order is linked to purchae order %1.\Are you sure you want to delete order no. %2?';
         recSaleLine: Record "Sales Line";
         recPurchHead: Record "Purchase Header";
+        lText001: Label 'The EiCard Links has been sent to the customer, and you are therefore not able to cancle the sales order.';
+        lText002: Label 'The EiCard order is linked to purchae order %1.\Are you sure you want to delete order no. %2?';
         lText003: Label 'The purchase order %1 was not sent to eShop, and has therefore been deleted.';
         lText004: Label 'The purchase order %1 has been sent to eShop and can not be deleted.\The purchase order has been prepared for invoicing.\ The only chance for getting the money back is to request HQ for a credit memo.';
     begin
         if Rec."Document Type" = Rec."document type"::Order then
-            if Rec."Sales Order Type" = Rec."sales order type"::EICard then begin
+            if Rec."Sales Order Type" = Rec."sales order type"::EICard then
                 if recEiCardQueue.Get(Rec."No.") then
                     if recEiCardQueue.Active then begin
                         if recEiCardQueue."Sales Order Status" = recEiCardQueue."sales order status"::"EiCard Sent to Customer" then
@@ -2562,7 +2540,7 @@ codeunit 50067 "Sales Header/Line Events"
                                         recPurchHead.Delete(true);
 
                                         recEiCardQueue.Validate("Purchase Order Status", recEiCardQueue."purchase order status"::Cancled);
-                                        recEiCardQueue."Purchase Order Deleted By" := UserId();
+                                        recEiCardQueue."Purchase Order Deleted By" := copystr(UserId(), 1, 50);
                                         recEiCardQueue.Modify(true);
 
                                         Message(lText003, recEiCardQueue."Purchase Order No.");
@@ -2578,7 +2556,6 @@ codeunit 50067 "Sales Header/Line Events"
                         end
                     end else
                         if not recEiCardQueue.Delete(true) then;
-            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Document Totals", 'OnAfterCalculateSalesSubPageTotals', '', false, false)]
@@ -2598,7 +2575,7 @@ codeunit 50067 "Sales Header/Line Events"
     local procedure OnBeforeValidateShipmentDateConfirmed_Page46(var Rec: Record "Sales Line"; var xRec: Record "Sales Line")
     var
         lText001: Label '"Warehouse Status" is %1 on "Delivery Document" %2.\Are you sure you want to unconfirm the line?';
-        PickDateConfMgt: Codeunit "Pick. Date Confirm Management";
+
     begin
         Rec.TestStatusOpen();
         if not Rec."Shipment Date Confirmed" then
@@ -2619,10 +2596,11 @@ codeunit 50067 "Sales Header/Line Events"
     local procedure OnAfterValidateNo_Page46(var Rec: Record "Sales Line"; var xRec: Record "Sales Line")
     var
         recItem: Record Item;
+        recAddEicardOrderInfo: Record "Add. Eicard Order Info";
         lText001: Label 'Please enter "%1" on "%2" "%3", item no. "%4".\\The "%1" is generated on the customers server. Please contact the customer.';
         lText002: Label 'Please enter "%1 and %2" on "%3" "%4", item no. "%5".';
         lText003: Label '\\You can key in the EMS and GLC information in "Line / Related Info / EMS or GLC".';
-        recAddEicardOrderInfo: Record "Add. Eicard Order Info";
+
     begin
         if (Rec."Document Type" = Rec."document type"::Order) and (Rec.Type = Rec.Type::Item) and (Rec."No." <> '') then begin
             recItem.Get(Rec."No.");
@@ -2703,8 +2681,6 @@ codeunit 50067 "Sales Header/Line Events"
 
     procedure CreateWarehouseReceipt(var Rec: Record "Sales Header")
     var
-        recSalesLine: Record "Sales Line";
-        recContDetail: Record "VCK Shipping Detail";
         recWhseInbHead: Record "Warehouse Inbound Header";
         GetSourceDocInbound: Codeunit "Get Source Doc. Inbound";
         ZyWebServMgt: Codeunit "Zyxel Web Service Management";
@@ -2714,7 +2690,7 @@ codeunit 50067 "Sales Header/Line Events"
             recWhseInbHead.SetRange("Container No.", Rec."No.");
             recWhseInbHead.SetRange("Warehouse Status", recWhseInbHead."warehouse status"::"On Stock");
             if recWhseInbHead.IsEmpty() then
-                ZyWebServMgt.SendContainerDetails(CompanyName(), 1, Rec."No.");
+                ZyWebServMgt.SendContainerDetails(copystr(CompanyName(), 1, 50), 1, Rec."No.");
         end;
     end;
 
@@ -2735,14 +2711,11 @@ codeunit 50067 "Sales Header/Line Events"
                 if recWhseIndbLine.FindFirst() then
                     if recWhseIndbLine."Document No." = '' then
                         recWhseIndbLine.DeleteAll(true)
-                    else begin
-                        if recWhseIndbHead.Get(recWhseIndbLine."Document No.") and
-                           (recWhseIndbHead."Warehouse Status" < recWhseIndbHead."warehouse status"::"Goods Received")
-                        then begin
+                    else
+                        if recWhseIndbHead.Get(recWhseIndbLine."Document No.") and (recWhseIndbHead."Warehouse Status" < recWhseIndbHead."warehouse status"::"Goods Received") then begin
                             recWhseIndbLine.DeleteAll(true);
                             recWhseIndbHead.Delete(true);
                         end;
-                    end
             end;
         end;
 
@@ -2752,7 +2725,7 @@ codeunit 50067 "Sales Header/Line Events"
     local procedure OnOpenPage_Page41(var Rec: Record "Sales Header")
     var
         recLink: Record "Record Link";
-        FileMgt: Codeunit "File Management";
+
     begin
         recLink.SetRange("Record ID", Rec.RecordId);
         if recLink.FindFirst() then
@@ -2786,7 +2759,6 @@ codeunit 50067 "Sales Header/Line Events"
     local procedure OnBeforeMakeOrderQuote(var Rec: Record "Sales Header")
     var
         recSalesLine: Record "Sales Line";
-        lText001: Label '"%1" %2 on "%3" does not match "%1" %4 on "%5".';
     begin
         recSalesLine.SetRange("Document Type", Rec."Document Type");
         recSalesLine.SetRange("Document No.", Rec."No.");
@@ -2818,7 +2790,7 @@ codeunit 50067 "Sales Header/Line Events"
             recSalesOrderLine.SetRange("Document Type", recSalesOrderHeader."Document Type");
             recSalesOrderLine.SetRange("Document No.", recSalesOrderHeader."No.");
             recSalesOrderLine.SetRange(Type, recSalesOrderLine.Type::Item);
-            recSalesOrderLine.SetFilter("End of Life Date", '>%1&<%2', 0D, WorkDate);
+            recSalesOrderLine.SetFilter("End of Life Date", '>%1&<%2', 0D, WorkDate());
             if recSalesOrderLine.FindSet(true) then
                 repeat
                     recItem.SetRange("Location Filter", recSalesOrderHeader."Location Code");
@@ -2862,12 +2834,12 @@ codeunit 50067 "Sales Header/Line Events"
     begin
         //>> 03-05-21 ZY-LD 084
         recSalesHead.SetRange("Blanket Order No.", Rec."No.");
-        recSalesHead.SetRange("Order Date", Today);
+        recSalesHead.SetRange("Order Date", Today());
         if recSalesHead.FindLast() then begin
             Page.Run(Page::"Sales Order", recSalesHead);
 
             EnterSelectedFields.SetSalesHeader(Rec);
-            EnterSelectedFields.RunModal;
+            EnterSelectedFields.RunModal();
             EnterSelectedFields.GetSalesHeader(recSalesHead2);
             if recSalesHead."Sales Order Type" = recSalesHead2."sales order type"::" " then begin
                 recLocation.Get(recSalesHead2."Location Code");
@@ -2931,7 +2903,7 @@ codeunit 50067 "Sales Header/Line Events"
     [EventSubscriber(ObjectType::Table, Database::"Sales Comment Line", 'OnBeforeInsertEvent', '', false, false)]
     local procedure OnBeforeInsertSalesCommentLine(var Rec: Record "Sales Comment Line"; RunTrigger: Boolean)
     begin
-        Rec."User Id" := UserId();
+        Rec."User Id" := copystr(UserId(), 1, 50);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Blanket Purch. Order to Order", 'OnRunOnAfterPurchBlanketOrderLineSetFilters', '', false, false)]
@@ -3054,18 +3026,17 @@ codeunit 50067 "Sales Header/Line Events"
         ModifyHead: Boolean;
     begin
         //Tectura Taiwan ZL100526A+
-        if (SalesHeader."Sales Order Type" <> 0) then begin
+        if (SalesHeader."Sales Order Type" <> 0) then
             SalesShptLine.SetFilter("Sales Order Type", '%1', SalesHeader."Sales Order Type");
-        end;
-        if (SalesHeader."Location Code" <> '') then begin
+
+        if (SalesHeader."Location Code" <> '') then
             SalesShptLine.SetFilter("Location Code", '%1', SalesHeader."Location Code");
-        end;
-        if (SalesHeader."Sell-to Customer No." <> '') then begin
+
+        if (SalesHeader."Sell-to Customer No." <> '') then
             SalesShptLine.SetFilter("Sell-to Customer No.", '%1', SalesHeader."Sell-to Customer No.");
-        end;
-        if (SalesHeader."Ship-to Code" <> '') then begin
+
+        if (SalesHeader."Ship-to Code" <> '') then
             SalesShptLine.SetFilter("Ship-to Code", '%1', SalesHeader."Ship-to Code");
-        end;
         //Tectura Taiwan ZL100526A-
 
         SalesShptLine.SetFilter("Currency Code", '%1|%2', SalesHeader."Currency Code", '');
@@ -3136,7 +3107,7 @@ codeunit 50067 "Sales Header/Line Events"
     var
         SalesSetup: Record "Sales & Receivables Setup";
     begin
-        SalesSetup.Get;
+        SalesSetup.Get();
         case SalesSetup."Calc. Sales Price Based on" of
             SalesSetup."Calc. Sales Price Based on"::"Requested Delivery Date":
                 begin
@@ -3155,7 +3126,6 @@ codeunit 50067 "Sales Header/Line Events"
     var
         SI: codeunit "Single Instance";
         PriceCalculation: interface "Price Calculation";
-        LineWithPrice: interface "Line With Price";
         PriceType: enum "Price Type";
     begin
         SI.SetUseBillToCustomer(true);
@@ -3231,14 +3201,13 @@ codeunit 50067 "Sales Header/Line Events"
         ZGT: Codeunit "ZyXEL General Tools";
     begin
         // 15-05-2025 BK #493054
-        IF ZGT.IsZComCompany() then Begin
+        IF ZGT.IsZComCompany() then
             IF ShouldCopyLocationCode then begin
                 IF ShipToAddress."Location Code" <> '' then
                     ShipLocation.get(ShipToAddress."Location Code");
                 IF (ShipLocation."Sales Order Type" <> SalesHeader."Sales Order Type") then
                     ShouldCopyLocationCode := false;
             end;
-        End;
         // 15-05-2025 BK #493054
     end;
 
@@ -3256,9 +3225,8 @@ codeunit 50067 "Sales Header/Line Events"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales Line - Price", OnAfterSetPrice, '', false, false)]
     local procedure "Sales Line - Price_OnAfterSetPrice"(var SalesLine: Record "Sales Line"; PriceListLine: Record "Price List Line"; AmountType: Enum "Price Amount Type"; var SalesHeader: Record "Sales Header")
     begin
-        If (SalesLine."Gen. Prod. Post. Grp. Type" = 1) and (SalesLine."Unit Price" = 0) then begin
+        If (SalesLine."Gen. Prod. Post. Grp. Type" = 1) and (SalesLine."Unit Price" = 0) then
             SalesLine."Line Discount %" := 0;
-        end;
     end;
 
 

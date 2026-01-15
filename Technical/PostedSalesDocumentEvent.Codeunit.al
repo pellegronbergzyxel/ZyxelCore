@@ -4,17 +4,18 @@ codeunit 50059 "Posted Sales Document Event"
     [EventSubscriber(ObjectType::Page, Page::"Posted Sales Inv. - Update", 'OnAfterRecordChanged', '', false, false)]
     local procedure PostedSalesInvUpdate_OnAfterRecordChanged(var SalesInvoiceHeader: Record "Sales Invoice Header"; xSalesInvoiceHeader: Record "Sales Invoice Header"; var IsChanged: Boolean)
     begin
-        IsChanged :=
-            (SalesInvoiceHeader."Bill-to Name" <> xSalesInvoiceHeader."Bill-to Name") or
-            (SalesInvoiceHeader."Bill-to Name 2" <> xSalesInvoiceHeader."Bill-to Name 2") or
-            (SalesInvoiceHeader."Bill-to Address" <> xSalesInvoiceHeader."Bill-to Address") or
-            (SalesInvoiceHeader."Bill-to Address 2" <> xSalesInvoiceHeader."Bill-to Address 2") or
-            (SalesInvoiceHeader."Bill-to Post Code" <> xSalesInvoiceHeader."Bill-to Post Code") or
-            (SalesInvoiceHeader."Bill-to City" <> xSalesInvoiceHeader."Bill-to City") or
-            (SalesInvoiceHeader."Bill-to County" <> xSalesInvoiceHeader."Bill-to County") or
-            (SalesInvoiceHeader."Bill-to Country/Region Code" <> xSalesInvoiceHeader."Bill-to Country/Region Code") or
-            (SalesInvoiceHeader."NL to DK Rev. Charge Posted" <> xSalesInvoiceHeader."NL to DK Rev. Charge Posted") or
-            (SalesInvoiceHeader."NL to DK Reverse Chg. Doc No." <> xSalesInvoiceHeader."NL to DK Reverse Chg. Doc No.");
+        if Not IsChanged then //06-01-2026 BK #From Harry change posted invoice 
+            IsChanged :=
+                (SalesInvoiceHeader."Bill-to Name" <> xSalesInvoiceHeader."Bill-to Name") or
+                (SalesInvoiceHeader."Bill-to Name 2" <> xSalesInvoiceHeader."Bill-to Name 2") or
+                (SalesInvoiceHeader."Bill-to Address" <> xSalesInvoiceHeader."Bill-to Address") or
+                (SalesInvoiceHeader."Bill-to Address 2" <> xSalesInvoiceHeader."Bill-to Address 2") or
+                (SalesInvoiceHeader."Bill-to Post Code" <> xSalesInvoiceHeader."Bill-to Post Code") or
+                (SalesInvoiceHeader."Bill-to City" <> xSalesInvoiceHeader."Bill-to City") or
+                (SalesInvoiceHeader."Bill-to County" <> xSalesInvoiceHeader."Bill-to County") or
+                (SalesInvoiceHeader."Bill-to Country/Region Code" <> xSalesInvoiceHeader."Bill-to Country/Region Code") or
+                (SalesInvoiceHeader."NL to DK Rev. Charge Posted" <> xSalesInvoiceHeader."NL to DK Rev. Charge Posted") or
+                (SalesInvoiceHeader."NL to DK Reverse Chg. Doc No." <> xSalesInvoiceHeader."NL to DK Reverse Chg. Doc No.");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales Inv. Header - Edit", 'OnRunOnBeforeAssignValues', '', false, false)]

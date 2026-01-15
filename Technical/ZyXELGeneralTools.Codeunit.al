@@ -1,29 +1,8 @@
 Codeunit 50000 "ZyXEL General Tools"
 {
-    // // The object has been moved to CU 50.000 so it can be copied to IT and TR.
-    // 
-    // 001. 05-04-18 ZY-LD 2018040410000201 - Accounting Managers.
-    // 002. 08-05-18 ZY-LD P0042 - New company functions.
-    // 003. 22-05-18 ZY-LD 2018050910000191 - User is HR.
-    // 004. 29-06-18 ZY-LD 2018062910000053 - 'ZYEU\ALENA.SEMBEROVA' is added.
-    // 005. 06-08-18 ZY-LD 2018080610000128 - Only DK is Accounting Managers.
-    // 006. 20-08-18 ZY-LD 2018082010000182 - Translate month no. to text.
-    // 007. 20-11-18 PAB - Added function ValidateDirectoryPath to check if a folder exists.
-    // 008. 16-01-19 ZY-LD 2019011610000076 - Danish Accounting managers.
-    // 009. 24-06-19 ZY-LD 000 - Avoid division by zero.
-    // 010. 07-08-19 ZY-LD 2019080610000117 - Validate E-mail.
-    // 011. 25-10-19 ZY-LD 000 - Validate E-mail.
-    // 012. 28-10-19 ZY-LD 2019102510000131 - Kirstine and Henriette added.
-    // 013. 16-01-20 ZY-LD 2020011610000028 - Delete blank values from e-mail.
-    // 014. 01-08-22 ZY-LD 2022071510000177 - MDM´s also needs access to picking days.
-    // 015. 16-08-22 ZY-LD 2022081610000101 - Ahmad is added.
-    // 016. 28-12-22 ZY-LD 000 - Convert Charters on e-mails.
-    // 017. 02-02-23 ZY-LD #8882881 - UK is added as accounting manager.
 
 
     trigger OnRun()
-    var
-        xxx: Record "Price List Line";
     begin
     end;
 
@@ -77,6 +56,32 @@ Codeunit 50000 "ZyXEL General Tools"
         exit(GetCompanyName(1));
     end;
 
+    procedure IsEMEADatabaseServer() rvalue: Boolean //12-01-2026 BK #Print User Permissions Report
+    var
+        ServerInstance: Record "Server Instance";
+    begin
+        ServerInstance.Setfilter("Service Name", '%1|%2', 'EMEA', 'TESTEMEA');
+        if ServerInstance.FindFirst then
+            exit(true);
+    end;
+
+    procedure IsITDatabaseServer() rvalue: Boolean //12-01-2026 BK #Print User Permissions Report
+    var
+        ServerInstance: Record "Server Instance";
+    begin
+        ServerInstance.Setfilter("Service Name", '%1|%2', 'IT', 'TESTIT');
+        if ServerInstance.FindFirst then
+            exit(true);
+    end;
+
+    procedure IsTRDatabaseServer() rvalue: Boolean //12-01-2026 BK #Print User Permissions Report
+    var
+        ServerInstance: Record "Server Instance";
+    begin
+        ServerInstance.Setfilter("Service Name", '%1|%2', 'TR', 'TESTTR');
+        if ServerInstance.FindFirst then
+            exit(true);
+    end;
 
     procedure OpenProgressWindow(PrimaryKey: Text; pTotalRec: Integer)
     var
@@ -776,12 +781,8 @@ Codeunit 50000 "ZyXEL General Tools"
         UpdateInventoryMovement: Codeunit "Update Inventory Movement";
         WarehouseInventoryRequest: Codeunit "Warehouse Inventory Request";
         ZyXELReplication: Codeunit "ZyXEL Replication";
-        ZyxelEmployeeReminderEmail: Report "Zyxel Employee Reminder E-mail";
-        ZyxelVCKPostManagement: Codeunit "Zyxel VCK Post Management";
         UpdateCurrExchRatesEOM: Codeunit "Update Curr. Exch. Rates - EOM";
-        SendEicardstoeShop: Codeunit "Send Eicards to eShop";
-        ">> Documents": Integer;
-        ">> MTD": Integer;
+
     begin
     end;
 

@@ -1335,6 +1335,11 @@ tableextension 50114 ItemZX extends Item
             Caption = 'RMA Reserved Quantity';
             Description = 'ZY2.1';
         }
+        field(62533; "Empty Outer Carton Weight"; Decimal) //06-01-2026 BK #John in a mail
+        {
+            Caption = 'Empty Outer Carton Weight (kg)';
+            DecimalPlaces = 2 : 2;
+        }
     }
 
     keys

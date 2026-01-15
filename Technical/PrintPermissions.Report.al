@@ -96,13 +96,25 @@ Report 50002 "Print Permissions"
     end;
 
     trigger OnPreReport()
+
     begin
-        if not ZGT.IsRhq or not ZGT.IsZComCompany then
-            if ZGT.IsZComCompany then
-                Error(Text001, ZGT.GetRHQCompanyName)
-            else
-                Error(Text001, ZGT.GetSistersCompanyName(1));
-        MakeExcelHead;
+        //12-01-2026 BK #Print User Permissions Report
+        if zgt.IsEMEADatabaseServer() then
+            if not ZGT.IsRhq then
+                if ZGT.IsZComCompany then
+                    Error(Text001, ZGT.GetRHQCompanyName)
+                else
+                    Error(Text001, ZGT.GetSistersCompanyName(1));
+
+        if zgt.IsITDatabaseServer() then
+            if not ZGT.IsZComCompany then
+                Error(Text001, ZGT.GetSistersCompanyName(14));
+
+        if zgt.IsTRDatabaseServer() then
+            if not ZGT.IsZComCompany then
+                Error(Text001, ZGT.GetSistersCompanyName(15));
+
+        MakeExcelHead();
         SI.UseOfReport(3, 50002, 3);
     end;
 
