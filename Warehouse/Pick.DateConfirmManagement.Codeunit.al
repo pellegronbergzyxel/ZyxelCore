@@ -49,9 +49,11 @@ Codeunit 50007 "Pick. Date Confirm Management"
                     if recSalesLine.Get(recSalesLine."document type"::Order, recPickdateConf."Source No.", recPickdateConf."Source Line No.") then begin
                         recItem.Get(recPickdateConf."Item No.");
                         NewQuantity := SalesHeaderLineEvents.CartonOrderingPolicySL(recSalesLine, SalesSetup, recItem);
-                        if recSalesLine.Quantity <> NewQuantity then
+                        if recSalesLine.Quantity <> NewQuantity then begin
                             if Confirm(lText002, true, recSalesLine.Quantity, NewQuantity, recSalesLine."Line No.", recSalesLine."No.") then
                                 SkipWrongCarton := true;
+                        end else
+                            SkipWrongCarton := true;
                     end;
 
                     IF SkipWrongCarton then BEGIN

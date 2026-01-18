@@ -219,7 +219,8 @@
             "dependencyPublishingOption": "Ignore",
             "startupCompany": "ZNet DK"
             //"startupCompany": "ZyND DK"
-        }, */      
+        }, */
+        /*     
         {
             "name": "Zyxel IT",
             "type": "al",
@@ -241,7 +242,7 @@
             //"schemaUpdateMode": "ForceSync",
             "startupCompany": "ZyND IT"
             //"startupCompany": "ZNET IT"
-        },
+        }, */
         {
             "name": "Zyxel@VisionPeople (W1)",
             "type": "al",
