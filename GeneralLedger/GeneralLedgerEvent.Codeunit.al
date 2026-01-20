@@ -34,8 +34,9 @@ codeunit 50085 "General Ledger Event"
         DeclineLabel: Label 'You have cancelled the creation of the G/L Account.';
 
     begin
-        if not Confirm(AskLabel, false) then
-            Error(DeclineLabel);
+        if RunTrigger then
+            if not Confirm(AskLabel, false) then
+                Error(DeclineLabel);
     end;
 
 
