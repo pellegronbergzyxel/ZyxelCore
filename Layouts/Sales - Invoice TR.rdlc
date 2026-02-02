@@ -11,7 +11,7 @@
       <am:Name>MSRB</am:Name>
       <am:Version>15.1.30001.02</am:Version>
     </am:UpdatedBy>
-    <am:LastModifiedTimestamp>2025-10-28T20:56:39.9638966Z</am:LastModifiedTimestamp>
+    <am:LastModifiedTimestamp>2026-01-26T14:41:26.3327315Z</am:LastModifiedTimestamp>
   </am:AuthoringMetadata>
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -108,7 +108,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!LineText1.Value</Value>
+                                                    <Value>=First(Fields!LineText1.Value, "DataSet_Result")</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -172,7 +172,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!LineText2.Value</Value>
+                                                    <Value>=First(Fields!LineText2.Value, "DataSet_Result")</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -183,6 +183,9 @@
                                               </Paragraph>
                                             </Paragraphs>
                                             <Style>
+                                              <Border>
+                                                <Style>None</Style>
+                                              </Border>
                                               <PaddingLeft>5pt</PaddingLeft>
                                               <PaddingRight>5pt</PaddingRight>
                                             </Style>
@@ -236,7 +239,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!LineText3.Value</Value>
+                                                    <Value>=First(Fields!LineText3.Value, "DataSet_Result")</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -247,6 +250,9 @@
                                               </Paragraph>
                                             </Paragraphs>
                                             <Style>
+                                              <Border>
+                                                <Style>None</Style>
+                                              </Border>
                                               <PaddingLeft>5pt</PaddingLeft>
                                               <PaddingRight>5pt</PaddingRight>
                                             </Style>
@@ -300,7 +306,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!LineText4.Value</Value>
+                                                    <Value>=First(Fields!LineText4.Value, "DataSet_Result")</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -311,6 +317,9 @@
                                               </Paragraph>
                                             </Paragraphs>
                                             <Style>
+                                              <Border>
+                                                <Style>None</Style>
+                                              </Border>
                                               <PaddingLeft>5pt</PaddingLeft>
                                               <PaddingRight>5pt</PaddingRight>
                                             </Style>
@@ -364,7 +373,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!LineText5.Value</Value>
+                                                    <Value>=First(Fields!LineText5.Value, "DataSet_Result")</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -375,6 +384,9 @@
                                               </Paragraph>
                                             </Paragraphs>
                                             <Style>
+                                              <Border>
+                                                <Style>None</Style>
+                                              </Border>
                                               <PaddingLeft>5pt</PaddingLeft>
                                               <PaddingRight>5pt</PaddingRight>
                                             </Style>
@@ -428,7 +440,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!LineText6.Value</Value>
+                                                    <Value>=First(Fields!LineText6.Value, "DataSet_Result")</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -439,6 +451,9 @@
                                               </Paragraph>
                                             </Paragraphs>
                                             <Style>
+                                              <Border>
+                                                <Style>None</Style>
+                                              </Border>
                                               <PaddingLeft>5pt</PaddingLeft>
                                               <PaddingRight>5pt</PaddingRight>
                                             </Style>
@@ -492,7 +507,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!LineText7.Value</Value>
+                                                    <Value>=First(Fields!LineText7.Value, "DataSet_Result")</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -503,6 +518,9 @@
                                               </Paragraph>
                                             </Paragraphs>
                                             <Style>
+                                              <Border>
+                                                <Style>None</Style>
+                                              </Border>
                                               <PaddingLeft>5pt</PaddingLeft>
                                               <PaddingRight>5pt</PaddingRight>
                                             </Style>
@@ -556,7 +574,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!LineText8.Value</Value>
+                                                    <Value>=First(Fields!LineText7.Value, "DataSet_Result")</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -567,6 +585,9 @@
                                               </Paragraph>
                                             </Paragraphs>
                                             <Style>
+                                              <Border>
+                                                <Style>None</Style>
+                                              </Border>
                                               <PaddingLeft>5pt</PaddingLeft>
                                               <PaddingRight>5pt</PaddingRight>
                                             </Style>
@@ -993,8 +1014,8 @@
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="BruttoTotalbl">
-                                            <rd:DefaultName>BruttoTotalbl</rd:DefaultName>
+                                          <Textbox Name="Textbox67">
+                                            <rd:DefaultName>Textbox67</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -1014,9 +1035,6 @@
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <Visibility>
-                                              <Hidden>=Fields!TotalLineDiscAmount.Value = ''</Hidden>
-                                            </Visibility>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -1035,20 +1053,20 @@
                                       <TablixCell />
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="Textbox38">
-                                            <rd:DefaultName>Textbox38</rd:DefaultName>
+                                          <Textbox Name="Textbox68">
+                                            <rd:DefaultName>Textbox68</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Sum(Fields!VATAmtLineLineAmt.Value) - Fields!TotalLineDiscAmount.Value</Value>
+                                                    <Value>=Sum(Fields!VATAmtLineLineAmt.Value) - (Fields!TotalLineDiscAmount.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
-                                                      <Format>#,0.00;(#,0.00);'-'</Format>
+                                                      <Format>#,0.00;(#,0.00)</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -1061,10 +1079,6 @@
                                               <Border>
                                                 <Style>None</Style>
                                               </Border>
-                                              <TopBorder>
-                                                <Color>Black</Color>
-                                                <Width>1pt</Width>
-                                              </TopBorder>
                                               <PaddingLeft>5pt</PaddingLeft>
                                             </Style>
                                           </Textbox>
@@ -1262,8 +1276,9 @@
                                       <TablixCell />
                                       <TablixCell>
                                         <CellContents>
-                                          <Textbox Name="Textbox69">
-                                            <rd:DefaultName>Textbox69</rd:DefaultName>
+                                          <rd:Selected>true</rd:Selected>
+                                          <Textbox Name="Textbox13">
+                                            <rd:DefaultName>Textbox13</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -1275,7 +1290,7 @@
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
-                                                      <Format>#,0.00;-#,0.00;'-'</Format>
+                                                      <Format>#,0.00</Format>
                                                     </Style>
                                                   </TextRun>
                                                 </TextRuns>
@@ -5308,7 +5323,7 @@ Cstr(Fields!SellVATID.Value), 2)</Hidden>
               <Top>2.37808cm</Top>
               <Left>12.40578cm</Left>
               <Height>3.4925cm</Height>
-              <Width>5.82083cm</Width>
+              <Width>5.46885cm</Width>
               <ZIndex>39</ZIndex>
               <Style>
                 <Border>
