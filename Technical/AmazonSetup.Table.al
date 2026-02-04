@@ -136,6 +136,15 @@ table 50090 "Amazon Setup"
         {
             caption = 'Application ID';
         }
+        field(33; Apitype; Enum zyxelApitype)
+        {
+            caption = 'Api Type';
+        }
+        field(34; ApiCompanyname; text[30])
+        {
+            caption = 'Api Companyname';
+        }
+
     }
     keys
     {

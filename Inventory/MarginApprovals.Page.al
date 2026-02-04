@@ -87,6 +87,17 @@ page 50118 "Margin Approvals"
                     Visible = false;
                     ToolTip = 'Specifies the description of the item associated with the margin approval request.';
                 }
+                field(requeststatus; Rec.requeststatus)
+                {
+                    Visible = true;
+                    ToolTip = 'Specifies the description of the item associated with the margin approval request.';
+                }
+                field(requeststatusDT; Rec.requeststatusDT)
+                {
+                    Visible = true;
+                    ToolTip = 'Specifies the description of the item associated with the margin approval request.';
+                }
+
             }
         }
         area(FactBoxes)
@@ -130,6 +141,23 @@ page 50118 "Margin Approvals"
                     Rec.UpdateOnSetup();
                 end;
             }
+            action(testmargincheck)
+            {
+                Caption = 'Run margin check API';
+                Image = UpdateDescription;
+
+
+                trigger OnAction()
+                var
+                    Helper: codeunit AmazonHelper;
+                    Marginsetup: record "amazon Setup";
+                begin
+                    if not Marginsetup.get('MARCHETST') then
+                        error('Please create MARCHETST in setup');
+                    Helper.SentMarginApproval(rec, Marginsetup);
+                end;
+            }
+
         }
     }
 

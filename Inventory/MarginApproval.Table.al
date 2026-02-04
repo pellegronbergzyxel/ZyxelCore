@@ -123,6 +123,15 @@ table 50071 "Margin Approval"
         {
             Caption = 'Sales Document Type';
         }
+        field(23; requeststatus; enum Apirequeststatus)
+        {
+            Caption = 'Request Status';
+        }
+        field(24; requeststatusDT; DateTime)
+        {
+            Caption = 'Request Status changed';
+        }
+
     }
     keys
     {
