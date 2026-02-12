@@ -143,6 +143,7 @@ table 50090 "Amazon Setup"
         field(34; ApiCompanyname; text[30])
         {
             caption = 'Api Companyname';
+            // margin
         }
 
     }
