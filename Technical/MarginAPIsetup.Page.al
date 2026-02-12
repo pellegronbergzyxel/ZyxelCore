@@ -39,6 +39,10 @@ page 50150 "Margin API setup"
                 {
 
                 }
+                field(Apitype; Rec.Apitype)
+                {
+
+                }
             }
         }
     }

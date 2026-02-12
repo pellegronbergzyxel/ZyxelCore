@@ -128,7 +128,10 @@ page 50133 "Amazon setup list"
                 {
                     ApplicationArea = All;
                 }
-
+                field(Apitype; Rec.Apitype)
+                {
+                    ApplicationArea = All;
+                }
             }
         }
     }

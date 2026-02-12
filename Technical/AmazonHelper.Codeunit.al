@@ -1935,8 +1935,74 @@ codeunit 50055 AmazonHelper
     // ZYXEL MARGIN REST API >>
 
 
+    procedure ProcessMarginApproval(var MarginApproval: record "Margin Approval")
+    var
+        JsontextReply: text;
+        Marginsetup: record "Amazon Setup";
+        jsonarrayMain: JsonArray;
+        TokenOrder: JsonToken;
+        jsonTokenMain: JsonToken;
+        jsonTokenorders: JsonToken;
+        TokenValue: JsonToken;
+        part_number: text[20];
+        is_low_margin: text[10];
 
-    procedure SentMarginApproval(MarginApproval: record "Margin Approval"; Marginsetup: record "amazon Setup"): Boolean
+    begin
+
+        if not Marginsetup.get('MARCHETST') then
+            error('Please create MARCHETST in setup');
+        if SentMarginApproval(MarginApproval, Marginsetup, JsontextReply) then begin
+            IF jsonTokenMain.ReadFrom(JsontextReply) then
+                if jsonTokenMain.SelectToken('margincheckresult', jsonTokenorders) then begin
+                    jsonarrayMain := jsonTokenorders.AsArray();
+                    foreach TokenOrder in jsonarrayMain do begin
+                        if TokenOrder.SelectToken('part_number', TokenValue) then
+                            EVALUATE(part_number, TokenValue.AsValue().AsText());
+                        if TokenOrder.SelectToken('is_low_margin', TokenValue) then
+                            EVALUATE(is_low_margin, TokenValue.AsValue().AsText());
+
+                        MarginApproval.requeststatusDT := CurrentDateTime;
+                        MarginApproval.requeststatus := MarginApproval.requeststatus::send;
+                        MarginApproval.is_low_margin := is_low_margin;
+                        MarginApproval.Status := MarginApproval.Status::"Waiting for Margin Approval";
+                        ;
+                        IF part_number = MarginApproval."Item No." then begin
+                            Case is_low_margin of
+
+                                'N':
+                                    begin
+                                        MarginApproval.requeststatus := MarginApproval.requeststatus::closed;
+                                        MarginApproval."Below Margin" := false;
+                                        MarginApproval."Approved/Rejected by" := 'WS';
+                                        MarginApproval.Status := MarginApproval.Status::Approved;
+
+                                    end;
+                                'Y':
+                                    begin
+                                        MarginApproval.requeststatus := MarginApproval.requeststatus::send;
+                                        MarginApproval."Below Margin" := true;
+                                        MarginApproval.Status := MarginApproval.Status::"Waiting for Approval";
+                                    end;
+
+                            End;
+
+                        end;
+                        MarginApproval.Modify()
+
+
+                    end;
+                end;
+
+
+
+        end;
+    end;
+
+
+
+
+
+    procedure SentMarginApproval(MarginApproval: record "Margin Approval"; Marginsetup: record "amazon Setup"; var replytext: text): Boolean
     var
 
         Httpcontent: HttpContent;
@@ -1987,7 +2053,7 @@ codeunit 50055 AmazonHelper
 
             // TEMP TEST >>
             httpResponse.Content().ReadAs(content);
-
+            replytext := content;
             // Save the data of the InStream as a file.
             if (Marginsetup.testmode) and GuiAllowed then begin
                 message('ok: %1', copystr(content, 1, 512));
@@ -2022,7 +2088,7 @@ codeunit 50055 AmazonHelper
         totalDoc.add('token', Marginsetup.client_secret);
         totalDoc.add('company', Marginsetup.ApiCompanyname);
         // loop >>
-        margin_info.add('id', MarginApproval.SystemId);
+        margin_info.add('entry_no', MarginApproval.SystemId);
         margin_info.add('part_number', MarginApproval."Item No.");
         tempcurr := '';
 
@@ -2057,6 +2123,44 @@ codeunit 50055 AmazonHelper
         end;
         exit(totextvar);
     end;
+
+
+
+    // event >>
+    [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnBeforeVerify', '', false, false)]
+    local procedure OnBeforeVerify(var PriceListLine: Record "Price List Line"; var IsHandled: Boolean)
+    var
+        salessetup: Record "Sales & Receivables Setup";
+        MarginApproval: record "Margin Approval";
+    begin
+        salessetup.get();
+        if salessetup."Margin Approval" then begin
+            MarginApproval.setrange("Source Type", MarginApproval."Source Type"::"Price Book");
+            MarginApproval.setrange("Source No.", PriceListLine."Price List Code");
+            MarginApproval.setrange("Source Line No.", PriceListLine."Line No.");
+            MarginApproval.setrange(Status, MarginApproval.Status::Approved);
+            if MarginApproval.IsEmpty then
+                IsHandled := true;
+        end
+    end;
+
+
+    [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnAfterValidateEvent', 'Status', false, false)]
+
+    local procedure OnAfterValidateStatusPriceListline(var Rec: Record "Price List Line"; var xRec: Record "Price List Line"; CurrFieldNo: Integer)
+    var
+        salessetup: Record "Sales & Receivables Setup";
+        MarginApproval: record "Margin Approval";
+    begin
+        salessetup.get();
+        if salessetup."Margin Approval" then begin
+
+            //MarginApproval.MarginApproved()
+
+        end
+    end;
+
+
 
     // ZYXEL MARGIN REST API<<
     var
