@@ -123,6 +123,20 @@ table 50071 "Margin Approval"
         {
             Caption = 'Sales Document Type';
         }
+        field(23; requeststatus; enum Apirequeststatus)
+        {
+            Caption = 'Request Status';
+        }
+        field(24; requeststatusDT; DateTime)
+        {
+            Caption = 'Request Status changed';
+        }
+        field(25; is_low_margin; text[10])
+        {
+            Caption = 'is_low_margin reply';
+        }
+
+
     }
     keys
     {
@@ -278,6 +292,11 @@ table 50071 "Margin Approval"
                 end else
                     MarginApp.Validate(Status, MarginApp.Status::"Waiting for Margin Approval");
                 MarginApp.Insert(true);
+            end else begin
+                MarginApp.Validate(Status, MarginApp.Status::"Waiting for Margin Approval");
+                MarginApp.requeststatus := MarginApp.requeststatus::new;
+                MarginApp.modify;
+
             end;
 
         end;

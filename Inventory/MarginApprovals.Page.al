@@ -69,8 +69,13 @@ page 50118 "Margin Approvals"
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
-                    Visible = false;
+                    Visible = true;
                     ToolTip = 'Specifies the customer number associated with the margin approval request.';
+                }
+                field("Currency Code"; Rec."Currency Code")
+                {
+                    Visible = true;
+
                 }
                 field("Customer Name"; Rec."Customer Name")
                 {
@@ -79,7 +84,7 @@ page 50118 "Margin Approvals"
                 }
                 field("Item No."; Rec."Item No.")
                 {
-                    Visible = false;
+                    Visible = true;
                     ToolTip = 'Specifies the item number associated with the margin approval request.';
                 }
                 field("Item Description"; Rec."Item Description")
@@ -87,6 +92,22 @@ page 50118 "Margin Approvals"
                     Visible = false;
                     ToolTip = 'Specifies the description of the item associated with the margin approval request.';
                 }
+                field(is_low_margin; Rec.is_low_margin)
+                {
+                    Visible = true;
+                    ToolTip = 'Specifies the description of the item associated with the margin approval request.';
+                }
+                field(requeststatus; Rec.requeststatus)
+                {
+                    Visible = true;
+                    ToolTip = 'Specifies the description of the item associated with the margin approval request.';
+                }
+                field(requeststatusDT; Rec.requeststatusDT)
+                {
+                    Visible = true;
+                    ToolTip = 'Specifies the description of the item associated with the margin approval request.';
+                }
+
             }
         }
         area(FactBoxes)
@@ -101,7 +122,36 @@ page 50118 "Margin Approvals"
         }
     }
     actions
+
     {
+        area(Navigation)
+        {
+            action(pricebook)
+            {
+                Caption = 'Card price book';
+
+                Image = Card;
+                Promoted = true;
+                PromotedCategory = Process;
+
+
+                trigger OnAction()
+                var
+                    pricebook: page "Sales Price List";
+                    salesprice: record "Price List Header";
+                begin
+                    if rec."Source Type" = rec."Source Type"::"Price Book" then begin
+                        salesprice.setrange(Code, rec."Source No.");
+                        salesprice.setrange("Price Type", salesprice."Price Type"::Sale);
+                        pricebook.SetTableView(salesprice);
+                        pricebook.Run();
+                    end;
+
+                end;
+            }
+        }
+
+
         area(Processing)
         {
             action(EnterUserComment)
@@ -130,6 +180,21 @@ page 50118 "Margin Approvals"
                     Rec.UpdateOnSetup();
                 end;
             }
+            action(testmargincheck)
+            {
+                Caption = 'Run margin check API';
+                Image = UpdateDescription;
+
+
+                trigger OnAction()
+                var
+                    Helper: codeunit AmazonHelper;
+
+                begin
+                    Helper.ProcessMarginApproval(rec);
+                end;
+            }
+
         }
     }
 

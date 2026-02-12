@@ -128,7 +128,10 @@ page 50133 "Amazon setup list"
                 {
                     ApplicationArea = All;
                 }
-
+                field(Apitype; Rec.Apitype)
+                {
+                    ApplicationArea = All;
+                }
             }
         }
     }
@@ -310,5 +313,13 @@ page 50133 "Amazon setup list"
 
         }
     }
+
+    trigger OnOpenPage()
+    var
+        zyxelApitype: enum zyxelApitype;
+
+    begin
+        rec.setrange(Apitype, zyxelApitype::Amazon);
+    end;
 
 }
