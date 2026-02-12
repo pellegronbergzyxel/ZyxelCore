@@ -18,9 +18,9 @@
             "environmentType": "OnPrem",
             // "tenant": "default",
             //"primaryTenantDomain": "89443d20-e988-4407-a3c1-0c80570fb401",
-            "schemaUpdateMode": "ForceSync",
+            //"schemaUpdateMode": "ForceSync",
+            //"startupCompany": "ZyND DE"
             "startupCompany": "ZyND DK"
-            //"startupCompany": "ZyND ES"
         },
         {
             "name": "Zyxel TESTEMEA ZNet",
@@ -196,7 +196,7 @@
             //"startupCompany": "ZNet DK"
             "startupCompany": "ZyND DK"
         }, */
-        /*
+        
         {
             "name": "Zyxel EMEA ZNet",
             "type": "al",
@@ -219,7 +219,7 @@
             "dependencyPublishingOption": "Ignore",
             "startupCompany": "ZNet DK"
             //"startupCompany": "ZNet UK"
-        }, */
+        }, 
         /*     
         {
             "name": "Zyxel IT",
