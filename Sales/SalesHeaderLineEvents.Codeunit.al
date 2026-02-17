@@ -3200,9 +3200,9 @@ codeunit 50067 "Sales Header/Line Events"
         ShipLocation: Record Location;
         ZGT: Codeunit "ZyXEL General Tools";
     begin
-        // 15-05-2025 BK #493054
+        // 15-05-2025 BK #493054 and (#556148)
         IF ZGT.IsZComCompany() then
-            IF ShouldCopyLocationCode then begin
+            IF (ShouldCopyLocationCode) and (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) then begin
                 IF ShipToAddress."Location Code" <> '' then
                     ShipLocation.get(ShipToAddress."Location Code");
                 IF (ShipLocation."Sales Order Type" <> SalesHeader."Sales Order Type") then
