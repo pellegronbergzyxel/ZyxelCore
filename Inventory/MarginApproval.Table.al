@@ -282,6 +282,7 @@ table 50071 "Margin Approval"
                 MarginApp.Validate("Customer No.", pCustNo);
                 MarginApp.Validate("Item No.", pItemNo);
                 MarginApp.Validate("Unit Price", pUnitPrice);
+                MarginApp.Validate("Currency Code", pCurrCode);
                 if pEntryNo <> 0 then begin
                     MarginApp2.get(pEntryNo);
                     MarginApp.Status := MarginApp2.Status;
@@ -293,9 +294,18 @@ table 50071 "Margin Approval"
                     MarginApp.Validate(Status, MarginApp.Status::"Waiting for Margin Approval");
                 MarginApp.Insert(true);
             end else begin
-                MarginApp.Validate(Status, MarginApp.Status::"Waiting for Margin Approval");
-                MarginApp.requeststatus := MarginApp.requeststatus::new;
-                MarginApp.modify;
+                if (MarginApp."Item No." <> pItemNo) OR
+                                (MarginApp."Currency Code" <> pCurrCode) or
+                                (MarginApp."Unit Price" <> pUnitPrice) or
+                                (MarginApp."Customer No." <> pCustNo) then begin
+                    MarginApp.Validate(Status, MarginApp.Status::"Waiting for Margin Approval");
+                    MarginApp.Validate("Customer No.", pCustNo);
+                    MarginApp.Validate("Item No.", pItemNo);
+                    MarginApp.Validate("Unit Price", pUnitPrice);
+                    MarginApp.Validate("Currency Code", pCurrCode);
+                    MarginApp.requeststatus := MarginApp.requeststatus::new;
+                    MarginApp.modify;
+                end;
 
             end;
 
@@ -469,4 +479,24 @@ table 50071 "Margin Approval"
     Begin
         exit(Rec.Status = Rec.Status::"Waiting for User Comment");
     End;
+
+    procedure Setapprovedpricebookline(marginapproval: Record "Margin Approval")
+    var
+        pricelist: record "Price List Line";
+    begin
+        if (marginapproval.Status = marginapproval.Status::Approved) and (marginapproval."Source Type" = marginapproval."Source Type"::"Price Book") then begin
+
+            pricelist.setrange("Price List Code", rec."Source No.");
+            pricelist.setrange("Line No.", marginapproval."Source Line No.");
+            pricelist.SetRange("Asset No.", marginapproval."Item No.");
+            if pricelist.FindSet() then begin
+                pricelist.VerifySource();
+                pricelist.TestField("Asset Type");
+                if (pricelist."Asset Type" = pricelist."Asset Type"::Item) and (pricelist."Amount Type" <> pricelist."Amount Type"::Discount) then
+                    pricelist.TestField("Asset No.");
+                pricelist.Status := pricelist.Status::Active;
+                pricelist.Modify(false);
+            end
+        end;
+    end;
 }

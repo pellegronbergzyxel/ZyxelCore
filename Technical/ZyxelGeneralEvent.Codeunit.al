@@ -23,6 +23,7 @@ codeunit 50087 "Zyxel General Event"
     local procedure OnAfterDeleteSalesPrice(var Rec: Record "Price List Line"; RunTrigger: Boolean)
     begin
         //DeleteSalesPriceReplicated(Rec);  
+        Message('margin delete');
     end;
 
     local procedure DeleteSalesPriceReplicated(var Rec: Record "Price List Line")
