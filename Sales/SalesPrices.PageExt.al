@@ -13,6 +13,14 @@ pageextension 50269 SalesPriceZX extends "Price List Lines"
                 ApplicationArea = Basic, Suite;
             }
         }
+        addlast(Control1)
+        {
+            field(Status; Rec.Status)
+            {
+                ApplicationArea = Basic, Suite;
+                Editable = false;
+            }
+        }
     }
 
     actions
@@ -68,6 +76,25 @@ pageextension 50269 SalesPriceZX extends "Price List Lines"
                         Page.RunModal(Page::"Change Log Entries", ChangeLogEntry);
                     end;
                 }
+                action(marginApproval)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Margin Approval';
+                    Image = Profit;
+
+                    trigger OnAction()
+                    var
+                        Marginapproval: record "Margin Approval";
+                        Marginapprovals: page "Margin Approvals";
+                    begin
+                        Marginapproval.setrange("Source Type", Marginapproval."Source Type"::"Price Book");
+                        Marginapproval.setrange("Source No.", rec."Price List Code");
+                        marginapproval.SetRange("Source Line No.", rec."Line No.");
+                        Marginapprovals.SetTableView(Marginapproval);
+                        Marginapprovals.Run();
+                    end;
+                }
+
             }
         }
     }

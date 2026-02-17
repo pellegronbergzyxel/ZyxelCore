@@ -1975,6 +1975,7 @@ codeunit 50055 AmazonHelper
                                         MarginApproval."Below Margin" := false;
                                         MarginApproval."Approved/Rejected by" := 'WS';
                                         MarginApproval.Status := MarginApproval.Status::Approved;
+                                        MarginApproval.Setapprovedpricebookline(MarginApproval);
 
                                     end;
                                 'Y':
@@ -2132,6 +2133,7 @@ codeunit 50055 AmazonHelper
     var
         salessetup: Record "Sales & Receivables Setup";
         MarginApproval: record "Margin Approval";
+        x: integer;
     begin
         salessetup.get();
         if salessetup."Margin Approval" then begin
@@ -2139,11 +2141,57 @@ codeunit 50055 AmazonHelper
             MarginApproval.setrange("Source No.", PriceListLine."Price List Code");
             MarginApproval.setrange("Source Line No.", PriceListLine."Line No.");
             MarginApproval.setrange(Status, MarginApproval.Status::Approved);
-            if MarginApproval.IsEmpty then
-                IsHandled := true;
-        end
-    end;
+            if MarginApproval.IsEmpty then begin
+                MarginApproval.setrange(Status);
+                if MarginApproval.findset then begin
+                    if (MarginApproval."Item No." <> PriceListLine."Product No.") OR
+                       (MarginApproval."Currency Code" <> PriceListLine."Currency Code") or
+                       (MarginApproval."Unit Price" <> PriceListLine."Unit Price") or
+                       (MarginApproval."Customer No." <> PriceListLine."Assign-to No.") then begin
+                        MarginApproval.Status := MarginApproval.Status::"Waiting for Margin Approval";
+                        MarginApproval.requeststatus := MarginApproval.requeststatus::new;
+                        MarginApproval.Validate("Customer No.", PriceListLine."Assign-to No.");
+                        MarginApproval.Validate("Item No.", PriceListLine."Product No.");
+                        MarginApproval.Validate("Unit Price", PriceListLine."Unit Price");
+                        MarginApproval.Validate("Currency Code", PriceListLine."Currency Code");
+                        MarginApproval.Modify(false);
+                        PriceListLine.Status := PriceListLine.Status::WaitingApproval;
+                        IsHandled := true;
+                    end else begin
+                        PriceListLine.Status := PriceListLine.Status::Active;
+                        IsHandled := true;
+                    end;
+                end else begin
+                    if MarginApproval.MarginApproved(MarginApproval."Source Type"::"Price Book", MarginApproval."Sales Document Type"::Quote, PriceListLine."Price List Code", PriceListLine."line no.", PriceListLine."Assign-to No.", PriceListLine."Product No.", PriceListLine."Currency Code", PriceListLine."Unit Price", MarginApproval."Entry No.") then begin
+                        PriceListLine.Status := PriceListLine.Status::WaitingApproval;
+                    end;
+                    IsHandled := true;
+                end;
 
+            end ELSE begin
+                if MarginApproval.findset then begin
+                    if (MarginApproval."Item No." <> PriceListLine."Product No.") OR
+                       (MarginApproval."Currency Code" <> PriceListLine."Currency Code") or
+                       (MarginApproval."Unit Price" <> PriceListLine."Unit Price") or
+                       (MarginApproval."Customer No." <> PriceListLine."Assign-to No.") then begin
+                        MarginApproval.Status := MarginApproval.Status::"Waiting for Margin Approval";
+                        MarginApproval.requeststatus := MarginApproval.requeststatus::new;
+                        MarginApproval.Validate("Customer No.", PriceListLine."Assign-to No.");
+                        MarginApproval.Validate("Item No.", PriceListLine."Product No.");
+                        MarginApproval.Validate("Unit Price", PriceListLine."Unit Price");
+                        MarginApproval.Validate("Currency Code", PriceListLine."Currency Code");
+                        MarginApproval.Modify(false);
+                        PriceListLine.Status := PriceListLine.Status::WaitingApproval;
+                        IsHandled := true;
+                    end else begin
+                        PriceListLine.Status := PriceListLine.Status::Active;
+                        IsHandled := true;
+                    end;
+
+                end;
+            end
+        end;
+    end;
 
     [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnAfterValidateEvent', 'Status', false, false)]
 
@@ -2152,17 +2200,229 @@ codeunit 50055 AmazonHelper
         salessetup: Record "Sales & Receivables Setup";
         MarginApproval: record "Margin Approval";
     begin
-        salessetup.get();
-        if salessetup."Margin Approval" then begin
+        //        salessetup.get();
+        //      if salessetup."Margin Approval" then begin
+    end;
+    //end;
 
-            //MarginApproval.MarginApproved()
 
-        end
+
+    [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnBeforeValidateEvent', 'Unit price', false, false)]
+
+    local procedure OnBeforeValidateUniPricePriceListline(var Rec: Record "Price List Line"; var xRec: Record "Price List Line"; CurrFieldNo: Integer)
+    var
+        salessetup: Record "Sales & Receivables Setup";
+        MarginApproval: record "Margin Approval";
+    begin
+        if (rec."Unit Price" <> xRec."Unit Price") and (rec.Status = rec.Status::WaitingApproval) then
+            rec.Status := rec.Status::draft;
     end;
 
 
+    [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnBeforeValidateEvent', 'Product No.', false, false)]
+
+    local procedure OnBeforeValidateProductNoPriceListline(var Rec: Record "Price List Line"; var xRec: Record "Price List Line"; CurrFieldNo: Integer)
+    var
+        salessetup: Record "Sales & Receivables Setup";
+        MarginApproval: record "Margin Approval";
+    begin
+        if (rec."Product No." <> xRec."Product No.") and (rec.Status = rec.Status::WaitingApproval) then
+            rec.Status := rec.Status::draft;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnBeforeValidateEvent', 'Currency Code', false, false)]
+
+    local procedure OnBeforeValidateCurrencyCidePriceListline(var Rec: Record "Price List Line"; var xRec: Record "Price List Line"; CurrFieldNo: Integer)
+    var
+        salessetup: Record "Sales & Receivables Setup";
+        MarginApproval: record "Margin Approval";
+    begin
+        if (rec."Currency Code" <> xRec."Currency Code") and (rec.Status = rec.Status::WaitingApproval) then
+            rec.Status := rec.Status::draft;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnBeforeValidateEvent', 'Assign-to No.', false, false)]
+
+    local procedure OnBeforeValidateAssigntoNoPriceListline(var Rec: Record "Price List Line"; var xRec: Record "Price List Line"; CurrFieldNo: Integer)
+    var
+        salessetup: Record "Sales & Receivables Setup";
+        MarginApproval: record "Margin Approval";
+    begin
+        if (rec."Assign-to No." <> xRec."Assign-to No.") and (rec.Status = rec.Status::WaitingApproval) then
+            rec.Status := rec.Status::draft;
+    end;
+
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Price List Management", 'OnBeforeResolveDuplicatePrices', '', false, false)]
+
+    local procedure OnBeforeResolveDuplicatePrices(PriceListHeader: Record "Price List Header"; var Resolved: Boolean; var IsHandled: Boolean)
+    var
+        salessetup: Record "Sales & Receivables Setup";
+    begin
+        salessetup.get();
+        if salessetup."Margin Approval" then begin
+            IsHandled := true;
+            resolved := true;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Price List header", 'OnUpdateStatusOnBeforeConfirmStatus', '', false, false)]
+
+    local procedure OnUpdateStatusOnBeforeConfirmStatus(PriceListHeader: Record "Price List Header"; Updated: Boolean; var Confirmed: Boolean; var IsHandled: Boolean)
+    var
+        salessetup: Record "Sales & Receivables Setup";
+        PriceListLine: record "Price List Line";
+        ConfirmManagement: Codeunit "Confirm Management";
+
+        StatusUpdateQst: Label 'Do you want to update status to %1?', Comment = '%1 - status value: Draft, Active, or Inactive';
+    begin
+        salessetup.get();
+        if salessetup."Margin Approval" then begin
+            PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
+            PriceListLine.setfilter(Status, '<>%1', Pricelistline.Status::WaitingApproval);
+            IsHandled := true;
+            Confirmed := false;
+            Updated := true;
+            if ConfirmManagement.GetResponseOrDefault(StrSubstNo(StatusUpdateQst, PriceListHeader.Status), true) then begin
+                PriceListLine.ModifyAll(Status, PriceListHeader.Status);
+                PriceListHeader.modify(false);
+            end else
+                Updated := false;
+        end;
+    end;
 
     // ZYXEL MARGIN REST API<<
+    // Price list import >>
+    procedure PricelistupdatefromExcel(PriceListHeader: Record "Price List Header")
+    var
+
+        TempExcelBuffer: record "Excel Buffer" temporary;
+        FileName: text[250];
+        SheetName: text[250];
+        UploadExcelMsg: Label 'Select fil';
+        NoFileFoundMsg: Label 'Fil error';
+
+
+        FileMgt: Codeunit "File Management";
+        IStream: InStream;
+        FromFile: Text[100];
+        dialogmgt: Codeunit "Progress Dialog";
+        lastrow: Integer;
+
+        Itemno: code[20];
+        currcode: code[10];
+        custcode: code[20];
+        Custype: Code[20];
+        startdate: date;
+        enddata: date;
+        Unitprice: Decimal;
+
+    begin
+        // load
+        UploadIntoStream(UploadExcelMsg, '', '', FromFile, IStream);
+        if FromFile <> '' then begin
+            FileName := FileMgt.GetFileName(FromFile);
+            SheetName := TempExcelBuffer.SelectSheetsNameStream(IStream);
+        end else
+            Error(NoFileFoundMsg);
+        TempExcelBuffer.Reset();
+        TempExcelBuffer.DeleteAll();
+        TempExcelBuffer.OpenBookStream(IStream, SheetName);
+        TempExcelBuffer.ReadSheet();
+
+        // Process
+        TempExcelBuffer.Setfilter("Row No.", '>%1', 1);
+        dialogmgt.OpenCopyCountMax('processing', TempExcelBuffer.Count);
+        if TempExcelBuffer.findset then begin
+            if lastrow = 0 then
+                lastrow := TempExcelBuffer."Row No.";
+            repeat
+                dialogmgt.UpdateCopyCount();
+                if lastrow <> TempExcelBuffer."Row No." then begin
+                    insertValueandValidatepriceline(PriceListHeader, Itemno, currcode, startdate, enddata, Unitprice, custcode, Custype);
+                    Itemno := '';
+                    currcode := '';
+                    custcode := '';
+                    Custype := '';
+                    startdate := 0D;
+                    enddata := 0D;
+                    Unitprice := 0;
+                    lastrow := TempExcelBuffer."Row No.";
+                end;
+                case TempExcelBuffer."Column No." of
+                    1:
+                        evaluate(Itemno, TempExcelBuffer."Cell Value as Text");
+                    2:
+                        evaluate(currcode, TempExcelBuffer."Cell Value as Text");
+                    3:
+                        evaluate(startdate, TempExcelBuffer."Cell Value as Text");
+                    4:
+                        evaluate(enddata, TempExcelBuffer."Cell Value as Text");
+                    5:
+                        evaluate(Unitprice, TempExcelBuffer."Cell Value as Text");
+                    6:
+                        Evaluate(custcode, TempExcelBuffer."Cell Value as Text");
+                    7:
+                        Evaluate(Custype, TempExcelBuffer."Cell Value as Text");
+
+                end;
+            until TempExcelBuffer.next = 0;
+            insertValueandValidatepriceline(PriceListHeader, Itemno, currcode, startdate, enddata, Unitprice, custcode, Custype);
+
+        end;
+
+
+    end;
+
+    procedure insertValueandValidatepriceline(PriceListHeader: Record "Price List Header"; Itemno: code[20]; currcode: code[10]; startdate: date; enddata: date; Unitprice: Decimal; Custcode: code[20]; Custtype: code[20])
+    var
+        Pricelistline: record "Price List Line";
+        X: Integer;
+    begin
+        Pricelistline.setrange("Price List Code", PriceListHeader.code);
+        if Pricelistline.findlast then
+            x := X + 10000 + Pricelistline."Line No.";
+
+        Pricelistline.init;
+        Pricelistline.VALIDATE("Price List Code", PriceListHeader.Code);
+        Pricelistline.VALIDATE("Line No.", X);
+        Pricelistline.Insert(true);
+        Pricelistline.Validate("Source Type", PriceListHeader."Source Type");
+        Pricelistline.Validate("Source No.", PriceListHeader."Source No.");
+        Pricelistline.Validate("Parent Source No.", PriceListHeader."Parent Source No.");
+        Pricelistline.Validate("Source ID", PriceListHeader."Source ID");
+        Pricelistline.Validate("Allow Invoice Disc.", true);
+        Pricelistline.Validate("Allow Line Disc.", true);
+        Case Custtype OF
+            'ALL':
+                Pricelistline.Validate("Source Type", Pricelistline."Source Type"::"All Customers");
+            'CUST':
+                Pricelistline.Validate("Source Type", Pricelistline."Source Type"::Customer);
+            'PRICE':
+                Pricelistline.Validate("Source Type", Pricelistline."Source Type"::"Customer Price Group");
+            'DISC':
+                Pricelistline.Validate("Source Type", Pricelistline."Source Type"::"Customer Disc. Group");
+        End;
+
+        Pricelistline.Validate("Assign-to No.", custcode);
+
+        //Pricelistline.Validate("Assign-to Parent No.", PriceListHeader."Assign-to Parent No.");
+        if PriceListHeader."VAT Bus. Posting Gr. (Price)" <> '' then
+            Pricelistline.validate("VAT Bus. Posting Gr. (Price)", PriceListHeader."VAT Bus. Posting Gr. (Price)");
+        Pricelistline.VALIDATE("Asset No.", Itemno);
+        Pricelistline.Validate("Price Includes VAT", PriceListHeader."Price Includes VAT");
+        Pricelistline.modify(true);
+        Pricelistline.VALIDATE("Starting Date", startdate);
+        Pricelistline.VALIDATE("Ending Date", enddata);
+        Pricelistline.modify(true);
+        pricelistline.VALIDATE("Currency Code", currcode);
+        Pricelistline.modify(true);
+        Pricelistline.validate("Unit Price", Unitprice);
+        Pricelistline.modify(true);
+
+
+    end;
+    // price list import <<
     var
         ZyxelApitype: enum zyxelApitype;
 
