@@ -2313,6 +2313,7 @@ codeunit 50055 AmazonHelper
         currcode: code[10];
         custcode: code[20];
         Custype: Code[20];
+        MoU: code[10];
         startdate: date;
         enddata: date;
         Unitprice: Decimal;
@@ -2339,10 +2340,11 @@ codeunit 50055 AmazonHelper
             repeat
                 dialogmgt.UpdateCopyCount();
                 if lastrow <> TempExcelBuffer."Row No." then begin
-                    insertValueandValidatepriceline(PriceListHeader, Itemno, currcode, startdate, enddata, Unitprice, custcode, Custype);
+                    insertValueandValidatepriceline(PriceListHeader, Itemno, currcode, startdate, enddata, Unitprice, custcode, Custype, MoU);
                     Itemno := '';
                     currcode := '';
                     custcode := '';
+                    MoU := '';
                     Custype := '';
                     startdate := 0D;
                     enddata := 0D;
@@ -2364,17 +2366,19 @@ codeunit 50055 AmazonHelper
                         Evaluate(custcode, TempExcelBuffer."Cell Value as Text");
                     7:
                         Evaluate(Custype, TempExcelBuffer."Cell Value as Text");
+                    8:
+                        Evaluate(MoU, TempExcelBuffer."Cell Value as Text");
 
                 end;
             until TempExcelBuffer.next = 0;
-            insertValueandValidatepriceline(PriceListHeader, Itemno, currcode, startdate, enddata, Unitprice, custcode, Custype);
+            insertValueandValidatepriceline(PriceListHeader, Itemno, currcode, startdate, enddata, Unitprice, custcode, Custype, MoU);
 
         end;
 
 
     end;
 
-    procedure insertValueandValidatepriceline(PriceListHeader: Record "Price List Header"; Itemno: code[20]; currcode: code[10]; startdate: date; enddata: date; Unitprice: Decimal; Custcode: code[20]; Custtype: code[20])
+    procedure insertValueandValidatepriceline(PriceListHeader: Record "Price List Header"; Itemno: code[20]; currcode: code[10]; startdate: date; enddata: date; Unitprice: Decimal; Custcode: code[20]; Custtype: code[20]; UoM: Code[10])
     var
         Pricelistline: record "Price List Line";
         X: Integer;
@@ -2419,6 +2423,13 @@ codeunit 50055 AmazonHelper
         Pricelistline.modify(true);
         Pricelistline.validate("Unit Price", Unitprice);
         Pricelistline.modify(true);
+        Pricelistline.Validate("Unit of Measure Code", UoM);
+        Pricelistline.modify(true);
+        Pricelistline.Verify();
+        Pricelistline.get(Pricelistline."Price List Code", Pricelistline."Line No.");
+        Pricelistline.modify(true);
+
+
 
 
     end;
