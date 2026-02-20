@@ -217,17 +217,14 @@ Report 50026 "WEEE Excel Export"
     var
         recSalesShipHead: Record "Sales Shipment Header";
         recSalesCrMemoHead: Record "Sales Cr.Memo Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
     begin
         begin
             pItemLedgerEntry.Quantity := -pItemLedgerEntry.Quantity;
             ShipToCountry := '';
 
             if pItemLedgerEntry."Entry Type" = pItemLedgerEntry."entry type"::Sale then begin
-                if ((pItemLedgerEntry."Document Type" = pItemLedgerEntry."document type"::"Sales Shipment") or
-                    ((pItemLedgerEntry."Document Type" = pItemLedgerEntry."document type"::"Sales Credit Memo") and
-                    (pItemLedgerEntry."Return Reason Code" = '1'))) and
-                   (not CustTmp.Get(pItemLedgerEntry."Source No."))
-                then begin
+                if (not CustTmp.Get(pItemLedgerEntry."Source No.")) then begin
                     case pItemLedgerEntry."Document Type" of
                         pItemLedgerEntry."document type"::"Sales Shipment":
                             begin
@@ -254,21 +251,49 @@ Report 50026 "WEEE Excel Export"
                                 if pCompanyName <> '' then
                                     recSalesCrMemoHead.ChangeCompany(pCompanyName);
 
-                                recSalesCrMemoHead.Get(pItemLedgerEntry."Document No.");
-                                if (recSalesCrMemoHead."Ship-to Country/Region Code" = '') or (StrPos(ShipToCountries, recSalesCrMemoHead."Ship-to Country/Region Code") <> 0) then begin
-                                    if recSalesCrMemoHead."Ship-to Country/Region Code" <> '' then
-                                        ShipToCountry := recSalesCrMemoHead."Ship-to Country/Region Code"
-                                    else
-                                        if StrPos(ShipToCountries, recSalesCrMemoHead."Sell-to Country/Region Code") <> 0 then
-                                            ShipToCountry := recSalesCrMemoHead."Sell-to Country/Region Code" + Text003
+                                IF (pItemLedgerEntry."Return Reason Code" = '1') then begin
+                                    recSalesCrMemoHead.Get(pItemLedgerEntry."Document No.");
+                                    if (recSalesCrMemoHead."Ship-to Country/Region Code" = '') or (StrPos(ShipToCountries, recSalesCrMemoHead."Ship-to Country/Region Code") <> 0) then begin
+                                        if recSalesCrMemoHead."Ship-to Country/Region Code" <> '' then
+                                            ShipToCountry := recSalesCrMemoHead."Ship-to Country/Region Code"
                                         else
-                                            if recSalesCrMemoHead."Sell-to Country/Region Code" <> '' then
-                                                CurrReport.Skip;
+                                            if StrPos(ShipToCountries, recSalesCrMemoHead."Sell-to Country/Region Code") <> 0 then
+                                                ShipToCountry := recSalesCrMemoHead."Sell-to Country/Region Code" + Text003
+                                            else
+                                                if recSalesCrMemoHead."Sell-to Country/Region Code" <> '' then
+                                                    CurrReport.Skip;
+                                    end else
+                                        CurrReport.Skip
                                 end else
-                                    CurrReport.Skip
+                                    CurrReport.Skip;
                             end;
+                        pItemLedgerEntry."document type"::"Sales Invoice":
+                            begin
+                                if (Not ZGT.IsRhq()) then begin
+                                    if pCompanyName <> '' then
+                                        SalesInvoiceHeader.ChangeCompany(pCompanyName);
+
+
+                                    SalesInvoiceHeader.Get(pItemLedgerEntry."Document No.");
+                                    if (SalesInvoiceHeader."Ship-to Country/Region Code" = '') or (StrPos(ShipToCountries, SalesInvoiceHeader."Ship-to Country/Region Code") <> 0) then begin
+                                        if SalesInvoiceHeader."Ship-to Country/Region Code" <> '' then
+                                            ShipToCountry := SalesInvoiceHeader."Ship-to Country/Region Code"
+                                        else
+                                            if StrPos(ShipToCountries, SalesInvoiceHeader."Sell-to Country/Region Code") <> 0 then
+                                                ShipToCountry := SalesInvoiceHeader."Sell-to Country/Region Code" + Text003
+                                            else
+                                                if SalesInvoiceHeader."Sell-to Country/Region Code" <> '' then
+                                                    CurrReport.Skip;
+                                    end else
+                                        CurrReport.Skip;
+
+                                    pItemLedgerEntry."Return Reason Code" := '';
+                                end else
+                                    CurrReport.Skip;
+                            end;
+
                         else
-                            Error(Text002, pItemLedgerEntry.FieldCaption(pItemLedgerEntry."Document Type"), pItemLedgerEntry."Document Type");
+                    //    Error(Text002, pItemLedgerEntry.FieldCaption(pItemLedgerEntry."Document Type"), pItemLedgerEntry."Document Type");
                     end;
 
                     recItem.SetRange("No.", pItemLedgerEntry."Item No.");
@@ -331,6 +356,8 @@ Report 50026 "WEEE Excel Export"
         ExcelBuf.AddColumn(recItem.FieldCaption("Gross Weight") + lText001, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(recItem.FieldCaption("Paper Weight"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(recItem.FieldCaption("Paper Weight") + lText001, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn(recItem.FieldCaption("Empty Outer Carton Weight"), false, '', true, false, false, '', ExcelBuf."cell type"::Text); //03-02-2026 BK #553504
+        ExcelBuf.AddColumn(recItem.FieldCaption("Empty Outer Carton Weight") + lText001, false, '', true, false, false, '', ExcelBuf."cell type"::Text); //03-02-2026 BK #553504
         ExcelBuf.AddColumn(recItem.FieldCaption("Plastic Weight"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(recItem.FieldCaption("Plastic Weight") + lText001, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(recItem.FieldCaption("Battery weight"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
@@ -340,11 +367,10 @@ Report 50026 "WEEE Excel Export"
         ExcelBuf.AddColumn(recItem.FieldCaption("Tariff No."), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(recItem.FieldCaption("UN Code"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(recItem.FieldCaption("UN Code") + lText002, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn(lText005, false, '', true, false, false, '', ExcelBuf."cell type"::Text);  // 17-10-18 ZY-LD 001
+        ExcelBuf.AddColumn(lText005, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(lText004, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        //ExcelBuf.AddColumn(recItem.FieldCaption(B2B),FALSE,'',TRUE,FALSE,FALSE,'',ExcelBuf."Cell Type"::Text);  // 16-01-19 ZY-LD 002  // 07-10-20 ZY-LD 004
-        //ExcelBuf.AddColumn(recItem.FieldCaption(B2C),FALSE,'',TRUE,FALSE,FALSE,'',ExcelBuf."Cell Type"::Text);  // 16-01-19 ZY-LD 002  // 07-10-20 ZY-LD 004
-        ExcelBuf.AddColumn(recItem.FieldCaption("Business to"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);  // 07-10-20 ZY-LD 004
+
+        ExcelBuf.AddColumn(recItem.FieldCaption("Business to"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.NewRow;
     end;
 
@@ -368,6 +394,8 @@ Report 50026 "WEEE Excel Export"
             AddColumnDecimal(recItem."Gross Weight" * pItemLedgerEntry.Quantity, '#,###,##0.000');
             AddColumnDecimal(recItem."Paper Weight", '#,###,##0.000');
             AddColumnDecimal(recItem."Paper Weight" * pItemLedgerEntry.Quantity, '#,###,##0.000');
+            AddColumnDecimal(recItem."Empty Outer Carton Weight", '#,###,##0.000'); //03-02-2026 BK #553504
+            AddColumnDecimal(recItem."Empty Outer Carton Weight" * pItemLedgerEntry.Quantity, '#,###,##0.000'); //03-02-2026 BK #553504
             AddColumnDecimal(recItem."Plastic Weight", '#,###,##0.000');
             AddColumnDecimal(recItem."Plastic Weight" * pItemLedgerEntry.Quantity, '#,###,##0.000');
             AddColumnDecimal(recItem."Battery weight", '#,###,##0.0000000000');
@@ -377,11 +405,9 @@ Report 50026 "WEEE Excel Export"
             ExcelBuf.AddColumn(recItem."Tariff No.", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn(recItem."UN Code", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn(recBatteryUNCodes.Description, false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.AddColumn(recItem."Product Length (cm)" > 50, false, '', false, false, false, '', ExcelBuf."cell type"::Text);  // 17-10-18 ZY-LD 001
+            ExcelBuf.AddColumn(recItem."Product Length (cm)" > 50, false, '', false, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn(pRelation, false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-            //ExcelBuf.AddColumn(recItem.B2B,FALSE,'',TRUE,FALSE,FALSE,'',ExcelBuf."Cell Type"::Text);  // 16-01-19 ZY-LD 002  // 07-10-20 ZY-LD 004
-            //ExcelBuf.AddColumn(recItem.B2C,FALSE,'',TRUE,FALSE,FALSE,'',ExcelBuf."Cell Type"::Text);  // 16-01-19 ZY-LD 002  // 07-10-20 ZY-LD 004
-            ExcelBuf.AddColumn(StrSubstNo('%1 %2', recItem.FieldCaption("Business to"), Format(recItem."Business to")), false, '', true, false, false, '', ExcelBuf."cell type"::Text);  // 07-10-20 ZY-LD 004
+            ExcelBuf.AddColumn(StrSubstNo('%1 %2', recItem.FieldCaption("Business to"), Format(recItem."Business to")), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.NewRow;
         end;
     end;
@@ -404,18 +430,18 @@ Report 50026 "WEEE Excel Export"
         ExcelBuf2.AddColumn('Grand Total:', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf2.SetCurrent(GetCurRowNo, 7);
         ToRowNo := GetCurRowNo - 2;
-        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 4, ToRowNo), true, '', true, false, false, '##,###,##0', ExcelBuf."cell type"::Number);
-        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 4, ToRowNo), true, '', true, false, false, '##,###,##0', ExcelBuf."cell type"::Number);
-        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 4, ToRowNo), true, '', true, false, false, '##,###,##0.00', ExcelBuf."cell type"::Number);
-        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 4, ToRowNo), true, '', true, false, false, '##,###,##0.000', ExcelBuf."cell type"::Number);
-        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 4, ToRowNo), true, '', true, false, false, '##,###,##0.000', ExcelBuf."cell type"::Number);
-        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 4, ToRowNo), true, '', true, false, false, '##,###,##0.000', ExcelBuf."cell type"::Number);
-        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 4, ToRowNo), true, '', true, false, false, '##,###,##0.000', ExcelBuf."cell type"::Number);
-        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 4, ToRowNo), true, '', true, false, false, '##,###,##0.000', ExcelBuf."cell type"::Number);
-        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 4, ToRowNo), true, '', true, false, false, '##,###,##0.000', ExcelBuf."cell type"::Number);
-        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 4, ToRowNo), true, '', true, false, false, '##,###,##0.000', ExcelBuf."cell type"::Number);
-        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 4, ToRowNo), true, '', true, false, false, '##,###,##0.0000000000', ExcelBuf."cell type"::Number);
-        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 4, ToRowNo), true, '', true, false, false, '##,###,##0.0000000000', ExcelBuf."cell type"::Number);
+        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 2, ToRowNo), true, '', true, false, false, '##,###,##0', ExcelBuf."cell type"::Number);
+        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 2, ToRowNo), true, '', true, false, false, '##,###,##0', ExcelBuf."cell type"::Number);
+        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 2, ToRowNo), true, '', true, false, false, '##,###,##0.00', ExcelBuf."cell type"::Number);
+        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 2, ToRowNo), true, '', true, false, false, '##,###,##0.000', ExcelBuf."cell type"::Number);
+        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 2, ToRowNo), true, '', true, false, false, '##,###,##0.000', ExcelBuf."cell type"::Number);
+        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 2, ToRowNo), true, '', true, false, false, '##,###,##0.000', ExcelBuf."cell type"::Number);
+        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 2, ToRowNo), true, '', true, false, false, '##,###,##0.000', ExcelBuf."cell type"::Number);
+        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 2, ToRowNo), true, '', true, false, false, '##,###,##0.000', ExcelBuf."cell type"::Number);
+        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 2, ToRowNo), true, '', true, false, false, '##,###,##0.000', ExcelBuf."cell type"::Number);
+        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 2, ToRowNo), true, '', true, false, false, '##,###,##0.000', ExcelBuf."cell type"::Number);
+        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 2, ToRowNo), true, '', true, false, false, '##,###,##0.0000000000', ExcelBuf."cell type"::Number);
+        ExcelBuf2.AddColumn(StrSubstNo(lText001, GetColumn, 2, ToRowNo), true, '', true, false, false, '##,###,##0.0000000000', ExcelBuf."cell type"::Number);
     end;
 
 
