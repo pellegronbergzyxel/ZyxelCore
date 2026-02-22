@@ -3,10 +3,6 @@
   "name": "Zyxel Core",
   "publisher": "Vision People A/S",
   "version": "1.26.6.25",
-<<<<<<< HEAD
-
-=======
->>>>>>> d76b6f35b56aa8fcc3f11a863f24e0b773203c8f
   "brief": "",
   "description": "Zyxel core: EMEA,IT",
   "privacyStatement": "",
@@ -29,7 +25,7 @@
     },
     {
       "id": "87990153-0e35-4e5d-ba61-2e93077d1699",
-      "name": "_Exclude_Review_General_Ledger_Entries",
+      "name": "Review General Ledger Entries",
       "publisher": "Microsoft",
       "version": "22.0.0.0"
     }
