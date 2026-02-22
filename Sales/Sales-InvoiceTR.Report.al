@@ -662,7 +662,7 @@ Report 50066 "Sales - Invoice TR"
                             VATAmountLine."VAT Identifier" := "Sales Invoice Line"."VAT Identifier";
                             VATAmountLine."VAT Calculation Type" := "Sales Invoice Line"."VAT Calculation Type";
                             VATAmountLine."Tax Group Code" := "Sales Invoice Line"."Tax Group Code";
-                            VATAmountLine."VAT %" := "Sales Invoice Line"."VAT %";
+                            VATAmountLine."VAT %" := "Sales Invoice Line"."VAT %" / 100; //20-02-26 BK #557829
                             VATAmountLine."VAT Base" := "Sales Invoice Line".Amount;
                             VATAmountLine."Amount Including VAT" := "Sales Invoice Line"."Amount Including VAT";
                             VATAmountLine."Line Amount" := "Sales Invoice Line"."Line Amount";

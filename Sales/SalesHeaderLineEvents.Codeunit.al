@@ -3201,13 +3201,22 @@ codeunit 50067 "Sales Header/Line Events"
         ZGT: Codeunit "ZyXEL General Tools";
     begin
         // 15-05-2025 BK #493054 and (#556148)
-        IF ZGT.IsZComCompany() then
+        IF ZGT.IsZComCompany() then begin
             IF (ShouldCopyLocationCode) and (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) then begin
                 IF ShipToAddress."Location Code" <> '' then
                     ShipLocation.get(ShipToAddress."Location Code");
                 IF (ShipLocation."Sales Order Type" <> SalesHeader."Sales Order Type") then
                     ShouldCopyLocationCode := false;
             end;
+
+            if (Not zgt.IsRhq()) then
+                IF (ShouldCopyLocationCode) and (SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice) then
+                    ShouldCopyLocationCode := false;
+
+            if (Not zgt.IsRhq()) then
+                IF (ShouldCopyLocationCode) and (SalesHeader."Document Type" = SalesHeader."Document Type"::"Credit Memo") then
+                    ShouldCopyLocationCode := false;
+        end;
         // 15-05-2025 BK #493054
     end;
 

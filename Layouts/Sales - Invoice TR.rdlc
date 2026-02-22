@@ -11,7 +11,7 @@
       <am:Name>MSRB</am:Name>
       <am:Version>15.1.30001.02</am:Version>
     </am:UpdatedBy>
-    <am:LastModifiedTimestamp>2026-01-26T14:41:26.3327315Z</am:LastModifiedTimestamp>
+    <am:LastModifiedTimestamp>2026-02-20T10:03:06.5336440Z</am:LastModifiedTimestamp>
   </am:AuthoringMetadata>
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -1276,7 +1276,6 @@
                                       <TablixCell />
                                       <TablixCell>
                                         <CellContents>
-                                          <rd:Selected>true</rd:Selected>
                                           <Textbox Name="Textbox13">
                                             <rd:DefaultName>Textbox13</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
@@ -1731,6 +1730,7 @@
                                       <TablixCell />
                                       <TablixCell>
                                         <CellContents>
+                                          <rd:Selected>true</rd:Selected>
                                           <Textbox Name="Textbox48">
                                             <rd:DefaultName>Textbox48</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
@@ -1739,7 +1739,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!VATAmtLineVATPer.Value/100</Value>
+                                                    <Value>=Sum(Fields!VATAmtLineVATPer.Value)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
