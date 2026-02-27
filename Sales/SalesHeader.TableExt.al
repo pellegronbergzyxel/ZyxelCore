@@ -396,6 +396,10 @@ tableextension 50116 SalesHeaderZX extends "Sales Header"
             Caption = 'From RHQ';
             Description = 'Unused';
         }
+        field(50106; "From CDC"; Boolean)
+        { //25-02-2026 BK SalesOrder Import from Jon
+            Caption = 'From CDC';
+        }
 
         field(55015; AmazonePoNo; Code[35])
         {
