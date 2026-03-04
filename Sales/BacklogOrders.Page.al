@@ -4,12 +4,12 @@ page 50090 "Backlog Orders"
     ApplicationArea = Basic, Suite;
     Caption = 'Backlog Orders';
     PageType = List;
-    SourceTable = "Sales Line";
+    SourceTable = "Sales Line"; //0303-2026 BK #522282
+
     SourceTableView = sorting("Document No.", "Line No.", "Document Type")
                       where("Document Type" = const(Order),
                             Type = const(Item),
-                            "Completely Shipped" = const(false),
-                            "Outstanding Quantity" = filter(<> 0),
+                            "Warehouse Status" = filter(0 | 1 | 2 | 3 | 4 | 5 | 6 | 8),
                             "BOM Line No." = const(0),
                             "Additional Item Line No." = const(0));
     UsageCategory = Lists;
