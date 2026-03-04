@@ -49,7 +49,7 @@ Report 50004 "Export Customer/Item Sales"
                             if recSalesInvHead.Get("Value Entry"."Document No.") then begin
                                 ShipToCode := recSalesInvHead."Ship-to Code";
                                 ShipToName := copystr(recSalesInvHead."Ship-to Name", 1, 50);
-                                ExtDocNo := recSalesInvHead."Your Reference";
+                                ExtDocNo := FindExtInvDocumentNo("Value Entry"); //04-03-2026 BK #556008
                                 DelDocNo := recSalesInvHead."Picking List No.";
                                 //03-03-2026 BK #522282
                                 SalesPerson := recSalesInvHead."Salesperson Code";
@@ -64,7 +64,8 @@ Report 50004 "Export Customer/Item Sales"
                             if recSalesCrMemoHead.Get("Value Entry"."Document No.") then begin
                                 ShipToCode := recSalesCrMemoHead."Ship-to Code";
                                 ShipToName := copystr(recSalesCrMemoHead."Ship-to Name", 1, 50);
-                                ExtDocNo := recSalesCrMemoHead."Your Reference";
+                                ExtDocNo := FindExtCRDocumentNo("Value Entry"); //04-03-2026 BK #556008
+                                ;
                                 //03-03-2026 BK #522282
                                 SalesPerson := recSalesCrMemoHead."Salesperson Code";
                                 ODResponsible := recSalesCrMemoHead."Order Desk Resposible Code";
@@ -109,7 +110,6 @@ Report 50004 "Export Customer/Item Sales"
                         EnterCell(RowNo, 14, '', false, false, false);
                         EnterCell(RowNo, 15, "Value Entry"."Item No.", false, false, false);
                         // 489194 >>
-                        // EnterCell(RowNo, 16, Item.Description, false, false, false);
                         if "Value Entry".Description <> '' then
                             EnterCell(RowNo, 16, "Value Entry".Description, false, false, false)
                         else
@@ -125,8 +125,6 @@ Report 50004 "Export Customer/Item Sales"
                         EnterCell(RowNo, 21, Format(Round("Value Entry"."Sales Amount (Actual)" * CurrencyFactor, Currency."Amount Rounding Precision", '<')), false, false, false);
                         EnterCell(RowNo, 22, Currency.Code, false, false, false);
                         EnterCell(RowNo, 23, Customer."Global Dimension 1 Code", false, false, false);
-
-                        // PAB 09/04/18
                         EnterCell(RowNo, 24, Item."Category 1 Code", false, false, false);
                         EnterCell(RowNo, 25, Item."Category 2 Code", false, false, false);
                         EnterCell(RowNo, 26, Item."Category 3 Code", false, false, false);
@@ -256,6 +254,7 @@ Report 50004 "Export Customer/Item Sales"
         Text003: label 'External Document No.';
         Text004: label 'Delivery Document No.';
 
+    //04-03-2026 BK #556008
     local procedure EnterCell(RowNo: Integer; ColumnNo: Integer; CellValue: Text[250]; Bold: Boolean; Italic: Boolean; UnderLine: Boolean)
     begin
         TempExcelBuffer.Init();
@@ -267,6 +266,35 @@ Report 50004 "Export Customer/Item Sales"
         TempExcelBuffer.Italic := Italic;
         TempExcelBuffer.Underline := UnderLine;
         TempExcelBuffer.Insert();
+    end;
+
+    //04-03-2026 BK #556008
+    local procedure FindExtInvDocumentNo(ValEntry: Record "Value Entry") ReturnExtDocNo: Code[35]
+    var
+        LocalSalesInvLine: Record "Sales Invoice Line";
+
+    begin
+        if "Value Entry"."Document Type" = "Value Entry"."Document Type"::"Sales Invoice" then begin
+            if LocalSalesInvLine.get("Value Entry"."Document No.", "Value Entry"."Document Line No.") then
+                if LocalSalesInvLine."External Document No." <> '' then
+                    ReturnExtDocNo := LocalSalesInvLine."External Document No."
+                else
+                    ReturnExtDocNo := "Value Entry"."External Document No.";
+        end;
+    end;
+
+    local procedure FindExtCRDocumentNo(ValEntry: Record "Value Entry") ReturnExtDocNo: Code[35]
+    var
+        LocalSalesCRLine: Record "Sales Cr.Memo Line";
+
+    begin
+        if "Value Entry"."Document Type" = "Value Entry"."Document Type"::"Sales Credit Memo" then begin
+            if LocalSalesCRLine.get("Value Entry"."Document No.", "Value Entry"."Document Line No.") then
+                if LocalSalesCRLine."External Document No." <> '' then
+                    ReturnExtDocNo := LocalSalesCRLine."External Document No."
+                else
+                    ReturnExtDocNo := "Value Entry"."External Document No.";
+        end;
     end;
 
 }
