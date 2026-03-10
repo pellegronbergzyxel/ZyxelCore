@@ -76,6 +76,9 @@ page 50223 "Enter Selected Fields"
         recCust: Record Customer;
         ZGT: Codeunit "ZyXEL General Tools";
     begin
+        if rec."From CDC" then //05-03-2026 BK #549826
+            exit;
+
         ShipToCodeVisible := Rec."Sales Order Type" <> Rec."sales order type"::EICard;
         SendMailVisible := Rec."Send Mail" = true;
         EicardTypeVisible := Rec."Eicard Type" <> Rec."eicard type"::" ";  // 18-02-20 ZY-LD 002

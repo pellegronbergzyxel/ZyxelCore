@@ -216,6 +216,9 @@ codeunit 50067 "Sales Header/Line Events"
         lText001: Label '"%1" %2 does not match "%3" %4.';
 
     begin
+        if (rec."From CDC") then //05-03-2026 BK #549826
+            exit;
+
         if (Rec."Document Type" in [Rec."document type"::Quote, Rec."document type"::Order, Rec."document type"::Invoice]) and
            (Rec."Sales Order Type" <> Rec."sales order type"::" ")
         then
@@ -681,6 +684,19 @@ codeunit 50067 "Sales Header/Line Events"
         SalOrdTypeRel: Record "Sales Order Type Relation";
 
     begin
+        if SalesHeader."From CDC" then //05-03-2026 BK #549826
+            begin
+            if Location.get(SalesHeader."Location Code") then begin
+                if Location."Sales Order Type" <> 0 then
+                    SalesHeader."Sales Order Type" := Location."Sales Order Type";
+
+                if SalesHeader."Sales Order Type" = SalesHeader."sales order type"::EICard then
+                    SalesHeader."Eicard Type" := SalesHeader."eicard type"::Normal
+                else
+                    SalesHeader."Eicard Type" := SalesHeader."eicard type"::" ";
+            End;
+        end;
+
         // If the location code has changed we change it back again.
         if ((SalesHeader."Sales Order Type" <> SalesHeader."Sales Order Type"::" ") and (SalesHeader."Sales Order Type" <> SalesHeader."Sales Order Type"::"G/L Account")) and
            (SalesHeader."Document Type" IN [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::Quote])
@@ -1015,6 +1031,9 @@ codeunit 50067 "Sales Header/Line Events"
         ZGT: Codeunit "ZyXEL General Tools";
         EnterSelectedFields: Page "Enter Selected Fields";
     begin
+        if rec."From CDC" then
+            exit; //05-03-2026 BK #549826
+
         if (GuiAllowed()) and
             (ZGT.IsRhq() or ZGT.CompanyNameIs(9) or ZGT.CompanyNameIs(14)) and
             (not Rec."eCommerce Order") and

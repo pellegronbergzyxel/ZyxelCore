@@ -694,6 +694,7 @@ codeunit 50048 "Intercompany Events"
                     SalesLine.Validate(SalesLine."Unit Price", CurrExchRates.ExchangeAmtFCYToFCY(SalesHeader."Order Date",
                                                                PurchLine."Currency Code", SalesLine."Currency Code",
                                                                PurchLine."Direct Unit Cost"));
+
                     SalesLine.Description := PurchLine.Description;
                 end else begin
                     SalesLine.Description := PurchLine.Description;
@@ -730,6 +731,10 @@ codeunit 50048 "Intercompany Events"
                 SalesLine."Hide Line" := PurchLine."Hide Line";
                 SalesLine."External Document Position No." := PurchLine."External Document Position No.";
                 SalesLine."Skip Posting Group Validation" := SalesHeader."Skip Posting Group Validation";
+                //10-03-2026 BK #560757
+                if (SalesLine."Unit Cost (LCY)" = 0) and (PurchLine."Unit Cost (LCY)" <> 0) and (PurchLine.Type = PurchLine.Type::Item) then
+                    SalesLine.Validate(SalesLine."Unit Cost (LCY)", PurchLine."Unit Cost (LCY)");
+
                 SalesLine.Modify();
 
                 PurchLine."Special Order" := true;

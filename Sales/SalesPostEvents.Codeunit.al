@@ -42,6 +42,7 @@ codeunit 50080 "Sales Post Events"
         recLocation: Record Location;
         ItemLedgEntry: Record "Item Ledger Entry";
         SaleslinecheckDD: Record "Sales Line";
+        PostedPurchLine: Record "Purch. Inv. Line"; //10-03-2026 BK #560757
         ItemWithZeroPriceFound: Boolean;
         showwarning: Boolean;
         lText001: Label 'Additional item lines must not have a value in "%1".';
@@ -287,8 +288,18 @@ codeunit 50080 "Sales Post Events"
                                                 ItemLedgEntry.SetRange("Entry Type", ItemLedgEntry."Entry Type"::Purchase);
                                                 ItemLedgEntry.SetRange("Location Code", recSaleLine."Location Code");
                                                 ItemLedgEntry.SetFilter("Cost Posted to G/L", '<>0');
-                                                if (recItem.Type = recItem.type::Inventory) and ((not recItem."Allow Unit Cost is Zero") or (ItemLedgEntry.FindLast())) then
-                                                    recSaleLine.TESTFIELD("Unit Cost (LCY)");
+                                                if (recItem.Type = recItem.type::Inventory) and ((not recItem."Allow Unit Cost is Zero") or (ItemLedgEntry.FindLast())) then begin
+                                                    //10-03-2026 BK #560757
+                                                    if recSaleLine."Unit Cost" = 0 then begin
+                                                        if PostedPurchLine.get(recSaleLine."Special Order Purchase No.", recSaleLine."Special Order Purch. Line No.") then begin
+                                                            if PostedPurchLine."Unit Price (LCY)" <> 0 then
+                                                                recSaleLine.TESTFIELD("Unit Cost (LCY)");
+                                                        end else
+                                                            recSaleLine.TESTFIELD("Unit Cost (LCY)");
+
+                                                    end else
+                                                        recSaleLine.TESTFIELD("Unit Cost (LCY)");
+                                                560757end;
                                             end;
                                         end;
 
