@@ -634,7 +634,6 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
         NS := NS.XmlNamespaceManager(XDoc.NameTable);
         NS.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');  // Change "Rep*" here
         rValue := XDoc.SelectSingleNode('//d:root', NS).InnerXml;
-
         ZyWsRequest.ReplicateICInboxPurchHead(pCompanyname, rValue);
         //<< 19-06-18 ZY-LD 003
     end;
