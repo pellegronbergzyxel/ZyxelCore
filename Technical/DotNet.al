@@ -21,7 +21,7 @@ dotnet
         type("System.Net.UploadFileCompletedEventArgs"; "UploadFileCompletedEventArgs") { }
         type("System.Net.UploadValuesCompletedEventArgs"; "UploadValuesCompletedEventArgs") { }
         type("System.Net.DownloadProgressChangedEventArgs"; "DownloadProgressChangedEventArgs") { }
-        type("System.Net.UploadProgressChangedEventArgs"; "UploadProgressChangedEventArgs") { }
+        //    type("System.Net.UploadProgressChangedEventArgs"; "UploadProgressChangedEventArgs") { }
     }
     assembly("System.Xml")
     {
@@ -63,13 +63,14 @@ dotnet
 
         type("VisionPeople.Net.Ftp.ComFtpSecure"; "ComFtpSecure") { }
     }
-    assembly("Microsoft.VisualBasic")
-    {
+    // 2026-03-03:  Not used
+    // assembly("Microsoft.VisualBasic")
+    // {
 
-        Culture = 'neutral';
-        PublicKeyToken = 'b03f5f7f11d50a3a';
-        Version = '10.0.0.0';
+    //     Culture = 'neutral';
+    //     PublicKeyToken = 'b03f5f7f11d50a3a';
+    //     Version = '10.0.0.0';
 
-        type("Microsoft.VisualBasic.Interaction"; "Interaction") { }
-    }
+    //     type("Microsoft.VisualBasic.Interaction"; "Interaction") { }
+    // }
 }

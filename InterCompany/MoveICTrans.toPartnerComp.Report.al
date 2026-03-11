@@ -596,7 +596,7 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
     begin
     end;
 
-    local procedure ReplicateICInboxPurchDoc(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
+    local procedure ReplicateICInboxPurchDocOLD(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
     var
         recItem: Record Item;
         StreamOut: OutStream;
@@ -612,6 +612,7 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
         OutStr: OutStream;
         InStr: InStream;
     begin
+        // 2026.03.03: CLOUD READY DELETE 
         //>> 19-06-18 ZY-LD 003
         // Create Inner XML
         TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
@@ -636,5 +637,33 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
 
         ZyWsRequest.ReplicateICInboxPurchHead(pCompanyname, rValue);
         //<< 19-06-18 ZY-LD 003
+    end;
+
+
+    local procedure ReplicateICInboxPurchDoc(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
+    var
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        ZyWsRequest: Codeunit "Zyxel Web Service Request";
+        rValue: Text;
+        NodeText: Text;
+    begin
+        // 2026.03.03: CLOUD READY NEW
+        TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+        WSICInboxPurchHead.SetDestination(StreamOut);
+        WSICInboxPurchHead.Export;  // Change XMLPortNo.
+        TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+        XmlDocument.ReadFrom(StreamIn, XmlDoc);
+        XmlNSMgr.NameTable(XmlDoc.NameTable());
+        XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');  // Change "Rep*" here
+        if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+            XmlRootNode.WriteTo(NodeText);
+            rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 1);
+        end;
+        ZyWsRequest.ReplicateICInboxPurchHead(pCompanyname, rValue);
     end;
 }
