@@ -253,6 +253,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         WsFunctionName: Text;
         i: Integer;
         TraceMode: Boolean;
+
     begin
         Url := recWebServiceSetup.GetWsUrl(GetSetupCode(), pCompany, GetWebServiceNo());
         WsFunctionName := 'SendCustomers';  // Change here
@@ -264,6 +265,7 @@ Codeunit 50084 "Zyxel Web Service Request"
                        pInnerXML +
                      '</customers>' +
                    '</SendCustomers>';
+
 
         // Save request text in instream
         TempBlob.CreateOutstream(ReqBodyOutStream, Textencoding::UTF8);
@@ -468,6 +470,12 @@ Codeunit 50084 "Zyxel Web Service Request"
         i: Integer;
         WsFunctionName: Text;
         TraceMode: Boolean;
+        // CLOUD READY
+
+        TempBlob2: codeunit "Temp Blob";
+        outStr: OutStream;
+        filename: text;
+        inStr: InStream;
 
     begin
         Url := recWebServiceSetup.GetWsUrl(GetSetupCode(), pCompany, GetWebServiceNo());
@@ -480,6 +488,12 @@ Codeunit 50084 "Zyxel Web Service Request"
                        pInnerXML +
                      '</icInboxPurchaseHeaders>' +
                    '</SendIcInboxPurchHeader>';
+        // CLOUD READY
+        TempBlob2.CreateOutStream(outStr, TextEncoding::UTF8);
+        outStr.WriteText(pInnerXML);
+        TempBlob2.CreateInStream(inStr, TextEncoding::UTF8);
+        fileName := 'test2.txt';
+        File.DownloadFromStream(inStr, 'Export', '', '', fileName);
 
         // Save request text in instream
         TempBlob.CreateOutstream(ReqBodyOutStream, Textencoding::UTF8);

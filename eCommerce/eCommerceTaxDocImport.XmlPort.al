@@ -403,7 +403,7 @@ XmlPort 50013 "eCommerce Tax Doc. Import"
         OrderID := Col06;
         ShipmentDate := ConvertToDate(Col07);
         ShipmentID := Col08;
-        TransactionID := Col09;
+        TransactionID := Copystr(Col09, 1, 50); //11-03-2026 BK #555510
         ASINImport := Col10;
         SKU := Col11;
         Evaluate(QuantityImport, Col12, 9);

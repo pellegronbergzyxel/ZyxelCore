@@ -7,6 +7,7 @@ Page 50348 "Del. Doc. Action Code 2"
     PageType = ListPart;
     PopulateAllFields = true;
     SourceTable = "Delivery Document Action Code";
+    DelayedInsert = true;
 
     layout
     {
@@ -20,7 +21,7 @@ Page 50348 "Del. Doc. Action Code 2"
 
                     trigger OnValidate()
                     begin
-                        Rec.Insert(true);
+                        //Rec.Insert(true);
                     end;
                 }
                 field("Action Description"; Rec."Action Description")
@@ -55,7 +56,7 @@ Page 50348 "Del. Doc. Action Code 2"
 
                     trigger OnValidate()
                     begin
-                        Rec.Modify(true);
+                        //Rec.Modify(true);
                     end;
                 }
                 field("Insert Blank After This Line"; Rec."Insert Blank After This Line")
