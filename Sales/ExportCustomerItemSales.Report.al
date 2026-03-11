@@ -49,8 +49,11 @@ Report 50004 "Export Customer/Item Sales"
                             if recSalesInvHead.Get("Value Entry"."Document No.") then begin
                                 ShipToCode := recSalesInvHead."Ship-to Code";
                                 ShipToName := copystr(recSalesInvHead."Ship-to Name", 1, 50);
-                                ExtDocNo := recSalesInvHead."Your Reference";
+                                ExtDocNo := FindExtInvDocumentNo("Value Entry"); //04-03-2026 BK #556008
                                 DelDocNo := recSalesInvHead."Picking List No.";
+                                //03-03-2026 BK #522282
+                                SalesPerson := recSalesInvHead."Salesperson Code";
+                                ODResponsible := recSalesInvHead."Order Desk Resposible Code";
                                 if recSalesInvHead."Currency Code" <> '' then begin
                                     Currency.get(recSalesInvHead."Currency Code");
                                     CurrencyFactor := recSalesInvHead."Currency Factor";
@@ -61,7 +64,11 @@ Report 50004 "Export Customer/Item Sales"
                             if recSalesCrMemoHead.Get("Value Entry"."Document No.") then begin
                                 ShipToCode := recSalesCrMemoHead."Ship-to Code";
                                 ShipToName := copystr(recSalesCrMemoHead."Ship-to Name", 1, 50);
-                                ExtDocNo := recSalesCrMemoHead."Your Reference";
+                                ExtDocNo := FindExtCRDocumentNo("Value Entry"); //04-03-2026 BK #556008
+                                ;
+                                //03-03-2026 BK #522282
+                                SalesPerson := recSalesCrMemoHead."Salesperson Code";
+                                ODResponsible := recSalesCrMemoHead."Order Desk Resposible Code";
                                 if recSalesCrMemoHead."Currency Code" <> '' then begin
                                     Currency.get(recSalesCrMemoHead."Currency Code");
                                     CurrencyFactor := recSalesCrMemoHead."Currency Factor";
@@ -73,7 +80,7 @@ Report 50004 "Export Customer/Item Sales"
                     if ("Value Entry"."Invoiced Quantity" <> 0) then begin
                         EnterCell(RowNo, 1, Copystr(CompanyName(), 1, 250), false, false, false);
                         EnterCell(RowNo, 2, Customer."No.", false, false, false);
-                        EnterCell(RowNo, 3, Customer.Name + ' ' + Customer."Name 2", false, false, false);
+                        EnterCell(RowNo, 3, Customer.Name, false, false, false);
                         EnterCell(RowNo, 4, Customer.Address, false, false, false);
                         EnterCell(RowNo, 5, Customer."Post Code", false, false, false);
                         EnterCell(RowNo, 6, Customer.City, false, false, false);
@@ -103,7 +110,6 @@ Report 50004 "Export Customer/Item Sales"
                         EnterCell(RowNo, 14, '', false, false, false);
                         EnterCell(RowNo, 15, "Value Entry"."Item No.", false, false, false);
                         // 489194 >>
-                        // EnterCell(RowNo, 16, Item.Description, false, false, false);
                         if "Value Entry".Description <> '' then
                             EnterCell(RowNo, 16, "Value Entry".Description, false, false, false)
                         else
@@ -119,8 +125,6 @@ Report 50004 "Export Customer/Item Sales"
                         EnterCell(RowNo, 21, Format(Round("Value Entry"."Sales Amount (Actual)" * CurrencyFactor, Currency."Amount Rounding Precision", '<')), false, false, false);
                         EnterCell(RowNo, 22, Currency.Code, false, false, false);
                         EnterCell(RowNo, 23, Customer."Global Dimension 1 Code", false, false, false);
-
-                        // PAB 09/04/18
                         EnterCell(RowNo, 24, Item."Category 1 Code", false, false, false);
                         EnterCell(RowNo, 25, Item."Category 2 Code", false, false, false);
                         EnterCell(RowNo, 26, Item."Category 3 Code", false, false, false);
@@ -128,7 +132,8 @@ Report 50004 "Export Customer/Item Sales"
                         EnterCell(RowNo, 28, ShipToName, false, false, false);
                         EnterCell(RowNo, 29, ExtDocNo, false, false, false);
                         EnterCell(RowNo, 30, DelDocNo, false, false, false);
-
+                        EnterCell(RowNo, 31, SalesPerson, false, false, false);
+                        EnterCell(RowNo, 32, ODResponsible, false, false, false);
                         RowNo := RowNo + 1;
                     end;
                 end;
@@ -172,10 +177,12 @@ Report 50004 "Export Customer/Item Sales"
                 EnterCell(RowNo, 24, 'Category 1 Code', true, false, false);
                 EnterCell(RowNo, 25, 'Category 2 Code', true, false, false);
                 EnterCell(RowNo, 26, 'Category 3 Code', true, false, false);
-                EnterCell(RowNo, 27, Text001, true, false, false);  // 23-10-18 ZY-LD 001
-                EnterCell(RowNo, 28, Text002, true, false, false);  // 24-11-20 ZY-LD 001
-                EnterCell(RowNo, 29, Text003, true, false, false);  // 14-01-22 ZY-LD 002
-                EnterCell(RowNo, 30, Text004, true, false, false);  // 14-01-22 ZY-LD 002
+                EnterCell(RowNo, 27, Text001, true, false, false);
+                EnterCell(RowNo, 28, Text002, true, false, false);
+                EnterCell(RowNo, 29, Text003, true, false, false);
+                EnterCell(RowNo, 30, Text004, true, false, false);
+                EnterCell(RowNo, 31, 'Sales Person', true, false, false);
+                EnterCell(RowNo, 32, 'OD Responsible', true, false, false);
 
                 RowNo := 2;
 
@@ -240,13 +247,14 @@ Report 50004 "Export Customer/Item Sales"
         CurrencyFactor: Decimal;
         ExtDocNo: Code[35];
         DelDocNo: Code[20];
+        SalesPerson: Text[100];
+        ODResponsible: Text[100];
         Text001: label 'Ship-to Code';
-
         Text002: label 'Ship-to Name';
-
         Text003: label 'External Document No.';
         Text004: label 'Delivery Document No.';
 
+    //04-03-2026 BK #556008
     local procedure EnterCell(RowNo: Integer; ColumnNo: Integer; CellValue: Text[250]; Bold: Boolean; Italic: Boolean; UnderLine: Boolean)
     begin
         TempExcelBuffer.Init();
@@ -258,6 +266,35 @@ Report 50004 "Export Customer/Item Sales"
         TempExcelBuffer.Italic := Italic;
         TempExcelBuffer.Underline := UnderLine;
         TempExcelBuffer.Insert();
+    end;
+
+    //04-03-2026 BK #556008
+    local procedure FindExtInvDocumentNo(ValEntry: Record "Value Entry") ReturnExtDocNo: Code[35]
+    var
+        LocalSalesInvLine: Record "Sales Invoice Line";
+
+    begin
+        if "Value Entry"."Document Type" = "Value Entry"."Document Type"::"Sales Invoice" then begin
+            if LocalSalesInvLine.get("Value Entry"."Document No.", "Value Entry"."Document Line No.") then
+                if LocalSalesInvLine."External Document No." <> '' then
+                    ReturnExtDocNo := LocalSalesInvLine."External Document No."
+                else
+                    ReturnExtDocNo := "Value Entry"."External Document No.";
+        end;
+    end;
+
+    local procedure FindExtCRDocumentNo(ValEntry: Record "Value Entry") ReturnExtDocNo: Code[35]
+    var
+        LocalSalesCRLine: Record "Sales Cr.Memo Line";
+
+    begin
+        if "Value Entry"."Document Type" = "Value Entry"."Document Type"::"Sales Credit Memo" then begin
+            if LocalSalesCRLine.get("Value Entry"."Document No.", "Value Entry"."Document Line No.") then
+                if LocalSalesCRLine."External Document No." <> '' then
+                    ReturnExtDocNo := LocalSalesCRLine."External Document No."
+                else
+                    ReturnExtDocNo := "Value Entry"."External Document No.";
+        end;
     end;
 
 }

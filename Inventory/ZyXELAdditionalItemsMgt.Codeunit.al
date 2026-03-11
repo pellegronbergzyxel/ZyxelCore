@@ -21,27 +21,28 @@ Codeunit 50069 "ZyXEL Additional Items Mgt"
         recItem: Record Item;
         recDimSetEntry: Record "Dimension Set Entry";
         recGenLedgSetup: Record "General Ledger Setup";
+        recSalesHeader: Record "Sales Header";
+        recAdditionalItems: Record "Additional Item";
         recCust: Record Customer;
+        ZGT: Codeunit "ZyXEL General Tools"; //10-03-2026 BK #560238
         AddItem1: Code[20];
         AddItem2: Code[20];
         AddItem3: Code[20];
         AddFound: Boolean;
-        recSalesHeader: Record "Sales Header";
-        recAdditionalItems: Record "Additional Item";
+
         LoopNo: Integer;
     begin
         if DocumentType = Documenttype::Order then begin
             recSalesHeader.SetRange("Document Type", DocumentType);
             recSalesHeader.SetRange("No.", DocumentNo);
-            recSalesHeader.SetFilter("Sales Order Type", '<>%1', recSalesHeader."sales order type"::"Drop Shipment");  // 30-12-19 ZY-LD 005
+            recSalesHeader.SetFilter("Sales Order Type", '<>%1', recSalesHeader."sales order type"::"Drop Shipment");
             if recSalesHeader.FindFirst then begin
-                //>> 03-04-18 ZY-LD 001
                 recGenLedgSetup.Get;
                 recDimSetEntry.SetRange("Dimension Set ID", recSalesHeader."Dimension Set ID");
                 recDimSetEntry.SetRange("Dimension Code", recGenLedgSetup."Global Dimension 2 Code");
                 recDimSetEntry.SetRange("Dimension Value Code", 'RMA');
-                if not recDimSetEntry.FindFirst then begin  //<< 03-04-18 ZY-LD 001
-                                                            //>> 20-11-18 ZY-LD 001
+                if not recDimSetEntry.FindFirst then begin
+
                     recCust.Get(recSalesHeader."Sell-to Customer No.");
                     recCust.TestField("Forecast Territory");
                     //recAdditionalItems.SETRANGE("Ship-to Country/Region",recSalesHeader."Ship-to Country/Region Code");
@@ -51,28 +52,29 @@ Codeunit 50069 "ZyXEL Additional Items Mgt"
                         recAdditionalItems.SetRange("Customer No.", recCust."No.")
                     else
                         recAdditionalItems.SetFilter("Customer No.", '%1', '');
-                    //<< 20-11-18 ZY-LD 001
                     recAdditionalItems.SetRange("Item No.", ItemNo);
                     if recAdditionalItems.FindSet then
                         repeat
-                            LoopNo += 100;
+                            //10-03-2026 BK #560238
+                            LoopNo := ZGT.FindNextSalesLine(DocumentNo, SalesLineNo);//10-03-2026 BK #560238
                             AddLine(
                               DocumentType,
                               DocumentNo,
                               SalesLineNo,
                               SalesLineNo + LoopNo,
                               recAdditionalItems."Additional Item No.",
-                              0,  // 20-11-18 ZY-LD 001
-                              recAdditionalItems.Quantity,  // 20-11-18 ZY-LD 001
+                              0,
+                              recAdditionalItems.Quantity,
                               recAdditionalItems."Hide Line",
-                              0D,  // 26-08-19 ZY-LD 004
-                              false,  // 26-08-19 ZY-LD 004
-                              recAdditionalItems."Edit Additional Sales Line");  // 08-10-20 ZY-LD 006
+                              0D,
+                              false,
+                              recAdditionalItems."Edit Additional Sales Line");
                         until recAdditionalItems.Next() = 0;
                 end;
             end;
         end;
     end;
+
 
 
     procedure UpdateAdditionalItems(SalesOrderType: enum "Sales Document Type"; SalesOrderNo: Code[20]; ShipToCountry: Code[10])
@@ -92,23 +94,20 @@ Codeunit 50069 "ZyXEL Additional Items Mgt"
             recSalesLine.SetRange("Document Type", SalesOrderType);
             recSalesLine.SetRange("Document No.", SalesOrderNo);
             recSalesLine.SetRange(Type, recSalesLine.Type::Item);
-            recSalesLine.SetFilter("No.", '<>%1', '');  //PAB 003
-            recSalesLine.SetRange("Additional Item Line No.", 0);  // 16-01-19 ZY-LD 002
+            recSalesLine.SetFilter("No.", '<>%1', '');
+            recSalesLine.SetRange("Additional Item Line No.", 0);
             if recSalesLine.FindSet then begin
                 repeat
                     LoopNo := 0;
                     recAddItem.SetRange("Item No.", recSalesLine."No.");
-                    //>> 20-11-18 ZY-LD 001
                     recCust.Get(recSalesLine."Sell-to Customer No.");
                     recCust.TestField("Forecast Territory");
-                    //recAddItem.SETRANGE("Ship-to Country/Region",ShipToCountry);
                     recAddItem.SetFilter("Ship-to Country/Region", '%1|%2', '', ShipToCountry);
                     recAddItem.SetFilter("Forecast Territory", '%1|%2', '', recCust."Forecast Territory");
                     if recCust."Additional Items" then
                         recAddItem.SetRange("Customer No.", recCust."No.")
                     else
                         recAddItem.SetFilter("Customer No.", '%1', '');
-                    //<< 20-11-18 ZY-LD 001
                     if recAddItem.FindSet then begin
                         repeat
                             LoopNo += 1;
@@ -126,11 +125,11 @@ Codeunit 50069 "ZyXEL Additional Items Mgt"
                                   recSalesLine."Line No." + LoopNo,
                                   recAddItem."Additional Item No.",
                                   recSalesLine.Quantity,
-                                  recAddItem.Quantity,  // 20-11-18 ZY-LD 001
+                                  recAddItem.Quantity,
                                   recAddItem."Hide Line",
-                                  recSalesLine."Shipment Date",  // 26-08-19 ZY-LD 004
-                                  recSalesLine."Shipment Date Confirmed",  // 26-08-19 ZY-LD 004
-                                  recAddItem."Edit Additional Sales Line");  // 08-10-20 ZY-LD 006
+                                  recSalesLine."Shipment Date",
+                                  recSalesLine."Shipment Date Confirmed",
+                                  recAddItem."Edit Additional Sales Line");
                                 AddItemsAdded := true;
                             end;
                         until recAddItem.Next() = 0;
@@ -160,7 +159,6 @@ Codeunit 50069 "ZyXEL Additional Items Mgt"
     var
         recSaleLine: Record "Sales Line";
     begin
-        //LineNo := GetSalesLineNo(SalesOrderNo);
         if LineNo <> 0 then begin
             recSaleLine.Init;
             recSaleLine.Validate("Document Type", recSaleLine."document type"::Order);
@@ -173,9 +171,9 @@ Codeunit 50069 "ZyXEL Additional Items Mgt"
             recSaleLine."Additional Item Line No." := SalesLineNo;
             if AddQty = 0 then
                 AddQty := 1;
-            recSaleLine."Additional Item Quantity" := AddQty;  // 20-11-18 ZY-LD 001
-            recSaleLine."Shipment Date" := ShipDate;  // 26-08-19 ZY-LD 004
-            recSaleLine."Shipment Date Confirmed" := ShipDateConfirmed;  // 26-08-19 ZY-LD 004
+            recSaleLine."Additional Item Quantity" := AddQty;
+            recSaleLine."Shipment Date" := ShipDate;
+            recSaleLine."Shipment Date Confirmed" := ShipDateConfirmed;
             recSaleLine."Edit Additional Sales Line" := EditAddLine;  // 08-10-20 ZY-LD 006
             recSaleLine.Insert(true);
         end else

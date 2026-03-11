@@ -4,14 +4,15 @@ page 50090 "Backlog Orders"
     ApplicationArea = Basic, Suite;
     Caption = 'Backlog Orders';
     PageType = List;
-    SourceTable = "Sales Line";
-    SourceTableView = sorting("Document No.", "Line No.", "Document Type")
+    SourceTable = "Sales Line"; //0303-2026 BK #522282
+    SourceTableTemporary = true;
+    /*SourceTableView = sorting("Document No.", "Line No.", "Document Type")
                       where("Document Type" = const(Order),
                             Type = const(Item),
-                            "Completely Shipped" = const(false),
-                            "Outstanding Quantity" = filter(<> 0),
+                            Quantity =filter(<>0),
+                            "Warehouse Status" = filter(0 | 1 | 2 | 3 | 4 | 5 | 6 | 8),
                             "BOM Line No." = const(0),
-                            "Additional Item Line No." = const(0));
+                            "Additional Item Line No." = const(0)); */
     UsageCategory = Lists;
 
     layout
@@ -169,5 +170,49 @@ page 50090 "Backlog Orders"
             }
         }
     }
+    trigger OnOpenPage()
+    begin
+
+        Rec.Reset();
+        Rec.DeleteAll();
+        FillInTempSLine(Rec);
+
+
+    end;
+
+    procedure FillInTempSLine(var Rec: Record "Sales Line" temporary)
+    var
+        SalesLine: Record "Sales Line";
+        DeliverDocument: Record "VCK Delivery Document Header";
+        SkipLine: Boolean;
+
+    begin
+        SkipLine := false;
+        SalesLine.SetCurrentKey("Document No.", "Line No.", "Document Type");
+        salesLine.setrange("Document Type", SalesLine."Document Type"::Order);
+        salesLine.setrange(Type, SalesLine.Type::Item);
+        SalesLine.setfilter(Quantity, '<>%1', 0);
+        SalesLine.Setfilter("Warehouse Status", '%1|%2|%3|%4|%5|%6|%7', SalesLine."Warehouse Status"::New, SalesLine."Warehouse Status"::"Ready to Pick", SalesLine."Warehouse Status"::Picking,
+                            SalesLine."Warehouse Status"::Packed, SalesLine."Warehouse Status"::"In Transit", SalesLine."Warehouse Status"::"Invoice Received", SalesLine."Warehouse Status"::"Waiting for invoice");
+        SalesLine.SetRange("BOM Line No.", 0);
+        SalesLine.setrange("Additional Item Line No.", 0);
+
+
+        if SalesLine.FindSet() then
+            repeat
+                if deliverDocument.Get(SalesLine."Delivery Document No.") then
+                    if DeliverDocument."Document Status" = DeliverDocument."Document Status"::Posted then
+                        SkipLine := true;
+
+                // if RealSalesLine.Type <> RealSalesLine.Type::Item then
+                //     continue;
+
+                if not SkipLine then begin
+                    Rec := SalesLine;
+                    Rec.Insert();
+                end;
+            until SalesLine.Next() = 0;
+
+    end;
 }
 

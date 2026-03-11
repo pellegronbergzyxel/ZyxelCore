@@ -293,6 +293,33 @@ page 50238 "eCommerce Orders"
                     Message('eCommerce Orders: %1', Rec.Count());
                 end;
             }
+
+            action("Update Location")
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Update Location';
+                ToolTip = 'Update Location';
+                Image = UpdateDescription;
+
+                trigger OnAction()
+                var
+                    LocationCode: Code[10];
+                    Location: Record Location;
+                    LocationList: page "Location List";
+                    ConfirmLbd: Label 'This action will update Location Code for current eCommerce Order %1. Do you want to continue?';
+
+                begin
+                    if confirm(ConfirmLbd, true, rec."eCommerce Order Id") then begin //04-03-2026 BK From Vojtech
+                        LocationList.LookupMode(true);
+                        if LocationList.RunModal() = Action::LookupOK then begin
+                            LocationList.GetRecord(Location);
+                            rec."Location Code" := Location.Code;
+                            if rec.Modify() then
+                                CurrPage.Update();
+                        end;
+                    End;
+                end;
+            }
             group(Import)
             {
                 Caption = 'Import';

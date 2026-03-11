@@ -16,6 +16,6 @@ pageextension 50231 JobQueueLogEntriesZX extends "Job Queue Log Entries"
 
     trigger OnOpenPage()
     begin
-        if not Rec.FindFirst() then;  // 27-08-19 ZY-LD 001
+        if not Rec.FindFirst() then;
     end;
 }

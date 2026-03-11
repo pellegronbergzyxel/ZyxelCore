@@ -826,4 +826,23 @@ Codeunit 50000 "ZyXEL General Tools"
         file.DownloadFromStream(instr, '', '', '', filename)
     end;
 
+    procedure FindNextSalesLine(DocumentNo: Code[20]; LineNo: Integer): Integer
+    var //10-03-2026 BK #560238
+        SalesLine: Record "Sales Line";
+    begin
+        if LineNo = 0 then
+            exit(10000);
+
+        SalesLine.SetRange("Document No.", DocumentNo);
+        if SalesLine.FindSet then
+            repeat
+                if SalesLine."Line No." = LineNo then begin
+                    if (SalesLine.Next(1) <> 0) then
+                        exit((SalesLine."Line No." - LineNo) / 2)
+                    else
+                        exit(10000);
+                end;
+            until SalesLine.Next(1) = 0;
+    end;
+
 }
