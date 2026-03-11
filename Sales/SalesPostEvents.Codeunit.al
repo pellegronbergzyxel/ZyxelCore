@@ -299,7 +299,7 @@ codeunit 50080 "Sales Post Events"
 
                                                     end else
                                                         recSaleLine.TESTFIELD("Unit Cost (LCY)");
-                                                560757end;
+                                                end;
                                             end;
                                         end;
 
