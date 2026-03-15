@@ -11,7 +11,7 @@ Codeunit 50078 "Zyxel HQ Web Service Request"
         ZGT: Codeunit "ZyXEL General Tools";
 
 
-    procedure SendCountryOfOrigin(pCompany: Text[80]) rValue: Text
+    procedure SendCountryOfOriginNew(pCompany: Text[80]) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
         WebServiceRequestMgt: Codeunit "SOAP Web Service Request Mgt.";
@@ -99,7 +99,7 @@ Codeunit 50078 "Zyxel HQ Web Service Request"
         end;
     end;
 
-    procedure SendCountryOfOriginOLD(pCompany: Text[80]) rValue: Text
+    procedure SendCountryOfOrigin(pCompany: Text[80]) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
         WebServiceRequestMgt: Codeunit "SOAP Web Service Request Mgt.";
@@ -183,7 +183,7 @@ Codeunit 50078 "Zyxel HQ Web Service Request"
         end;
     end;
 
-    procedure GetSerialNo(pCompany: Text[80]) rValue: Text
+    procedure GetSerialNoNew(pCompany: Text[80]) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
         WebServiceRequestMgt: Codeunit "SOAP Web Service Request Mgt.";
@@ -317,7 +317,7 @@ Codeunit 50078 "Zyxel HQ Web Service Request"
         //<< 11-04-19 ZY-LD 001
     end;
 
-    procedure GetSerialNoOLD(pCompany: Text[80]) rValue: Text
+    procedure GetSerialNo(pCompany: Text[80]) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
         WebServiceRequestMgt: Codeunit "SOAP Web Service Request Mgt.";
@@ -464,7 +464,7 @@ Codeunit 50078 "Zyxel HQ Web Service Request"
         exit(50076);
     end;
 
-    procedure SendSalesOrder(pCompany: Text[80]) rValue: Text
+    procedure SendSalesOrderNew(pCompany: Text[80]) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
         WebServiceRequestMgt: Codeunit "SOAP Web Service Request Mgt.";
@@ -556,7 +556,7 @@ Codeunit 50078 "Zyxel HQ Web Service Request"
     end;
 
 
-    procedure SendSalesOrderOLD(pCompany: Text[80]) rValue: Text
+    procedure SendSalesOrder(pCompany: Text[80]) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
         WebServiceRequestMgt: Codeunit "SOAP Web Service Request Mgt.";

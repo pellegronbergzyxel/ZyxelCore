@@ -470,12 +470,13 @@ Codeunit 50084 "Zyxel Web Service Request"
         i: Integer;
         WsFunctionName: Text;
         TraceMode: Boolean;
-        // CLOUD READY
 
+        // 2026.03.12: CLOUD READY DELETE 
         TempBlob2: codeunit "Temp Blob";
         outStr: OutStream;
         filename: text;
         inStr: InStream;
+    // 2026.03.12: CLOUD READY DELETE 
 
     begin
         Url := recWebServiceSetup.GetWsUrl(GetSetupCode(), pCompany, GetWebServiceNo());
@@ -488,12 +489,14 @@ Codeunit 50084 "Zyxel Web Service Request"
                        pInnerXML +
                      '</icInboxPurchaseHeaders>' +
                    '</SendIcInboxPurchHeader>';
-        // CLOUD READY
-        TempBlob2.CreateOutStream(outStr, TextEncoding::UTF8);
-        outStr.WriteText(pInnerXML);
-        TempBlob2.CreateInStream(inStr, TextEncoding::UTF8);
-        fileName := 'test2.txt';
-        File.DownloadFromStream(inStr, 'Export', '', '', fileName);
+
+        // 2026.03.12: CLOUD READY DELETE 
+        //TempBlob2.CreateOutStream(outStr, TextEncoding::UTF8);
+        //outStr.WriteText(pInnerXML);
+        //TempBlob2.CreateInStream(inStr, TextEncoding::UTF8);
+        //fileName := 'test2.txt';
+        //File.DownloadFromStream(inStr, 'Export', '', '', fileName);
+        // 2026.03.12: CLOUD READY DELETE 
 
         // Save request text in instream
         TempBlob.CreateOutstream(ReqBodyOutStream, Textencoding::UTF8);
