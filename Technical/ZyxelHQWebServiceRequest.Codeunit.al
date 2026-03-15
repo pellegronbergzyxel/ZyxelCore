@@ -555,7 +555,6 @@ Codeunit 50078 "Zyxel HQ Web Service Request"
         end;
     end;
 
-
     procedure SendSalesOrderOLD(pCompany: Text[80]) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
