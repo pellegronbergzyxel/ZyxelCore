@@ -262,8 +262,6 @@ xmlport 50020 "eCommerce Payment Import"
     begin
         if not HeaderInserted then begin
             recAmzPayHead.Init();
-            //recAmzPayHead."Transaction Summary" := STRSUBSTNO(Text001,recAmzMktPlace."Marketplace ID",SettleStartDate,SettleEndDate);
-            //recAmzPayHead.Period := STRSUBSTNO(Text003,recAmzMktPlace."Marketplace ID",DT2DATE(SettleStartDate),DT2DATE(SettleEndDate));
             recAmzPayHead."Settlement ID" := SettlementID;
             recAmzPayHead.Date := Today;
             recAmzPayHead."Deposit Date" := Dt2Date(DeposDate);
@@ -276,26 +274,23 @@ xmlport 50020 "eCommerce Payment Import"
         end;
 
         if not AmzMktPlaceLocated then begin
-            //>> 30-08-24 ZY-LD 002
             if MarketplaceName = '' then begin
                 recAmzMktPlace.SetRange("Currency Code", CurrCode);
                 if recAmzMktPlace.FindFirst() and (recAmzMktPlace.count = 1) then
                     MarketplaceName := recAmzMktPlace."Market Place Name";
                 recAmzMktPlace.SetRange("Currency Code");
             end;
-            //<< 30-08-24 ZY-LD 002
 
             if MarketplaceName <> '' then begin
                 recAmzMktPlace.SetRange("Market Place Name", UpperCase(MarketplaceName));
                 if recAmzMktPlace.FindFirst() then begin
                     recAmzPayHead."Transaction Summary" := StrSubstNo(Text001, recAmzMktPlace."Marketplace ID", SettleStartDate, SettleEndDate);
                     recAmzPayHead.Period := StrSubstNo(Text003, recAmzMktPlace."Marketplace ID", Dt2Date(SettleStartDate), Dt2Date(SettleEndDate));
-                    //>> 30-10-23 ZY-LD 001
                     IF recAmzMktPlace."Use Main Market Place ID" THEN
                         recAmzPayHead."Market Place ID" := recAmzMktPlace."Main Market Place ID"
-                    ELSE  //<< 30-10-23 ZY-LD 001                    
+                    ELSE                 
                         recAmzPayHead."Market Place ID" := recAmzMktPlace."Marketplace ID";
-                    recAmzPayHead.TESTFIELD("Market Place ID");  // 30-10-23 ZY-LD 001
+                    recAmzPayHead.TESTFIELD("Market Place ID");
                     recAmzPayHead.Modify(true);
 
                     AmzMktPlaceLocated := true;
@@ -334,15 +329,6 @@ xmlport 50020 "eCommerce Payment Import"
             else
                 recAmzPayment."Line No." := NexLineNo;
         end;
-        /*CASE UPPERCASE(TransactType) OF
-          UPPERCASE('Commingling VAT') : recAmzPayment.VALIDATE("Transaction Type",recAmzPayment."Transaction Type"::"Commingling VAT");
-          UPPERCASE('Order') : recAmzPayment.VALIDATE("Transaction Type",recAmzPayment."Transaction Type"::Order);
-          UPPERCASE('other-transaction') : recAmzPayment.VALIDATE("Transaction Type",recAmzPayment."Transaction Type"::"Other Transaction");
-          UPPERCASE('Refund') : recAmzPayment.VALIDATE("Transaction Type",recAmzPayment."Transaction Type"::Refund);
-          UPPERCASE('ServiceFee') : recAmzPayment.VALIDATE("Transaction Type",recAmzPayment."Transaction Type"::"Service Fees");
-          ELSE
-            ERROR('Transaction Type is missing.');
-        END;*/
 
         if StrLen(MerchantOrderID) <= MaxStrLen(recAmzPayment."Order ID") then
             recAmzPayment.Validate("Order ID", MerchantOrderID)
@@ -376,10 +362,8 @@ xmlport 50020 "eCommerce Payment Import"
             recAmzPayment.Validate(Quantity);
         end;
 
-        //>> 30-10-23 ZY-LD 001
         GetMarketPlace(MarketplaceName);
         recAmzPayment.VALIDATE("Fee Market Place", recAmzMktPlace."Marketplace ID");
-        //<< 30-10-23 ZY-LD 001
 
         NewRecords += 1;
         recAmzPayment.Insert(true);
@@ -425,8 +409,7 @@ xmlport 50020 "eCommerce Payment Import"
         END ELSE
             IF recAmzMktPlace."Market Place Name" <> UPPERCASE(pMarketPlaceName) THEN BEGIN
                 recAmzMktPlace.SETRANGE("Market Place Name", UPPERCASE(pMarketPlaceName));
-                //IF NOT recAmzMktPlace.FINDFIRST THEN  // 30-08-24 ZY-LD 002
-                recAmzMktPlace.FINDFIRST;  // 30-08-24 ZY-LD 002
+                recAmzMktPlace.FINDFIRST;  
                 recAmzMktPlace.GET(recAmzMktPlace."Main Market Place ID");
             END;
 
