@@ -483,7 +483,7 @@ Codeunit 50084 "Zyxel Web Service Request"
                    '</SendIcInboxPurchHeader>';
         // TEMP >>
 
-        amazonhelper.downloadtext2fil(reqtext);
+        amazonhelper.downloadtext2fil(reqtext, 'SendIcInboxPurchHeader.txt');
 
 
 

@@ -2441,18 +2441,29 @@ codeunit 50055 AmazonHelper
 
     end;
 
+    procedure RemoveCRLF(InputText: Text): Text
+    var
+        char13: char;
+        char10: char;
+    begin
+        char13 := 13;
+        char10 := 10;
+        InputText := InputText.Replace(char13, '');
+        InputText := InputText.Replace(char10, '');
+        exit(InputText);
+    end;
 
-    procedure downloadtext2fil(filtext: text)
+    procedure downloadtext2fil(filtext: text; filename: text)
     var
         TempBlob2: codeunit "Temp Blob";
         outStr: OutStream;
-        filename: text;
+
         inStr: InStream;
     begin
         TempBlob2.CreateOutStream(outStr, TextEncoding::UTF8);
         outStr.WriteText(filtext);
         TempBlob2.CreateInStream(inStr, TextEncoding::UTF8);
-        fileName := 'test.txt';
+
         File.DownloadFromStream(inStr, 'Export', '', '', fileName);
     end;
     // price list import <<

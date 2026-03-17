@@ -596,7 +596,7 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
     begin
     end;
 
-    local procedure ReplicateICInboxPurchDocOLD(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
+    local procedure ReplicateICInboxPurchDocOld(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
     var
         recItem: Record Item;
         StreamOut: OutStream;
@@ -611,6 +611,7 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
         file: file;
         OutStr: OutStream;
         InStr: InStream;
+        amazonhelper: Codeunit AmazonHelper;
     begin
         // 2026.03.03: CLOUD READY DELETE 
         //>> 19-06-18 ZY-LD 003
@@ -634,7 +635,10 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
         NS := NS.XmlNamespaceManager(XDoc.NameTable);
         NS.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');  // Change "Rep*" here
         rValue := XDoc.SelectSingleNode('//d:root', NS).InnerXml;
+        amazonhelper.downloadtext2fil(rValue, 'rvalueold.txt');
+
         ZyWsRequest.ReplicateICInboxPurchHead(pCompanyname, rValue);
+
         //<< 19-06-18 ZY-LD 003
     end;
 
@@ -650,19 +654,25 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
         ZyWsRequest: Codeunit "Zyxel Web Service Request";
         rValue: Text;
         NodeText: Text;
+        amazonhelper: Codeunit AmazonHelper;
     begin
         // 2026.03.03: CLOUD READY NEW
         TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
         WSICInboxPurchHead.SetDestination(StreamOut);
         WSICInboxPurchHead.Export;  // Change XMLPortNo.
-        TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+        TempBlob.CreateInstream(StreamIn, Textencoding::UTF16);
         XmlDocument.ReadFrom(StreamIn, XmlDoc);
         XmlNSMgr.NameTable(XmlDoc.NameTable());
         XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');  // Change "Rep*" here
         if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
             XmlRootNode.WriteTo(NodeText);
-            rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 1);
+            rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);  //ori = -1 
+            rValue := rValue.TrimEnd(' ').TrimStart(' ');
+            rValue := amazonhelper.RemoveCRLF(rvalue);
+            amazonhelper.downloadtext2fil(rValue, 'rvaluenew2.txt');
         end;
+
         ZyWsRequest.ReplicateICInboxPurchHead(pCompanyname, rValue);
+
     end;
 }
