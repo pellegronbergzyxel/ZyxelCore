@@ -1,26 +1,5 @@
 page 50165 "Item List MDM View"
 {
-    // 001.  DT1.01  01-07-2010  SH
-    //  .Documention for tectura customasation
-    //  .IsEICard added to tablebox
-    // 
-    // 003. DT5.0 05-01-2012 TS
-    //   .New fielde
-    //   50080 Cost Amount (Actual)
-    //   50081 Cost Amount (Actual LCY)
-    //   50082 Cost Posted to G/L
-    //   50083 Coat Posted to G/L (LCY)
-    // ZY2.0 BS 15.06.2012 Added Qty. fields on form
-    //       BS 03.08.2012 Added Serial code,business unit,country code,sp/channel code
-    // 004. Steven Su
-    //      . Modify "Quantity per Pallet" wording to "Cartons per Pallet" according to Kim's demand
-    // 005. 08-03-18 ZY-LD 2018022810000231 - Old category code has been removed.
-    // 006. 08-11-18 ZY-LD 2018110710000138 - "Category 4 Code" is added.
-    // 007. 21-11-18 ZY-LD 2018112110000049 - Change Log is added.
-    // 008. 05-07-19 ZY-LD P0213 - EU2Inventory is replaced by Inventory.
-    // 009. 09-08-19 ZY-LD 2019080810000097 - New field.
-    // 010. 19-02-20 ZY-LD 000 - Find actual HQ price.
-
     AdditionalSearchTerms = 'product,finished good,component,raw material,assembly item';
     ApplicationArea = Basic, Suite, Assembly, Service;
     Caption = 'Item List MDM View';
@@ -107,7 +86,7 @@ page 50165 "Item List MDM View"
                 }
                 field(InventoryField; Rec.Inventory)
                 {
-                    ApplicationArea = Invoicing, Basic, Suite;
+                    ApplicationArea = Basic, Suite;
                     HideValue = IsNonInventoriable;
                     ToolTip = 'Specifies how many units, such as pieces, boxes, or cans, of the item are in inventory.';
                 }
@@ -154,7 +133,7 @@ page 50165 "Item List MDM View"
                 }
                 field("Base Unit of Measure"; Rec."Base Unit of Measure")
                 {
-                    ApplicationArea = Invoicing, Basic, Suite;
+                    ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the base unit used to measure the item, such as piece, box, or pallet. The base unit of measure also serves as the conversion basis for alternate units of measure.';
                 }
                 field("Shelf No."; Rec."Shelf No.")
@@ -205,12 +184,12 @@ page 50165 "Item List MDM View"
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-                    ApplicationArea = Invoicing, Basic, Suite;
+                    ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the price for one unit of the item, in LCY.';
                 }
                 field("Actual FOB Price"; Rec."Actual FOB Price")
                 {
-                    ApplicationArea = Invoicing, Basic, Suite;
+                    ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the value of the Actual FOB Price field.';
                 }
                 field("Inventory Posting Group"; Rec."Inventory Posting Group")
@@ -221,7 +200,7 @@ page 50165 "Item List MDM View"
                 }
                 field("Gen. Prod. Posting Group"; Rec."Gen. Prod. Posting Group")
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the item''s product type to link transactions made for this item with the appropriate general ledger account according to the general posting setup.';
                     Visible = false;
                 }
@@ -298,7 +277,7 @@ page 50165 "Item List MDM View"
                 }
                 field("Purch. Unit of Measure"; Rec."Purch. Unit of Measure")
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the unit of measure code used when you purchase the item.';
                     Visible = false;
                 }
@@ -586,7 +565,7 @@ page 50165 "Item List MDM View"
                     Visible = false;
                     ToolTip = 'Specifies the value of the Qty Per Pallet field.';
                 }
-                field(ScipNo; Rec.GetScipNo)
+                field(ScipNo; Rec.GetScipNo())
                 {
                     Caption = 'SCIP No.';
                     Visible = false;
@@ -611,14 +590,24 @@ page 50165 "Item List MDM View"
                 field("CalcAvailableStock(TRUE)"; Rec.CalcAvailableStock(true))
                 {
                     Caption = 'Qty. Stock for Sales';
+                    ToolTip = '"Qty. Stock for Sales" = "Qty. On-Hand" - "Qty. on Sales Order Confirmed" - "Trans. Ord. Shipment (Qty.)"';
                     Visible = false;
                     DecimalPlaces = 0 : 0;
                 }
                 field(Amaz_ASIN; Rec.Amaz_ASIN)
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the Amazon Standard Identification Number (ASIN) for the item. The ASIN is used to identify products in the Amazon marketplace.';
                     Visible = false;
                 }
+                field("RMA Reserved Quantity"; Rec."RMA Reserved Quantity")
+                {
+                    Caption = 'RMA Reserved Quantity';
+                    ApplicationArea = Basic, Suite; //16-03-2026 BK #561893
+                    ToolTip = 'Specifies the quantity of the item that is reserved for return merchandise authorizations (RMAs).';
+                    Visible = false;
+                }
+
             }
         }
         area(factboxes)
@@ -917,12 +906,10 @@ page 50165 "Item List MDM View"
                     ToolTip = 'Executes the Activate Item action.';
                     trigger Onaction()
                     begin
-                        //>> 03-11-17 ZY-LD 001
                         if Confirm(Text001, false, Rec."No.") then begin
                             Rec.Inactive := false;
                             CurrPage.Update();
                         end;
-                        //<< 03-11-17 ZY-LD 001
                     end;
                 }
                 action("Physical Inventory Journal")
@@ -2618,15 +2605,13 @@ page 50165 "Item List MDM View"
         SetWorkflowManagementEnabledState();
         IsOnPhone := ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::Phone;
 
-        //15-51643 -
+
         if ItemListFilter <> '' then begin
             Rec.SetFilter("No.", ItemListFilter);
             CurrPage.CAPTION := 'Item List [Filtered]';
         end;
-        //15-51643 +
 
-        //>> 19-02-20 ZY-LD 010
-        if ZGT.IsRhq then begin
+        if ZGT.IsRhq() then begin
             recVendZCom.SetRange("SBU Company", recVendZCom."SBU Company"::"ZCom HQ");
             recVendZCom.FindFirst();
             recVendZNet.SetRange("SBU Company", recVendZNet."SBU Company"::"ZNet HQ");
@@ -2636,12 +2621,12 @@ page 50165 "Item List MDM View"
             Rec.SetFilter("Date Filter Act. FOB Pr. End", '%1|%2..', 0D, TODAY);
             Rec.CalcFields("Actual FOB Price");
         end;
-        //<< 19-02-20 ZY-LD 010
+
 
         if ZGT.IsZNetCompany() then
             SetQtyStockForSalesVisible(true);
 
-        Rec.SetLocationFilterOnMainWarehouse();  // 05-07-19 ZY-LD 008
+        Rec.SetLocationFilterOnMainWarehouse();
 
     end;
 
@@ -2649,6 +2634,8 @@ page 50165 "Item List MDM View"
         TempFilterItemAttributesBuffer: Record "Filter Item Attributes Buffer" temporary;
         TempItemFilteredFromAttributes: Record Item temporary;
         TempItemFilteredFromPickItem: Record Item temporary;
+        recVendZCom: Record Vendor;
+        recVendZNet: Record Vendor;
         ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
         PowerBIServiceMgt: Codeunit "Power BI Service Mgt.";
         CalculateStdCost: Codeunit "Calculate Standard Cost";
@@ -2656,12 +2643,13 @@ page 50165 "Item List MDM View"
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         ClientTypeManagement: Codeunit "Client Type Management";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
+
+        ZGT: Codeunit "ZyXEL General Tools";
         SkilledResourceList: Page "Skilled Resource List";
         ItemListFilter: Text[1024];
         Text001: Label 'Do you want to activate item "%1"?';
-        ZGT: Codeunit "ZyXEL General Tools";
-        recVendZCom: Record Vendor;
-        recVendZNet: Record Vendor;
+
+
         [InDataSet]
         QtyStockforSalesVisible: Boolean;
 
@@ -2671,7 +2659,6 @@ page 50165 "Item List MDM View"
         CRMIsCoupledToRecord: Boolean;
         BlockedFilterApplied: Boolean;
         ExtendedPriceEnabled: Boolean;
-        NewFromPictureVisible: Boolean;
         OpenApprovalEntriesExist: Boolean;
         EnabledApprovalWorkflowsExist: Boolean;
         CanCancelApprovalForRecord: Boolean;
@@ -2827,7 +2814,7 @@ page 50165 "Item List MDM View"
         ForecastOverviewPage: Page "Forecast Overview";
     begin
         ForecastOverviewPage.Init(Rec."No.");
-        ForecastOverviewPage.RunModal;
+        ForecastOverviewPage.RunModal();
     end;
 }
 

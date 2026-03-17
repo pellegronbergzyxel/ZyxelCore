@@ -204,13 +204,12 @@ page 50090 "Backlog Orders"
                     if DeliverDocument."Document Status" = DeliverDocument."Document Status"::Posted then
                         SkipLine := true;
 
-                // if RealSalesLine.Type <> RealSalesLine.Type::Item then
-                //     continue;
-
                 if not SkipLine then begin
                     Rec := SalesLine;
                     Rec.Insert();
                 end;
+
+                SkipLine := false; //16-03-2026 BK #560383
             until SalesLine.Next() = 0;
 
     end;
