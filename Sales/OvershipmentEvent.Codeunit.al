@@ -19,6 +19,7 @@ Codeunit 50072 "Overshipment Event"
         recGenProdPostGrp: Record "Gen. Product Posting Group";
         recItem: Record Item;
         ZyXELAdditionalItems: Codeunit "ZyXEL Additional Items Mgt";
+        ZGT: Codeunit "ZyXEL General Tools"; //17-03-2026 BK #561965 
         Qty: Decimal;
         lText001: label 'Remember to update quantity on the overshipment line manually!';
         lText002: label '%1, %2% free %3';
@@ -37,10 +38,8 @@ Codeunit 50072 "Overshipment Event"
                (not recSalesLine.FindFirst)
             then begin
                 if Rec."Overshipment Line No." = 0 then begin
-                    //>> 18-04-23 ZY-LD 001
                     recItem.Get(Rec."No.");
-                    //if not recItem."Freight Cost Item" then begin  //<< 18-04-23 ZY-LD 001  // 31-05-24 ZY-LD 000
-                    if recItem.type = recItem.Type::Inventory then begin  // 31-05-24 ZY-LD 000
+                    if recItem.type = recItem.Type::Inventory then begin
                         recCustOvership.SetRange("Customer No.", Rec."Sell-to Customer No.");
                         recCustOvership.SetFilter("Item No.", '%1|%2', '', Rec."No.");
                         if recCustOvership.FindLast then begin
@@ -53,7 +52,7 @@ Codeunit 50072 "Overshipment Event"
                             recSalesLine.Init;
                             recSalesLine.Validate("Document Type", Rec."Document Type");
                             recSalesLine.Validate("Document No.", Rec."Document No.");
-                            recSalesLine.Validate("Line No.", Rec."Line No." + 10000);
+                            recSalesLine.Validate("Line No.", Rec."Line No." + zgt.FindNextSalesLine(rec."Document No.", rec."Line No.")); //17-03-2026 BK #561965
                             recSalesLine.Validate(Type, Rec.Type);
                             recSalesLine.Validate("No.", Rec."No.");
                             if recSalesLine."Country Code" = 'IT' then
