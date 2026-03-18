@@ -596,7 +596,11 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
     begin
     end;
 
+<<<<<<< HEAD
     local procedure ReplicateICInboxPurchDocOld(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
+=======
+    local procedure ReplicateICInboxPurchDoc(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
+>>>>>>> 438494f73f018acc131824d27c92845cbe144098
     var
         recItem: Record Item;
         StreamOut: OutStream;
@@ -643,7 +647,7 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
     end;
 
 
-    local procedure ReplicateICInboxPurchDoc(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
+    local procedure ReplicateICInboxPurchDocNew(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
     var
         StreamOut: OutStream;
         StreamIn: InStream;
