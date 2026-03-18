@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 ﻿{"Added":[],"Modified":[],"Removed":[]}
+=======
+﻿{"Added":[],"Modified":[{"Id":50117,"Kind":13,"Name":"Delete Sales Price Cleanup","Namespace":""},{"Id":50072,"Kind":11,"Name":"Overshipment Event","Namespace":""},{"Id":50090,"Kind":12,"Name":"Backlog Orders","Namespace":""},{"Id":50165,"Kind":12,"Name":"Item List MDM View","Namespace":""},{"Id":50000,"Kind":11,"Name":"ZyXEL General Tools","Namespace":""}],"Removed":[]}
+>>>>>>> 8b0c7e232946144a00e77499b76088ea4dec5d61

@@ -838,7 +838,7 @@ Codeunit 50000 "ZyXEL General Tools"
             repeat
                 if SalesLine."Line No." = LineNo then begin
                     if (SalesLine.Next(1) <> 0) then
-                        exit((SalesLine."Line No." - LineNo) / 2)
+                        exit(ROUND((SalesLine."Line No." - LineNo) / 2, 1, '>'))
                     else
                         exit(10000);
                 end;
