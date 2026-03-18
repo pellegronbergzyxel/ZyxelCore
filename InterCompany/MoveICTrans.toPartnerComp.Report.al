@@ -596,11 +596,7 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
     begin
     end;
 
-<<<<<<< HEAD
-    local procedure ReplicateICInboxPurchDocOld(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
-=======
     local procedure ReplicateICInboxPurchDoc(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
->>>>>>> 438494f73f018acc131824d27c92845cbe144098
     var
         recItem: Record Item;
         StreamOut: OutStream;
@@ -647,7 +643,7 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
     end;
 
 
-    local procedure ReplicateICInboxPurchDocNew(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
+    local procedure ReplicateICInboxPurchDocnew(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
     var
         StreamOut: OutStream;
         StreamIn: InStream;
@@ -673,6 +669,13 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
             rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);  //ori = -1 
             rValue := rValue.TrimEnd(' ').TrimStart(' ');
             rValue := amazonhelper.RemoveCRLF(rvalue);
+            rValue := rValue.TrimEnd(' ').TrimStart(' ');
+            rValue := amazonhelper.RemoveSpacesBetweenXmlTags(rvalue);
+            // Add namespace declaration to the first XML tag
+            if rValue.IndexOf('>') > 0 then
+                rValue := rValue.Substring(1, rValue.IndexOf('>') - 1) +
+                           ' xmlns="urn:microsoft-dynamics-nav/Replicate"' +
+                           rValue.Substring(rValue.IndexOf('>'));
             amazonhelper.downloadtext2fil(rValue, 'rvaluenew2.txt');
         end;
 

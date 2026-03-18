@@ -2453,6 +2453,50 @@ codeunit 50055 AmazonHelper
         exit(InputText);
     end;
 
+    procedure RemoveSpacesBetweenXmlTags(InputText: Text): Text
+    var
+        ResultText: Text;
+        InTag: Boolean;
+        i: Integer;
+        CurrentChar: Char;
+        SpaceBuffer: Text;
+        LastWasClosing: Boolean;
+    begin
+        ResultText := '';
+        SpaceBuffer := '';
+        InTag := false;
+        LastWasClosing := false;
+
+        for i := 1 to StrLen(InputText) do begin
+            CurrentChar := InputText[i];
+            case true of
+                CurrentChar = 60: // '<'
+                    begin
+                        SpaceBuffer := '';
+                        InTag := true;
+                        ResultText += Format(CurrentChar);
+                    end;
+                CurrentChar = 62: // '>'
+                    begin
+                        InTag := false;
+                        LastWasClosing := true;
+                        ResultText += Format(CurrentChar);
+                    end;
+                (CurrentChar = 32) and LastWasClosing and not InTag: // space after '>'
+                    SpaceBuffer += Format(CurrentChar);
+                else begin
+                    if (SpaceBuffer <> '') and (CurrentChar <> 60) then
+                        ResultText += SpaceBuffer;
+                    SpaceBuffer := '';
+                    LastWasClosing := false;
+                    ResultText += Format(CurrentChar);
+                end;
+            end;
+        end;
+        exit(ResultText);
+    end;
+
+
     procedure downloadtext2fil(filtext: text; filename: text)
     var
         TempBlob2: codeunit "Temp Blob";
