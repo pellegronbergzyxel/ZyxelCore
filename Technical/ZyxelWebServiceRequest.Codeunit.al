@@ -495,7 +495,6 @@ Codeunit 50084 "Zyxel Web Service Request"
         error('stopforfile');
 
 
-
         // 2026.03.12: CLOUD READY DELETE 
         //TempBlob2.CreateOutStream(outStr, TextEncoding::UTF8);
         //outStr.WriteText(pInnerXML);
