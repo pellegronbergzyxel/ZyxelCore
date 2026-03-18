@@ -494,14 +494,6 @@ Codeunit 50084 "Zyxel Web Service Request"
         amazonhelper.downloadtext2fil(ReqText, 'ReqText.txt');
         error('stopforfile');
 
-
-        // 2026.03.12: CLOUD READY DELETE 
-        //TempBlob2.CreateOutStream(outStr, TextEncoding::UTF8);
-        //outStr.WriteText(pInnerXML);
-        //TempBlob2.CreateInStream(inStr, TextEncoding::UTF8);
-        //fileName := 'test2.txt';
-        //File.DownloadFromStream(inStr, 'Export', '', '', fileName);
-
         // 2026.03.12: CLOUD READY DELETE 
 
         // Save request text in instream
