@@ -596,7 +596,7 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
     begin
     end;
 
-    local procedure ReplicateICInboxPurchDoc(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
+    local procedure ReplicateICInboxPurchDocold(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
     var
         recItem: Record Item;
         StreamOut: OutStream;
@@ -643,7 +643,7 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
     end;
 
 
-    local procedure ReplicateICInboxPurchDocnew(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
+    local procedure ReplicateICInboxPurchDoc(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
     var
         StreamOut: OutStream;
         StreamIn: InStream;
@@ -651,9 +651,14 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
         XmlDoc: XmlDocument;
         XmlNSMgr: XmlNamespaceManager;
         XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
         ZyWsRequest: Codeunit "Zyxel Web Service Request";
         rValue: Text;
         NodeText: Text;
+             ChildText: Text;
         amazonhelper: Codeunit AmazonHelper;
     begin
         // 2026.03.03: CLOUD READY NEW
@@ -671,12 +676,23 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
             rValue := amazonhelper.RemoveCRLF(rvalue);
             rValue := rValue.TrimEnd(' ').TrimStart(' ');
             rValue := amazonhelper.RemoveSpacesBetweenXmlTags(rvalue);
-            // Add namespace declaration to the first XML tag
-            if rValue.IndexOf('>') > 0 then
-                rValue := rValue.Substring(1, rValue.IndexOf('>') - 1) +
-                           ' xmlns="urn:microsoft-dynamics-nav/Replicate"' +
-                           rValue.Substring(rValue.IndexOf('>'));
-            amazonhelper.downloadtext2fil(rValue, 'rvaluenew2.txt');
+
+              // Re-parse with namespace on the wrapper so children inherit it.
+            // Write each child individually — the serializer declares xmlns on each element since there is no parent context.
+            XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
+            InnerXmlDoc.GetRoot(InnerRootEl);
+            InnerChildNodes := InnerRootEl.GetChildElements();
+            rValue := '';
+            foreach InnerChildNode in InnerChildNodes do begin
+                InnerChildNode.WriteTo(ChildText);
+                rValue += ChildText;
+            end;
+           // rValue := CopyStr(rValue, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+
+
+
+
+            amazonhelper.downloadtext2fil(rValue, 'rvaluenew4.txt');
         end;
 
         ZyWsRequest.ReplicateICInboxPurchHead(pCompanyname, rValue);

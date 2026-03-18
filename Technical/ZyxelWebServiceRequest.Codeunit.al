@@ -491,8 +491,8 @@ Codeunit 50084 "Zyxel Web Service Request"
                      '</icInboxPurchaseHeaders>' +
                    '</SendIcInboxPurchHeader>';
         // TEMP >>
-        amazonhelper.downloadtext2fil(ReqText, 'ReqText.txt');
-        error('stopforfile');
+        amazonhelper.downloadtext2fil(ReqText, 'ReqTextnew.txt');
+//        error('stopforfile');
 
         // 2026.03.12: CLOUD READY DELETE 
 
