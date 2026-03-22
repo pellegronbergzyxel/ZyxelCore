@@ -101,7 +101,8 @@ Page 50290 "Web Service Setup"
     }
 
     var
-        ZyxelHQWebServiceRequest: Codeunit "Zyxel HQ Web Service Request";
+        //ZyxelHQWebServiceRequest: Codeunit "Zyxel HQ Web Service Request";
+        // 2026.03.03: CLOUD READY DELETE
         Text001: label 'Do you want to run?';
         ZyxelWebServiceRequest: Codeunit "Zyxel Web Service Request";
         ZyxelWebServiceManagement: Codeunit "Zyxel Web Service Management";

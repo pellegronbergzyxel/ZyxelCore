@@ -99,7 +99,7 @@
             "environmentType": "OnPrem",
             // "tenant": "default",
             //"primaryTenantDomain": "89443d20-e988-4407-a3c1-0c80570fb401",
-            "schemaUpdateMode": "ForceSync",
+            //"schemaUpdateMode": "ForceSync",
             "startupCompany": "ZNet DK"
             //"startupCompany": "ZNet ES"
         },
@@ -121,7 +121,7 @@
             "tenant": "default",
             "primaryTenantDomain": "89443d20-e988-4407-a3c1-0c80570fb401",
             //"schemaUpdateMode": "Synchronize",
-            "schemaUpdateMode": "ForceSync",
+            //"schemaUpdateMode": "ForceSync",
             "startupCompany": "ZNet IT"
         },
         {
@@ -142,10 +142,10 @@
             "tenant": "default",
             "primaryTenantDomain": "89443d20-e988-4407-a3c1-0c80570fb401",
             //"schemaUpdateMode": "Synchronize",
-            "schemaUpdateMode": "ForceSync",
+            //"schemaUpdateMode": "ForceSync",
             "startupCompany": "ZyND IT"
         },
-         
+         /*
         {
             "name": "Zyxel EMEA ZCom",
             "type": "al",
@@ -168,8 +168,8 @@
             "dependencyPublishingOption": "Ignore",
             //"startupCompany": "ZNet DK"
             "startupCompany": "ZyND DK"
-        }, 
-        /*
+        }, */
+        
         {
             "name": "Zyxel EMEA ZNet",
             "type": "al",
@@ -192,7 +192,7 @@
             "dependencyPublishingOption": "Ignore",
             "startupCompany": "ZNet DK"
             //"startupCompany": "ZNet UK"
-        }, */
+        }, 
         /*     
         {
             "name": "Zyxel IT",

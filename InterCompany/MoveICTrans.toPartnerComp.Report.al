@@ -596,7 +596,7 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
     begin
     end;
 
-    local procedure ReplicateICInboxPurchDocold(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
+    /*local procedure ReplicateICInboxPurchDocold(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
     var
         recItem: Record Item;
         StreamOut: OutStream;
@@ -621,13 +621,6 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
         WSICInboxPurchHead.SetDestination(StreamOut);
         WSICInboxPurchHead.Export;  // Change XMLPortNo.
 
-        /*Write content to a file
-        file.WriteMode(true);
-        file.create('C:\Tmp\BlobContent.xml');
-        file.CreateOutStream(OutStr);
-        TempBlob.CreateInStream(InStr);
-        CopyStream(OutStr, InStr);
-        file.Close();*/
         TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
 
         XDoc := XDoc.XmlDocument();
@@ -640,7 +633,7 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
         ZyWsRequest.ReplicateICInboxPurchHead(pCompanyname, rValue);
 
         //<< 19-06-18 ZY-LD 003
-    end;
+    end; */
 
 
     local procedure ReplicateICInboxPurchDoc(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
@@ -658,7 +651,7 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
         ZyWsRequest: Codeunit "Zyxel Web Service Request";
         rValue: Text;
         NodeText: Text;
-             ChildText: Text;
+        ChildText: Text;
         amazonhelper: Codeunit AmazonHelper;
     begin
         // 2026.03.03: CLOUD READY NEW
@@ -677,7 +670,7 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
             rValue := rValue.TrimEnd(' ').TrimStart(' ');
             rValue := amazonhelper.RemoveSpacesBetweenXmlTags(rvalue);
 
-              // Re-parse with namespace on the wrapper so children inherit it.
+            // Re-parse with namespace on the wrapper so children inherit it.
             // Write each child individually — the serializer declares xmlns on each element since there is no parent context.
             XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
             InnerXmlDoc.GetRoot(InnerRootEl);
@@ -687,7 +680,7 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
                 InnerChildNode.WriteTo(ChildText);
                 rValue += ChildText;
             end;
-           // rValue := CopyStr(rValue, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+            // rValue := CopyStr(rValue, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
 
 
 

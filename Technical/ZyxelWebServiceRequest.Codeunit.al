@@ -471,14 +471,6 @@ Codeunit 50084 "Zyxel Web Service Request"
         WsFunctionName: Text;
         TraceMode: Boolean;
 
-        // 2026.03.12: CLOUD READY DELETE 
-        TempBlob2: codeunit "Temp Blob";
-        outStr: OutStream;
-        filename: text;
-        inStr: InStream;
-        amazonhelper: codeunit AmazonHelper;
-    // 2026.03.12: CLOUD READY DELETE 
-
     begin
         Url := recWebServiceSetup.GetWsUrl(GetSetupCode(), pCompany, GetWebServiceNo());
         WsFunctionName := 'SendIcInboxPurchHeader';  // Change here
@@ -490,11 +482,8 @@ Codeunit 50084 "Zyxel Web Service Request"
                        pInnerXML +
                      '</icInboxPurchaseHeaders>' +
                    '</SendIcInboxPurchHeader>';
-        // TEMP >>
-        amazonhelper.downloadtext2fil(ReqText, 'ReqTextnew.txt');
-//        error('stopforfile');
 
-        // 2026.03.12: CLOUD READY DELETE 
+        //amazonhelper.downloadtext2fil(ReqText, 'ReqTextnew.txt');
 
         // Save request text in instream
         TempBlob.CreateOutstream(ReqBodyOutStream, Textencoding::UTF8);
