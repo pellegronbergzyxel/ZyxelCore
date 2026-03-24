@@ -170,7 +170,7 @@ Page 50089 "VCK Delivery Document SNos"
     var
         Text001: label 'Do you want to "GetSerialNo"?';
         recDelDocNo: Record "VCK Delivery Document Header";
-        ZyWebServReq: Codeunit "Zyxel HQ Web Service Request";
+        //ZyWebServReq: Codeunit "Zyxel HQ Web Service Request"; // 2026.03.03: CLOUD READY DELETE
         repImportPalletNo: Report "Import Pallet No.";
         Text002: label 'Do you want to delete %1 serial number(s)?';
         Text003: label 'Are you sure?';

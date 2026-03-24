@@ -859,6 +859,8 @@ codeunit 50080 "Sales Post Events"
                 end;
     end;
 
+
+
     local procedure SerialNoAttached(pSalesInvNo: Code[20]): Boolean
     var
         recSalesShipLine: Record "Sales Shipment Line";
@@ -957,6 +959,13 @@ codeunit 50080 "Sales Post Events"
                     end;
             end;
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales Whse. Post Shipment", OnHandleSalesLineOnAfterCalcShouldModifyShipmentDate, '', false, false)]
+    local procedure "Sales Whse. Post Shipment_OnHandleSalesLineOnAfterCalcShouldModifyShipmentDate"(WarehouseShipmentHeader: Record "Warehouse Shipment Header"; var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var SalesLine: Record "Sales Line"; var ShouldModifyShipmentDate: Boolean)
+    begin
+        ShouldModifyShipmentDate := false; //20-03-206 BK #550819 wrong update on shipment date - backlog order fails
+    end;
+
 
     local procedure GlAccIsReverseLineToChargeItem(var SalesLine: Record "Sales Line") rValue: Boolean
     var

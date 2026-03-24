@@ -737,8 +737,8 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 RunObject = Page "eCommerce Ship Details FactBox";
                 RunPageLink = "eCommerce Order Id" = field("No.");
             }
-            action("Post Grp. Setup pr. Country / Location")
-            {
+            /*action("Post Grp. Setup pr. Country / Location")
+            {   // 2026.03.03: CLOUD READY DELETE
                 ApplicationArea = Basic, Suite;
                 Caption = 'Post Grp. Setup pr. Country / Location';
                 ToolTip = 'Customer Posting Group Setup pr. Country / Location';
@@ -754,7 +754,7 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                     Page.Run(Page::"Data Export Record Definitions", recCustPostGrpSetup);
                     //<< 04-01-21 ZY-LD 010
                 end;
-            }
+            } */
             action("Delivery Documents")
             {
                 ApplicationArea = Basic, Suite;
