@@ -464,7 +464,7 @@ Codeunit 50078 "Zyxel HQ Web Service Request"
         exit(50076);
     end;
 
-    procedure SendSalesOrderNew(pCompany: Text[80]) rValue: Text
+    procedure SendSalesOrder(pCompany: Text[80]) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
         WebServiceRequestMgt: Codeunit "SOAP Web Service Request Mgt.";

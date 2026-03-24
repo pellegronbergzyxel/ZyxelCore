@@ -276,27 +276,43 @@ page 50065 "eCommerce Order Archive Card"
 
                 trigger OnAction()
                 var
+                    TempBlob: Codeunit "Temp Blob";
+                    HttpClient: HttpClient;
+                    HttpResponse: HttpResponseMessage;
+                    OutStream: OutStream;
+                    InStream: InStream;
+                    ResponseText: Text;
                     ClientFilename: Text;
-                    ServerFilename: Text;
-                    FileMgt: Codeunit "File Management";
-
+                // ServerFilename: Text;  // CLOUD READY DELETE
+                // FileMgt: Codeunit "File Management";  // CLOUD READY DELETE
                 begin
-                    ServerFilename := FileMgt.ServerTempFileName('.pdf');
-                    WebClient := WebClient.WebClient;
-                    ServicePointManager.SecurityProtocol := SecurityProtocolType.Tls12;
-                    WebClient.DownloadFile(Rec."Invoice Download", ServerFilename);
-                    if FileMgt.ServerFileExists(ServerFilename) then begin
-                        ClientFilename := StrSubstNo('%1.pdf', Rec."Invoice No.");
-                        FileMgt.DownloadHandler(ServerFilename, '', '', 'PDF(*.pdf)|*.pdf|All files(*.*)|*.*', ClientFilename);
-                        FileMgt.DeleteServerFile(ServerFilename);
-                    end;
+                    // CLOUD READY DELETE:
+                    // ServerFilename := FileMgt.ServerTempFileName('.pdf');
+                    // WebClient := WebClient.WebClient;
+                    // ServicePointManager.SecurityProtocol := SecurityProtocolType.Tls12;
+                    // WebClient.DownloadFile(Rec."Invoice Download", ServerFilename);
+                    // if FileMgt.ServerFileExists(ServerFilename) then begin
+                    //     ClientFilename := StrSubstNo('%1.pdf', Rec."Invoice No.");
+                    //     FileMgt.DownloadHandler(ServerFilename, '', '', 'PDF(*.pdf)|*.pdf|All files(*.*)|*.*', ClientFilename);
+                    //     FileMgt.DeleteServerFile(ServerFilename);
+                    // end;
+                    // CLOUD READY NEW
+                    if HttpClient.Get(Rec."Invoice Download", HttpResponse) then
+                        if HttpResponse.IsSuccessStatusCode() then begin
+                            HttpResponse.Content.ReadAs(ResponseText);
+                            TempBlob.CreateOutstream(OutStream);
+                            OutStream.WriteText(ResponseText);
+                            ClientFilename := StrSubstNo('%1.pdf', Rec."Invoice No.");
+                            TempBlob.CreateInstream(InStream);
+                            File.DownloadFromStream(InStream, '', '', 'PDF(*.pdf)|*.pdf|All files(*.*)|*.*', ClientFilename);
+                        end;
                 end;
             }
         }
     }
 
     var
-        WebClient: dotnet WebClient;
-        ServicePointManager: dotnet ServicePointManager;
-        SecurityProtocolType: dotnet SecurityProtocolType;
+    // WebClient: dotnet WebClient;  // CLOUD READY DELETE
+    // ServicePointManager: dotnet ServicePointManager;  // CLOUD READY DELETE
+    // SecurityProtocolType: dotnet SecurityProtocolType;  // CLOUD READY DELETE
 }

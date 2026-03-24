@@ -24,6 +24,68 @@ Codeunit 50083 "Zyxel Web Service Management"
     procedure ReplicateGlAccounts(pCompanyName: Text[80]; pNo: Code[20])
     var
         recRepComp: Record "Replication Company";
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "WS Replicate G/L Account";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        rValue: Text;
+    begin
+        // CLOUD READY NEW
+        if not ZGT.CompanyNameIs(1) then  // RHQ
+            exit;
+
+        // Create Inner XML
+        TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+        Clear(WsXmlPort);
+        WsXmlPort.SetData(pNo);
+        WsXmlPort.SetDestination(StreamOut);
+        WsXmlPort.Export;
+
+        TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+        XmlDocument.ReadFrom(StreamIn, XmlDoc);
+        XmlNSMgr.NameTable(XmlDoc.NameTable());
+        XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');
+        if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+            XmlRootNode.WriteTo(NodeText);
+            rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+            XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
+            InnerXmlDoc.GetRoot(InnerRootEl);
+            InnerChildNodes := InnerRootEl.GetChildElements();
+            rValue := '';
+            foreach InnerChildNode in InnerChildNodes do begin
+                InnerChildNode.WriteTo(ChildText);
+                rValue += ChildText;
+            end;
+        end;
+
+        // Replicate
+        if pCompanyName <> '' then
+            recRepComp.SetRange("Company Name", pCompanyName);
+        recRepComp.SetRange("Replicate Chart of Account", true);
+        if recRepComp.FindSet then begin
+            ZGT.OpenProgressWindow('', recRepComp.Count);
+            repeat
+                ZGT.UpdateProgressWindow(recRepComp."Company Name", 0, true);
+                ZyWebServReq.ReplicateGlAccount(recRepComp."Company Name", rValue);
+            until recRepComp.Next() = 0;
+            ZGT.CloseProgressWindow;
+        end;
+    end;
+
+    procedure ReplicateGlAccountsOLD(pCompanyName: Text[80]; pNo: Code[20])
+    var
+        recRepComp: Record "Replication Company";
         recItem: Record Item;
         StreamOut: OutStream;
         StreamIn: InStream;
@@ -34,6 +96,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         NS: dotnet XmlNamespaceManager;
         rValue: Text;
     begin
+        // CLOUD READY DELETE
         if not ZGT.CompanyNameIs(1) then  // RHQ
             exit;
 
@@ -72,6 +135,68 @@ Codeunit 50083 "Zyxel Web Service Management"
     procedure ReplicateCostTypeName(pCompanyName: Text[80]; pNo: Code[20])
     var
         recRepComp: Record "Replication Company";
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "WS Replicate Cost Type Name";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        rValue: Text;
+    begin
+        // CLOUD READY NEW
+        if not ZGT.CompanyNameIs(1) then  // RHQ
+            exit;
+
+        // Create Inner XML
+        TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+        Clear(WsXmlPort);
+        WsXmlPort.SetData;
+        WsXmlPort.SetDestination(StreamOut);
+        WsXmlPort.Export;
+
+        TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+        XmlDocument.ReadFrom(StreamIn, XmlDoc);
+        XmlNSMgr.NameTable(XmlDoc.NameTable());
+        XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');
+        if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+            XmlRootNode.WriteTo(NodeText);
+            rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+            XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
+            InnerXmlDoc.GetRoot(InnerRootEl);
+            InnerChildNodes := InnerRootEl.GetChildElements();
+            rValue := '';
+            foreach InnerChildNode in InnerChildNodes do begin
+                InnerChildNode.WriteTo(ChildText);
+                rValue += ChildText;
+            end;
+        end;
+
+        // Replicate
+        if pCompanyName <> '' then
+            recRepComp.SetRange("Company Name", pCompanyName);
+        recRepComp.SetRange("Replicate Cost Type Name", true);
+        if recRepComp.FindSet then begin
+            ZGT.OpenProgressWindow('', recRepComp.Count);
+            repeat
+                ZGT.UpdateProgressWindow(recRepComp."Company Name", 0, true);
+                ZyWebServReq.ReplicateCostTypeName(recRepComp."Company Name", rValue);
+            until recRepComp.Next() = 0;
+            ZGT.CloseProgressWindow;
+        end;
+    end;
+
+    procedure ReplicateCostTypeNameOLD(pCompanyName: Text[80]; pNo: Code[20])
+    var
+        recRepComp: Record "Replication Company";
         recItem: Record Item;
         StreamOut: OutStream;
         StreamIn: InStream;
@@ -82,6 +207,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         NS: dotnet XmlNamespaceManager;
         rValue: Text;
     begin
+        // CLOUD READY DELETE
         if not ZGT.CompanyNameIs(1) then  // RHQ
             exit;
 
@@ -120,6 +246,66 @@ Codeunit 50083 "Zyxel Web Service Management"
     procedure ReplicateCustomers(pCompanyName: Text[30]; pCustNoFilter: Text; pForceReplication: Boolean)
     var
         recRepComp: Record "Replication Company";
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "WS Replicate Customer";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        rValue: Text;
+    begin
+        // CLOUD READY NEW
+        if not ZGT.CompanyNameIs(1) then  // RHQ
+            exit;
+
+        if pCompanyName <> '' then
+            recRepComp.SetRange("Company Name", pCompanyName);
+        recRepComp.SetRange("Replicate Customer", true);
+        if recRepComp.FindSet then
+            repeat
+                // Create Inner XML
+                Clear(TempBlob);
+                TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+                Clear(WsXmlPort);
+                if WsXmlPort.SetData(recRepComp."Company Name", pCustNoFilter, pForceReplication) then begin
+                    WsXmlPort.SetDestination(StreamOut);
+                    WsXmlPort.Export;
+
+                    TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+                    XmlDocument.ReadFrom(StreamIn, XmlDoc);
+                    XmlNSMgr.NameTable(XmlDoc.NameTable());
+                    XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');
+                    if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+                        XmlRootNode.WriteTo(NodeText);
+                        rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                        XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
+                        InnerXmlDoc.GetRoot(InnerRootEl);
+                        InnerChildNodes := InnerRootEl.GetChildElements();
+                        rValue := '';
+                        foreach InnerChildNode in InnerChildNodes do begin
+                            InnerChildNode.WriteTo(ChildText);
+                            rValue += ChildText;
+                        end;
+                    end;
+
+                    // Replicate
+                    ZyWebServReq.ReplicateCustomer(recRepComp."Company Name", rValue);
+                end;
+            until recRepComp.Next() = 0;
+    end;
+
+    procedure ReplicateCustomersOLD(pCompanyName: Text[30]; pCustNoFilter: Text; pForceReplication: Boolean)
+    var
+        recRepComp: Record "Replication Company";
         recItem: Record Item;
         StreamOut: OutStream;
         StreamIn: InStream;
@@ -130,6 +316,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         NS: dotnet XmlNamespaceManager;
         rValue: Text;
     begin
+        // CLOUD READY DELETE
         if not ZGT.CompanyNameIs(1) then  // RHQ
             exit;
 
@@ -167,6 +354,103 @@ Codeunit 50083 "Zyxel Web Service Management"
     procedure ReplicateItems(pCompanyName: Text[30]; pItemNoFilter: Text; pReplicateDummy: Boolean; pForceReplication: Boolean)
     var
         recRepComp: Record "Replication Company";
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "WS Replicate Item";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        rValue: Text;
+    begin
+        // CLOUD READY NEW
+        if not ZGT.CompanyNameIs(1) then  // RHQ
+            exit;
+
+        if pReplicateDummy then begin
+            // Create Inner XML
+            TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+            Clear(WsXmlPort);
+            WsXmlPort.SetData(recRepComp."Company Name", pItemNoFilter, pReplicateDummy, pForceReplication);  // 07-01-19 ZY-LD 002
+            WsXmlPort.SetDestination(StreamOut);
+            WsXmlPort.Export;  // Change XMLPortNo.
+
+            TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+            XmlDocument.ReadFrom(StreamIn, XmlDoc);
+            XmlNSMgr.NameTable(XmlDoc.NameTable());
+            XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');  // Change "Rep*" here
+            if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+                XmlRootNode.WriteTo(NodeText);
+                rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
+                InnerXmlDoc.GetRoot(InnerRootEl);
+                InnerChildNodes := InnerRootEl.GetChildElements();
+                rValue := '';
+                foreach InnerChildNode in InnerChildNodes do begin
+                    InnerChildNode.WriteTo(ChildText);
+                    rValue += ChildText;
+                end;
+            end;
+
+            // Replicate
+            if pCompanyName <> '' then
+                recRepComp.SetRange("Company Name", pCompanyName);
+            recRepComp.SetRange("Replicate Item", true);
+            if recRepComp.FindSet then
+                repeat
+                    ZyWebServReq.ReplicateItem(recRepComp."Company Name", rValue);  // Change call of function here
+                until recRepComp.Next() = 0;
+        end else begin
+            if pCompanyName <> '' then
+                recRepComp.SetRange("Company Name", pCompanyName);
+            recRepComp.SetRange("Replicate Item", true);
+            if recRepComp.FindSet then
+                repeat
+                    // Create Inner XML
+                    Clear(TempBlob);
+                    TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+                    Clear(WsXmlPort);
+                    if WsXmlPort.SetData(recRepComp."Company Name", pItemNoFilter, pReplicateDummy, pForceReplication) then begin  // 07-01-19 ZY-LD 002
+                        WsXmlPort.SetDestination(StreamOut);
+                        WsXmlPort.Export;  // Change XMLPortNo.
+
+                        TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+                        XmlDocument.ReadFrom(StreamIn, XmlDoc);
+                        XmlNSMgr.NameTable(XmlDoc.NameTable());
+                        XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');  // Change "Rep*" here
+                        if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+                            XmlRootNode.WriteTo(NodeText);
+                            rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                            XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
+                            InnerXmlDoc.GetRoot(InnerRootEl);
+                            InnerChildNodes := InnerRootEl.GetChildElements();
+                            rValue := '';
+                            foreach InnerChildNode in InnerChildNodes do begin
+                                InnerChildNode.WriteTo(ChildText);
+                                rValue += ChildText;
+                            end;
+                        end;
+
+                        // Replicate
+                        ZyWebServReq.ReplicateItem(recRepComp."Company Name", rValue);  // Change call of function here
+                    end;
+                until recRepComp.Next() = 0;
+        end;
+    end;
+
+    procedure ReplicateItemsOLD(pCompanyName: Text[30]; pItemNoFilter: Text; pReplicateDummy: Boolean; pForceReplication: Boolean)
+    var
+        recRepComp: Record "Replication Company";
         recItem: Record Item;
         StreamOut: OutStream;
         StreamIn: InStream;
@@ -177,6 +461,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         NS: dotnet XmlNamespaceManager;
         rValue: Text;
     begin
+        // CLOUD READY DELETE
         if not ZGT.CompanyNameIs(1) then  // RHQ
             exit;
 
@@ -245,6 +530,70 @@ Codeunit 50083 "Zyxel Web Service Management"
     procedure ReplicateEmailAddress(pCompany: Text[80]; pCode: Code[20])
     var
         recRepComp: Record "Replication Company";
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "WS Replicate E-mail Address";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        rValue: Text;
+    begin
+        // CLOUD READY NEW
+        if not ZGT.IsRhq then  // RHQ
+            exit;
+
+        // Create Inner XML
+        TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+        Clear(WsXmlPort);
+        WsXmlPort.SetData(pCode);
+        WsXmlPort.SetDestination(StreamOut);
+        WsXmlPort.Export;
+
+        TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+        XmlDocument.ReadFrom(StreamIn, XmlDoc);
+        XmlNSMgr.NameTable(XmlDoc.NameTable());
+        XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');
+        if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+            XmlRootNode.WriteTo(NodeText);
+            rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+            XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
+            InnerXmlDoc.GetRoot(InnerRootEl);
+            InnerChildNodes := InnerRootEl.GetChildElements();
+            rValue := '';
+            foreach InnerChildNode in InnerChildNodes do begin
+                InnerChildNode.WriteTo(ChildText);
+                rValue += ChildText;
+            end;
+        end;
+
+        // Replicate
+        //>> 21-01-20 ZY-LD 005
+        if pCompany <> '' then
+            recRepComp.SetRange("Company Name", pCompany)  //<< 21-01-20 ZY-LD 005
+        else
+            recRepComp.SetRange("Replicate E-mail Address", true);
+        if recRepComp.FindSet then begin
+            ZGT.OpenProgressWindow('', recRepComp.Count);
+            repeat
+                ZGT.UpdateProgressWindow(recRepComp."Company Name", 0, true);
+                ZyWebServReq.ReplicateEmailAddress(recRepComp."Company Name", rValue);
+            until recRepComp.Next() = 0;
+            ZGT.CloseProgressWindow;
+        end;
+    end;
+
+    procedure ReplicateEmailAddressOLD(pCompany: Text[80]; pCode: Code[20])
+    var
+        recRepComp: Record "Replication Company";
         recItem: Record Item;
         StreamOut: OutStream;
         StreamIn: InStream;
@@ -255,6 +604,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         NS: dotnet XmlNamespaceManager;
         rValue: Text;
     begin
+        // CLOUD READY DELETE
         if not ZGT.IsRhq then  // RHQ
             exit;
 
@@ -295,6 +645,68 @@ Codeunit 50083 "Zyxel Web Service Management"
     procedure ReplicateUserSetup(pCode: Code[50])
     var
         recRepComp: Record "Replication Company";
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "WS Replicate User Setup";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        rValue: Text;
+    begin
+        // CLOUD READY NEW
+        //>> 06-12-18 ZY-LD 001
+        if not ZGT.CompanyNameIs(1) then  // RHQ
+            exit;
+
+        // Create Inner XML
+        TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+        Clear(WsXmlPort);
+        WsXmlPort.SetData(pCode);
+        WsXmlPort.SetDestination(StreamOut);
+        WsXmlPort.Export;
+
+        TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+        XmlDocument.ReadFrom(StreamIn, XmlDoc);
+        XmlNSMgr.NameTable(XmlDoc.NameTable());
+        XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');
+        if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+            XmlRootNode.WriteTo(NodeText);
+            rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+            XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
+            InnerXmlDoc.GetRoot(InnerRootEl);
+            InnerChildNodes := InnerRootEl.GetChildElements();
+            rValue := '';
+            foreach InnerChildNode in InnerChildNodes do begin
+                InnerChildNode.WriteTo(ChildText);
+                rValue += ChildText;
+            end;
+        end;
+
+        // Replicate
+        recRepComp.SetRange("Replicate User Setup", true);
+        if recRepComp.FindSet then begin
+            ZGT.OpenProgressWindow('', recRepComp.Count);
+            repeat
+                ZGT.UpdateProgressWindow(recRepComp."Company Name", 0, true);
+                ZyWebServReq.ReplicateUserSetup(recRepComp."Company Name", rValue);
+            until recRepComp.Next() = 0;
+            ZGT.CloseProgressWindow;
+        end;
+        //>> 06-12-18 ZY-LD 001
+    end;
+
+    procedure ReplicateUserSetupOLD(pCode: Code[50])
+    var
+        recRepComp: Record "Replication Company";
         recItem: Record Item;
         StreamOut: OutStream;
         StreamIn: InStream;
@@ -305,6 +717,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         NS: dotnet XmlNamespaceManager;
         rValue: Text;
     begin
+        // CLOUD READY DELETE
         //>> 06-12-18 ZY-LD 001
         if not ZGT.CompanyNameIs(1) then  // RHQ
             exit;
@@ -343,6 +756,71 @@ Codeunit 50083 "Zyxel Web Service Management"
     procedure ReplicateExchangeRate(var pExchRateTmp: Record "Currency Exchange Rate Buffer" temporary) rValue: Boolean
     var
         recRepComp: Record "Replication Company";
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "WS Replicate Exchange Rate";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        lText001: label 'Replicate %1 - %2';
+        InnerText: Text;
+    begin
+        // CLOUD READY NEW
+        if not ZGT.IsRhq then  // RHQ
+            exit;
+
+        if pExchRateTmp.FindSet then begin
+            ZGT.OpenProgressWindow('', pExchRateTmp.Count);
+
+            repeat
+                ZGT.UpdateProgressWindow(StrSubstNo(lText001, pExchRateTmp."Currency Code", pExchRateTmp.Company), 0, true);
+
+                // Create Inner XML
+                Clear(TempBlob);
+                TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+                Clear(WsXmlPort);
+                WsXmlPort.SetData_Replication(pExchRateTmp);
+                WsXmlPort.SetDestination(StreamOut);
+                WsXmlPort.Export;
+
+                TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+                XmlDocument.ReadFrom(StreamIn, XmlDoc);
+                XmlNSMgr.NameTable(XmlDoc.NameTable());
+                XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/exchrate');
+                if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+                    XmlRootNode.WriteTo(NodeText);
+                    InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                    XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/exchrate">' + InnerText + '</root>', InnerXmlDoc);
+                    InnerXmlDoc.GetRoot(InnerRootEl);
+                    InnerChildNodes := InnerRootEl.GetChildElements();
+                    InnerText := '';
+                    foreach InnerChildNode in InnerChildNodes do begin
+                        InnerChildNode.WriteTo(ChildText);
+                        InnerText += ChildText;
+                    end;
+                end;
+
+                // Replicate
+                recRepComp.Get(pExchRateTmp.Company);
+                rValue := ZyWebServReq.SendRequestBoolean(pExchRateTmp.Company, 'SendExchangeRate', 'exchangeRates', InnerText, '');
+            until pExchRateTmp.Next() = 0;
+
+            ZGT.CloseProgressWindow;
+        end;
+    end;
+
+    procedure ReplicateExchangeRateOLD(var pExchRateTmp: Record "Currency Exchange Rate Buffer" temporary) rValue: Boolean
+    var
+        recRepComp: Record "Replication Company";
         recItem: Record Item;
         StreamOut: OutStream;
         StreamIn: InStream;
@@ -354,6 +832,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         lText001: label 'Replicate %1 - %2';
         InnerText: Text;
     begin
+        // CLOUD READY DELETE
         if not ZGT.IsRhq then  // RHQ
             exit;
 
@@ -395,6 +874,31 @@ Codeunit 50083 "Zyxel Web Service Management"
     procedure GetCustomerCreditLimits()
     var
         recRepComp: Record "Replication Company";
+        rValue: Text;
+        recCustCredLimit: Record "Customer Credit Limited";
+    begin
+        // CLOUD READY NEW
+        if not ZGT.IsRhq then  // RHQ
+            exit;
+
+        recRepComp.SetRange("Customer Credit Limit", true);
+        if recRepComp.FindSet then begin
+            recCustCredLimit.DeleteAll;
+            Commit;
+            ZGT.OpenProgressWindow('', recRepComp.Count);
+
+            repeat
+                ZGT.UpdateProgressWindow(recRepComp."Company Name", 0, true);
+                ZyWebServReq.GetCustomerCreditLimit(recRepComp."Company Name", rValue);  // Change call of function here
+            until recRepComp.Next() = 0;
+
+            ZGT.CloseProgressWindow;
+        end;
+    end;
+
+    procedure GetCustomerCreditLimitsOLD()
+    var
+        recRepComp: Record "Replication Company";
         recItem: Record Item;
         StreamOut: OutStream;
         StreamIn: InStream;
@@ -406,6 +910,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         rValue: Text;
         recCustCredLimit: Record "Customer Credit Limited";
     begin
+        // CLOUD READY DELETE
         if not ZGT.IsRhq then  // RHQ
             exit;
 
@@ -430,12 +935,69 @@ Codeunit 50083 "Zyxel Web Service Management"
         StreamOut: OutStream;
         StreamIn: InStream;
         TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "WS Account Pay./Receiv";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        InnerText: Text;
+    begin
+        // CLOUD READY NEW
+        if not recRepSetup.Get(pCompanyName) then;
+        // Create Inner XML
+        TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+        Clear(WsXmlPort);
+        WsXmlPort.SetRequest(EndDate, CurrencyDate, ReportingCurrency);
+        WsXmlPort.SetDestination(StreamOut);
+        WsXmlPort.Export;  // Change XMLPortNo.
+
+        TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+        XmlDocument.ReadFrom(StreamIn, XmlDoc);
+        XmlNSMgr.NameTable(XmlDoc.NameTable());
+        XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/acc');  // Change "Rep*" here
+        if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+            XmlRootNode.WriteTo(NodeText);
+            InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+            XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/acc">' + InnerText + '</root>', InnerXmlDoc);
+            InnerXmlDoc.GetRoot(InnerRootEl);
+            InnerChildNodes := InnerRootEl.GetChildElements();
+            InnerText := '';
+            foreach InnerChildNode in InnerChildNodes do begin
+                InnerChildNode.WriteTo(ChildText);
+                InnerText += ChildText;
+            end;
+        end;
+
+        // Get data
+        ZGT.OpenProgressWindow('', 1);
+        ZGT.UpdateProgressWindow(pCompanyName, 0, true);
+        if pType = Ptype::Payable then
+            ZyWebServReq.GetAccountPay_Receivable(pCompanyName, 'GetAccountPayable', 'accountPayables', InnerText, AccPayBuff)  // Change call of function here
+        else  // Receivable
+            ZyWebServReq.GetAccountPay_Receivable(pCompanyName, 'GetAccountReceivable', 'accountReceivables', InnerText, AccPayBuff);  // Change call of function here
+        ZGT.CloseProgressWindow;
+    end;
+
+    procedure GetAccountPay_ReceivableOLD(pType: Option Payable,Receivable; pCompanyName: Text[30]; EndDate: Date; CurrencyDate: Date; ReportingCurrency: Code[10]; var AccPayBuff: Record "Account Pay./Receiv Buffer" temporary)
+    var
+        recRepSetup: Record "Replication Company";
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
         Item: Record Item;
         WsXmlPort: XmlPort "WS Account Pay./Receiv";
         XDoc: dotnet XmlDocument;
         NS: dotnet XmlNamespaceManager;
         InnerText: Text;
     begin
+        // CLOUD READY DELETE
         if not recRepSetup.Get(pCompanyName) then;
         // Create Inner XML
         TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
@@ -487,9 +1049,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         TempBlob: Codeunit "Temp Blob";
         Item: Record Item;
         WsXmlPort: XmlPort "WS Customer Credit Limit";
-        XDoc: dotnet XmlDocument;
-        NS: dotnet XmlNamespaceManager;
-        rValue: Text;
+              rValue: Text;
         CrFilter: Text;
     begin
         //>> 11-04-19 ZY-LD 003
@@ -506,6 +1066,60 @@ Codeunit 50083 "Zyxel Web Service Management"
         StreamOut: OutStream;
         StreamIn: InStream;
         TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "IC Reconciliation";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        InnerXml: Text;
+        CrFilter: Text;
+        DecimalText: Text;
+    begin
+        // CLOUD READY NEW
+        // Create Inner XML
+        TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+        Clear(WsXmlPort);
+        WsXmlPort.SetData(IcReconName, IcReconLine, StartDate, EndDate, ReportingCurrency);
+        WsXmlPort.SetDestination(StreamOut);
+        WsXmlPort.Export;
+
+        TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+        XmlDocument.ReadFrom(StreamIn, XmlDoc);
+        XmlNSMgr.NameTable(XmlDoc.NameTable());
+        XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/IcRecon');
+        if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+            XmlRootNode.WriteTo(NodeText);
+            InnerXml := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+            XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/IcRecon">' + InnerXml + '</root>', InnerXmlDoc);
+            InnerXmlDoc.GetRoot(InnerRootEl);
+            InnerChildNodes := InnerRootEl.GetChildElements();
+            InnerXml := '';
+            foreach InnerChildNode in InnerChildNodes do begin
+                InnerChildNode.WriteTo(ChildText);
+                InnerXml += ChildText;
+            end;
+        end;
+
+        // Replicate
+        DecimalText := ZyWebServReq.SendRequestDecimalText(IcReconLine."Company Name", 'GetIcReconciliation', 'iCReconciliation', InnerXml);
+        if StrLen(DecimalText) > 4 then begin
+            ReportingCurrency := CopyStr(DecimalText, 1, 3);
+            Evaluate(rValue, CopyStr(DecimalText, 4, StrLen(DecimalText)), 9);
+        end;
+    end;
+
+    procedure GetIcReconciliationOLD(IcReconName: Record "IC Reconciliation Name"; IcReconLine: Record "IC Reconciliation Line"; Level: Integer; StartDate: Date; EndDate: Date; var ReportingCurrency: Code[10]) rValue: Decimal
+    var
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
         Item: Record Item;
         WsXmlPort: XmlPort "IC Reconciliation";
         XDoc: dotnet XmlDocument;
@@ -514,6 +1128,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         CrFilter: Text;
         DecimalText: Text;
     begin
+        // CLOUD READY DELETE
         // Create Inner XML
         TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
 
@@ -543,6 +1158,85 @@ Codeunit 50083 "Zyxel Web Service Management"
     var
         recCurrExchRateBuf: Record "Currency Exchange Rate Buffer" temporary;
         recRepComp: Record "Replication Company";
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "WS Replicate Exchange Rate";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        rValue: Text;
+        lText001: label 'Get info %1 - %2';
+    begin
+        // CLOUD READY NEW
+        if not ZGT.IsRhq then  // RHQ
+            exit;
+
+        // Create Inner XML
+        TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+        Clear(WsXmlPort);
+        WsXmlPort.SetData_Request(pCurrencyCode);
+        WsXmlPort.SetDestination(StreamOut);
+        WsXmlPort.Export;
+
+        TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+        XmlDocument.ReadFrom(StreamIn, XmlDoc);
+        XmlNSMgr.NameTable(XmlDoc.NameTable());
+        XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/exchrate');
+        if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+            XmlRootNode.WriteTo(NodeText);
+            rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+            XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/exchrate">' + rValue + '</root>', InnerXmlDoc);
+            InnerXmlDoc.GetRoot(InnerRootEl);
+            InnerChildNodes := InnerRootEl.GetChildElements();
+            rValue := '';
+            foreach InnerChildNode in InnerChildNodes do begin
+                InnerChildNode.WriteTo(ChildText);
+                rValue += ChildText;
+            end;
+        end;
+
+        // Replicate
+        if pCompany <> '' then
+            recRepComp.SetRange("Company Name", pCompany)
+        else
+            recRepComp.SetRange("Replicate Exchange Rate", recRepComp."replicate exchange rate"::Yes);
+
+        Clear(TempBlob);
+        if recRepComp.FindSet then begin
+            ZGT.OpenProgressWindow('', recRepComp.Count);
+
+            repeat
+                ZGT.UpdateProgressWindow(StrSubstNo(lText001, pCurrencyCode, recRepComp."Company Name"), 0, true);
+
+                recCurrExchRateBuf.DeleteAll;
+                ZyWebServReq.GetExchangeInfo(recRepComp."Company Name", 'GetExchangeRate', 'exchangeRates', rValue, recCurrExchRateBuf);
+
+                if recCurrExchRateBuf.FindFirst then begin
+                    pExchRateTmp := recCurrExchRateBuf;
+
+                    if CopyStr(pExchRateTmp.Company, 1, 4) = 'TEST' then
+                        pExchRateTmp.Company := CopyStr(pExchRateTmp.Company, 6, StrLen(pExchRateTmp.Company));
+                    pExchRateTmp.Insert;
+                end;
+            until recRepComp.Next() = 0;
+
+            ZGT.CloseProgressWindow;
+        end;
+    end;
+
+    procedure GetExchangeInfoOLD(pCompany: Text[80]; pCurrencyCode: Code[10]; var pExchRateTmp: Record "Currency Exchange Rate Buffer" temporary)
+    var
+        recCurrExchRateBuf: Record "Currency Exchange Rate Buffer" temporary;
+        recRepComp: Record "Replication Company";
         recItem: Record Item;
         StreamOut: OutStream;
         StreamIn: InStream;
@@ -554,6 +1248,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         rValue: Text;
         lText001: label 'Get info %1 - %2';
     begin
+        // CLOUD READY DELETE
         if not ZGT.IsRhq then  // RHQ
             exit;
 
@@ -652,8 +1347,8 @@ Codeunit 50083 "Zyxel Web Service Management"
         TempBlob: Codeunit "Temp Blob";
         Item: Record Item;
         WsXmlPort: XmlPort "WS Customer Credit Limit";
-        XDoc: dotnet XmlDocument;
-        NS: dotnet XmlNamespaceManager;
+       // XDoc: dotnet XmlDocument;
+       // NS: dotnet XmlNamespaceManager;
         InnerText: Text;
     begin
         if not ZGT.IsRhq then  // RHQ
@@ -720,8 +1415,8 @@ Codeunit 50083 "Zyxel Web Service Management"
         TempBlob: Codeunit "Temp Blob";
         Item: Record Item;
         WsXmlPort: XmlPort "WS Customer Credit Limit";
-        XDoc: dotnet XmlDocument;
-        NS: dotnet XmlNamespaceManager;
+       // XDoc: dotnet XmlDocument;
+       // NS: dotnet XmlNamespaceManager;
         rValue: Text;
         CrFilter: Text;
         lText001: label 'Invoice No. could not be updated in "%1".';
@@ -736,6 +1431,67 @@ Codeunit 50083 "Zyxel Web Service Management"
 
     procedure SendPurchasOrders(pCompany: Text[50]; pPurchOrderNo: Code[20]; pCustomerNo: Code[20]) rValue: Boolean
     var
+        recPurchHead: Record "Purchase Header";
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "WS Sales Order";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        InnerText: Text;
+        lText001: label 'Purchase Order "%1" has been sent.';
+        lText002: label 'Purchase Order "%1" has already been sent.';
+    begin
+        // CLOUD READY NEW
+        if not ZGT.IsRhq then
+            exit;
+
+        recPurchHead.Get(recPurchHead."document type"::Order, pPurchOrderNo);
+        if not recPurchHead."EShop Order Sent" then begin
+            // Create Inner XML
+            TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+            Clear(WsXmlPort);
+            if WsXmlPort.SetData(pPurchOrderNo, pCustomerNo) then begin
+                WsXmlPort.SetDestination(StreamOut);
+                WsXmlPort.Export;  // Change XMLPortNo.
+
+                TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+                XmlDocument.ReadFrom(StreamIn, XmlDoc);
+                XmlNSMgr.NameTable(XmlDoc.NameTable());
+                XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/so');  // Change "Rep*" here
+                if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+                    XmlRootNode.WriteTo(NodeText);
+                    InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                    XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/so">' + InnerText + '</root>', InnerXmlDoc);
+                    InnerXmlDoc.GetRoot(InnerRootEl);
+                    InnerChildNodes := InnerRootEl.GetChildElements();
+                    InnerText := '';
+                    foreach InnerChildNode in InnerChildNodes do begin
+                        InnerChildNode.WriteTo(ChildText);
+                        InnerText += ChildText;
+                    end;
+                end;
+
+                // Replicate
+                rValue := ZyWebServReq.SendPurchaseOrder(pCompany, InnerText);  // Change call of function here
+
+                Message(lText001, pPurchOrderNo);
+            end;
+        end else
+            Message(lText002, pPurchOrderNo);
+    end;
+
+    procedure SendPurchasOrdersOLD(pCompany: Text[50]; pPurchOrderNo: Code[20]; pCustomerNo: Code[20]) rValue: Boolean
+    var
         recItem: Record Item;
         recPurchHead: Record "Purchase Header";
         StreamOut: OutStream;
@@ -749,6 +1505,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         lText001: label 'Purchase Order "%1" has been sent.';
         lText002: label 'Purchase Order "%1" has already been sent.';
     begin
+        // CLOUD READY DELETE
         if not ZGT.IsRhq then
             exit;
 
@@ -783,6 +1540,64 @@ Codeunit 50083 "Zyxel Web Service Management"
 
     procedure SendTravelExpense(var pTrExpHead: Record "Travel Expense Header"; NewPostDocument: Boolean) rValue: Boolean
     var
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "WS Travel Expense";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        InnerText: Text;
+        TopHeader: Text;
+    begin
+        // CLOUD READY NEW
+        if not ZGT.IsRhq then
+            exit;
+
+        // Create Inner XML
+        TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+        Clear(WsXmlPort);
+        if WsXmlPort.SetData(pTrExpHead, NewPostDocument) then begin
+            WsXmlPort.SetDestination(StreamOut);
+            WsXmlPort.Export;  // Change XMLPortNo.
+
+            TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+            XmlDocument.ReadFrom(StreamIn, XmlDoc);
+            XmlNSMgr.NameTable(XmlDoc.NameTable());
+            XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/transfer');  // Change "Rep*" here
+            if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+                XmlRootNode.WriteTo(NodeText);
+                InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/transfer">' + InnerText + '</root>', InnerXmlDoc);
+                InnerXmlDoc.GetRoot(InnerRootEl);
+                InnerChildNodes := InnerRootEl.GetChildElements();
+                InnerText := '';
+                foreach InnerChildNode in InnerChildNodes do begin
+                    InnerChildNode.WriteTo(ChildText);
+                    InnerText += ChildText;
+                end;
+            end;
+
+            TopHeader := StrSubstNo('<automation>%1</automation>', ZGT.ConvertBooleanToTrueFalse(not GuiAllowed, 1));
+
+            // Replicate
+            if ZyWebServReq.SendRequestBoolean(pTrExpHead."Concur Company Name", 'SendTravelExpense', 'travelExpenses', InnerText, TopHeader) then begin  // Change call of function here
+                pTrExpHead.ModifyAll("Document Status", pTrExpHead."document status"::Transferred);
+                rValue := true;
+            end;
+        end;
+    end;
+
+    procedure SendTravelExpenseOLD(var pTrExpHead: Record "Travel Expense Header"; NewPostDocument: Boolean) rValue: Boolean
+    var
         recItem: Record Item;
         recPurchHead: Record "Purchase Header";
         StreamOut: OutStream;
@@ -797,6 +1612,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         lText002: label 'Purchase Order "%1" has already been sent.';
         TopHeader: Text;
     begin
+        // CLOUD READY DELETE
         if not ZGT.IsRhq then
             exit;
 
@@ -830,6 +1646,58 @@ Codeunit 50083 "Zyxel Web Service Management"
 
     procedure SendUnshippedQuantity(pCompany: Text[50]; pCustomerNo: Code[20]) rValue: Boolean
     var
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "WS Unshipped Quantity";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        InnerText: Text;
+    begin
+        // CLOUD READY NEW
+        if not ZGT.IsRhq then
+            exit;
+
+        // Create Inner XML
+        TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+        Clear(WsXmlPort);
+        if WsXmlPort.SetData(pCustomerNo) then begin
+            WsXmlPort.SetDestination(StreamOut);
+            WsXmlPort.Export;  // Change XMLPortNo.
+
+            TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+            XmlDocument.ReadFrom(StreamIn, XmlDoc);
+            XmlNSMgr.NameTable(XmlDoc.NameTable());
+            XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/uq');  // Change "Rep*" here
+            if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+                XmlRootNode.WriteTo(NodeText);
+                InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/uq">' + InnerText + '</root>', InnerXmlDoc);
+                InnerXmlDoc.GetRoot(InnerRootEl);
+                InnerChildNodes := InnerRootEl.GetChildElements();
+                InnerText := '';
+                foreach InnerChildNode in InnerChildNodes do begin
+                    InnerChildNode.WriteTo(ChildText);
+                    InnerText += ChildText;
+                end;
+            end;
+
+            // Replicate
+            rValue := ZyWebServReq.SendUnshippedQuantity(pCompany, InnerText);  // Change call of function here
+        end;
+    end;
+
+    procedure SendUnshippedQuantityOLD(pCompany: Text[50]; pCustomerNo: Code[20]) rValue: Boolean
+    var
         recItem: Record Item;
         recPurchHead: Record "Purchase Header";
         StreamOut: OutStream;
@@ -843,6 +1711,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         lText001: label 'Purchase Order "%1" has been sent.';
         lText002: label 'Purchase Order "%1" has already been sent.';
     begin
+        // CLOUD READY DELETE
         if not ZGT.IsRhq then
             exit;
 
@@ -871,6 +1740,73 @@ Codeunit 50083 "Zyxel Web Service Management"
 
     procedure SendContainerDetails(pCompany: Text[50]; pSourceType: Option "Sales Invoice","Sales Return Order","Purchase Order","Transfer Order"; pSourceNo: Code[20]) rValue: Boolean
     var
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "WS Container Detail";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        InnerText: Text;
+        SetDataOK: Boolean;
+    begin
+        // CLOUD READY NEW
+        if not ZGT.IsRhq then
+            exit;
+
+        // Create Inner XML
+        TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+        Clear(WsXmlPort);
+
+        //>> 18-03-20 ZY-LD 006
+        //IF WsXmlPort.SetData(pSalesInvNo) THEN BEGIN
+        case pSourceType of
+            Psourcetype::"Sales Invoice":
+                SetDataOK := WsXmlPort.SetData(pSourceNo);
+            Psourcetype::"Sales Return Order":
+                SetDataOK := WsXmlPort.SetData_SalesReturn(pSourceNo);
+            Psourcetype::"Purchase Order":
+                SetDataOK := WsXmlPort.SetData_PurchaseOrder(pSourceNo);
+            Psourcetype::"Transfer Order":
+                SetDataOK := WsXmlPort.SetData_TransferOrder(pSourceNo);  // 30-11-20 ZY-LD 008
+        end;
+        //<< 18-03-20 ZY-LD 006
+        if SetDataOK then begin
+            WsXmlPort.SetDestination(StreamOut);
+            WsXmlPort.Export;  // Change XMLPortNo.
+
+            TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+            XmlDocument.ReadFrom(StreamIn, XmlDoc);
+            XmlNSMgr.NameTable(XmlDoc.NameTable());
+            XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/cd');  // Change "Rep*" here
+            if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+                XmlRootNode.WriteTo(NodeText);
+                InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/cd">' + InnerText + '</root>', InnerXmlDoc);
+                InnerXmlDoc.GetRoot(InnerRootEl);
+                InnerChildNodes := InnerRootEl.GetChildElements();
+                InnerText := '';
+                foreach InnerChildNode in InnerChildNodes do begin
+                    InnerChildNode.WriteTo(ChildText);
+                    InnerText += ChildText;
+                end;
+            end;
+
+            // Replicate
+            rValue := ZyWebServReq.SendContainerDetails(pCompany, InnerText);  // Change call of function here
+        end;
+    end;
+
+    procedure SendContainerDetailsOLD(pCompany: Text[50]; pSourceType: Option "Sales Invoice","Sales Return Order","Purchase Order","Transfer Order"; pSourceNo: Code[20]) rValue: Boolean
+    var
         recItem: Record Item;
         recPurchHead: Record "Purchase Header";
         StreamOut: OutStream;
@@ -885,6 +1821,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         lText002: label 'Purchase Order "%1" has already been sent.';
         SetDataOK: Boolean;
     begin
+        // CLOUD READY DELETE
         if not ZGT.IsRhq then
             exit;
 
@@ -927,6 +1864,58 @@ Codeunit 50083 "Zyxel Web Service Management"
 
     procedure SendSalesOrderFrance(pPurchOrderNo: Code[20]) rValue: Boolean
     var
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "FR Sales Order";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        InnerText: Text;
+    begin
+        // CLOUD READY NEW
+        if not ZGT.IsRhq then
+            exit;
+
+        // Create Inner XML
+        TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+        Clear(WsXmlPort);
+        if WsXmlPort.SetData(pPurchOrderNo) then begin
+            WsXmlPort.SetDestination(StreamOut);
+            WsXmlPort.Export;  // Change XMLPortNo.
+
+            TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+            XmlDocument.ReadFrom(StreamIn, XmlDoc);
+            XmlNSMgr.NameTable(XmlDoc.NameTable());
+            XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/sofr');  // Change "Rep*" here
+            if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+                XmlRootNode.WriteTo(NodeText);
+                InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/sofr">' + InnerText + '</root>', InnerXmlDoc);
+                InnerXmlDoc.GetRoot(InnerRootEl);
+                InnerChildNodes := InnerRootEl.GetChildElements();
+                InnerText := '';
+                foreach InnerChildNode in InnerChildNodes do begin
+                    InnerChildNode.WriteTo(ChildText);
+                    InnerText += ChildText;
+                end;
+            end;
+
+            // Send
+            rValue := ZyWebServReq.SendSalesOrderFrance('ZNet DK', InnerText);  // Change call of function here
+        end;
+    end;
+
+    procedure SendSalesOrderFranceOLD(pPurchOrderNo: Code[20]) rValue: Boolean
+    var
         recItem: Record Item;
         recPurchHead: Record "Purchase Header";
         StreamOut: OutStream;
@@ -940,6 +1929,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         lText001: label 'Purchase Order "%1" has been sent.';
         lText002: label 'Purchase Order "%1" has already been sent.';
     begin
+        // CLOUD READY DELETE
         if not ZGT.IsRhq then
             exit;
 
@@ -966,6 +1956,58 @@ Codeunit 50083 "Zyxel Web Service Management"
 
     procedure SendPurchasePrice(pCompany: Text[50]; pVendorCode: Code[10]; var pPurchPriceTmp: Record "Price List Line" temporary) rValue: Boolean
     var
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "HQ Purchase Price";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        InnerText: Text;
+    begin
+        // CLOUD READY NEW
+        if not ZGT.IsRhq then
+            exit;
+
+        // Create Inner XML
+        TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+        Clear(WsXmlPort);
+        if WsXmlPort.SetData(pVendorCode, pPurchPriceTmp) then begin
+            WsXmlPort.SetDestination(StreamOut);
+            WsXmlPort.Export;  // Change XMLPortNo.
+
+            TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+            XmlDocument.ReadFrom(StreamIn, XmlDoc);
+            XmlNSMgr.NameTable(XmlDoc.NameTable());
+            XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/pp');  // Change "Rep*" here
+            if XmlDoc.SelectSingleNode('//d:Root', XmlNSMgr, XmlRootNode) then begin
+                XmlRootNode.WriteTo(NodeText);
+                InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/pp">' + InnerText + '</root>', InnerXmlDoc);
+                InnerXmlDoc.GetRoot(InnerRootEl);
+                InnerChildNodes := InnerRootEl.GetChildElements();
+                InnerText := '';
+                foreach InnerChildNode in InnerChildNodes do begin
+                    InnerChildNode.WriteTo(ChildText);
+                    InnerText += ChildText;
+                end;
+            end;
+
+            // Replicate
+            rValue := ZyWebServReq.SendPurchasePrice(pCompany, InnerText);  // Change call of function here
+        end;
+    end;
+
+    procedure SendPurchasePriceOLD(pCompany: Text[50]; pVendorCode: Code[10]; var pPurchPriceTmp: Record "Price List Line" temporary) rValue: Boolean
+    var
         recItem: Record Item;
         recPurchHead: Record "Purchase Header";
         StreamOut: OutStream;
@@ -979,6 +2021,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         lText001: label 'Purchase Order "%1" has been sent.';
         lText002: label 'Purchase Order "%1" has already been sent.';
     begin
+        // CLOUD READY DELETE
         if not ZGT.IsRhq then
             exit;
 
@@ -1007,6 +2050,58 @@ Codeunit 50083 "Zyxel Web Service Management"
 
     procedure SendSalesPrice(pCompany: Text[50]; var pSalesPriceTmp: Record "Price List Line" temporary) rValue: Boolean
     var
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "HQ Sales Price";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        InnerText: Text;
+    begin
+        // CLOUD READY NEW
+        if not ZGT.IsRhq then
+            exit;
+
+        // Create Inner XML
+        TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+        Clear(WsXmlPort);
+        if WsXmlPort.SetData(pSalesPriceTmp) then begin
+            WsXmlPort.SetDestination(StreamOut);
+            WsXmlPort.Export;  // Change XMLPortNo.
+
+            TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+            XmlDocument.ReadFrom(StreamIn, XmlDoc);
+            XmlNSMgr.NameTable(XmlDoc.NameTable());
+            XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/sp');
+            if XmlDoc.SelectSingleNode('//d:Root', XmlNSMgr, XmlRootNode) then begin
+                XmlRootNode.WriteTo(NodeText);
+                InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/sp">' + InnerText + '</root>', InnerXmlDoc);
+                InnerXmlDoc.GetRoot(InnerRootEl);
+                InnerChildNodes := InnerRootEl.GetChildElements();
+                InnerText := '';
+                foreach InnerChildNode in InnerChildNodes do begin
+                    InnerChildNode.WriteTo(ChildText);
+                    InnerText += ChildText;
+                end;
+            end;
+
+            // Replicate
+            rValue := ZyWebServReq.SendSalesPrice(pCompany, InnerText);  // Change call of function here
+        end;
+    end;
+
+    procedure SendSalesPriceOLD(pCompany: Text[50]; var pSalesPriceTmp: Record "Price List Line" temporary) rValue: Boolean
+    var
         recItem: Record Item;
         recPurchHead: Record "Purchase Header";
         StreamOut: OutStream;
@@ -1020,6 +2115,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         lText001: label 'Purchase Order "%1" has been sent.';
         lText002: label 'Purchase Order "%1" has already been sent.';
     begin
+        // CLOUD READY DELETE
         if not ZGT.IsRhq then
             exit;
 
@@ -1048,6 +2144,58 @@ Codeunit 50083 "Zyxel Web Service Management"
 
     procedure SendPhasesPurchaseOrder(pPurchOrderNo: Code[20]) rValue: Boolean
     var
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "PH Purchase Order";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        InnerText: Text;
+    begin
+        // CLOUD READY NEW
+        if not ZGT.IsRhq then
+            exit;
+
+        // Create Inner XML
+        TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+        Clear(WsXmlPort);
+        if WsXmlPort.SetData(pPurchOrderNo) then begin
+            WsXmlPort.SetDestination(StreamOut);
+            WsXmlPort.Export;  // Change XMLPortNo.
+
+            TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+            XmlDocument.ReadFrom(StreamIn, XmlDoc);
+            XmlNSMgr.NameTable(XmlDoc.NameTable());
+            XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/purchaseorder');
+            if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+                XmlRootNode.WriteTo(NodeText);
+                InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/purchaseorder">' + InnerText + '</root>', InnerXmlDoc);
+                InnerXmlDoc.GetRoot(InnerRootEl);
+                InnerChildNodes := InnerRootEl.GetChildElements();
+                InnerText := '';
+                foreach InnerChildNode in InnerChildNodes do begin
+                    InnerChildNode.WriteTo(ChildText);
+                    InnerText += ChildText;
+                end;
+            end;
+
+            // Send
+            rValue := ZyWebServReq.SendRequestBoolean('ZNet DK', 'SendPhasesPurchaseOrder', 'purchaseOrders', InnerText, '');  // Change call of function here
+        end;
+    end;
+
+    procedure SendPhasesPurchaseOrderOLD(pPurchOrderNo: Code[20]) rValue: Boolean
+    var
         recItem: Record Item;
         recPurchHead: Record "Purchase Header";
         StreamOut: OutStream;
@@ -1061,6 +2209,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         lText001: label 'Purchase Order "%1" has been sent.';
         lText002: label 'Purchase Order "%1" has already been sent.';
     begin
+        // CLOUD READY DELETE
         if not ZGT.IsRhq then
             exit;
 
@@ -1132,6 +2281,58 @@ Codeunit 50083 "Zyxel Web Service Management"
 
     procedure SendUseOfReport(var pUseOfReportTmp: Record "Use of Report Entry" temporary)
     var
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort "WS Use of Report";
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        rValue: Text;
+    begin
+        // CLOUD READY NEW
+        //>> 16-10-20 ZY-LD 006
+        Clear(WsXmlPort);
+        if WsXmlPort.SetData(pUseOfReportTmp) then begin
+            // Create Inner XML
+            Clear(TempBlob);
+            TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+            WsXmlPort.SetDestination(StreamOut);
+            WsXmlPort.Export;
+
+            TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+            XmlDocument.ReadFrom(StreamIn, XmlDoc);
+            XmlNSMgr.NameTable(XmlDoc.NameTable());
+            XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/useofreport');
+            if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+                XmlRootNode.WriteTo(NodeText);
+                rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/useofreport">' + rValue + '</root>', InnerXmlDoc);
+                InnerXmlDoc.GetRoot(InnerRootEl);
+                InnerChildNodes := InnerRootEl.GetChildElements();
+                rValue := '';
+                foreach InnerChildNode in InnerChildNodes do begin
+                    InnerChildNode.WriteTo(ChildText);
+                    rValue += ChildText;
+                end;
+            end;
+
+            // Send
+            ZyWebServReq.SendRequestBoolean(ZGT.GetCompanyName(1), 'SendUseOfReport', 'useOfReports', rValue, '');
+        end;
+        //<< 16-10-20 ZY-LD 006
+    end;
+
+    procedure SendUseOfReportOLD(var pUseOfReportTmp: Record "Use of Report Entry" temporary)
+    var
         recRepComp: Record "Replication Company";
         recItem: Record Item;
         StreamOut: OutStream;
@@ -1144,6 +2345,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         rValue: Text;
         lText001: label 'Replicate %1 - %2';
     begin
+        // CLOUD READY DELETE
         //>> 16-10-20 ZY-LD 006
         Clear(WsXmlPort);
         if WsXmlPort.SetData(pUseOfReportTmp) then begin
@@ -1266,6 +2468,72 @@ Codeunit 50083 "Zyxel Web Service Management"
 
     procedure ReplicateItemBudgetEntries(pCompanyName: Text[30])
     var
+        StreamOut: OutStream;
+        StreamIn: InStream;
+        TempBlob: Codeunit "Temp Blob";
+        WsXmlPort: XmlPort ItemBudgetEntries;
+        XmlDoc: XmlDocument;
+        XmlNSMgr: XmlNamespaceManager;
+        XmlRootNode: XmlNode;
+        InnerXmlDoc: XmlDocument;
+        InnerRootEl: XmlElement;
+        InnerChildNodes: XmlNodeList;
+        InnerChildNode: XmlNode;
+        NodeText: Text;
+        ChildText: Text;
+        rValue: Text;
+        recItemBudgetEntry: Record "Item Budget Entry";
+    begin
+        // CLOUD READY NEW
+        if not ZGT.CompanyNameIs(1) then  // RHQ
+            exit;
+
+        recItemBudgetEntry.SetCurrentkey("Analysis Area", "Budget Name", "Item No.", "Source Type", "Source No.", Date, "Location Code", "Global Dimension 1 Code");
+        recItemBudgetEntry.SetRange("Global Dimension 1 Code", 'CH');
+        recItemBudgetEntry.SetFilter("Budget Name", 'MASTER', 'FORECAST', 'PREVIOUS');
+        if recItemBudgetEntry.FindSet then begin
+            ZGT.OpenProgressWindow('', recItemBudgetEntry.Count);
+
+            repeat
+                ZGT.UpdateProgressWindow(Format(recItemBudgetEntry."Entry No."), 0, true);
+                // Create Inner XML
+                Clear(TempBlob);
+                TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
+
+                Clear(WsXmlPort);
+                if WsXmlPort.SetData(recItemBudgetEntry) then begin  // 07-01-19 ZY-LD 002
+                    WsXmlPort.SetDestination(StreamOut);
+                    WsXmlPort.Export;  // Change XMLPortNo.
+
+                    TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
+
+                    XmlDocument.ReadFrom(StreamIn, XmlDoc);
+                    XmlNSMgr.NameTable(XmlDoc.NameTable());
+                    XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');
+                    if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
+                        XmlRootNode.WriteTo(NodeText);
+                        rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                        XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
+                        InnerXmlDoc.GetRoot(InnerRootEl);
+                        InnerChildNodes := InnerRootEl.GetChildElements();
+                        rValue := '';
+                        foreach InnerChildNode in InnerChildNodes do begin
+                            InnerChildNode.WriteTo(ChildText);
+                            rValue += ChildText;
+                        end;
+                    end;
+
+                    // Replicate
+                    ZyWebServReq.ReplicateItemBudgetEntry(pCompanyName, rValue);  // Change call of function here
+                end;
+            until recItemBudgetEntry.Next() = 0;
+
+            ZGT.CloseProgressWindow;
+        end;
+    end;
+
+    procedure ReplicateItemBudgetEntriesOLD(pCompanyName: Text[30])
+    var
         recRepComp: Record "Replication Company";
         recItem: Record Item;
         StreamOut: OutStream;
@@ -1278,6 +2546,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         rValue: Text;
         recItemBudgetEntry: Record "Item Budget Entry";
     begin
+        // CLOUD READY DELETE
         if not ZGT.CompanyNameIs(1) then  // RHQ
             exit;
 

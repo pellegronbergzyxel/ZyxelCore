@@ -158,16 +158,16 @@ Report 50027 "Export G/L Entries - Tax Audit"
 
     trigger OnPostReport()
     var
-        ClientTempFileName: Text[250];
+        TempBlobInStream: InStream;
     begin
         ToFileName := GetFileName;
-        Writer.Close;
-
-        FileManagement.DownloadHandler(OutputFileName, '', '', FileManagement.GetToFilterText('', '.txt'), ToFileName);
-
-        Clear(oStream);
-
-        FileManagement.DeleteServerFile(OutputFileName);
+        // CLOUD READY DELETE:
+        // Writer.Close;
+        // FileManagement.DownloadHandler(OutputFileName, '', '', FileManagement.GetToFilterText('', '.txt'), ToFileName);
+        // Clear(oStream);
+        // FileManagement.DeleteServerFile(OutputFileName);
+        TempBlob.CreateInstream(TempBlobInStream, TextEncoding::UTF8);
+        File.DownloadFromStream(TempBlobInStream, '', '', FileManagement.GetToFilterText('', '.txt'), ToFileName);
         Message(FileCreatedMsg);
     end;
 
@@ -192,11 +192,12 @@ Report 50027 "Export G/L Entries - Tax Audit"
 
     var
         FileManagement: Codeunit "File Management";
-        OutputFile: File;
+        TempBlob: Codeunit "Temp Blob";
+        // OutputFile: File;  // CLOUD READY DELETE
         oStream: OutStream;
-        Writer: dotnet StreamWriter;
-        encoding: dotnet Encoding;
-        OutputFileName: Text[250];
+        // Writer: dotnet StreamWriter;  // CLOUD READY DELETE
+        // encoding: dotnet Encoding;  // CLOUD READY DELETE
+        // OutputFileName: Text[250];  // CLOUD READY DELETE
         StartingDate: Date;
         EndingDate: Date;
         GLAccNoFilter: Code[250];
@@ -233,15 +234,15 @@ Report 50027 "Export G/L Entries - Tax Audit"
 
     local procedure CreateServerFile()
     begin
-        OutputFileName := FileManagement.ServerTempFileName(ServerFileExtensionTxt);
-        if Exists(OutputFileName) then
-            Erase(OutputFileName);
-
-        OutputFile.TextMode(true);
-        OutputFile.WriteMode(true);
-        OutputFile.CreateOutstream(oStream);
-
-        Writer := Writer.StreamWriter(OutputFileName, false, encoding.Default); // append = FALSE
+        // CLOUD READY DELETE:
+        // OutputFileName := FileManagement.ServerTempFileName(ServerFileExtensionTxt);
+        // if Exists(OutputFileName) then
+        //     Erase(OutputFileName);
+        // OutputFile.TextMode(true);
+        // OutputFile.WriteMode(true);
+        // OutputFile.CreateOutstream(oStream);
+        // Writer := Writer.StreamWriter(OutputFileName, false, encoding.Default); // append = FALSE
+        TempBlob.CreateOutstream(oStream, TextEncoding::UTF8);
     end;
 
     local procedure FindGLRegister(var GLRegister: Record "G/L Register"; EntryNo: Integer)
@@ -661,6 +662,15 @@ Report 50027 "Export G/L Entries - Tax Audit"
           DateApplied);
     end;
 
+    local procedure WriteLine(LineText: Text)
+    var
+        CRLF: Text[2];
+    begin
+        CRLF[1] := 13;
+        CRLF[2] := 10;
+        oStream.WriteText(LineText + CRLF);
+    end;
+
     local procedure ResetTransactionData()
     begin
         CustVendLedgEntryPartyNo := '';
@@ -672,7 +682,8 @@ Report 50027 "Export G/L Entries - Tax Audit"
 
     local procedure WriteHeaderToFile()
     begin
-        Writer.WriteLine('JournalCode|JournalLib|EcritureNum|EcritureDate|CompteNum|CompteLib|CompAuxNum|CompAuxLib|PieceRef|' +
+        // Writer.WriteLine('JournalCode|...');  // CLOUD READY DELETE
+        WriteLine('JournalCode|JournalLib|EcritureNum|EcritureDate|CompteNum|CompteLib|CompAuxNum|CompAuxLib|PieceRef|' +
           'PieceDate|EcritureLib|Debit|Credit|EcritureLet|DateLet|ValidDate|Montantdevise|Idevise');
     end;
 
@@ -686,7 +697,7 @@ Report 50027 "Export G/L Entries - Tax Audit"
         else
             CreditAmount := Abs(OpeningBalance);
 
-        Writer.WriteLine('00000|' +
+        WriteLine('00000|' +
           'BALANCE OUVERTURE|' +
           '0|' +
           GetFormattedDate(StartingDate) + '|' +
@@ -707,7 +718,7 @@ Report 50027 "Export G/L Entries - Tax Audit"
     begin
         begin
             GLEntry.CalcFields(GLEntry."G/L Account Name");
-            Writer.WriteLine(
+            WriteLine(
               GLEntry."Source Code" + '|' +
               GetSourceCodeDesc(GLEntry."Source Code") + '|' +
               Format(GLRegisterNo) + '|' +
@@ -777,7 +788,7 @@ Report 50027 "Export G/L Entries - Tax Audit"
                 GetBankAccountData(SourceNo, PartyNo, PartyName);
         end;
 
-        Writer.WriteLine('00000|' +
+        WriteLine('00000|' +
           'BALANCE OUVERTURE|' +
           '0|' +
           GetFormattedDate(StartingDate) + '|' +
