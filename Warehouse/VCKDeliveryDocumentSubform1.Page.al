@@ -20,28 +20,33 @@ Page 50088 "VCK Delivery Document Subform1"
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
+                    ToolTip = 'Item No.';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
+                    ToolTip = 'Description';
                 }
                 field(Posted; Rec.Posted)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Posted';
                 }
                 field(Control1000000005; Rec.Quantity)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = QuantityEditable;
+                    ToolTip = 'Quantity';
                 }
 
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
+                    ToolTip = 'Unit of Measure Code';
                 }
                 field(getTotalQTYperCarton; item.getTotalQTYperCarton(Rec."Item No."))
                 {
@@ -49,6 +54,7 @@ Page 50088 "VCK Delivery Document Subform1"
                     Editable = false;
                     caption = 'Total Qty. per Carton';
                     BlankZero = true;
+                    ToolTip = 'Total Quantity per Carton';
                 }
 
 
@@ -57,35 +63,42 @@ Page 50088 "VCK Delivery Document Subform1"
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Unit Price Excl. VAT';
                 }
                 field(Amount; Rec.Amount)
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Amount Excl. VAT';
                 }
                 field("Line Amount"; Rec."Line Amount")
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = true;
+                    ToolTip = 'Line Amount Excl. VAT';
                 }
                 field("Line Discount %"; Rec."Line Discount %")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    ToolTip = 'Line Discount %';
                 }
                 field("Line Discount Amount"; Rec."Line Discount Amount")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    ToolTip = 'Line Discount Amount';
                 }
                 field("VAT %"; Rec."VAT %")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    ToolTip = 'VAT %';
                 }
                 field("Amount Including VAT"; Rec."Amount Including VAT")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    ToolTip = 'Amount Including VAT';
                 }
                 field("Sales Order No."; Rec."Sales Order No.")
                 {
@@ -93,13 +106,14 @@ Page 50088 "VCK Delivery Document Subform1"
                     AssistEdit = true;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Sales Order No.';
 
                     trigger OnAssistEdit()
                     var
                         recSalesHeader: Record "Sales Header";
                     begin
                         recSalesHeader.SetFilter("No.", Rec."Sales Order No.");
-                        if not recSalesHeader.FindFirst then Error(Text0001);
+                        if not recSalesHeader.FindFirst() then Error(Text0001);
                         Page.RunModal(42, recSalesHeader)
                     end;
                 }
@@ -107,18 +121,22 @@ Page 50088 "VCK Delivery Document Subform1"
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    ToolTip = 'Sales Order Line No.';
                 }
                 field("Customer Order No."; Rec."Customer Order No.")
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Customer Order No.';
+
                 }
                 field("Customer Order Position No."; Rec."Customer Order Position No.") //23-05-2025 BK #508124
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Customer Order Position No.';
                 }
                 field("Warehouse Status"; Rec."Warehouse Status")
                 {
@@ -126,21 +144,25 @@ Page 50088 "VCK Delivery Document Subform1"
                     Editable = true;
                     Style = Strong;
                     StyleExpr = true;
+                    ToolTip = 'Warehouse Status';
                 }
                 field("Shipment Date"; Rec."Shipment Date")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    ToolTip = 'Shipment Date';
                 }
                 field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    ToolTip = 'Line No.';
                 }
                 field("No of Serial No."; Rec."No of Serial No.")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                    ToolTip = 'No of Serial No.';
                 }
             }
         }
@@ -154,6 +176,7 @@ Page 50088 "VCK Delivery Document Subform1"
             {
                 Caption = 'Show Freight Lines';
                 Image = ClearFilter;
+                ToolTip = 'Show all lines including freight cost lines';
                 trigger OnAction()
                 begin
                     Rec.SetRange("Freight Cost Item");
@@ -164,20 +187,22 @@ Page 50088 "VCK Delivery Document Subform1"
             {
                 Caption = 'View';
                 Image = View;
+                ToolTip = 'View related documents';
                 action("Order")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Order';
                     Image = "Order";
+                    ToolTip = 'View related Order';
 
                     trigger OnAction()
                     begin
                         Rec.CalcFields(Rec."Document Type");
                         case Rec."Document Type" of
                             Rec."document type"::Sales:
-                                ViewSalesOrder;
+                                ViewSalesOrder();
                             Rec."document type"::Transfer:
-                                ViewTransferOrder;
+                                ViewTransferOrder();
                         end;
                     end;
                 }
@@ -186,6 +211,7 @@ Page 50088 "VCK Delivery Document Subform1"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Sales Invoice Line';
                     Image = Line;
+                    ToolTip = 'View related Sales Invoice Line';
                     RunObject = Page "Sales Invoice Line";
                     RunPageLink = "Picking List No." = field("Document No."),
                                   Type = const(Item),
@@ -197,6 +223,7 @@ Page 50088 "VCK Delivery Document Subform1"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Sales Shipment';
                     Image = SalesShipment;
+                    ToolTip = 'View related Sales Shipment';
                     RunObject = Page "Posted Sales Shipment";
                     RunPageLink = "Order No." = field("Sales Order No.");
                 }
@@ -205,10 +232,11 @@ Page 50088 "VCK Delivery Document Subform1"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Sales Invoice';
                     Image = Invoice;
+                    ToolTip = 'View related Sales Invoice';
 
                     trigger OnAction()
                     begin
-                        ViewSalesInvoice;
+                        ViewSalesInvoice();
                     end;
                 }
             }
@@ -217,10 +245,13 @@ Page 50088 "VCK Delivery Document Subform1"
                 Caption = 'Edit';
                 Visible = EditButtonVisible;
                 Image = Edit;
+                ToolTip = 'Edit the selected line';
                 action(Delete)
                 {
                     Caption = 'Delete Line';
                     Image = Delete;
+                    ToolTip = 'Delete the selected line';
+
                     trigger OnAction()
                     var
                         lText001: Label 'Go ahead and delete?';
@@ -234,6 +265,7 @@ Page 50088 "VCK Delivery Document Subform1"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Quantity';
                     Image = Edit;
+                    ToolTip = 'Edit Quantity';
 
                     trigger OnAction()
                     begin
@@ -245,6 +277,7 @@ Page 50088 "VCK Delivery Document Subform1"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Unit Price Excl. VAT';
                     Image = Edit;
+                    ToolTip = 'Edit Unit Price Excl. VAT';
 
                     trigger OnAction()
                     begin
@@ -257,6 +290,7 @@ Page 50088 "VCK Delivery Document Subform1"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Validate Amount';
                     Image = EditLines;
+                    ToolTip = 'Validate Amount based on Quantity and Unit Price';
 
                     trigger OnAction()
                     begin
@@ -272,17 +306,12 @@ Page 50088 "VCK Delivery Document Subform1"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Serial Numbers';
                 Image = SerialNo;
+                ToolTip = 'View Serial Numbers';
                 RunObject = Page "VCK Delivery Document SNos";
                 RunPageLink = "Delivery Document No." = field("Document No."),
                               "Delivery Document Line No." = field("Line No.");
                 RunPageView = sorting("Serial No.", "Delivery Document No.", "Delivery Document Line No.");
 
-                trigger OnAction()
-                var
-                    frmSerials: Page "VCK Delivery Document SNos";
-                begin
-
-                end;
             }
             action("Export Excel")
             {
@@ -293,7 +322,7 @@ Page 50088 "VCK Delivery Document Subform1"
 
                 trigger OnAction()
                 begin
-                    ExportExcel;
+                    ExportExcel();
                 end;
             }
             action("Change Log")
@@ -301,6 +330,7 @@ Page 50088 "VCK Delivery Document Subform1"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Change Log';
                 Image = ChangeLog;
+                ToolTip = 'View change log for this line';
                 RunObject = Page "Change Log Entries";
                 RunPageLink = "Primary Key Field 1 Value" = field("Document No.");
                 RunPageView = sorting("Table No.", "Date and Time")
@@ -312,38 +342,40 @@ Page 50088 "VCK Delivery Document Subform1"
 
     trigger OnAfterGetRecord()
     begin
-        SetActions;
+        SetActions();
 
-        ItemNoOnFormat;
-        DescriptionOnFormat;
-        ActionCodeOnFormat;
-        SalespersonCodeOnFormat;
-        QuantityOnFormat;
-        UnitPriceOnFormat;
-        CurrencyCodeOnFormat;
-        LocationOnFormat;
-        SalesOrderNoOnFormat;
-        TransferOrderNoOnFormat;
-        CustomerOrderNoOnFormat;
-        WarehouseStatusOnFormat;
-        PickingDateTimeOnFormat;
-        LoadingDateTimeOnFormat;
-        DeliveryDateTimeOnFormat;
-        DeliveryRemarkOnFormat;
-        DeliveryStatusOnFormat;
-        ReceiverReferenceOnFormat;
-        ShipperReferenceOnFormat;
-        SignedByOnFormat;
+        ItemNoOnFormat();
+        DescriptionOnFormat();
+        ActionCodeOnFormat();
+        SalespersonCodeOnFormat();
+        QuantityOnFormat();
+        UnitPriceOnFormat();
+        CurrencyCodeOnFormat();
+        LocationOnFormat();
+        SalesOrderNoOnFormat();
+        TransferOrderNoOnFormat();
+        CustomerOrderNoOnFormat();
+        WarehouseStatusOnFormat();
+        PickingDateTimeOnFormat();
+        LoadingDateTimeOnFormat();
+        DeliveryDateTimeOnFormat();
+        DeliveryRemarkOnFormat();
+        DeliveryStatusOnFormat();
+        ReceiverReferenceOnFormat();
+        ShipperReferenceOnFormat();
+        SignedByOnFormat();
     end;
 
     trigger OnOpenPage()
     begin
-        SetActions;
+        SetActions();
         Rec.SetRange(Rec."Freight Cost Item", false);
     end;
 
     var
         item: Record Item;
+        TempExcelBuffer: Record "Excel Buffer" temporary;
+        ZyXELVCKEditDeliveryDoc: Codeunit "ZyXEL VCK Edit Delivery Doc.";
         MakeBold: Boolean;
         Color: Integer;
         Text001: label 'Are you sure that you want to delete the line %1?';
@@ -389,9 +421,8 @@ Page 50088 "VCK Delivery Document Subform1"
         "Signed ByEmphasize": Boolean;
         Text0001: label 'The Sales Order is no longer available.';
         Text0002: label 'The Transfer Order is no longer available.';
-        TempExcelBuffer: Record "Excel Buffer" temporary;
+
         QuantityEditable: Boolean;
-        ZyXELVCKEditDeliveryDoc: Codeunit "ZyXEL VCK Edit Delivery Doc.";
         EditButtonVisible: Boolean;
         Text003: label 'Do you want to validate Amount?';
 
@@ -402,7 +433,7 @@ Page 50088 "VCK Delivery Document Subform1"
     begin
         if Rec."Item No." <> '' then begin
             recItem.SetFilter("No.", Rec."Item No.");
-            if recItem.FindFirst then
+            if recItem.FindFirst() then
                 Page.RunModal(30, recItem);
         end;
     end;
@@ -415,16 +446,26 @@ Page 50088 "VCK Delivery Document Subform1"
         if not Rec."Has Serial No" then
             Error('The selected line does not have any serial numbers.');
 
-        frmSerials.RunModal;
+        frmSerials.RunModal();
     end;
 
 
     procedure ViewSalesOrder()
     var
         recSalesOrder: Record "Sales Header";
+        SalesHeaderArchive: Record "Sales Header Archive";
+        text0003: Label 'The Sales Order is no longer available and is not archived.';
     begin
         if recSalesOrder.Get(recSalesOrder."document type"::Order, Rec."Sales Order No.") then
-            Page.RunModal(Page::"Sales Order", recSalesOrder);
+            Page.RunModal(Page::"Sales Order", recSalesOrder)
+        else begin //24-03-2026 BK #525775
+            SalesHeaderArchive.SetRange("Document Type", SalesHeaderArchive."Document Type"::Order);
+            SalesHeaderArchive.SetRange("No.", Rec."Sales Order No.");
+            if SalesHeaderArchive.FindFirst() then
+                Page.RunModal(Page::"Sales Order Archive", SalesHeaderArchive)
+            else
+                Error(Text0003);
+        end;
     end;
 
 
@@ -445,10 +486,10 @@ Page 50088 "VCK Delivery Document Subform1"
 
         recSalesShipLine.SetRange("Order No.", Rec."Sales Order No.");
         recSalesShipLine.SetRange("Order Line No.", Rec."Sales Order Line No.");
-        if recSalesShipLine.FindFirst then begin
+        if recSalesShipLine.FindFirst() then begin
             recSalesInvLine.SetRange("Shipment No.", recSalesShipLine."Document No.");
             recSalesInvLine.SetRange("Shipment Line No.", recSalesShipLine."Line No.");
-            if recSalesInvLine.FindFirst then begin
+            if recSalesInvLine.FindFirst() then begin
                 recSalesInvHead.Get(recSalesInvLine."Document No.");
                 Page.RunModal(Page::"Posted Sales Invoice", recSalesInvHead);
             end;
@@ -511,143 +552,143 @@ Page 50088 "VCK Delivery Document Subform1"
             if Rec."Ignore In Posting" = false then begin
                 recSalesLine.SetFilter("Document No.", Rec."Sales Order No.");
                 recSalesLine.SetRange("Line No.", Rec."Sales Order Line No.");
-                if recSalesLine.FindFirst then begin
+                if recSalesLine.FindFirst() then begin
                     recSalesLine."Delivery Document No." := '';
-                    recSalesLine.Modify;
+                    recSalesLine.Modify();
                 end;
             end;
-            Rec.Delete;
+            Rec.Delete();
         end;
     end;
 
     local procedure ItemNoOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         "Item No.Emphasize" := MakeBold;
     end;
 
     local procedure DescriptionOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         DescriptionEmphasize := MakeBold;
     end;
 
     local procedure ActionCodeOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         "Action CodeEmphasize" := MakeBold;
     end;
 
     local procedure SalespersonCodeOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         "Salesperson CodeEmphasize" := MakeBold;
     end;
 
     local procedure QuantityOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         QuantityEmphasize := MakeBold;
     end;
 
     local procedure UnitPriceOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         "Unit PriceEmphasize" := MakeBold;
     end;
 
     local procedure CurrencyCodeOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         "Currency CodeEmphasize" := MakeBold;
     end;
 
     local procedure LocationOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         LocationEmphasize := MakeBold;
     end;
 
     local procedure SalesOrderNoOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         "Sales Order No.Emphasize" := MakeBold;
     end;
 
     local procedure TransferOrderNoOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         "Transfer Order No.Emphasize" := MakeBold;
     end;
 
     local procedure CustomerOrderNoOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         "Customer Order No.Emphasize" := MakeBold;
     end;
 
     local procedure WarehouseStatusOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         "Warehouse StatusEmphasize" := MakeBold;
     end;
 
     local procedure PickingDateTimeOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         "Picking Date TimeEmphasize" := MakeBold;
     end;
 
     local procedure LoadingDateTimeOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         "Loading Date TimeEmphasize" := MakeBold;
     end;
 
     local procedure DeliveryDateTimeOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         "Delivery Date TimeEmphasize" := MakeBold;
     end;
 
     local procedure DeliveryRemarkOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         "Delivery RemarkEmphasize" := MakeBold;
     end;
 
     local procedure DeliveryStatusOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         "Delivery StatusEmphasize" := MakeBold;
     end;
 
     local procedure ReceiverReferenceOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         "Receiver ReferenceEmphasize" := MakeBold;
     end;
 
     local procedure ShipperReferenceOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         "Shipper ReferenceEmphasize" := MakeBold;
     end;
 
     local procedure SignedByOnFormat()
     begin
-        CheckStatus;
+        CheckStatus();
         "Signed ByEmphasize" := MakeBold;
     end;
 
     local procedure ExportExcel()
     var
-        ddnumber: Code[30];
+
         recDeliveryDocumentLine: Record "VCK Delivery Document Line";
         Window: Dialog;
-        RecNo: Integer;
         TotalRecNo: Integer;
         RowNo: Integer;
+        ddnumber: Code[30];
         Text000: label 'Analyzing Data...\\';
     begin
 
@@ -655,8 +696,8 @@ Page 50088 "VCK Delivery Document Subform1"
         recDeliveryDocumentLine.SetFilter("Document No.", ddnumber);
         Window.Open(Text000 + '@1@@@@@@@@@@@@@@@@@@@@@\');
         Window.Update(1, 0);
-        RecNo := 0;
-        TempExcelBuffer.DeleteAll;
+
+        TempExcelBuffer.DeleteAll();
         Clear(TempExcelBuffer);
         RowNo := 1;
         EnterCell(RowNo, 1, 'Document No.', true, false, false);
@@ -688,8 +729,8 @@ Page 50088 "VCK Delivery Document Subform1"
         EnterCell(RowNo, 27, 'Requested Delivery Date', true, false, false);
         EnterCell(RowNo, 28, 'Release Date', true, false, false);
         EnterCell(RowNo, 29, 'Requested Ship Date', true, false, false);
-        TotalRecNo := recDeliveryDocumentLine.Count;
-        if recDeliveryDocumentLine.FindFirst then begin
+        TotalRecNo := recDeliveryDocumentLine.Count();
+        if recDeliveryDocumentLine.FindSet() then
             repeat
                 RowNo := RowNo + 1;
                 EnterCell(RowNo, 1, recDeliveryDocumentLine."Document No.", false, false, false);
@@ -733,17 +774,16 @@ Page 50088 "VCK Delivery Document Subform1"
                 EnterCell(RowNo, 29, Format(recDeliveryDocumentLine."Requested Ship Date"), false, false, false);
                 Window.Update(1, ROUND(RowNo / TotalRecNo * 10000, 1));
             until recDeliveryDocumentLine.Next() = 0;
-        end;
-        Window.Close;
+        Window.Close();
         TempExcelBuffer.CreateBook('', 'Delivery Document Lines');
         TempExcelBuffer.WriteSheet('Delivery Document Lines', CompanyName(), UserId());
-        TempExcelBuffer.CloseBook;
-        TempExcelBuffer.OpenExcel;
+        TempExcelBuffer.CloseBook();
+        TempExcelBuffer.OpenExcel();
     end;
 
     local procedure EnterCell(RowNo: Integer; ColumnNo: Integer; CellValue: Text[250]; Bold: Boolean; Italic: Boolean; UnderLine: Boolean)
     begin
-        TempExcelBuffer.Init;
+        TempExcelBuffer.Init();
         TempExcelBuffer.Validate("Row No.", RowNo);
         TempExcelBuffer.Validate("Column No.", ColumnNo);
         TempExcelBuffer."Cell Value as Text" := CellValue;
@@ -751,7 +791,7 @@ Page 50088 "VCK Delivery Document Subform1"
         TempExcelBuffer.Bold := Bold;
         TempExcelBuffer.Italic := Italic;
         TempExcelBuffer.Underline := UnderLine;
-        TempExcelBuffer.Insert;
+        TempExcelBuffer.Insert();
     end;
 
     local procedure SetActions()
