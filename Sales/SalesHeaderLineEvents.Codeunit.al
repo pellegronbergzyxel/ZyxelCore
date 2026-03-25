@@ -1299,7 +1299,9 @@ codeunit 50067 "Sales Header/Line Events"
         recVend: Record Vendor;
         recGlAcc: Record "G/L Account";
         recPostGrpCtryLoc: Record "Post Grp. pr. Country / Loc.";
+        SalesSetup: Record "Sales & Receivables Setup";
         SI: Codeunit "Single Instance";
+        ZGT: Codeunit "ZyXEL General Tools";
         lText002: Label 'The license must be purchased by vendor %1 - %2.';
         lText003: Label 'The field "%1" must be filled on "%2" "%3". Please contact the Finance Department.';
         lText004: Label '"%1" is %2. Are you sure you want to use item no. %3?';
@@ -1382,6 +1384,13 @@ codeunit 50067 "Sales Header/Line Events"
 
         SetAddVatProdPostGrp(Rec);
         Rec.Validate(Rec."Gen. Prod. Posting Group");
+
+        //24-03-2026 BK #524786 
+        if ZGT.IsZComCompany() then
+            if SalesSetup.Get() then
+                if SalesSetup."Default Shipment Date" <> 0D then
+                    Rec."Shipment Date" := SalesSetup."Default Shipment Date"; //16-07-2025 BK #512739
+
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeValidateEvent', 'Quantity', false, false)]

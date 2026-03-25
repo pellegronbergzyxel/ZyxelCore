@@ -315,7 +315,7 @@ Table 50046 "VCK Shipping Detail"
             Caption = 'Main Warehouse';
             Description = '20-01-22 ZY-LD 014';
         }
-        field(49; "Vessel Code"; Code[50])
+        field(49; "Vessel Code"; Code[100]) //24-03-2026 BK #560168 Request from John HQ
         {
             Caption = 'Vessel Code';
             TableRelation = Vessel;

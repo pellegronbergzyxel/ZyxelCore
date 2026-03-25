@@ -461,7 +461,7 @@ Page 50088 "VCK Delivery Document Subform1"
         else begin //24-03-2026 BK #525775
             SalesHeaderArchive.SetRange("Document Type", SalesHeaderArchive."Document Type"::Order);
             SalesHeaderArchive.SetRange("No.", Rec."Sales Order No.");
-            if SalesHeaderArchive.FindFirst() then
+            if SalesHeaderArchive.FindLast() then
                 Page.RunModal(Page::"Sales Order Archive", SalesHeaderArchive)
             else
                 Error(Text0003);

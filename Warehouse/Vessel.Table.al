@@ -7,7 +7,7 @@ Table 50026 Vessel
 
     fields
     {
-        field(1; "Code"; Code[50])
+        field(1; "Code"; Code[100]) //24-03-2026 BK #560168 Request from John HQ
         {
             Caption = 'Code';
             NotBlank = true;
