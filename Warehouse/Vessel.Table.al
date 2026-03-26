@@ -12,7 +12,7 @@ Table 50026 Vessel
             Caption = 'Code';
             NotBlank = true;
         }
-        field(2; Description; Text[50])
+        field(2; Description; Text[100]) //24-03-2026 BK #560168 Request from John HQ
         {
             Caption = 'Description';
         }

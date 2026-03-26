@@ -212,17 +212,18 @@ codeunit 50087 "Zyxel General Event"
     begin
         SI.UseOfReport(3, ReportID, 1);
     end;
+    // CLOUD READY DELETE
+    /*
+        [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeCompanyClose', '', false, false)]
+        local procedure OnBeforeCompanyClose()
+        var
+            SI: Codeunit "Single Instance";
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeCompanyClose', '', false, false)]
-    local procedure OnBeforeCompanyClose()
-    var
-        SI: Codeunit "Single Instance";
-
-    begin
-        if GuiAllowed() then
-            SI.SaveUseOfReport();
-    end;
-
+        begin
+            if GuiAllowed() then
+                SI.SaveUseOfReport();
+        end;
+    */
     local procedure UpdateReportLayoutSelection(ReportID: Integer; NewLayout: Text)
     var
         ReportLayoutList: Record "Report Layout List";

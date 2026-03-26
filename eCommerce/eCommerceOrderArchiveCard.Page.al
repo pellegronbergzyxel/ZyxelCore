@@ -266,6 +266,8 @@ page 50065 "eCommerce Order Archive Card"
                 }
             }
         }
+        // CLOUD READY DELETE
+        /*
         area(processing)
         {
             action("Download eCommerce Document")
@@ -308,7 +310,7 @@ page 50065 "eCommerce Order Archive Card"
                         end;
                 end;
             }
-        }
+        }*/
     }
 
     var

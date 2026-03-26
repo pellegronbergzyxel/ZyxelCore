@@ -681,11 +681,7 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
                 rValue += ChildText;
             end;
             // rValue := CopyStr(rValue, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-
-
-
-
-            amazonhelper.downloadtext2fil(rValue, 'rvaluenew4.txt');
+            //amazonhelper.downloadtext2fil(rValue, 'rvaluenew4.txt'); 26-03-2026 BK #563532
         end;
 
         ZyWsRequest.ReplicateICInboxPurchHead(pCompanyname, rValue);
