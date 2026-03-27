@@ -37,14 +37,13 @@ Codeunit 50015 "Convert Codepage"
         f.WriteAllLines(lOutputFileName, f.ReadAllLines(pInputFileName, InEnc), OutEnc);
     end;
 
-    procedure ConvertCodepage(pInputFileName: Text; pOutPutExt: Text[5]; pFromCodePage: Code[10]; pToCodePage: Code[10])
+   procedure ConvertCodepage(pInputFileName: Text; pOutPutExt: Text[5]; pFromCodePage: Code[10]; pToCodePage: Code[10])
     var
-        lOutputFileName: Text[250];
         InFile: File;
         OutFile: File;
-        c: Char;
+        lLine: Text;
+        lLines: List of [Text];
     begin
-        // CLOUD READY NEW
         if not Exists(pInputFileName) then
             Error(Text50000, pInputFileName);
 
@@ -53,21 +52,21 @@ Codeunit 50015 "Convert Codepage"
             pFromCodePage := CodepageANSI;
         if pToCodePage = '' then
             pToCodePage := CodepageUTF8;
-        if pOutPutExt = '' then
-            pOutPutExt := FileMgt.GetExtension(pInputFileName);
-        if CopyStr(pOutPutExt, 1, 1) <> '.' then
-            pOutPutExt := '.' + pOutPutExt;
 
-        lOutputFileName := FileMgt.GetDirectoryName(pInputFileName) + '\' + FileMgt.GetFileNameWithoutExtension(pInputFileName) + pOutPutExt;
-
+        // Read all lines from input file
         InFile.TextMode(true);
         InFile.Open(pInputFileName, CodePageToTextEncoding(pFromCodePage));
+        while InFile.Read(lLine) > 0 do
+            lLines.Add(lLine);
+        InFile.Close();
+
+        // Erase and recreate the same file with new encoding
+        Erase(pInputFileName);
         OutFile.TextMode(true);
         OutFile.WriteMode(true);
-        OutFile.Create(lOutputFileName, CodePageToTextEncoding(pToCodePage));
-        while InFile.Read(c) > 0 do
-            OutFile.Write(c);
-        InFile.Close();
+        OutFile.Create(pInputFileName, CodePageToTextEncoding(pToCodePage));
+        foreach lLine in lLines do
+            OutFile.Write(lLine);
         OutFile.Close();
     end;
 
@@ -99,14 +98,14 @@ Codeunit 50015 "Convert Codepage"
         f.WriteAllLines(lOutputFileName, f.ReadAllLines(pInputFileName, InEnc), OutEnc);
     end;
 
+    
     local procedure ConvertCodepageStr(pInputFileName: Text; pOutPutExt: Text[5]; pFromCodePage: Code[10]; pToCodePage: Code[10])
     var
-        lOutputFileName: Text[250];
         InFile: File;
         OutFile: File;
-        c: Char;
+        lLine: Text;
+        lLines: List of [Text];
     begin
-        // CLOUD READY NEW
         if not Exists(pInputFileName) then
             Error(Text50000);
 
@@ -115,22 +114,21 @@ Codeunit 50015 "Convert Codepage"
             pFromCodePage := 'ISO-8859-1';  // ANSI
         if pToCodePage = '' then
             pToCodePage := 'UTF-8';
-        if pOutPutExt = '' then
-            pOutPutExt := FileMgt.GetExtension(pInputFileName)
-        else
-            if CopyStr(pOutPutExt, 1, 1) <> '.' then
-                pOutPutExt := '.' + pOutPutExt;
 
-        lOutputFileName := CopyStr(pInputFileName, 1, StrPos(pInputFileName, '.') - 1) + pOutPutExt;
-
+        // Read all lines from input file
         InFile.TextMode(true);
         InFile.Open(pInputFileName, CodePageToTextEncoding(pFromCodePage));
+        while InFile.Read(lLine) > 0 do
+            lLines.Add(lLine);
+        InFile.Close();
+
+        // Erase and recreate the same file with new encoding
+        Erase(pInputFileName);
         OutFile.TextMode(true);
         OutFile.WriteMode(true);
-        OutFile.Create(lOutputFileName, CodePageToTextEncoding(pToCodePage));
-        while InFile.Read(c) > 0 do
-            OutFile.Write(c);
-        InFile.Close();
+        OutFile.Create(pInputFileName, CodePageToTextEncoding(pToCodePage));
+        foreach lLine in lLines do
+            OutFile.Write(lLine);
         OutFile.Close();
     end;
 
