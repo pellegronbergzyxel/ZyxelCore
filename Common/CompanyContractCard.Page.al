@@ -143,7 +143,7 @@ page 50226 "Company Contract Card"
         Tag: Text[20];
         SI: Codeunit "Single Instance";
         CustContrSetup: Record "Customer Contract Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series"; //UpgradeReady
         FileMgt: Codeunit "File Management";
         Text001: Label 'Download Document';
 }

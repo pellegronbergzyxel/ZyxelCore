@@ -2,7 +2,11 @@
   "id": "e654e9a7-b3cf-49f4-90ee-4863f48e374a",
   "name": "Zyxel Core",
   "publisher": "Vision People A/S",
+<<<<<<< HEAD
   "version": "1.26.6.38",
+=======
+  "version": "1.26.6.37",
+>>>>>>> 0de12522626dd4a65328b722969ca684dfa3171c
   "brief": "",
   "description": "Zyxel core: EMEA,IT",
   "privacyStatement": "",

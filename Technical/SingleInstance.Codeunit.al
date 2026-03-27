@@ -214,7 +214,8 @@ Codeunit 50054 "Single Instance"
         //<< 16-10-20 ZY-LD 007
     end;
 
-
+    // CLOUD READY DELETE
+    /*
     procedure SaveUseOfReport()
     var
         recUseofRep: Record "Use of Report Entry";
@@ -233,7 +234,7 @@ Codeunit 50054 "Single Instance"
 
         //<< 16-10-20 ZY-LD 007
     end;
-
+    */
 
     procedure InsertUseOfReport(var pUseOfRepTmp: Record "Use of Report Entry" temporary)
     var

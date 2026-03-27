@@ -341,7 +341,7 @@ Table 50024 "Warehouse Inbound Header"
         {
             Caption = 'Error Description';
         }
-        field(43; "Vessel Code"; Code[50])
+        field(43; "Vessel Code"; Code[100]) //24-03-2026 BK #560168 Request from John HQ
         {
             Caption = 'Vessel Code';
             Description = '19-05-22 ZY-LD 005';

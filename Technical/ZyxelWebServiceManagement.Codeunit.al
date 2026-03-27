@@ -1049,7 +1049,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         TempBlob: Codeunit "Temp Blob";
         Item: Record Item;
         WsXmlPort: XmlPort "WS Customer Credit Limit";
-              rValue: Text;
+        rValue: Text;
         CrFilter: Text;
     begin
         //>> 11-04-19 ZY-LD 003
@@ -1347,8 +1347,8 @@ Codeunit 50083 "Zyxel Web Service Management"
         TempBlob: Codeunit "Temp Blob";
         Item: Record Item;
         WsXmlPort: XmlPort "WS Customer Credit Limit";
-       // XDoc: dotnet XmlDocument;
-       // NS: dotnet XmlNamespaceManager;
+        // XDoc: dotnet XmlDocument;
+        // NS: dotnet XmlNamespaceManager;
         InnerText: Text;
     begin
         if not ZGT.IsRhq then  // RHQ
@@ -1415,8 +1415,8 @@ Codeunit 50083 "Zyxel Web Service Management"
         TempBlob: Codeunit "Temp Blob";
         Item: Record Item;
         WsXmlPort: XmlPort "WS Customer Credit Limit";
-       // XDoc: dotnet XmlDocument;
-       // NS: dotnet XmlNamespaceManager;
+        // XDoc: dotnet XmlDocument;
+        // NS: dotnet XmlNamespaceManager;
         rValue: Text;
         CrFilter: Text;
         lText001: label 'Invoice No. could not be updated in "%1".';
@@ -2279,6 +2279,8 @@ Codeunit 50083 "Zyxel Web Service Management"
     //     end;
     // end;
 
+    // CLOUD READY DELETE
+    /*
     procedure SendUseOfReport(var pUseOfReportTmp: Record "Use of Report Entry" temporary)
     var
         StreamOut: OutStream;
@@ -2330,7 +2332,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         end;
         //<< 16-10-20 ZY-LD 006
     end;
-
+    */
     procedure SendUseOfReportOLD(var pUseOfReportTmp: Record "Use of Report Entry" temporary)
     var
         recRepComp: Record "Replication Company";
