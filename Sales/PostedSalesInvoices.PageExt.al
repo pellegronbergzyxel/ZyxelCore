@@ -405,13 +405,14 @@ pageextension 50159 PostedSalesInvoicesZX extends "Posted Sales Invoices"
         zText001: Label 'Please use "Customs/Shipping Invoice" from the Delivery Document.';
         eCommerceVisible: Boolean;
 
-    local procedure CreateFolder(FolderName: Text[1024])
-    var
-        SystemIODirectory: dotnet Directory;
-        SystemIODirectoryInfo: dotnet DirectoryInfo;
-    begin
-        if not SystemIODirectory.Exists(FolderName) then SystemIODirectoryInfo := SystemIODirectory.CreateDirectory(FolderName);
-    end;
+    // CLOUD READY DELETE
+    // local procedure CreateFolder(FolderName: Text[1024])
+    // var
+    //     SystemIODirectory: dotnet Directory;
+    //     SystemIODirectoryInfo: dotnet DirectoryInfo;
+    // begin
+    //     if not SystemIODirectory.Exists(FolderName) then SystemIODirectoryInfo := SystemIODirectory.CreateDirectory(FolderName);
+    // end;
 
     local procedure CreateOutboxOnSalesInvoice()
     var

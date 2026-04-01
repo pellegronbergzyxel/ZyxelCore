@@ -1,5 +1,6 @@
 dotnet
 {
+    // CLOUD READY DELETE
     assembly("System")
     {
 
@@ -10,17 +11,17 @@ dotnet
         type("System.Net.WebClient"; "WebClient") { }
         type("System.Net.ServicePointManager"; "ServicePointManager") { }
         type("System.Net.SecurityProtocolType"; "SecurityProtocolType") { }
-        type("System.Net.WriteStreamClosedEventArgs"; "WriteStreamClosedEventArgs") { }
-        type("System.Net.OpenReadCompletedEventArgs"; "OpenReadCompletedEventArgs") { }
-        type("System.Net.OpenWriteCompletedEventArgs"; "OpenWriteCompletedEventArgs") { }
-        type("System.Net.DownloadStringCompletedEventArgs"; "DownloadStringCompletedEventArgs") { }
-        type("System.Net.DownloadDataCompletedEventArgs"; "DownloadDataCompletedEventArgs") { }
-        type("System.ComponentModel.AsyncCompletedEventArgs"; "AsyncCompletedEventArgs") { }
-        type("System.Net.UploadStringCompletedEventArgs"; "UploadStringCompletedEventArgs") { }
-        type("System.Net.UploadDataCompletedEventArgs"; "UploadDataCompletedEventArgs") { }
-        type("System.Net.UploadFileCompletedEventArgs"; "UploadFileCompletedEventArgs") { }
-        type("System.Net.UploadValuesCompletedEventArgs"; "UploadValuesCompletedEventArgs") { }
-        type("System.Net.DownloadProgressChangedEventArgs"; "DownloadProgressChangedEventArgs") { }
+     //   type("System.Net.WriteStreamClosedEventArgs"; "WriteStreamClosedEventArgs") { }
+     //   type("System.Net.OpenReadCompletedEventArgs"; "OpenReadCompletedEventArgs") { }
+     //   type("System.Net.OpenWriteCompletedEventArgs"; "OpenWriteCompletedEventArgs") { }
+     //   type("System.Net.DownloadStringCompletedEventArgs"; "DownloadStringCompletedEventArgs") { }
+     //   type("System.Net.DownloadDataCompletedEventArgs"; "DownloadDataCompletedEventArgs") { }
+     //   type("System.ComponentModel.AsyncCompletedEventArgs"; "AsyncCompletedEventArgs") { }
+     //   type("System.Net.UploadStringCompletedEventArgs"; "UploadStringCompletedEventArgs") { }
+     //   type("System.Net.UploadDataCompletedEventArgs"; "UploadDataCompletedEventArgs") { }
+     //   type("System.Net.UploadFileCompletedEventArgs"; "UploadFileCompletedEventArgs") { }
+     //   type("System.Net.UploadValuesCompletedEventArgs"; "UploadValuesCompletedEventArgs") { }
+     //   type("System.Net.DownloadProgressChangedEventArgs"; "DownloadProgressChangedEventArgs") { }
         //    type("System.Net.UploadProgressChangedEventArgs"; "UploadProgressChangedEventArgs") { }
     }
     assembly("System.Xml")
