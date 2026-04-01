@@ -130,7 +130,7 @@ Codeunit 50039 "Process EiCard Links"
             until recEiCardQueue.Next() = 0;
     end;
 
-    local procedure DownloadEiCardLinkFiles(PurchOrderNo: Code[20]; SalesOrderNo: Code[20]; var SaveFilesInFolder: Text; CustNo: Code[20]) rValue: Boolean
+    local procedure DownloadEiCardLinkFilesOld(PurchOrderNo: Code[20]; SalesOrderNo: Code[20]; var SaveFilesInFolder: Text; CustNo: Code[20]) rValue: Boolean
     var
         recEiCardLinkLine: Record "EiCard Link Line";
         recFTPFolder: Record "FTP Folder";
@@ -147,6 +147,7 @@ Codeunit 50039 "Process EiCard Links"
         ServerDir: Text;
         lText002: label 'Download file';
     begin
+        // CLOUD READY DELETE
         // Download http-links to a file.
         //IF recAutoSetup."Download and Attach Eicards" THEN BEGIN  // 11-09-20 ZY-LD 007  // 14-01-21 ZY-LD 008
         recEiCardLinkLine.SetRange("Purchase Order No.", PurchOrderNo);
@@ -222,6 +223,107 @@ Codeunit 50039 "Process EiCard Links"
         //  rValue := TRUE;  // 11-09-20 ZY-LD 007  // 14-01-21 ZY-LD 008
     end;
 
+    local procedure DownloadEiCardLinkFiles(PurchOrderNo: Code[20]; SalesOrderNo: Code[20]; var SaveFilesInFolder: Text; CustNo: Code[20]) rValue: Boolean
+    var
+        recEiCardLinkLine: Record "EiCard Link Line";
+        recFTPFolder: Record "FTP Folder";
+        recFile: Record File;
+        recItem: Record Item;
+        recSalesLine: Record "Sales Line";
+        recCust: Record Customer;
+        HttpClient: HttpClient;
+        HttpResponse: HttpResponseMessage;
+        ContentInStream: InStream;
+        OutFile: File;
+        OutStream: OutStream;
+        Filename: Text;
+        FileMgt: Codeunit "File Management";
+        lText001: label 'EiCard Link file "%1" was not downloaded.';
+        ServerDir: Text;
+        lText002: label 'Download file';
+    begin
+        // Cloude READY NEW
+        // Download http-links to a file.
+        //IF recAutoSetup."Download and Attach Eicards" THEN BEGIN  // 11-09-20 ZY-LD 007  // 14-01-21 ZY-LD 008
+        recEiCardLinkLine.SetRange("Purchase Order No.", PurchOrderNo);
+        recEiCardLinkLine.SetFilter(Link, '<>%1', '');
+        if recEiCardLinkLine.FindSet(true) then begin
+            ZGT.OpenProgressWindow('', recEiCardLinkLine.Count);
+
+            recServEnviron.Get;
+            recFTPFolder.Get('HQ-EICARD-LINKS', recServEnviron.Environment);
+            recFTPFolder.TestField(Active, true);
+            recFTPFolder.TestField("Archive Folder");
+            SaveFilesInFolder := StrSubstNo('%1%2\', recFTPFolder."Archive Folder", PurchOrderNo);
+            if not FileMgt.ServerDirectoryExists(SaveFilesInFolder) then
+                FileMgt.ServerCreateDirectory(SaveFilesInFolder);
+
+            repeat
+                ZGT.UpdateProgressWindow(lText002, 0, true);
+                recItem.Get(recEiCardLinkLine."Item No.");  // 15-10-19 ZY-LD 002
+                                                            //IF NOT recItem."EMS License" THEN BEGIN  // 15-10-19 ZY-LD 002  // 24-05-23 ZY-LD 011
+                if recItem."Enter Security for Eicard on" = recItem."enter security for eicard on"::" " then begin  // 24-05-23 ZY-LD 011
+                    if not recSalesLine.Get(recSalesLine."document type"::Order, SalesOrderNo, recEiCardLinkLine."Purchase Order Line No.") then;  // 23-03-20 ZY-LD 006
+                    if not recCust.Get(CustNo) then  // 14-01-21 ZY-LD 008
+                        Clear(recCust);  // 14-01-21 ZY-LD 008
+                    if (recEiCardLinkLine.Filename = '') and
+                        (recSalesLine.Quantity < recAutoSetup."Download if Qty. is Less than") and  // 23-03-20 ZY-LD 006
+                        (recAutoSetup."Download and Attach Eicards" or recCust."Download and Attach Eicards")  // 14-01-21 ZY-LD 008
+                    then begin
+                        Filename := StrSubstNo('%1%2-%3-%4%5', SaveFilesInFolder, PurchOrderNo, recEiCardLinkLine."Purchase Order Line No.", recEiCardLinkLine."Line No.", Text23);
+                        if HttpClient.Get(recEiCardLinkLine.Link, HttpResponse) and HttpResponse.IsSuccessStatusCode() then begin
+                            HttpResponse.Content.ReadAs(ContentInStream);
+                            OutFile.WriteMode(true);
+                            OutFile.Create(Filename);
+                            OutFile.CreateOutStream(OutStream);
+                            CopyStream(OutStream, ContentInStream);
+                            OutFile.Close();
+                        end;
+                        if FileMgt.ServerFileExists(Filename) then begin
+                            recEiCardLinkLine.Filename := Filename;
+
+                            // Find the size of the file
+                            recFile.SetRange(Path, FileMgt.GetDirectoryName(recEiCardLinkLine.Filename));
+                            recFile.SetRange(Name, FileMgt.GetFileName(recEiCardLinkLine.Filename));
+                            if recFile.FindFirst and (recFile.Size > 0) then
+                                recEiCardLinkLine."Size (MB)" := ROUND(recFile.Size / 1000000);
+
+                            // Count number of .pdf files. It has to be the same as on the sales order.
+                            recFile.Reset;
+                            ServerDir := StrSubstNo('%1\%2', FileMgt.GetDirectoryName(recEiCardLinkLine.Filename), PurchOrderNo);
+                            FileMgt.ServerCreateDirectory(ServerDir);
+                            ExtractZipFile(recEiCardLinkLine.Filename, ServerDir);
+                            recFile.SetRange(Path, ServerDir);
+                            recFile.SetRange("Is a file", true);
+                            recFile.SetFilter(Name, '*.pdf');
+                            recEiCardLinkLine.Quantity := recFile.Count;
+                            FileMgt.ServerRemoveDirectory(ServerDir, true);
+
+                            recEiCardLinkLine.Modify(true);
+                            Commit;  // The file is downloaded, so we have to commit here.
+
+                            rValue := true;
+                        end else
+                            Error(lText001, Filename);
+                    end else begin
+                        //>> 20-04-22 ZY-LD 010
+                        recEiCardLinkLine.Quantity := recSalesLine.Quantity;
+                        recEiCardLinkLine.Modify(true);
+                        //<< 20-04-22 ZY-LD 010
+
+                        rValue := true;
+                    end;
+                end else
+                    rValue := true;
+            until recEiCardLinkLine.Next() = 0;
+
+            ZGT.CloseProgressWindow;
+        end;
+        //END ELSE  // 14-01-21 ZY-LD 008
+        //  rValue := TRUE;  // 11-09-20 ZY-LD 007  // 14-01-21 ZY-LD 008
+    end;
+
+   
     local procedure SendEiCardLink(recEiCardQueue: Record "EiCard Queue"; TestEmailAdd: Text; ReSend: Boolean): Boolean
     var
         recEiCardLinkLine: Record "EiCard Link Line";
@@ -462,7 +564,44 @@ Codeunit 50039 "Process EiCard Links"
         //<< 07-01-20 ZY-LD 003
     end;
 
-    local procedure ExtractZipFile(ZipFilePath: Text; DestinationFolder: Text)
+local procedure ExtractZipFile(ZipFilePath: Text; DestinationFolder: Text)
+    var
+        FileMgt: Codeunit "File Management";
+        DataCompression: Codeunit "Data Compression";
+        EntryList: List of [Text];
+        EntryKey: Text;
+        ZipFile: File;
+        ZipInStream: InStream;
+        OutFile: File;
+        EntryOutStream: OutStream;
+        EntryLength: Integer;
+        Text004: Label 'The file %1 does not exist.';
+    begin
+        // CLOUD READY NEW
+        if not FileMgt.ServerFileExists(ZipFilePath) then
+            Error(Text004, ZipFilePath);
+
+        FileMgt.ServerCreateDirectory(DestinationFolder);
+
+        ZipFile.Open(ZipFilePath);
+        ZipFile.CreateInStream(ZipInStream);
+        DataCompression.OpenZipArchive(ZipInStream, false);
+        DataCompression.GetEntryList(EntryList);
+
+        foreach EntryKey in EntryList do begin
+            OutFile.WriteMode(true);
+            OutFile.Create(DestinationFolder + '\' + FileMgt.GetFileName(EntryKey));
+            OutFile.CreateOutStream(EntryOutStream);
+            DataCompression.ExtractEntry(EntryKey, EntryOutStream, EntryLength);
+            OutFile.Close();
+        end;
+
+        DataCompression.CloseZipArchive();
+        ZipFile.Close();
+    end;
+
+
+    local procedure ExtractZipFileOld(ZipFilePath: Text; DestinationFolder: Text)
     var
         FileMgt: Codeunit "File Management";
         Text004: Label 'The file %1 does not exist.';
@@ -472,6 +611,7 @@ Codeunit 50039 "Process EiCard Links"
         ZipArchiveMode: DotNet ZipArchiveMode;
 
     begin
+        // CLOUD READY OLD
         IF NOT FileMgt.ServerFileExists(ZipFilePath) THEN
             ERROR(Text004, ZipFilePath);
 
