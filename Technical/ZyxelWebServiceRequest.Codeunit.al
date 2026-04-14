@@ -1190,8 +1190,7 @@ Codeunit 50084 "Zyxel Web Service Request"
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
     end;
-
-
+    // CLOUD READY DELETE
     procedure ReplicateItemBudgetEntry(pCompany: Text[80]; pInnerText: Text) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
