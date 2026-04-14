@@ -348,7 +348,9 @@ pageextension 50159 PostedSalesInvoicesZX extends "Posted Sales Invoices"
                         UpdateShipToCode();
                     end;
                 }
-                action("Update Invoice No. for End Customer")
+
+                //CLOUD READY DELETE
+                /*action("Update Invoice No. for End Customer")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Update Invoice No. for End Customer';
@@ -358,7 +360,7 @@ pageextension 50159 PostedSalesInvoicesZX extends "Posted Sales Invoices"
                     begin
                         UpdateInvoiceNoForEndCust();  // 23-04-19 ZY-LD 006
                     end;
-                }
+                }*/
                 action("Send Batch")
                 {
                     ApplicationArea = Basic, Suite;
@@ -608,7 +610,8 @@ pageextension 50159 PostedSalesInvoicesZX extends "Posted Sales Invoices"
         //<< 23-04-19 ZY-LD 006
     end;
 
-    local procedure UpdateInvoiceNoForEndCust()
+    //CLOUD READY DELETE
+    /*local procedure UpdateInvoiceNoForEndCust()
     var
         recBillToCust: Record Customer;
         recIcPartner: Record "IC Partner";
@@ -632,7 +635,7 @@ pageextension 50159 PostedSalesInvoicesZX extends "Posted Sales Invoices"
                 end;
         //<< 23-04-19 ZY-LD 006
     end;
-
+*/
     local procedure SendContainerDetails()
     var
         lText001: Label 'Do you want to send container details to "%1"?';

@@ -5,11 +5,8 @@ Codeunit 50097 "Update End Cust. Sales Inv. No"
 
     trigger OnRun()
     begin
-        //MESSAGE('%1',ZyWebServMgt.GetSalesInvoiceNo('ZyND UK','19-2002173'));
         SI.SetHideSalesDialog(true);
         UpdateSerialNoLines;
-        //COMMIT;
-        //UpdateSalesInvoiceHeader;
         SI.SetHideSalesDialog(false);
     end;
 
@@ -18,7 +15,8 @@ Codeunit 50097 "Update End Cust. Sales Inv. No"
         ZyWebServMgt: Codeunit "Zyxel Web Service Management";
         SI: Codeunit "Single Instance";
 
-    local procedure UpdateSalesInvoiceHeader()
+    //CLOUD READY DELETE
+    /*local procedure UpdateSalesInvoiceHeader()
     var
         recSalesInvHead: Record "Sales Invoice Header";
         recSalesInvHead2: Record "Sales Invoice Header";
@@ -54,7 +52,7 @@ Codeunit 50097 "Update End Cust. Sales Inv. No"
                 ZGT.CloseProgressWindow;
             end;
         end;
-    end;
+    end;*/
 
     local procedure UpdateSerialNoLines()
     var

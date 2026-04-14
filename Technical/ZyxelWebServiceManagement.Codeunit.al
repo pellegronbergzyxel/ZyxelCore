@@ -1053,7 +1053,8 @@ Codeunit 50083 "Zyxel Web Service Management"
                     exit(ZyWebServReq.GetCustomerOverdueBalance(recICPartner."Inbox Details", pCustNo, pDueDate, pShowOpenPayments));
     end;
 
-    procedure GetSalesInvoiceNo(pCompany: Text[80]; pSalesInvNo: Code[20]): Code[20]
+    //CLOUD READY DELETE
+    /*procedure GetSalesInvoiceNo(pCompany: Text[80]; pSalesInvNo: Code[20]): Code[20]
     var
         recRepComp: Record "Replication Company";
         recItem: Record Item;
@@ -1072,7 +1073,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         if recRepComp.Get(pCompany) and (recRepComp."Get End Cust. Sales Inv. No.") then
             exit(ZyWebServReq.GetSalesInvoiceNo(pCompany, pSalesInvNo));  // Change call of function here
         //<< 11-04-19 ZY-LD 003
-    end;
+    end; */
 
     procedure GetIcReconciliation(IcReconName: Record "IC Reconciliation Name"; IcReconLine: Record "IC Reconciliation Line"; Level: Integer; StartDate: Date; EndDate: Date; var ReportingCurrency: Code[10]) rValue: Decimal
     var
@@ -1887,7 +1888,8 @@ Codeunit 50083 "Zyxel Web Service Management"
         end;
     end;
 
-    procedure SendSalesOrderFrance(pPurchOrderNo: Code[20]) rValue: Boolean
+    //CLOUD READY DELETE
+    /*procedure SendSalesOrderFrance(pPurchOrderNo: Code[20]) rValue: Boolean
     var
         StreamOut: OutStream;
         StreamIn: InStream;
@@ -1939,9 +1941,10 @@ Codeunit 50083 "Zyxel Web Service Management"
             // Send
             rValue := ZyWebServReq.SendSalesOrderFrance('ZNet DK', InnerText);  // Change call of function here
         end;
-    end;
+    end;*/
 
-    procedure SendSalesOrderFranceOLD(pPurchOrderNo: Code[20]) rValue: Boolean
+    //CLOUD READY DELETE
+    /*procedure SendSalesOrderFranceOLD(pPurchOrderNo: Code[20]) rValue: Boolean
     var
         recItem: Record Item;
         recPurchHead: Record "Purchase Header";
@@ -1979,7 +1982,7 @@ Codeunit 50083 "Zyxel Web Service Management"
             // Send
             rValue := ZyWebServReq.SendSalesOrderFrance('ZNet DK', InnerText);  // Change call of function here
         end;
-    end;
+    end; */
 
     procedure SendPurchasePrice(pCompany: Text[50]; pVendorCode: Code[10]; var pPurchPriceTmp: Record "Price List Line" temporary) rValue: Boolean
     var
@@ -2501,7 +2504,8 @@ Codeunit 50083 "Zyxel Web Service Management"
         recICInboxTrans.Insert(true);
     end;
 
-    procedure ReplicateItemBudgetEntries(pCompanyName: Text[30])
+    // CLOUD READY DELETE
+    /*procedure ReplicateItemBudgetEntries(pCompanyName: Text[30])
     var
         StreamOut: OutStream;
         StreamIn: InStream;
@@ -2567,7 +2571,7 @@ Codeunit 50083 "Zyxel Web Service Management"
 
             ZGT.CloseProgressWindow;
         end;
-    end;
+    end; */
 
     procedure ReplicateItemBudgetEntriesOLD(pCompanyName: Text[30])
     var

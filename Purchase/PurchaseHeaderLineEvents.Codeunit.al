@@ -1,34 +1,5 @@
 codeunit 50079 "Purchase Header/Line Events"
 {
-    // 001. 04-12-18 ZY-LD 2018120310000072 - Warning is send, it a user choose to delete a line after it's send to HQ.
-    // 002. 22-01-19 ZY-LD 000 - When an purchase order line is deleted, the corresponding lines is deleted in VCK Inbound and Container Details.
-    // 003. 12-02-19 ZY-LD 000 - Set "Qty. to Receive" to zero.
-    // 004. 15-02-19 ZY-LD 000 - Lookup items on CH and SP.
-    // 005. 18-02-19 ZY-LD 000 - Code is moved from CU 415.
-    // 006. 19-02-19 ZY-LD 000 - Changed from "Sent to HQ" to "eShop Order Sent".
-    // 007. 25-02-19 ZY-LD 2019022010000075 - Handle consignment stock.
-    // 008. 11-03-19 ZY-LD 000 - Don't run when temporary.
-    // 009. 13-03-19 ZY-LD 2019031210000071 - We send only HQ purchase orders.
-    // 010. 09-05-19 ZY-LD 000 - Maintain warehouse recipt headen at release and reopen.
-    // 011. 15-05-19 ZY-LD 2019051510000098 - We can buy from another vendor, so it can't be alligned with HQ.
-    // 012. 01-07-19 ZY-LD P0213 - We also want to sent to EMEA.
-    // 013. 14-08-19 ZY-LD 2019081310000167 - Update location based on value on the header.
-    // 014. 03-09-19 ZY-LD 000 - EiCard orders that has been sent to eShop can't be deleted.
-    // 015. 05-11-19 ZY-LD P0334 - Validate "FTP Code".
-    // 016. 11-11-19 ZY-LD 2019111110000173 - Lookup on the correct account.
-    // 017. 03-12-19 ZY-LD P0334 - Check SBU Company.
-    // 018. 27-12-19 ZY-LD 000 - Purchase Order Status set to Cancled on Eicard Queue.
-    // 019. 12-02-20 ZY-LD 000 - We don't want to send IC Document.
-    // 020. 24-03-20 ZY-LD P0394 - Test of item "End of Life".
-    // 021. 02-04-20 ZY-LD P0388 - Inbound order has moved to Warehouse inbound order.
-    // 022. 05-05-20 ZY-LD 2020050510000032 - Code for FTP upload to eShop had moved.
-    // 023. 18-02-21 ZY-LD P0557 - Sample setup.
-    // 024. 15-11-21 ZY-LD 2021111210000069 - If Type is filled, "No." must have a value.
-    // 025. 20-01-22 ZY-LD 000 - Lookup on the rest of the fields.
-    // 026. 06-12-23 ZY-LD 000 - Procedure is made global.
-    // 027. 06-06-24 ZY-LD 000 - eCommerce eicards has already been sold, and should not be blocked.
-    // 028. 10-09-24 ZY-LD 000 - Deferral must have identical text on the header and the lines.
-    // 029. 25-09-24 ZY-LD 000 - NL to DK Reverse Charge.
 
     Permissions = TableData "Change Log Entry" = d;
 

@@ -1852,8 +1852,8 @@ Codeunit 50084 "Zyxel Web Service Request"
 
     end;
 
-
-    procedure GetSalesInvoiceNo(pCompany: Text[80]; var pSalesInvNo: Code[20]) rValue: Text
+    //CLOUD READY DELETE
+    /*procedure GetSalesInvoiceNo(pCompany: Text[80]; var pSalesInvNo: Code[20]) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
         WebServiceRequestMgt: Codeunit "SOAP Web Service Request Mgt.";
@@ -1914,7 +1914,7 @@ Codeunit 50084 "Zyxel Web Service Request"
             Error(ErrorTxt);
         end;
         //<< 11-04-19 ZY-LD 001
-    end;
+    end; */
 
 
     procedure GetSalesInvoiceNoOLD(pCompany: Text[80]; var pSalesInvNo: Code[20]) rValue: Text
@@ -2954,8 +2954,8 @@ Codeunit 50084 "Zyxel Web Service Request"
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
     end;
 
-
-    procedure SendSalesOrderFrance(pCompany: Text[80]; pInnerXml: Text) rValue: Boolean
+    // CLOUD READY DELETE
+    /*procedure SendSalesOrderFrance(pCompany: Text[80]; pInnerXml: Text) rValue: Boolean
     var
         recWebServiceSetup: Record "Web Service Setup";
         WebServiceRequestMgt: Codeunit "SOAP Web Service Request Mgt.";
@@ -3018,7 +3018,7 @@ Codeunit 50084 "Zyxel Web Service Request"
             WebServiceRequestMgt.ProcessFaultResponse(ErrorTxt);
             Error(ErrorTxt);
         end;
-    end;
+    end;*/
 
 
     procedure SendSalesOrderFranceOLD(pCompany: Text[80]; pInnerXml: Text) rValue: Boolean
