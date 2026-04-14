@@ -145,6 +145,10 @@ table 50090 "Amazon Setup"
             caption = 'Api Companyname';
             // margin
         }
+        field(35; URL_ShippingLabels; text[200])
+        {
+            caption = 'URL Shipping Labels';
+        }
 
     }
     keys

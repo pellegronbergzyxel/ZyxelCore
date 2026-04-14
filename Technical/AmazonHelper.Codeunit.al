@@ -1279,6 +1279,91 @@ codeunit 50055 AmazonHelper
     end;
 
 
+    /// <summary>
+    /// Gets a Restricted Data Token (RDT) from the Amazon SP-API Tokens API.
+    /// The RDT must be used instead of the normal LWA access token when calling
+    /// restricted SP-API operations that return PII (e.g. buyerInfo, shippingAddress).
+    /// Ref: https://developer-docs.amazon.com/sp-api/docs/authorization-with-the-restricted-data-token
+    /// POST /tokens/2021-03-01/restrictedDataToken
+    /// </summary>
+    procedure GetNewRestrictedDataToken(var token: Text; NordiskPartyid: Code[10]; rMethod: Text; rPath: Text; rdataElements: List of [Text]): Boolean
+    var
+        Amazsetup: Record "Amazon Setup";
+        client: HttpClient;
+        request: HttpRequestMessage;
+        httpContent: HttpContent;
+        contentHeaders: HttpHeaders;
+        httpResponse: HttpResponseMessage;
+        lwaToken: Text;
+        jsonPayload: Text;
+        responseText: Text;
+        jsonToken: JsonToken;
+        jsonObject: JsonObject;
+        TokensEndpoint: Text;
+    begin
+        Amazsetup.Get(NordiskPartyid);
+
+        // Step 1: Get a standard LWA access token to authenticate the Tokens API call
+        if not GetnewToken(lwaToken, NordiskPartyid) then
+            exit(false);
+
+        // Step 2: Build the JSON body for createRestrictedDataToken
+        // { "targetApplication": "...", "restrictedResources": [{ "method": "GET", "path": "...", "dataElements": ["buyerInfo"] }] }
+        jsonPayload := makeJsonPayloadrestrictedDataToken(NordiskPartyid, rMethod, rPath, rdataElements);
+
+        // Step 3: POST to the Tokens API endpoint
+        // Endpoint: https://sellingpartnerapi-{region}.amazon.com/tokens/2021-03-01/restrictedDataToken
+        TokensEndpoint := Amazsetup.URL_Get_RCT;
+
+        httpContent.WriteFrom(jsonPayload);
+        httpContent.GetHeaders(contentHeaders);
+        contentHeaders.Remove('Content-Type');
+        contentHeaders.Add('Content-Type', 'application/json');
+
+        request.Method := 'POST';
+        request.SetRequestUri(TokensEndpoint);
+        request.GetHeaders(contentHeaders);
+        contentHeaders.Add('x-amz-access-token', lwaToken);
+        contentHeaders.Add('Accept', 'application/json');
+        //request.GetHeaders().Add('x-amz-access-token', lwaToken);
+
+        request.Content := httpContent;
+
+        if not client.Send(request, httpResponse) then begin
+            Message('Restricted Data Token request failed - could not connect to: %1', TokensEndpoint);
+            exit(false);
+        end;
+
+        if not httpResponse.IsSuccessStatusCode() then begin
+            httpResponse.Content().ReadAs(responseText);
+            if Amazsetup.testmode then
+                Error('Restricted Data Token error:\Status: %1\Reason: %2\Body: %3',
+                      httpResponse.HttpStatusCode(), httpResponse.ReasonPhrase(), responseText)
+            else
+                Message('Restricted Data Token error:\Status: %1\Reason: %2',
+                        httpResponse.HttpStatusCode(), httpResponse.ReasonPhrase());
+            exit(false);
+        end;
+
+        // Step 4: Parse the response and extract the restrictedDataToken
+        // Response: { "restrictedDataToken": "...", "expiresIn": 3600 }
+        httpResponse.Content().ReadAs(responseText);
+        if not jsonToken.ReadFrom(responseText) then begin
+            Message('Could not parse Restricted Data Token response: %1', responseText);
+            exit(false);
+        end;
+
+        jsonObject := jsonToken.AsObject();
+        if not jsonObject.Get('restrictedDataToken', jsonToken) then begin
+            Message('restrictedDataToken field not found in response: %1', responseText);
+            exit(false);
+        end;
+
+        token := jsonToken.AsValue().AsText();
+        exit(token <> '');
+    end;
+
+
     Procedure makeJsonPayloadAcknowledgement(SO: record "Sales header"; NordiskPartyid: code[10]): text
     var
         Amazsetup: Record "Amazon Setup";
@@ -1980,7 +2065,7 @@ codeunit 50055 AmazonHelper
                                     end;
                                 'Y':
                                     begin
-                                        MarginApproval.requeststatus := MarginApproval.requeststatus::send;
+                                        MarginApproval.requeststatus := MarginApproval.requeststatus::WaitingPrice;
                                         MarginApproval."Below Margin" := true;
                                         MarginApproval.Status := MarginApproval.Status::"Waiting for Approval";
                                     end;
@@ -1998,6 +2083,49 @@ codeunit 50055 AmazonHelper
 
         end;
     end;
+
+
+
+    procedure ProcessPriceApproval(var MarginApproval: record "Margin Approval")
+    var
+        JsontextReply: text;
+        Marginsetup: record "Amazon Setup";
+        jsonarrayMain: JsonArray;
+        TokenOrder: JsonToken;
+        jsonTokenMain: JsonToken;
+        jsonTokenorders: JsonToken;
+        TokenValue: JsonToken;
+        part_number: text[20];
+        is_low_margin: text[10];
+
+    begin
+        if MarginApproval.requeststatus <> MarginApproval.requeststatus::WaitingPrice then
+            exit;
+
+        if not Marginsetup.get('PRICHETST') then
+            error('Please create PriCHETST in setup');
+
+        if SentPriceApproval(MarginApproval, Marginsetup, JsontextReply) then begin
+            IF jsonTokenMain.ReadFrom(JsontextReply) then
+                if jsonTokenMain.SelectToken('margincheckresult', jsonTokenorders) then begin
+                    jsonarrayMain := jsonTokenorders.AsArray();
+                    foreach TokenOrder in jsonarrayMain do begin
+
+
+                        MarginApproval.requeststatusDT := CurrentDateTime;
+                        MarginApproval.requeststatus := MarginApproval.requeststatus::SendPrice;
+
+                        MarginApproval.Status := MarginApproval.Status::"Waiting for Margin Approval";
+                        MarginApproval.Modify()
+
+                    end;
+                end;
+
+
+
+        end;
+    end;
+
 
 
 
@@ -2126,6 +2254,136 @@ codeunit 50055 AmazonHelper
     end;
 
 
+    procedure SentPriceApproval(MarginApproval: record "Margin Approval"; Marginsetup: record "amazon Setup"; var replytext: text): Boolean
+    var
+
+        Httpcontent: HttpContent;
+        contentHeaders: HttpHeaders;
+        request: HttpRequestMessage;
+        responseMessage: HttpResponseMessage;
+        httpResponse: HttpResponseMessage;
+        client: HttpClient;
+        content: Text;
+        url: Text;
+        token: JsonToken;
+        token2: JsonToken;
+        JSonArray: JsonArray;
+        tiPartNumber: text;
+        quantity: Decimal;
+        newtoken: text;
+        // test
+        TempBlob: Codeunit "Temp Blob";
+        outStr: OutStream;
+        inStr: InStream;
+        filename: text;
+        temptext: text;
+    begin
+        temptext := makePriceApprovalXml(MarginApproval, Marginsetup);
+        if temptext <> '' then begin
+            httpcontent.writefrom(temptext);
+            httpcontent.GetHeaders(contentHeaders);
+            // contentHeaders.Add('Accept', 'application/json');
+            // contentHeaders.Clear();
+            // request.GetHeaders(contentHeaders);
+            //  request.SetRequestUri(StrSubstNo(Amazsetup.URL_PO_GET, Amazsetup.URL_PO_GET_status));
+            // request.Method := 'GET';
+            HttpContent.GetHeaders(contentHeaders);
+            //   contentHeaders.Add('x-amz-access-token', newtoken);
+            contentHeaders.Remove('Content-Type');
+            contentHeaders.Add('Content-Type', 'application/json');
+            // contentHeaders.Add('Content-Length', format(StrLen(temptext)));
+
+            if not (client.post(marginsetup."Token endpoint", HttpContent, httpResponse)) then begin
+                Message('Url not workign : %1 %2 %3', marginsetup."Token endpoint", httpResponse.HttpStatusCode(), httpResponse.ReasonPhrase());
+                exit(false);
+            end;
+            if not (httpResponse.IsSuccessStatusCode()) then begin
+                httpResponse.Content().ReadAs(content);
+                Message('Status code: %1\Description: %2, (%3) %4 %5', httpResponse.HttpStatusCode(), httpResponse.ReasonPhrase(), copystr(content, 1, 512), marginsetup."Token endpoint", temptext);
+                exit(false);
+            end;
+
+            // TEMP TEST >>
+            httpResponse.Content().ReadAs(content);
+            replytext := content;
+            // Save the data of the InStream as a file.
+            if (Marginsetup.testmode) and GuiAllowed then begin
+                message('ok: %1', copystr(content, 1, 512));
+                TempBlob.CreateOutStream(outStr, TextEncoding::UTF8);
+                outStr.WriteText(content + ' ' + temptext);
+                TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
+                fileName := StrSubstNo('Amazon_inv_%1_.txt', format(responseMessage.HttpStatusCode()));
+                File.DownloadFromStream(inStr, 'Export', '', '', fileName);
+            end;
+            // TEMP TEST >>
+            exit(true);
+        end;
+    end;
+
+    procedure makePriceApprovalXml(MarginApproval: record "Margin Approval"; Marginsetup: record "amazon Setup"): Text
+    var
+        totalDoc: JsonObject;
+        totextvar: Text;
+        margin_info: JsonObject;
+        margin_infoArray: JsonArray;
+        Salesline: record "Sales Line";
+        Priceline: record "Price List Line";
+        Customer: record Customer;
+        tempcurr: code[3];
+        glsetup: record "General Ledger Setup";
+        // Testfil
+        TempBlob: Codeunit "Temp Blob";
+        outStr: OutStream;
+        inStr: InStream;
+        filename: text;
+    begin
+        glsetup.get();
+        totalDoc.add('token', Marginsetup.client_secret);
+        totalDoc.add('company', Marginsetup.ApiCompanyname);
+        if (MarginApproval."Customer No." <> '') and (MarginApproval."Customer Name" = '') then
+            if customer.get(MarginApproval."Customer No.") then
+                MarginApproval."Customer Name" := Customer.Name;
+        if MarginApproval."Customer Name" = '' then
+            MarginApproval."Customer Name" := 'Zyxel pricelist';
+
+        totalDoc.add('customer_name', MarginApproval."Customer Name");
+        // loop >>
+        margin_info.add('entry_no', MarginApproval.SystemId);
+        margin_info.add('part_number', MarginApproval."Item No.");
+        tempcurr := '';
+
+        case MarginApproval."Source Type" of
+            MarginApproval."Source Type"::Sales:
+                begin
+                    if Salesline.get(MarginApproval."Sales Document Type", MarginApproval."Source Line No.") then
+                        tempcurr := Salesline."Currency Code"
+                end;
+            MarginApproval."Source Type"::"Price Book":
+                begin
+                    if Priceline.get(MarginApproval."Source No.", MarginApproval."Source Line No.") then
+                        tempcurr := Priceline."Currency Code";
+                end;
+        end;
+        if tempcurr = '' then
+            tempcurr := glsetup."LCY Code";
+        margin_info.add('currency', tempcurr);
+        margin_info.add('selling_price', MarginApproval."Unit Price");
+        margin_info.Add('comment', 'comment missing');
+        margin_infoArray.add(margin_info);
+        // loop >>
+        totalDoc.add('priceapprovereq', margin_infoArray);
+        // totalDoc.add('fulfillment', fulfillment);
+        totalDoc.WriteTo(totextvar);
+        // Save the data of the InStream as a file.
+        if (Marginsetup.testmode) and GuiAllowed then begin
+            TempBlob.CreateOutStream(outStr, TextEncoding::UTF8);
+            outStr.WriteText(totextvar);
+            TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
+            fileName := 'Shopify_postfulfillment.txt';
+            File.DownloadFromStream(inStr, 'Export', '', '', fileName);
+        end;
+        exit(totextvar);
+    end;
 
     // event >>
     [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnBeforeVerify', '', false, false)]
@@ -2417,6 +2675,7 @@ codeunit 50055 AmazonHelper
         //Pricelistline.Validate("Assign-to Parent No.", PriceListHeader."Assign-to Parent No.");
         if PriceListHeader."VAT Bus. Posting Gr. (Price)" <> '' then
             Pricelistline.validate("VAT Bus. Posting Gr. (Price)", PriceListHeader."VAT Bus. Posting Gr. (Price)");
+        Pricelistline."Amount Type" := Pricelistline."Amount Type"::Price;
         Pricelistline.VALIDATE("Asset No.", Itemno);
         Pricelistline.Validate("Price Includes VAT", PriceListHeader."Price Includes VAT");
         Pricelistline.modify(true);
@@ -2511,6 +2770,157 @@ codeunit 50055 AmazonHelper
         File.DownloadFromStream(inStr, 'Export', '', '', fileName);
     end;
     // price list import <<
+
+    procedure makeJsonPayloadShippingLabel(SalesHeader: Record "Sales Header"; NordiskPartyid: Code[10]): Text
+    // CLOUD READY NEW
+    var
+        Amazsetup: Record "Amazon Setup";
+        SalesLine: Record "Sales Line";
+        Payload: JsonObject;
+        shippingLabelRequestsArray: JsonArray;
+        shippingLabelRequest: JsonObject;
+        sellingParty: JsonObject;
+        shipFromParty: JsonObject;
+        sellingPartyId: JsonObject;
+        shipFromPartyId: JsonObject;
+        containersArray: JsonArray;
+        container: JsonObject;
+        packedItemsArray: JsonArray;
+        packedItem: JsonObject;
+        itemDetails: JsonObject;
+        CompInfo: Record "Company Information";
+        totextvar: Text;
+        TempBlob: Codeunit "Temp Blob";
+        outStr: OutStream;
+        inStr: InStream;
+        fileName: Text;
+    begin
+        Amazsetup.Get(NordiskPartyid);
+        CompInfo.Get();
+
+        // sellingParty
+        sellingPartyId.Add('partyId', Amazsetup.ZyxelPartyid);
+        sellingParty.Add('partyId', sellingPartyId);
+
+        // shipFromParty (company address)
+        shipFromPartyId.Add('partyId', NordiskPartyid);
+        shipFromParty.Add('partyId', shipFromPartyId);
+
+        // Build containers from sales lines
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange(Type, SalesLine.Type::Item);
+        SalesLine.SetFilter("No.", '<>%1', '');
+        if SalesLine.FindSet() then
+            repeat
+                Clear(packedItem);
+                Clear(itemDetails);
+                itemDetails.Add('productTitle', SalesLine.Description);
+                itemDetails.Add('orderedQuantity', SalesLine.Quantity);
+                packedItem.Add('itemSequenceNumber', SalesLine."Line No.");
+                packedItem.Add('buyerProductIdentifier', SalesLine."No.");
+                packedItem.Add('itemDetails', itemDetails);
+                packedItemsArray.Add(packedItem);
+            until SalesLine.Next() = 0;
+
+        container.Add('containerType', 'carton');
+        container.Add('containerSequenceNumber', 1);
+        container.Add('packedItems', packedItemsArray);
+        containersArray.Add(container);
+
+        // Build the shipping label request object
+        shippingLabelRequest.Add('purchaseOrderNumber', SalesHeader.AmazonePoNo);
+        shippingLabelRequest.Add('sellingParty', sellingParty);
+        shippingLabelRequest.Add('shipFromParty', shipFromParty);
+        shippingLabelRequest.Add('labelFormat', 'PNG');
+        shippingLabelRequest.Add('containers', containersArray);
+        shippingLabelRequestsArray.Add(shippingLabelRequest);
+
+        Payload.Add('shippingLabelRequests', shippingLabelRequestsArray);
+        Payload.WriteTo(totextvar);
+
+        if Amazsetup.testmode and GuiAllowed then begin
+            TempBlob.CreateOutStream(outStr, TextEncoding::UTF8);
+            Payload.WriteTo(outStr);
+            TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
+            fileName := StrSubstNo('ShippingLabel_%1.txt', SalesHeader.AmazonePoNo);
+            File.DownloadFromStream(inStr, 'Export', '', '', fileName);
+        end;
+
+        exit(totextvar);
+    end;
+
+    procedure SubmitShippingLabelRequest(SalesHeader: Record "Sales Header"): Boolean
+    // CLOUD READY NEW
+    var
+        Amazsetup: Record "Amazon Setup";
+        client: HttpClient;
+        request: HttpRequestMessage;
+        httpContent: HttpContent;
+        contentHeaders: HttpHeaders;
+        httpResponse: HttpResponseMessage;
+        rdtToken: Text;
+        jsonPayload: Text;
+        responseText: Text;
+        NordiskPartyid: Code[10];
+        rdataElements: List of [Text];
+        ShippingLabelsEndpoint: Text;
+    begin
+        NordiskPartyid := CopyStr(SalesHeader.AmazonSellpartyid, 1, 10);
+        Amazsetup.Get(NordiskPartyid);
+
+        if Amazsetup.URL_ShippingLabels = '' then
+            Error('URL Shipping Labels is not configured in Amazon Setup for %1', NordiskPartyid);
+
+        ShippingLabelsEndpoint := Amazsetup.URL_ShippingLabels;
+        // "https://sellingpartnerapi-na.amazon.com/vendor/directFulfillment/shipping/v1/shippingLabels"
+
+        // Get Restricted Data Token for this endpoint
+        rdataElements.Add('shippingLabels');
+        rdataElements.Add('sellingParty');
+        rdataElements.Add('shipFromParty');
+        rdataElements.Add('labelData');
+        if not GetNewRestrictedDataToken(rdtToken, NordiskPartyid, 'POST', '/vendor/directFulfillment/shipping/v1/shippingLabels', rdataElements) then
+            exit(false);
+
+        jsonPayload := makeJsonPayloadShippingLabel(SalesHeader, NordiskPartyid);
+
+        httpContent.WriteFrom(jsonPayload);
+        httpContent.GetHeaders(contentHeaders);
+        contentHeaders.Remove('Content-Type');
+        contentHeaders.Add('Content-Type', 'application/json');
+
+        request.Method := 'POST';
+        request.SetRequestUri(ShippingLabelsEndpoint);
+        //     request.GetHeaders().Add('x-amz-access-token', rdtToken);
+        request.GetHeaders(contentHeaders);
+        contentHeaders.Add('x-amz-access-token', rdtToken);
+        contentHeaders.Add('Accept', 'application/json');
+        request.Content := httpContent;
+
+        if not client.Send(request, httpResponse) then begin
+            Message('Shipping label request failed - could not connect to: %1', ShippingLabelsEndpoint);
+            exit(false);
+        end;
+
+        if not httpResponse.IsSuccessStatusCode() then begin
+            httpResponse.Content().ReadAs(responseText);
+            if Amazsetup.testmode then
+                Error('Shipping label error:\Status: %1\Reason: %2\Body: %3',
+                      httpResponse.HttpStatusCode(), httpResponse.ReasonPhrase(), responseText)
+            else
+                Message('Shipping label error:\Status: %1\Reason: %2',
+                        httpResponse.HttpStatusCode(), httpResponse.ReasonPhrase());
+            exit(false);
+        end;
+
+        httpResponse.Content().ReadAs(responseText);
+        if Amazsetup.testmode and GuiAllowed then
+            Message('Shipping label submitted OK:\%1', CopyStr(responseText, 1, 512));
+
+        exit(true);
+    end;
+
     var
         ZyxelApitype: enum zyxelApitype;
 
