@@ -8,7 +8,6 @@ Codeunit 50084 "Zyxel Web Service Request"
         ZGT: Codeunit "ZyXEL General Tools";
         ServerEnviron: Record "Server Environment";
 
-
     procedure ReplicateItem(pCompany: Text[80]; pInnerText: Text) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
