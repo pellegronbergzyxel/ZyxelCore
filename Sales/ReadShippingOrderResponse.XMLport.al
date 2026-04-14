@@ -504,7 +504,7 @@ xmlport 50060 "Read Shipping Order Response"
     trigger OnPostXmlPort()
     begin
         if ErrorOnSerialNo <> '' then
-            EmailAddMgt.CreateEmailWithBodytext('LOGSHIPRES', ErrorOnSerialNo, '');  // 18-06-19 ZY-LD 002
+            EmailAddMgt.CreateEmailWithBodytext('LOGSHIPRES', ErrorOnSerialNo, '');
     end;
 
     trigger OnPreXmlPort()
@@ -512,7 +512,7 @@ xmlport 50060 "Read Shipping Order Response"
         recWhseSetup.Get();
         recWhseSetup.TestField("Whse. Ship Response Nos.");
         LineNo := 10000;
-        ErrorOnSerialNo := '';  // 18-06-19 ZY-LD 002
+        ErrorOnSerialNo := '';
     end;
 
     var
@@ -522,7 +522,6 @@ xmlport 50060 "Read Shipping Order Response"
         recDelDocLine: Record "VCK Delivery Document Line";
         recWhseSetup: Record "Warehouse Setup";
         VCKXML: Codeunit "VCK Communication Management";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
         recRespHead: Record "Ship Response Header";
         Text003: Label 'Status not found.';
         gFileMgtEntryNo: Integer;

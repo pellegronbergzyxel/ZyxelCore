@@ -102,7 +102,7 @@ Table 50062 "Customer Contract"
 
     var
         CustContractSetup: Record "Customer Contract Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series"; //UpgradeReady
 
 
     procedure UploadFile(pCustomerNo: Code[20]; pCustomerName: Text)

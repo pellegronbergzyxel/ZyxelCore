@@ -242,7 +242,7 @@ Codeunit 50039 "Process EiCard Links"
         ServerDir: Text;
         lText002: label 'Download file';
     begin
-        // Cloude READY NEW
+        // // CLOUD READY NEW
         // Download http-links to a file.
         //IF recAutoSetup."Download and Attach Eicards" THEN BEGIN  // 11-09-20 ZY-LD 007  // 14-01-21 ZY-LD 008
         recEiCardLinkLine.SetRange("Purchase Order No.", PurchOrderNo);
@@ -323,7 +323,7 @@ Codeunit 50039 "Process EiCard Links"
         //  rValue := TRUE;  // 11-09-20 ZY-LD 007  // 14-01-21 ZY-LD 008
     end;
 
-   
+
     local procedure SendEiCardLink(recEiCardQueue: Record "EiCard Queue"; TestEmailAdd: Text; ReSend: Boolean): Boolean
     var
         recEiCardLinkLine: Record "EiCard Link Line";
@@ -564,7 +564,7 @@ Codeunit 50039 "Process EiCard Links"
         //<< 07-01-20 ZY-LD 003
     end;
 
-local procedure ExtractZipFile(ZipFilePath: Text; DestinationFolder: Text)
+    local procedure ExtractZipFile(ZipFilePath: Text; DestinationFolder: Text)
     var
         FileMgt: Codeunit "File Management";
         DataCompression: Codeunit "Data Compression";

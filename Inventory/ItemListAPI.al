@@ -74,17 +74,6 @@ Page 50205 "Item List API"
                     ApplicationArea = All;
                     ToolTip = 'Specifies if the item is an assembly BOM.';
                 }
-                /* field("Production BOM No."; Rec."Production BOM No.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the number of the production BOM that the item represents.';
-                }
-                field("Routing No."; Rec."Routing No.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the number of the production routing that the item is used in.';
-                }
-                */
                 field("Base Unit of Measure"; Rec."Base Unit of Measure")
                 {
                     ApplicationArea = All;
@@ -177,11 +166,6 @@ Page 50205 "Item List API"
                     ApplicationArea = All;
                     ToolTip = 'Specifies a search description that you use to find the item in lists.';
                 }
-                /* field("Overhead Rate"; Rec."Overhead Rate")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the item''s indirect cost as an absolute amount.';
-                } */
                 field("Indirect Cost %"; Rec."Indirect Cost %")
                 {
                     ApplicationArea = All;
@@ -217,37 +201,6 @@ Page 50205 "Item List API"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the unit of measure code used when you purchase the item.';
                 }
-                /*field("Lead Time Calculation"; Rec."Lead Time Calculation")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies a date formula for the amount of time it takes to replenish the item.';
-                }
-                field("Manufacturing Policy"; Rec."Manufacturing Policy")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies if additional orders for any related components are calculated.';
-                }
-                field("Flushing Method"; Rec."Flushing Method")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies how consumption of the item (component) is calculated and handled in production processes. Manual: Enter and post consumption in the consumption journal manually. Forward: Automatically posts consumption according to the production order component lines when the first operation starts. Backward: Automatically calculates and posts consumption according to the production order component lines when the production order is finished. Pick + Forward / Pick + Backward: Variations with warehousing.';
-                }
-                field("Assembly Policy"; Rec."Assembly Policy")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies which default order flow is used to supply this assembly item.';
-                }
-                field("Item Tracking Code"; Rec."Item Tracking Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies how items are tracked in the supply chain.';
-                }
-                field("Default Deferral Template Code"; Rec."Default Deferral Template Code")
-                {
-                    ApplicationArea = All;
-                    Caption = 'Default Deferral Template';
-                    ToolTip = 'Specifies the default template that governs how to defer revenues and expenses to the periods when they occurred.';
-                } */
                 field("Coupled to Dataverse"; Rec."Coupled to Dataverse")
                 {
                     ApplicationArea = All;
@@ -323,11 +276,6 @@ Page 50205 "Item List API"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Alternative Item No. field.';
                 }
-                /*field("Application Wksh. User ID"; Rec."Application Wksh. User ID")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the ID of a user who is working in the Application Worksheet window.';
-                }*/
                 field("Automatic Ext. Texts"; Rec."Automatic Ext. Texts")
                 {
                     ApplicationArea = All;
@@ -443,11 +391,7 @@ Page 50205 "Item List API"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Comment field.';
                 }
-                /* field("Commission Group"; Rec."Commission Group")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Commission Group field.';
-                } */
+
                 field("Common Item No."; Rec."Common Item No.")
                 {
                     ApplicationArea = All;
@@ -478,11 +422,6 @@ Page 50205 "Item List API"
                     ApplicationArea = All;
                     ToolTip = 'Specifies that all the inventory costs for this item have been posted to the general ledger.';
                 }
-                /*field("Cost of Open Production Orders"; Rec."Cost of Open Production Orders")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Cost of Open Production Orders field.';
-                } */
                 field("Cost Posted to G/L"; Rec."Cost Posted to G/L")
                 {
                     ApplicationArea = All;
@@ -528,16 +467,6 @@ Page 50205 "Item List API"
                     ApplicationArea = All;
                     ToolTip = 'Specifies if the item is included in availability calculations to promise a shipment date for its parent item.';
                 }
-                /*field("Dampener Period"; Rec."Dampener Period")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies a period of time during which you do not want the planning system to propose to reschedule existing supply orders forward. The dampener period limits the number of insignificant rescheduling of existing supply to a later date if that new date is within the dampener period. The dampener period function is only initiated if the supply can be rescheduled to a later date and not if the supply can be rescheduled to an earlier date. Accordingly, if the suggested new supply date is after the dampener period, then the rescheduling suggestion is not blocked. If the lot accumulation period is less than the dampener period, then the dampener period is dynamically set to equal the lot accumulation period. This is not shown in the value that you enter in the Dampener Period field. The last demand in the lot accumulation period is used to determine whether a potential supply date is in the dampener period. If this field is empty, then the value in the Default Dampener Period field in the Manufacturing Setup window applies. The value that you enter in the Dampener Period field must be a date formula, and one day (1D) is the shortest allowed period.';
-                }
-                field("Dampener Quantity"; Rec."Dampener Quantity")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies a dampener quantity to block insignificant change suggestions for an existing supply, if the change quantity is lower than the dampener quantity.';
-                }*/
                 field("Deal Reg"; Rec."Deal Reg")
                 {
                     ApplicationArea = All;
@@ -593,26 +522,6 @@ Page 50205 "Item List API"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the DSV Inv TE1 field.';
                 }
-                /*field(Durability; Rec.Durability)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Durability field.';
-                }
-                field("Duty Code"; Rec."Duty Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Duty Code field.';
-                }
-                field("Duty Due %"; Rec."Duty Due %")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Duty Due % field.';
-                }
-                field("Duty Unit Conversion"; Rec."Duty Unit Conversion")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Duty Unit Conversion field.';
-                } */
                 field("EAC Ready"; Rec."EAC Ready")
                 {
                     ApplicationArea = All;
@@ -960,22 +869,7 @@ Page 50205 "Item List API"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Negative Adjmt. (LCY) field.';
-                } /*
-                field("Negative Adjmt. (Qty.)"; Rec."Negative Adjmt. (Qty.)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Negative Adjmt. (Qty.) field.';
                 }
-                field("Net Change"; Rec."Net Change")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Net Change field.';
-                }
-                field("Net Invoiced Qty."; Rec."Net Invoiced Qty.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies how many units of the item in inventory have been invoiced.';
-                } */
                 field("Net Weight"; Rec."Net Weight")
                 {
                     ApplicationArea = All;
@@ -1105,47 +999,7 @@ Page 50205 "Item List API"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Physical Item field.';
-                } /*
-                field(Picture; Rec.Picture)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the picture that has been inserted for the item.';
                 }
-                field("Planned Order Receipt (Qty.)"; Rec."Planned Order Receipt (Qty.)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Planned Order Receipt (Qty.) field.';
-                }
-                field("Planned Order Release (Qty.)"; Rec."Planned Order Release (Qty.)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Planned Order Release (Qty.) field.';
-                }
-                field("Planning Issues (Qty.)"; Rec."Planning Issues (Qty.)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Planning Issues (Qty.) field.';
-                }
-                field("Planning Receipt (Qty.)"; Rec."Planning Receipt (Qty.)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Planning Receipt (Qty.) field.';
-                }
-                field("Planning Release (Qty.)"; Rec."Planning Release (Qty.)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Planning Release (Qty.) field.';
-                }
-                field("Planning Transfer Ship. (Qty)."; Rec."Planning Transfer Ship. (Qty).")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Planning Transfer Ship. (Qty). field.';
-                }
-                field("Planning Worksheet (Qty.)"; Rec."Planning Worksheet (Qty.)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Planning Worksheet (Qty.) field.';
-                }*/
                 field("Plastic Weight"; Rec."Plastic Weight")
                 {
                     ApplicationArea = All;
@@ -1240,122 +1094,7 @@ Page 50205 "Item List API"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Qty Per Pallet field.';
-                } /*
-                field("Qty. Assigned to ship"; Rec."Qty. Assigned to ship")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Qty. Assigned to ship field.';
                 }
-                field("Qty. in Transit"; Rec."Qty. in Transit")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the quantity of the items that are currently in transit.';
-                }
-                field("Qty. on Asm. Component"; Rec."Qty. on Asm. Component")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies how many units of the item are allocated as assembly components, which means how many are listed on outstanding assembly order lines.';
-                }
-                field("Qty. on Assembly Order"; Rec."Qty. on Assembly Order")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies how many units of the item are allocated to assembly orders, which is how many are listed on outstanding assembly order headers.';
-                }
-                field("Qty. on Component Lines"; Rec."Qty. on Component Lines")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies how many units of the item are allocated as production order components, meaning listed under outstanding production order lines.';
-                }
-                field("Qty. on Delivery Document"; Rec."Qty. on Delivery Document")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Qty. on Delivery Document field.';
-                }
-                field("Qty. on Job Order"; Rec."Qty. on Job Order")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies how many units of the item are allocated to jobs, meaning listed on outstanding job planning lines.';
-                }
-                field("Qty. on Prod. Order"; Rec."Qty. on Prod. Order")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies how many units of the item are allocated to production orders, meaning listed on outstanding production order lines.';
-                }
-                field("Qty. on Purch. Order"; Rec."Qty. on Purch. Order")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies how many units of the item are inbound on purchase orders, meaning listed on outstanding purchase order lines.';
-                }
-                field("Qty. on Purch. Return"; Rec."Qty. on Purch. Return")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Qty. on Purch. Return field.';
-                }
-                field("Qty. on Sales Order"; Rec."Qty. on Sales Order")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies how many units of the item are allocated to sales orders, meaning listed on outstanding sales orders lines.';
-                }
-                field("Qty. on Sales Order Conf."; Rec."Qty. on Sales Order Conf.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Qty. on Sales Order Confirmed (New) field.';
-                }
-                field("Qty. on Sales Order Conf.Total"; Rec."Qty. on Sales Order Conf.Total")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Qty. on Sales Order Confirmed field.';
-                }
-                field("Qty. on Sales Order Confirmed"; Rec."Qty. on Sales Order Confirmed")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Qty. on Sales Order Confirmed field.';
-                }
-                field("Qty. on Sales Order Total"; Rec."Qty. on Sales Order Total")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Qty. on Sales Order field.';
-                }
-                field("Qty. on Sales Order Unconf."; Rec."Qty. on Sales Order Unconf.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Qty. on Sales Order Unconfirmed field.';
-                }
-                field("Qty. on Sales Return"; Rec."Qty. on Sales Return")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Qty. on Sales Return field.';
-                }
-                field("Qty. on Service Order"; Rec."Qty. on Service Order")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies how many units of the item are allocated to service orders, meaning listed on outstanding service order lines.';
-                }
-                field("Qty. on Ship. Detail Received"; Rec."Qty. on Ship. Detail Received")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Quantity on Shipping Detail Received field.';
-                }
-                field("Qty. on Shipping Detail"; Rec."Qty. on Shipping Detail")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Qty. on Shipping Detail field.';
-                }
-                field("Qty. Per Carton"; Rec."Qty. Per Carton")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Qty. Per Carton field.';
-                }
-                field("Qty. per Color Box"; Rec."Qty. per Color Box")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Qty. per Color Box field.';
-                }
-                field("Qty. Picked"; Rec."Qty. Picked")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Qty. Picked field.';
-                } */
                 field("Reac Bromine Wgt. PCB"; Rec."Reac Bromine Wgt. PCB")
                 {
                     ApplicationArea = All;
@@ -1415,87 +1154,7 @@ Page 50205 "Item List API"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Repair Cost field.';
-                } /*
-                field("Res. Qty. on  Asm. Comp."; Rec."Res. Qty. on  Asm. Comp.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Res. Qty. on  Asm. Comp. field.';
                 }
-                field("Res. Qty. on Assembly Order"; Rec."Res. Qty. on Assembly Order")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Res. Qty. on Assembly Order field.';
-                }
-                field("Res. Qty. on Inbound Transfer"; Rec."Res. Qty. on Inbound Transfer")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Res. Qty. on Inbound Transfer field.';
-                }
-                field("Res. Qty. on Job Order"; Rec."Res. Qty. on Job Order")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Res. Qty. on Job Order field.';
-                }
-                field("Res. Qty. on Outbound Transfer"; Rec."Res. Qty. on Outbound Transfer")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Res. Qty. on Outbound Transfer field.';
-                }
-                field("Res. Qty. on Prod. Order Comp."; Rec."Res. Qty. on Prod. Order Comp.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Res. Qty. on Prod. Order Comp. field.';
-                }
-                field("Res. Qty. on Purch. Returns"; Rec."Res. Qty. on Purch. Returns")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Res. Qty. on Purch. Returns field.';
-                }
-                field("Res. Qty. on Req. Line"; Rec."Res. Qty. on Req. Line")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Res. Qty. on Req. Line field.';
-                }
-                field("Res. Qty. on Sales Returns"; Rec."Res. Qty. on Sales Returns")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Res. Qty. on Sales Returns field.';
-                }
-                field("Res. Qty. on Service Orders"; Rec."Res. Qty. on Service Orders")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Res. Qty. on Service Orders field.';
-                }
-                field("Rescheduling Period"; Rec."Rescheduling Period")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies a period within which any suggestion to change a supply date always consists of a Reschedule action and never a Cancel + New action.';
-                }
-                field(Reserve; Rec.Reserve)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies if and how the item will be reserved. Never: It is not possible to reserve the item. Optional: You can reserve the item manually. Always: The item is automatically reserved from demand, such as sales orders, against inventory, purchase orders, assembly orders, and production orders.';
-                }
-                field("Reserved Qty. on Inventory"; Rec."Reserved Qty. on Inventory")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Reserved Qty. on Inventory field.';
-                }
-                field("Reserved Qty. on Prod. Order"; Rec."Reserved Qty. on Prod. Order")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Reserved Qty. on Prod. Order field.';
-                }
-                field("Reserved Qty. on Purch. Orders"; Rec."Reserved Qty. on Purch. Orders")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Reserved Qty. on Purch. Orders field.';
-                }
-                field("Reserved Qty. on Sales Orders"; Rec."Reserved Qty. on Sales Orders")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Reserved Qty. on Sales Orders field.';
-                } */
                 field("Rework BOM"; Rec."Rework BOM")
                 {
                     ApplicationArea = All;
@@ -1515,31 +1174,7 @@ Page 50205 "Item List API"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the RMA Vendor Cost field.';
-                } /*
-                field("Rolled-up Cap. Overhead Cost"; Rec."Rolled-up Cap. Overhead Cost")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Rolled-up Cap. Overhead Cost field.';
                 }
-                field("Rolled-up Capacity Cost"; Rec."Rolled-up Capacity Cost")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Rolled-up Capacity Cost field.';
-                }
-                field("Rolled-up Material Cost"; Rec."Rolled-up Material Cost")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Rolled-up Material Cost field.';
-                }
-                field("Rolled-up Mfg. Ovhd Cost"; Rec."Rolled-up Mfg. Ovhd Cost")
-                {
-                    ToolTip = 'Specifies the value of the Rolled-up Mfg. Ovhd Cost field.';
-                }
-                field("Rolled-up Subcontracted Cost"; Rec."Rolled-up Subcontracted Cost")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Rolled-up Subcontracted Cost field.';
-                } */
                 field("Rounding Precision"; Rec."Rounding Precision")
                 {
                     ApplicationArea = All;
@@ -1579,12 +1214,7 @@ Page 50205 "Item List API"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the SBU Company field.';
-                } /*
-                field("Scheduled Receipt (Qty.)"; Rec."Scheduled Receipt (Qty.)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Scheduled Receipt (Qty.) field.';
-                } */
+                }
                 field("SCIP No."; Rec."SCIP No.")  // 18-04-24 ZY-LD 000
                 {
                     ApplicationArea = All;
@@ -1619,47 +1249,12 @@ Page 50205 "Item List API"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Serial Number Required field.';
-                } /*
-                field("Service Item Group"; Rec."Service Item Group")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the code of the service item group that the item belongs to.';
                 }
-                field("Shipment (Qty.)"; Rec."Shipment (Qty.)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Shipment (Qty.) field.';
-                } */
                 field("Show In Web"; Rec."Show In Web")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Show In Web field.';
-                } /*
-                field("Single-Level Cap. Ovhd Cost"; Rec."Single-Level Cap. Ovhd Cost")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Single-Level Cap. Ovhd Cost field.';
                 }
-                field("Single-Level Capacity Cost"; Rec."Single-Level Capacity Cost")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Single-Level Capacity Cost field.';
-                }
-                field("Single-Level Material Cost"; Rec."Single-Level Material Cost")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Single-Level Material Cost field.';
-                }
-                field("Single-Level Mfg. Ovhd Cost"; Rec."Single-Level Mfg. Ovhd Cost")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Single-Level Mfg. Ovhd Cost field.';
-                }
-                field("Single-Level Subcontrd. Cost"; Rec."Single-Level Subcontrd. Cost")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Single-Level Subcontrd. Cost field.';
-                } */
                 field("Special Equipment Code"; Rec."Special Equipment Code")
                 {
                     ApplicationArea = All;
@@ -1719,17 +1314,7 @@ Page 50205 "Item List API"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the SystemModifiedBy field.';
-                } /*
-                field("Tax Group Code"; Rec."Tax Group Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the tax group that is used to calculate and post sales tax.';
                 }
-                field("Tax Group Id"; Rec."Tax Group Id")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the ID of the tax group.';
-                } */
                 field("Tax rate (SEK/kg)"; Rec."Tax rate (SEK/kg)")
                 {
                     ApplicationArea = All;
@@ -1764,37 +1349,7 @@ Page 50205 "Item List API"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Total Qty. per Carton field.';
-                } /*
-                field("Tr. Or. Ship (Qty.) Confirmed"; Rec."Tr. Or. Ship (Qty.) Confirmed")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Trans. Ord. Shipment (Qty.) Confirmed field.';
                 }
-                field("Trade In"; Rec."Trade In")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Trade In field.';
-                }
-                field("Trans. Ord. Receipt (Qty.)"; Rec."Trans. Ord. Receipt (Qty.)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the quantity of the items that remains to be received but are not yet shipped as the difference between the Quantity and the Quantity Shipped fields.';
-                }
-                field("Trans. Ord. Shipment (Qty.)"; Rec."Trans. Ord. Shipment (Qty.)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the quantity of the items that remains to be shipped as the difference between the Quantity and the Quantity Shipped fields.';
-                }
-                field("Transferred (LCY)"; Rec."Transferred (LCY)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Transferred (LCY) field.';
-                }
-                field("Transferred (Qty.)"; Rec."Transferred (Qty.)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Transferred (Qty.) field.';
-                } */
                 field("UN Code"; Rec."UN Code")
                 {
                     ApplicationArea = All;
@@ -1920,17 +1475,17 @@ Page 50205 "Item List API"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Width (ctn) field.';
                 }
-
-
-
             }
         }
     }
 
 
     trigger OnAfterGetRecord()
+    var
+        SCIPNumber: Record "SCIP Number";
     begin
-        //rec.CalcFields("SCIP No.")
-
+        SCIPNumber.SetRange("Item No.", Rec."No.");
+        if SCIPNumber.FindFirst() then
+            Rec."SCIP No." := SCIPNumber."SCIP No.";
     end;
 }

@@ -347,7 +347,7 @@ Report 50026 "WEEE Excel Export"
         ExcelBuf.AddColumn("Item Ledger Entry".FieldCaption("Document No."), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
 
         ExcelBuf.AddColumn("Item Ledger Entry".FieldCaption(Quantity), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn(recItem.FieldCaption("Number per carton"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn(recItem.FieldCaption("Cartons Per Pallet"), false, '', true, false, false, '', ExcelBuf."cell type"::Text); //13-04-2026 BK #567065
         ExcelBuf.AddColumn(recItem.FieldCaption("Qty Per Pallet"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn("Item Ledger Entry".FieldCaption("Sales Amount (Actual)"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
 
@@ -386,7 +386,7 @@ Report 50026 "WEEE Excel Export"
             ExcelBuf.AddColumn(Format(pItemLedgerEntry."Document Type"), false, '', false, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn(pItemLedgerEntry."Document No.", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
             AddColumnDecimal(pItemLedgerEntry.Quantity, '#,###,##0');
-            AddColumnDecimal(recItem."Number per carton", '#,###,##0');
+            AddColumnDecimal(recItem."Cartons Per Pallet", '#,###,##0'); //13-04-2026 BK #567065
             AddColumnDecimal(recItem."Qty Per Pallet", '#,###,##0.00');
             AddColumnDecimal(pItemLedgerEntry."Sales Amount (Actual)", '#,###,##0.00');
             AddColumnDecimal(recItem."Net Weight", '#,###,##0.000');

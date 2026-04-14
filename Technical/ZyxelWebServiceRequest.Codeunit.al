@@ -1,11 +1,5 @@
 Codeunit 50084 "Zyxel Web Service Request"
 {
-    // 001. 11-04-19 ZY-LD P0217 - Get Sales Invoice No.
-    // 002. 30-04-19 ZY-LD P0224 - Trace mode is set on the table, to awoid too many files on the server.
-    // 003. 24-02-20 ZY-LD 2020022410000047 - Evaluate Amount.
-    // 004. 15-08-22 ZY-LD 2022081510000077 - HQ Company Name.
-
-
     trigger OnRun()
     begin
     end;
