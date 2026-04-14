@@ -194,6 +194,20 @@ page 50118 "Margin Approvals"
                     Helper.ProcessMarginApproval(rec);
                 end;
             }
+                 action(testPricecheck)
+            {
+                Caption = 'Run Price approval API';
+                Image = UpdateDescription;
+
+
+                trigger OnAction()
+                var
+                    Helper: codeunit AmazonHelper;
+
+                begin
+                    Helper.ProcessPriceApproval(rec);
+                end;
+            }
 
         }
     }

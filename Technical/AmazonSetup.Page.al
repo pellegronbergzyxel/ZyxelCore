@@ -132,6 +132,10 @@ page 50133 "Amazon setup list"
                 {
                     ApplicationArea = All;
                 }
+                    field(URL_ShippingLabels; Rec.URL_ShippingLabels)
+                {
+                    ApplicationArea = All;
+                }
             }
         }
     }

@@ -389,14 +389,17 @@ Codeunit 50083 "Zyxel Web Service Management"
             XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');  // Change "Rep*" here
             if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
                 XmlRootNode.WriteTo(NodeText);
-                rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
-                InnerXmlDoc.GetRoot(InnerRootEl);
-                InnerChildNodes := InnerRootEl.GetChildElements();
-                rValue := '';
-                foreach InnerChildNode in InnerChildNodes do begin
-                    InnerChildNode.WriteTo(ChildText);
-                    rValue += ChildText;
+
+                if StrLen(NodeText) - StrLen(DelChr(NodeText, '=', '<')) > 2 then begin
+                    rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                    XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
+                    InnerXmlDoc.GetRoot(InnerRootEl);
+                    InnerChildNodes := InnerRootEl.GetChildElements();
+                    rValue := '';
+                    foreach InnerChildNode in InnerChildNodes do begin
+                        InnerChildNode.WriteTo(ChildText);
+                        rValue += ChildText;
+                    end;
                 end;
             end;
 
@@ -430,14 +433,16 @@ Codeunit 50083 "Zyxel Web Service Management"
                         XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');  // Change "Rep*" here
                         if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
                             XmlRootNode.WriteTo(NodeText);
-                            rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-                            XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
-                            InnerXmlDoc.GetRoot(InnerRootEl);
-                            InnerChildNodes := InnerRootEl.GetChildElements();
-                            rValue := '';
-                            foreach InnerChildNode in InnerChildNodes do begin
-                                InnerChildNode.WriteTo(ChildText);
-                                rValue += ChildText;
+                            if StrLen(NodeText) - StrLen(DelChr(NodeText, '=', '<')) > 2 then begin
+                                rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
+                                InnerXmlDoc.GetRoot(InnerRootEl);
+                                InnerChildNodes := InnerRootEl.GetChildElements();
+                                rValue := '';
+                                foreach InnerChildNode in InnerChildNodes do begin
+                                    InnerChildNode.WriteTo(ChildText);
+                                    rValue += ChildText;
+                                end;
                             end;
                         end;
 
@@ -564,14 +569,16 @@ Codeunit 50083 "Zyxel Web Service Management"
         XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');
         if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
             XmlRootNode.WriteTo(NodeText);
-            rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-            XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
-            InnerXmlDoc.GetRoot(InnerRootEl);
-            InnerChildNodes := InnerRootEl.GetChildElements();
-            rValue := '';
-            foreach InnerChildNode in InnerChildNodes do begin
-                InnerChildNode.WriteTo(ChildText);
-                rValue += ChildText;
+            if StrLen(NodeText) - StrLen(DelChr(NodeText, '=', '<')) > 2 then begin
+                rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
+                InnerXmlDoc.GetRoot(InnerRootEl);
+                InnerChildNodes := InnerRootEl.GetChildElements();
+                rValue := '';
+                foreach InnerChildNode in InnerChildNodes do begin
+                    InnerChildNode.WriteTo(ChildText);
+                    rValue += ChildText;
+                end;
             end;
         end;
 
@@ -680,14 +687,16 @@ Codeunit 50083 "Zyxel Web Service Management"
         XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');
         if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
             XmlRootNode.WriteTo(NodeText);
-            rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-            XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
-            InnerXmlDoc.GetRoot(InnerRootEl);
-            InnerChildNodes := InnerRootEl.GetChildElements();
-            rValue := '';
-            foreach InnerChildNode in InnerChildNodes do begin
-                InnerChildNode.WriteTo(ChildText);
-                rValue += ChildText;
+            if StrLen(NodeText) - StrLen(DelChr(NodeText, '=', '<')) > 2 then begin
+                rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
+                InnerXmlDoc.GetRoot(InnerRootEl);
+                InnerChildNodes := InnerRootEl.GetChildElements();
+                rValue := '';
+                foreach InnerChildNode in InnerChildNodes do begin
+                    InnerChildNode.WriteTo(ChildText);
+                    rValue += ChildText;
+                end;
             end;
         end;
 
@@ -798,14 +807,16 @@ Codeunit 50083 "Zyxel Web Service Management"
                 XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/exchrate');
                 if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
                     XmlRootNode.WriteTo(NodeText);
-                    InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-                    XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/exchrate">' + InnerText + '</root>', InnerXmlDoc);
-                    InnerXmlDoc.GetRoot(InnerRootEl);
-                    InnerChildNodes := InnerRootEl.GetChildElements();
-                    InnerText := '';
-                    foreach InnerChildNode in InnerChildNodes do begin
-                        InnerChildNode.WriteTo(ChildText);
-                        InnerText += ChildText;
+                    if StrLen(NodeText) - StrLen(DelChr(NodeText, '=', '<')) > 2 then begin
+                        InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                        XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/exchrate">' + InnerText + '</root>', InnerXmlDoc);
+                        InnerXmlDoc.GetRoot(InnerRootEl);
+                        InnerChildNodes := InnerRootEl.GetChildElements();
+                        InnerText := '';
+                        foreach InnerChildNode in InnerChildNodes do begin
+                            InnerChildNode.WriteTo(ChildText);
+                            InnerText += ChildText;
+                        end;
                     end;
                 end;
 
@@ -964,14 +975,16 @@ Codeunit 50083 "Zyxel Web Service Management"
         XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/acc');  // Change "Rep*" here
         if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
             XmlRootNode.WriteTo(NodeText);
-            InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-            XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/acc">' + InnerText + '</root>', InnerXmlDoc);
-            InnerXmlDoc.GetRoot(InnerRootEl);
-            InnerChildNodes := InnerRootEl.GetChildElements();
-            InnerText := '';
-            foreach InnerChildNode in InnerChildNodes do begin
-                InnerChildNode.WriteTo(ChildText);
-                InnerText += ChildText;
+            if StrLen(NodeText) - StrLen(DelChr(NodeText, '=', '<')) > 2 then begin
+                InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/acc">' + InnerText + '</root>', InnerXmlDoc);
+                InnerXmlDoc.GetRoot(InnerRootEl);
+                InnerChildNodes := InnerRootEl.GetChildElements();
+                InnerText := '';
+                foreach InnerChildNode in InnerChildNodes do begin
+                    InnerChildNode.WriteTo(ChildText);
+                    InnerText += ChildText;
+                end;
             end;
         end;
 
@@ -1096,14 +1109,16 @@ Codeunit 50083 "Zyxel Web Service Management"
         XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/IcRecon');
         if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
             XmlRootNode.WriteTo(NodeText);
-            InnerXml := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-            XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/IcRecon">' + InnerXml + '</root>', InnerXmlDoc);
-            InnerXmlDoc.GetRoot(InnerRootEl);
-            InnerChildNodes := InnerRootEl.GetChildElements();
-            InnerXml := '';
-            foreach InnerChildNode in InnerChildNodes do begin
-                InnerChildNode.WriteTo(ChildText);
-                InnerXml += ChildText;
+            if StrLen(NodeText) - StrLen(DelChr(NodeText, '=', '<')) > 2 then begin
+                InnerXml := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/IcRecon">' + InnerXml + '</root>', InnerXmlDoc);
+                InnerXmlDoc.GetRoot(InnerRootEl);
+                InnerChildNodes := InnerRootEl.GetChildElements();
+                InnerXml := '';
+                foreach InnerChildNode in InnerChildNodes do begin
+                    InnerChildNode.WriteTo(ChildText);
+                    InnerXml += ChildText;
+                end;
             end;
         end;
 
@@ -1193,14 +1208,16 @@ Codeunit 50083 "Zyxel Web Service Management"
         XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/exchrate');
         if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
             XmlRootNode.WriteTo(NodeText);
-            rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-            XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/exchrate">' + rValue + '</root>', InnerXmlDoc);
-            InnerXmlDoc.GetRoot(InnerRootEl);
-            InnerChildNodes := InnerRootEl.GetChildElements();
-            rValue := '';
-            foreach InnerChildNode in InnerChildNodes do begin
-                InnerChildNode.WriteTo(ChildText);
-                rValue += ChildText;
+            if StrLen(NodeText) - StrLen(DelChr(NodeText, '=', '<')) > 2 then begin
+                rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/exchrate">' + rValue + '</root>', InnerXmlDoc);
+                InnerXmlDoc.GetRoot(InnerRootEl);
+                InnerChildNodes := InnerRootEl.GetChildElements();
+                rValue := '';
+                foreach InnerChildNode in InnerChildNodes do begin
+                    InnerChildNode.WriteTo(ChildText);
+                    rValue += ChildText;
+                end;
             end;
         end;
 
@@ -1470,14 +1487,16 @@ Codeunit 50083 "Zyxel Web Service Management"
                 XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/so');  // Change "Rep*" here
                 if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
                     XmlRootNode.WriteTo(NodeText);
-                    InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-                    XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/so">' + InnerText + '</root>', InnerXmlDoc);
-                    InnerXmlDoc.GetRoot(InnerRootEl);
-                    InnerChildNodes := InnerRootEl.GetChildElements();
-                    InnerText := '';
-                    foreach InnerChildNode in InnerChildNodes do begin
-                        InnerChildNode.WriteTo(ChildText);
-                        InnerText += ChildText;
+                    if StrLen(NodeText) - StrLen(DelChr(NodeText, '=', '<')) > 2 then begin
+                        InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                        XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/so">' + InnerText + '</root>', InnerXmlDoc);
+                        InnerXmlDoc.GetRoot(InnerRootEl);
+                        InnerChildNodes := InnerRootEl.GetChildElements();
+                        InnerText := '';
+                        foreach InnerChildNode in InnerChildNodes do begin
+                            InnerChildNode.WriteTo(ChildText);
+                            InnerText += ChildText;
+                        end;
                     end;
                 end;
 
@@ -1575,14 +1594,16 @@ Codeunit 50083 "Zyxel Web Service Management"
             XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/transfer');  // Change "Rep*" here
             if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
                 XmlRootNode.WriteTo(NodeText);
-                InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/transfer">' + InnerText + '</root>', InnerXmlDoc);
-                InnerXmlDoc.GetRoot(InnerRootEl);
-                InnerChildNodes := InnerRootEl.GetChildElements();
-                InnerText := '';
-                foreach InnerChildNode in InnerChildNodes do begin
-                    InnerChildNode.WriteTo(ChildText);
-                    InnerText += ChildText;
+                if StrLen(NodeText) - StrLen(DelChr(NodeText, '=', '<')) > 2 then begin
+                    InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                    XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/transfer">' + InnerText + '</root>', InnerXmlDoc);
+                    InnerXmlDoc.GetRoot(InnerRootEl);
+                    InnerChildNodes := InnerRootEl.GetChildElements();
+                    InnerText := '';
+                    foreach InnerChildNode in InnerChildNodes do begin
+                        InnerChildNode.WriteTo(ChildText);
+                        InnerText += ChildText;
+                    end;
                 end;
             end;
 
@@ -1680,14 +1701,16 @@ Codeunit 50083 "Zyxel Web Service Management"
             XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/uq');  // Change "Rep*" here
             if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
                 XmlRootNode.WriteTo(NodeText);
-                InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/uq">' + InnerText + '</root>', InnerXmlDoc);
-                InnerXmlDoc.GetRoot(InnerRootEl);
-                InnerChildNodes := InnerRootEl.GetChildElements();
-                InnerText := '';
-                foreach InnerChildNode in InnerChildNodes do begin
-                    InnerChildNode.WriteTo(ChildText);
-                    InnerText += ChildText;
+                if StrLen(NodeText) - StrLen(DelChr(NodeText, '=', '<')) > 2 then begin
+                    InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                    XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/uq">' + InnerText + '</root>', InnerXmlDoc);
+                    InnerXmlDoc.GetRoot(InnerRootEl);
+                    InnerChildNodes := InnerRootEl.GetChildElements();
+                    InnerText := '';
+                    foreach InnerChildNode in InnerChildNodes do begin
+                        InnerChildNode.WriteTo(ChildText);
+                        InnerText += ChildText;
+                    end;
                 end;
             end;
 
@@ -1789,14 +1812,16 @@ Codeunit 50083 "Zyxel Web Service Management"
             XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/cd');  // Change "Rep*" here
             if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
                 XmlRootNode.WriteTo(NodeText);
-                InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/cd">' + InnerText + '</root>', InnerXmlDoc);
-                InnerXmlDoc.GetRoot(InnerRootEl);
-                InnerChildNodes := InnerRootEl.GetChildElements();
-                InnerText := '';
-                foreach InnerChildNode in InnerChildNodes do begin
-                    InnerChildNode.WriteTo(ChildText);
-                    InnerText += ChildText;
+                if StrLen(NodeText) - StrLen(DelChr(NodeText, '=', '<')) > 2 then begin
+                    InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                    XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/cd">' + InnerText + '</root>', InnerXmlDoc);
+                    InnerXmlDoc.GetRoot(InnerRootEl);
+                    InnerChildNodes := InnerRootEl.GetChildElements();
+                    InnerText := '';
+                    foreach InnerChildNode in InnerChildNodes do begin
+                        InnerChildNode.WriteTo(ChildText);
+                        InnerText += ChildText;
+                    end;
                 end;
             end;
 
@@ -1898,14 +1923,16 @@ Codeunit 50083 "Zyxel Web Service Management"
             XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/sofr');  // Change "Rep*" here
             if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
                 XmlRootNode.WriteTo(NodeText);
-                InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/sofr">' + InnerText + '</root>', InnerXmlDoc);
-                InnerXmlDoc.GetRoot(InnerRootEl);
-                InnerChildNodes := InnerRootEl.GetChildElements();
-                InnerText := '';
-                foreach InnerChildNode in InnerChildNodes do begin
-                    InnerChildNode.WriteTo(ChildText);
-                    InnerText += ChildText;
+                if StrLen(NodeText) - StrLen(DelChr(NodeText, '=', '<')) > 2 then begin
+                    InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                    XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/sofr">' + InnerText + '</root>', InnerXmlDoc);
+                    InnerXmlDoc.GetRoot(InnerRootEl);
+                    InnerChildNodes := InnerRootEl.GetChildElements();
+                    InnerText := '';
+                    foreach InnerChildNode in InnerChildNodes do begin
+                        InnerChildNode.WriteTo(ChildText);
+                        InnerText += ChildText;
+                    end;
                 end;
             end;
 
@@ -1990,14 +2017,16 @@ Codeunit 50083 "Zyxel Web Service Management"
             XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/pp');  // Change "Rep*" here
             if XmlDoc.SelectSingleNode('//d:Root', XmlNSMgr, XmlRootNode) then begin
                 XmlRootNode.WriteTo(NodeText);
-                InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/pp">' + InnerText + '</root>', InnerXmlDoc);
-                InnerXmlDoc.GetRoot(InnerRootEl);
-                InnerChildNodes := InnerRootEl.GetChildElements();
-                InnerText := '';
-                foreach InnerChildNode in InnerChildNodes do begin
-                    InnerChildNode.WriteTo(ChildText);
-                    InnerText += ChildText;
+                if StrLen(NodeText) - StrLen(DelChr(NodeText, '=', '<')) > 2 then begin
+                    InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                    XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/pp">' + InnerText + '</root>', InnerXmlDoc);
+                    InnerXmlDoc.GetRoot(InnerRootEl);
+                    InnerChildNodes := InnerRootEl.GetChildElements();
+                    InnerText := '';
+                    foreach InnerChildNode in InnerChildNodes do begin
+                        InnerChildNode.WriteTo(ChildText);
+                        InnerText += ChildText;
+                    end;
                 end;
             end;
 
@@ -2084,14 +2113,16 @@ Codeunit 50083 "Zyxel Web Service Management"
             XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/sp');
             if XmlDoc.SelectSingleNode('//d:Root', XmlNSMgr, XmlRootNode) then begin
                 XmlRootNode.WriteTo(NodeText);
-                InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/sp">' + InnerText + '</root>', InnerXmlDoc);
-                InnerXmlDoc.GetRoot(InnerRootEl);
-                InnerChildNodes := InnerRootEl.GetChildElements();
-                InnerText := '';
-                foreach InnerChildNode in InnerChildNodes do begin
-                    InnerChildNode.WriteTo(ChildText);
-                    InnerText += ChildText;
+                if StrLen(NodeText) - StrLen(DelChr(NodeText, '=', '<')) > 2 then begin
+                    InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                    XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/sp">' + InnerText + '</root>', InnerXmlDoc);
+                    InnerXmlDoc.GetRoot(InnerRootEl);
+                    InnerChildNodes := InnerRootEl.GetChildElements();
+                    InnerText := '';
+                    foreach InnerChildNode in InnerChildNodes do begin
+                        InnerChildNode.WriteTo(ChildText);
+                        InnerText += ChildText;
+                    end;
                 end;
             end;
 
@@ -2178,14 +2209,16 @@ Codeunit 50083 "Zyxel Web Service Management"
             XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/purchaseorder');
             if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
                 XmlRootNode.WriteTo(NodeText);
-                InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-                XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/purchaseorder">' + InnerText + '</root>', InnerXmlDoc);
-                InnerXmlDoc.GetRoot(InnerRootEl);
-                InnerChildNodes := InnerRootEl.GetChildElements();
-                InnerText := '';
-                foreach InnerChildNode in InnerChildNodes do begin
-                    InnerChildNode.WriteTo(ChildText);
-                    InnerText += ChildText;
+                if StrLen(NodeText) - StrLen(DelChr(NodeText, '=', '<')) > 2 then begin
+                    InnerText := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                    XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/purchaseorder">' + InnerText + '</root>', InnerXmlDoc);
+                    InnerXmlDoc.GetRoot(InnerRootEl);
+                    InnerChildNodes := InnerRootEl.GetChildElements();
+                    InnerText := '';
+                    foreach InnerChildNode in InnerChildNodes do begin
+                        InnerChildNode.WriteTo(ChildText);
+                        InnerText += ChildText;
+                    end;
                 end;
             end;
 
@@ -2514,14 +2547,16 @@ Codeunit 50083 "Zyxel Web Service Management"
                     XmlNSMgr.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');
                     if XmlDoc.SelectSingleNode('//d:root', XmlNSMgr, XmlRootNode) then begin
                         XmlRootNode.WriteTo(NodeText);
-                        rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
-                        XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
-                        InnerXmlDoc.GetRoot(InnerRootEl);
-                        InnerChildNodes := InnerRootEl.GetChildElements();
-                        rValue := '';
-                        foreach InnerChildNode in InnerChildNodes do begin
-                            InnerChildNode.WriteTo(ChildText);
-                            rValue += ChildText;
+                        if StrLen(NodeText) - StrLen(DelChr(NodeText, '=', '<')) > 2 then begin
+                            rValue := CopyStr(NodeText, NodeText.IndexOf('>') + 2, NodeText.LastIndexOf('<') - NodeText.IndexOf('>') - 2);
+                            XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
+                            InnerXmlDoc.GetRoot(InnerRootEl);
+                            InnerChildNodes := InnerRootEl.GetChildElements();
+                            rValue := '';
+                            foreach InnerChildNode in InnerChildNodes do begin
+                                InnerChildNode.WriteTo(ChildText);
+                                rValue += ChildText;
+                            end;
                         end;
                     end;
 

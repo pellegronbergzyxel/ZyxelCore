@@ -24,4 +24,14 @@ enum 50005 Apirequeststatus
     {
         Caption = 'closed';
     }
+    //PriceApproveRequest
+    value(5; WaitingPrice)
+    {
+        Caption = 'WaitingPrice';
+    }
+    value(6; SendPrice)
+    {
+        Caption = 'SendPrice';
+    }
+
 }
