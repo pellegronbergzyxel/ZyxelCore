@@ -2217,7 +2217,7 @@ codeunit 50055 AmazonHelper
         totalDoc.add('token', Marginsetup.client_secret);
         totalDoc.add('company', Marginsetup.ApiCompanyname);
         // loop >>
-        margin_info.add('entry_no', MarginApproval.SystemId);
+        margin_info.add('entry_no', MarginApproval."Entry No.");
         margin_info.add('part_number', MarginApproval."Item No.");
         tempcurr := '';
 
@@ -2348,7 +2348,7 @@ codeunit 50055 AmazonHelper
 
         totalDoc.add('customer_name', MarginApproval."Customer Name");
         // loop >>
-        margin_info.add('entry_no', MarginApproval.SystemId);
+        margin_info.add('entry_no', MarginApproval."Entry No.");
         margin_info.add('part_number', MarginApproval."Item No.");
         tempcurr := '';
 
