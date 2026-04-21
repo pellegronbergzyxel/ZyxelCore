@@ -301,7 +301,8 @@ pageextension 50132 PurchaseOrderZX extends "Purchase Order"
                             end;
                     end;
                 }
-                action("Send ZBO")
+                //CLOUD READY DELETE
+                /*action("Send ZBO")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Send ZBO';
@@ -310,7 +311,7 @@ pageextension 50132 PurchaseOrderZX extends "Purchase Order"
                     begin
                         SendZBO;
                     end;
-                }
+                } */
             }
         }
         addafter(Receipts)
@@ -486,7 +487,8 @@ pageextension 50132 PurchaseOrderZX extends "Purchase Order"
         PostButtonsEnabled := SalesHeadEvent.HidePostButtons(Rec."Location Code", '');  // 13-03-19 ZY-LD 007
     end;
 
-    local procedure SendZBO()
+    //CLOUD READY DELETE
+    /*local procedure SendZBO()
     var
         ZyWebServMgt: Codeunit "Zyxel Web Service Management";
         lText001: Label 'Do you want to send order no. %1 to "%2"?';
@@ -497,5 +499,5 @@ pageextension 50132 PurchaseOrderZX extends "Purchase Order"
                 Rec.Modify();
                 Message('Order has been sent.');
             end;
-    end;
+    end; */
 }
