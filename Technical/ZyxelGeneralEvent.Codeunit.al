@@ -194,12 +194,14 @@ codeunit 50087 "Zyxel General Event"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', false, false)]
     local procedure OnAfterCompanyOpen()
     var
-
-        ServicePointManager: dotnet ServicePointManager;
-        SecurityProtocolType: dotnet SecurityProtocolType;
+    // CLOUD READY DELETE >>
+    //ServicePointManager: dotnet ServicePointManager;
+    // SecurityProtocolType: dotnet SecurityProtocolType;
+    // CLOUD READY DELETE >>
     begin
-        ServicePointManager.SecurityProtocol := SecurityProtocolType.Tls12;
-
+        // CLOUD READY DELETE >>
+        // ServicePointManager.SecurityProtocol := SecurityProtocolType.Tls12;
+        // CLOUD READY DELETE <<
         // Change default document layout on standard reports
         UpdateReportLayoutSelection(Report::"Purchase - Invoice", './Layouts/PurchaseInvoiceZyxel.rdlc');
         UpdateReportLayoutSelection(Report::"Purchase - Credit Memo", './Layouts/PurchaseCreditMemoZyxel.rdlc');

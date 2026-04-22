@@ -146,8 +146,15 @@ Table 76153 "EiCard Link Line"
             CopyStream(OutStream, ContentInStream);
             OutFile.Close();
         end;
-        Hyperlink(Filename);
-        FileMgt.DeleteServerFile(Filename);
+        //Hyperlink(Filename);
+        //FileMgt.DeleteServerFile(Filename);
+          if FILE.Exists(BaseFolderName) then begin
+                serverFile.Open(BaseFolderName);
+                serverFile.CreateInStream(NewStream);
+                Filename := FileMgt.GetFileName(BaseFolderName);
+                if DownloadFromStream(NewStream, 'Export', '', 'All Files (*.*)|*.*', Filename) then
+                    message('fil downloaded')
+            end;
         //<< 20-04-22 ZY-LD 002
     end;
 }
