@@ -28,9 +28,14 @@
       "name": "Review General Ledger Entries",
       "publisher": "Microsoft",
       "version": "22.0.0.0"
+    },
+    { 
+      "id": "8cc7b394-6661-4d12-97e0-6c3d982ac9c2",
+      "name": "VisionEssentials", 
+      "publisher": "Vision People A/S", 
+      "version": "20.2.1.51"
     }
-   
-],
+  ],
   "screenshots": [],
   "platform": "1.0.0.0",
   "application": "22.0.0.0",
