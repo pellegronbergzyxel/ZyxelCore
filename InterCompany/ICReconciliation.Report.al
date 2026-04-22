@@ -420,7 +420,8 @@ Report 50115 "IC Reconciliation"
                                     ReportingCurrency := Cust."Currency Code"
                                 else
                                     ReportingCurrency := recGenLedgSetup."LCY Code";
-
+                            //if CurrentClientType = ClientType::SOAP then
+                                CurrencyDate := EndDate + 1;
                             repeat
                                 recCustLedgEntry.SetCurrentkey("Customer No.", Open);
                                 recCustLedgEntry.SetAutocalcFields("Remaining Amount", "Remaining Amt. (LCY)");
@@ -464,7 +465,8 @@ Report 50115 "IC Reconciliation"
                                     ReportingCurrency := Vend."Currency Code"
                                 else
                                     ReportingCurrency := recGenLedgSetup."LCY Code";
-
+                        //    if CurrentClientType = ClientType::SOAP then
+                                CurrencyDate := EndDate + 1;
                             repeat
                                 recVendLedgEntry.SetCurrentkey("Vendor No.", Open);
                                 recVendLedgEntry.SetAutocalcFields("Remaining Amount", "Remaining Amt. (LCY)");
@@ -581,11 +583,15 @@ Report 50115 "IC Reconciliation"
                 EndDateReq := 0D;
 
             EndDate := EndDateReq;
+
         end else begin
             StartDate := 0D;
             EndDateReq := 0D;
-            EndDate := 99991231D
+            EndDate := 99991231D;
+
         end;
+        if EndDate <> 0D then
+            CurrencyDate := enddate + 1;
     end;
 
 

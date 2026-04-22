@@ -405,4 +405,11 @@ codeunit 50076 "Zyxel HQ Web Service"
         if ZGT.IsRhq then
             PurchaseOrdersStatus.SetData();
     end;
+
+
+    procedure SendMarginApprovalResponses(MarginApprovalResponse: XmlPort "MarginApprovalResponse")
+    var
+    begin 
+
+    end;
 }

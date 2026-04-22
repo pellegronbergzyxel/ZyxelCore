@@ -1040,7 +1040,8 @@ Codeunit 50083 "Zyxel Web Service Management"
             ZyWebServReq.GetAccountPay_Receivable(pCompanyName, 'GetAccountReceivable', 'accountReceivables', InnerText, AccPayBuff);  // Change call of function here
         ZGT.CloseProgressWindow;
     end;
-
+    //CLOUD READY DELETE
+    /*
     procedure GetCustomerOverdueBalance(pCustNo: Code[20]; pDueDate: Date; pShowOpenPayments: Boolean): Decimal
     var
         recCust: Record Customer;
@@ -1051,7 +1052,7 @@ Codeunit 50083 "Zyxel Web Service Management"
             if recBillToCust.Get(recCust."Bill-to Customer No.") then
                 if recICPartner.Get(recBillToCust."IC Partner Code") then
                     exit(ZyWebServReq.GetCustomerOverdueBalance(recICPartner."Inbox Details", pCustNo, pDueDate, pShowOpenPayments));
-    end;
+    end;*/
 
     //CLOUD READY DELETE
     /*procedure GetSalesInvoiceNo(pCompany: Text[80]; pSalesInvNo: Code[20]): Code[20]
@@ -1355,7 +1356,8 @@ Codeunit 50083 "Zyxel Web Service Management"
     //     // Get Data
     //     ZyWebServReq.GetConcurVendor(pCompany, 'GetConcurVendor', 'vendors', InnerText, pVendTmp, pVendorNo);
     // end;
-
+    // CLOUD READY DELETE
+    /*
     procedure GetConcurValidation(pCompany: Text[80]; SourceTable: Integer; SourceFieldNo: Integer; SourceCode: Code[20]): Boolean
     var
         recRepComp: Record "Replication Company";
@@ -1379,7 +1381,7 @@ Codeunit 50083 "Zyxel Web Service Management"
 
         if recRepComp.Get(pCompany) then
             exit(ZyWebServReq.SendRequestBoolean(pCompany, 'GetConcurValidation', '', InnerText, ''));  // Change call of function here
-    end;
+    end; */
 
     // procedure SendConcurVendor(pCompany: Text[80]; var pConcVend: Record "Concur Vendor") rValue: Code[20]
     // var

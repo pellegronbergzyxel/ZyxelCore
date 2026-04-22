@@ -3267,7 +3267,8 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
     end;
 
-
+    // CLOUD READY DELETE
+    /*
     procedure SendRequestText(pCompany: Text[80]; pWsFunctionName: Text; pWsHeader: Text; pInnerText: Text) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -3404,7 +3405,7 @@ Codeunit 50084 "Zyxel Web Service Request"
             WebServiceRequestMgt.ProcessFaultResponse(ErrorTxt);
             Error(ErrorTxt);
         end;
-    end;
+    end; */
 
 
     procedure SendRequestDecimal(pCompany: Text[80]; pWsFunctionName: Text; pWsHeader: Text; pInnerText: Text) rValue: Decimal
@@ -4150,7 +4151,8 @@ Codeunit 50084 "Zyxel Web Service Request"
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
     end;
 
-
+    //CLOUD READY DELETE
+    /*
     procedure GetCustomerOverdueBalance(pCompany: Text[80]; pCustNo: Code[20]; pDueDate: Date; pShowOpenPayments: Boolean) rValue: Decimal
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -4214,7 +4216,7 @@ Codeunit 50084 "Zyxel Web Service Request"
             Error(ErrorTxt);
         end;
 
-    end;
+    end; */
 
 
     procedure GetCustomerOverdueBalanceOLD(pCompany: Text[80]; pCustNo: Code[20]; pDueDate: Date; pShowOpenPayments: Boolean) rValue: Decimal

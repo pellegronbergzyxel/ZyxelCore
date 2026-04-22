@@ -82,6 +82,7 @@ XmlPort 50006 "IC Reconciliation"
                                 Evaluate(MM, CopyStr(EndDateText, 6, 2));
                                 Evaluate(YYYY, CopyStr(EndDateText, 1, 4));
                                 EndDate := Dmy2date(DD, MM, YYYY);
+                                
                             end;
                         end;
                     }
@@ -119,7 +120,9 @@ XmlPort 50006 "IC Reconciliation"
         "IC Reconciliation Line".Insert;
 
         StartDateText := Format(pStartDate, 0, 9);
+       
         EndDateText := Format(pEndDate, 0, 9);
+        
         ReportingCurrency := pReportingCurrency;
     end;
 
