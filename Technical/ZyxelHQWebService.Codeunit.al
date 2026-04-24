@@ -377,8 +377,10 @@ codeunit 50076 "Zyxel HQ Web Service"
     procedure SendMarginApprovalResponse(EMEACompanyName: Text[20]; var Responses: XmlPort "HQ Margin Approval Response"): Boolean
     var
         lText001: Label '"%1" does not match current company name "%2".';
+        company: record company;
     begin
-        If CompanyName <> EMEACompanyName then
+        company.get(CompanyName);
+        If (CompanyName <> EMEACompanyName) and (company."Display Name" <> EMEACompanyName) then
             Error(lText001, EMEACompanyName, CompanyName);
         Responses.Import();
         Responses.ProcessData();
@@ -407,9 +409,5 @@ codeunit 50076 "Zyxel HQ Web Service"
     end;
 
 
-    procedure SendMarginApprovalResponses(MarginApprovalResponse: XmlPort "MarginApprovalResponse")
-    var
-    begin 
-
-    end;
+ 
 }

@@ -1,4 +1,4 @@
-table 50071 "Margin Approval"
+ table 50071 "Margin Approval"
 {
     //30-10-2025 BK #MarginApproval          
     Caption = 'Margin Approval';

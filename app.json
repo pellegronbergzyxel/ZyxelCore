@@ -2,7 +2,7 @@
   "id": "e654e9a7-b3cf-49f4-90ee-4863f48e374a",
   "name": "Zyxel Core",
   "publisher": "Vision People A/S",
-  "version": "1.26.6.43",
+  "version": "1.26.6.46",
   "brief": "",
   "description": "Zyxel core: EMEA,IT",
   "privacyStatement": "",
@@ -28,12 +28,6 @@
       "name": "Review General Ledger Entries",
       "publisher": "Microsoft",
       "version": "22.0.0.0"
-    },
-    { 
-      "id": "8cc7b394-6661-4d12-97e0-6c3d982ac9c2",
-      "name": "VisionEssentials", 
-      "publisher": "Vision People A/S", 
-      "version": "20.2.1.51"
     }
   ],
   "screenshots": [],

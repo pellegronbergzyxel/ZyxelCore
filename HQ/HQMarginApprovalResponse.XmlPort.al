@@ -29,13 +29,21 @@ xmlport 50011 "HQ Margin Approval Response"
 
                     trigger OnAfterAssignVariable()
                     begin
+                        MarginApproval.requeststatusDT := CurrentDateTime;
                         case UpperCase(IsApproved) of
                             'C':
                                 MarginApproval.Status := MarginApproval.Status::"Waiting for User Comment";
                             'N':
-                                MarginApproval.Status := MarginApproval.Status::Rejected;
+                                begin
+                                    MarginApproval.Status := MarginApproval.Status::Rejected;
+                                    MarginApproval.requeststatus := MarginApproval.requeststatus::RejectedPrice;
+                                end;
                             'Y':
-                                MarginApproval.Status := MarginApproval.Status::Approved;
+                                begin
+                                    MarginApproval.Status := MarginApproval.Status::Approved;
+                                    MarginApproval.requeststatus := MarginApproval.requeststatus::closed;
+
+                                end;
                         end;
                     end;
 
@@ -52,9 +60,13 @@ xmlport 50011 "HQ Margin Approval Response"
                     MinOccurs = Once;
                     MaxOccurs = Once;
                 }
+
             }
         }
+
     }
+
+
 
     procedure ProcessData()
     var
@@ -80,7 +92,15 @@ xmlport 50011 "HQ Margin Approval Response"
                     else
                         MarginApp.SetComment(1, ReceivedComment);
                 end;
+                MarginApp.requeststatusDT := CurrentDateTime;
+                MarginApp.Status := MarginApproval.Status;
+                MarginApp.requeststatus := MarginApproval.requeststatus;
                 MarginApp.Modify(true);
+                if MarginApp.Status = MarginApp.Status::Approved then begin
+                    if MarginApp."Source Type" = MarginApp."Source Type"::"Price Book" then
+                        MarginApp.Setapprovedpricebookline(MarginApproval);
+                end;
+
             until MarginApproval.Next() = 0;
     end;
 }

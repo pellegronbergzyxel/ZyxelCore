@@ -21,9 +21,15 @@ codeunit 50087 "Zyxel General Event"
 
     [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnAfterDeleteEvent', '', false, false)]
     local procedure OnAfterDeleteSalesPrice(var Rec: Record "Price List Line"; RunTrigger: Boolean)
+    var
+        marginapproval: Record "Margin Approval";
     begin
         //DeleteSalesPriceReplicated(Rec);  
-        Message('margin delete');
+        marginapproval.setrange("Source Type", marginapproval."Source Type"::"Price Book");
+        marginapproval.setrange("Source No.", rec."Price List Code");
+        marginapproval.setrange("Source Line No.", rec."Line No.");
+        marginapproval.setrange("Item No.", rec."Asset No.");
+        marginapproval.DeleteAll(true);
     end;
 
     local procedure DeleteSalesPriceReplicated(var Rec: Record "Price List Line")

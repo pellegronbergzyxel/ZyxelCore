@@ -34,4 +34,9 @@ enum 50005 Apirequeststatus
         Caption = 'SendPrice';
     }
 
+    value(7; RejectedPrice)
+    {
+        Caption = 'RejectedPrice';
+    }
+
 }

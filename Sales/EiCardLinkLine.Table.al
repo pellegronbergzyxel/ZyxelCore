@@ -135,6 +135,7 @@ Table 76153 "EiCard Link Line"
         OutStream: OutStream;
         FileMgt: Codeunit "File Management";
         Filename: Text;
+        newFilename: text;
     begin
         //>> 20-04-22 ZY-LD 002
         Filename := FileMgt.ServerTempFileName('');
@@ -144,17 +145,19 @@ Table 76153 "EiCard Link Line"
             OutFile.Create(Filename);
             OutFile.CreateOutStream(OutStream);
             CopyStream(OutStream, ContentInStream);
+            newFilename := rec."Item No." + '_EICARD.xlsx';
+            if DownloadFromStream(ContentInStream, 'Export', '', 'All Files (*.*)|*.*', newFilename) then
+                message('fil downloaded');
             OutFile.Close();
         end;
         //Hyperlink(Filename);
         //FileMgt.DeleteServerFile(Filename);
-          if FILE.Exists(BaseFolderName) then begin
-                serverFile.Open(BaseFolderName);
-                serverFile.CreateInStream(NewStream);
-                Filename := FileMgt.GetFileName(BaseFolderName);
-                if DownloadFromStream(NewStream, 'Export', '', 'All Files (*.*)|*.*', Filename) then
-                    message('fil downloaded')
-            end;
+        // if FILE.Exists(BaseFolderName) then begin
+        //     serverFile.Open(BaseFolderName);
+        //     serverFile.CreateInStream(NewStream);
+        //     Filename := FileMgt.GetFileName(BaseFolderName);
+
+        // end;
         //<< 20-04-22 ZY-LD 002
     end;
 }

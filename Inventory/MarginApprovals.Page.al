@@ -208,7 +208,20 @@ page 50118 "Margin Approvals"
                     Helper.ProcessPriceApproval(rec);
                 end;
             }
+      action(ReturnpriceApprovaltoPricelist)
+            {
+                Caption = 'Confirm approval in price list';
+                Image = Apply;
+ApplicationArea = all;
 
+                trigger OnAction()
+                var
+                    
+
+                begin
+                    rec.Setapprovedpricebookline(rec);
+                end;
+            }
         }
     }
 
