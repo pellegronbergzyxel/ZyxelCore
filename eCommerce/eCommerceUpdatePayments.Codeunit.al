@@ -57,7 +57,7 @@ codeunit 50064 "eCommerce Update Payments"
         Err011: Label 'eCommerce Periodic Account Description missing in eCommerce Setup.';
         PaymentNumberSeries: Code[20];
         Err012: Label 'eCommerce Payment Number Series missing in eCommerce Setup.';
-        NoSeriesMangement: Codeunit NoSeriesManagement;
+        NoSeriesMangement: Codeunit "No. Series"; //UpgradeReady
         LocationCode: Code[20];
 
     procedure RunWithConfirm(var Rec: Record "eCommerce Payment")
@@ -86,13 +86,9 @@ codeunit 50064 "eCommerce Update Payments"
             GetPostingInformation(Rec."Journal Batch No.");
             if CompanyName() = UKCompany then
                 UseRHQ := true;
-
-            //ResetErrors;
-            //FixExternalDocumentNo;
             if UpdatePostingInformation then begin
-                receCommercePayments.SetCurrentkey("Journal Batch No.");  // 12-06-20 ZY-LD 006
-                receCommercePayments.SetRange("Journal Batch No.", Rec."Journal Batch No.");  // 12-06-20 ZY-LD 006
-                                                                                              //receCommercePayments.SETFILTER("Order ID",'<>%1', '');  // 12-06-20 ZY-LD 006
+                receCommercePayments.SetCurrentkey("Journal Batch No.");
+                receCommercePayments.SetRange("Journal Batch No.", Rec."Journal Batch No.");
                 receCommercePayments.SetRange(Open, true);
                 ZGT.OpenProgressWindow('', receCommercePayments.Count());
                 if receCommercePayments.FindSet() then begin
@@ -109,19 +105,7 @@ codeunit 50064 "eCommerce Update Payments"
                         PurchNo := '';
                         MarketPlace := '';
                         CountryCode := '';
-                        //>> 30-01-19 ZY-LD 004
-                        /*
-                        CountryCode := GeteCommerceCountryCode(receCommercePayments."Order ID");
-                        receCommercePayments."Ship To Country" := CountryCode;
-                        receCommercePayments.MODIFY;
-                        eCommerceInvoice := GeteCommerceInvoiceNo(receCommercePayments."Order ID");
-                        receCommercePayments."eCommerce Invoice No." := eCommerceInvoice;
-                        receCommercePayments.MODIFY;
-                        MarketPlace := GeteCommerceMarketPlace(receCommercePayments."Order ID");
-                        receCommercePayments."eCommerce Market Place" := MarketPlace;
-                        receCommercePayments.MODIFY;
-                        */
-                        //<< 30-01-19 ZY-LD 004
+
                         if ZGT.IsZComCompany and ZGT.CompanyNameIs(2) then begin  //xx
                             RHQNo := GetRHQSalesOrderNo(receCommercePayments."Order ID", eCommerceInvoice);
 
@@ -153,7 +137,6 @@ codeunit 50064 "eCommerce Update Payments"
                                 receCommercePayments."Purchase Invoice No." := PurchNo;
                                 receCommercePayments."Source Invoice No." := RHQNo;
                                 receCommercePayments."Sales Invoice No." := InvNo;
-                                //receCommercePayments."Sales Credit No." := CrNo;
                                 receCommercePayments."eCommerce Invoice No." := eCommerceInvoice;
                                 receCommercePayments."Error x" := false;
                                 receCommercePayments.Exception := false;
@@ -165,39 +148,6 @@ codeunit 50064 "eCommerce Update Payments"
                                 receCommercePayments.Modify();
                             end;
                         end;
-
-                    /*IF ZGT.IsZNetCompany THEN BEGIN
-                      recCustomerLedgerEntries.SetCurrentKey("External Document No.");
-                      recCustomerLedgerEntries.SETRANGE("External Document No.",receCommercePayments."Order ID");
-                      IF receCommercePayments."Transaction Type" = receCommercePayments."Transaction Type"::Refund THEN
-                        recCustomerLedgerEntries.SETRANGE("Document Type",recCustomerLedgerEntries."Document Type"::Reminder)
-                      ELSE
-                        recCustomerLedgerEntries.SETRANGE("Document Type",recCustomerLedgerEntries."Document Type"::Invoice);
-                      IF recCustomerLedgerEntries.FINDLAST THEN BEGIN
-                        IF receCommercePayments."Transaction Type" = receCommercePayments."Transaction Type"::Refund THEN
-                          CrNo := recCustomerLedgerEntries."Document No."
-                        ELSE
-                          InvNo := recCustomerLedgerEntries."Document No.";
-                      END ELSE BEGIN
-                        recCustLedgEntryDE.CHANGECOMPANY(ZGT.GetSistersCompanyName(11));
-                        recCustLedgEntryDE.SetCurrentKey("External Document No.");
-                        recCustLedgEntryDE.SETRANGE("External Document No.",receCommercePayments."Order ID");
-                        IF receCommercePayments."Transaction Type" = receCommercePayments."Transaction Type"::Refund THEN
-                          recCustLedgEntryDE.SETRANGE("Document Type",recCustLedgEntryDE."Document Type"::Reminder)
-                        ELSE
-                          recCustLedgEntryDE.SETRANGE("Document Type",recCustLedgEntryDE."Document Type"::Invoice);
-                        IF recCustLedgEntryDE.FINDLAST THEN
-                          IF receCommercePayments."Transaction Type" = receCommercePayments."Transaction Type"::Refund THEN
-                            CrNo := 'ZyND DE'
-                          ELSE
-                            InvNo := 'ZyND DE';
-                      END;
-
-                      receCommercePayments."Sales Invoice No." := InvNo;
-                      receCommercePayments."Sales Credit No." := CrNo;
-                      receCommercePayments.MODIFY;
-                    END;*/
-
                     until receCommercePayments.Next() = 0;
                     ZGT.CloseProgressWindow;
                 end;
@@ -224,7 +174,7 @@ codeunit 50064 "eCommerce Update Payments"
     begin
         if UseRHQ then begin
             recSalesInvoiceHeader.ChangeCompany(RHQName);
-            recSalesCrMemoHeader.ChangeCompany(RHQName);  // 21-11-18 ZY-LD 003
+            recSalesCrMemoHeader.ChangeCompany(RHQName);
         end;
 
         if eCommerceOrderNo <> '' then begin
@@ -633,31 +583,6 @@ codeunit 50064 "eCommerce Update Payments"
         NewString := String;
     end;
 
-    local procedure UpdateTransactionDetails()
-    var
-        receCommerceTransactionSummary: Record "eCommerce Transaction Summary";
-        receCommercePayments: Record "eCommerce Payment";
-    begin
-        // Window.OPEN(Text009 +  '@1@@@@@@@@@@@@@@@@@@@@@@@@@\');
-        // Window.UPDATE(1,0);
-        // receCommercePayments.SETFILTER("Fee Purchase Invoice No.",'%1', '');
-        // IF receCommercePayments.FINDSET THEN BEGIN
-        //  RowCount := receCommercePayments.COUNT;
-        //  RecNo := 0;
-        //  REPEAT
-        //    RecNo := RecNo + 1;
-        //    Window.UPDATE(1,ROUND(RecNo / RowCount * 10000,1));
-        //    receCommerceTransactionSummary.SETFILTER("Transaction Summary",receCommercePayments."Transaction Summary");
-        //    IF NOT receCommerceTransactionSummary.FINDFIRST THEN BEGIN
-        //      receCommerceTransactionSummary.INIT;
-        //      receCommerceTransactionSummary."Transaction Summary" := receCommercePayments."Transaction Summary";
-        //      receCommerceTransactionSummary.INSERT;
-        //    END;
-        //  UNTIL receCommercePayments.Next() = 0;
-        // END;
-        // Window.CLOSE;
-    end;
-
     local procedure CreatePurchaseInvoice(Rec: Record "eCommerce Payment")
     var
         recAmzPay: Record "eCommerce Payment";
@@ -795,153 +720,6 @@ codeunit 50064 "eCommerce Update Payments"
         end;
     end;
 
-    local procedure OLD_CreatePurchaseInvoice(Rec: Record "eCommerce Payment")
-    var
-        receCommercePayments: Record "eCommerce Payment";
-        receCommercePaymentsMatrix: Record "eCommerce Payment Matrix";
-        recGenJnl: Record "Gen. Journal Line";
-        RecNo: Integer;
-        RowCount: Integer;
-        receCommerceTransactionSummary: Record "eCommerce Transaction Summary";
-        Amount: Decimal;
-        recPurchaseHeader: Record "Purchase Header";
-        PurchaseNo: Code[20];
-        recPurchaseLine: Record "Purchase Line";
-        LineNo: Integer;
-        TotalAmount: Decimal;
-        DocNo: Code[20];
-        DocType: Option "0","1",Invoice,"Credit Memo";
-        CountryDim: Code[10];
-    begin
-        // Window.OPEN(Text010 +  '@1@@@@@@@@@@@@@@@@@@@@@@@@@\');
-        // Window.UPDATE(1,0);
-        // //receCommerceTransactionSummary.SETFILTER("Fee Purchase Invoice No.",'%1', '');
-        // receCommerceTransactionSummary.SETRANGE(Open,TRUE);
-        // IF receCommerceTransactionSummary.FINDSET(TRUE) THEN BEGIN
-        //  REPEAT
-        //    receCommercePayments.SETRANGE(Open,TRUE);
-        //    receCommercePayments.SETFILTER("Transaction Summary",receCommerceTransactionSummary."Transaction Summary");
-        //    receCommercePayments.SETFILTER("Posting Type",'%1|%2',receCommercePayments."Posting Type"::Charge,receCommercePayments."Posting Type"::Fee);
-        //    IF receCommercePayments.FINDSET THEN REPEAT
-        //      TotalAmount := TotalAmount + receCommercePayments.Amount;
-        //    UNTIL receCommercePayments.Next() = 0;
-        //    IF TotalAmount < 0 THEN
-        //      DocType := DocType::Invoice
-        //    ELSE
-        //      DocType := DocType::"Credit Memo";
-        //
-        //    IF receCommercePayments.FINDSET(TRUE) THEN BEGIN
-        //      //PurchaseNo := GetNextNumber;
-        //      recPurchaseHeader.INIT;
-        //      recPurchaseHeader.SetHideValidationDialog(TRUE);
-        //      recPurchaseHeader.VALIDATE("Document Type",DocType);
-        //      recPurchaseHeader.INSERT(TRUE);
-        //      //recPurchaseHeader.VALIDATE("No.",PurchaseNo);
-        //      recPurchaseHeader.VALIDATE("Buy-from Vendor No.",Vendor);
-        //      recPurchaseHeader.VALIDATE("Posting Date",TODAY);
-        //      recPurchaseHeader.VALIDATE("Document Date",TODAY);
-        //      recPurchaseHeader.VALIDATE("Due Date",TODAY);
-        //      recPurchaseHeader."Posting Description" := 'eCommerce Fee: ' + COPYSTR(receCommerceTransactionSummary."Transaction Summary",25,STRLEN(receCommerceTransactionSummary."Transaction Summary"));
-        //      recPurchaseHeader."Vendor Invoice No." := 'eCommerce: ' + recPurchaseHeader."No.";
-        //      recPurchaseHeader."eCommerce Order" := TRUE;
-        //      recPurchaseHeader.MODIFY(TRUE);
-        //
-        //      Amount := 0;
-        //      TotalAmount := 0;
-        //      LineNo := 10000;
-        //      RowCount := receCommercePayments.COUNT;
-        //      RecNo := 0;
-        //
-        //      REPEAT
-        //        RecNo := RecNo + 1;
-        //        Window.UPDATE(1,ROUND(RecNo / RowCount * 10000,1));
-        //        IF receCommercePayments.Amount <> 0 THEN BEGIN
-        //          CLEAR(recPurchaseLine);
-        //          recPurchaseLine.INIT;
-        //          recPurchaseLine.VALIDATE("Document Type",recPurchaseHeader."Document Type");
-        //          recPurchaseLine.VALIDATE("Document No.",recPurchaseHeader."No.");
-        //          recPurchaseLine.VALIDATE("Line No.",LineNo);
-        //          recPurchaseLine.VALIDATE(Type,recPurchaseLine.Type::"G/L Account");
-        //          //recPurchaseLine."VAT Bus. Posting Group" := 'DOMESTIC';
-        //          CASE receCommercePayments."Posting Type" OF
-        //            receCommercePayments."Posting Type"::Fee : recPurchaseLine.VALIDATE("No." , FeeAccountNo);
-        //            receCommercePayments."Posting Type"::Charge : recPurchaseLine.VALIDATE("No." , ChargeAccountNo);
-        //          END;
-        //          recPurchaseLine.Description := FORMAT(receCommercePayments."Payment Type");
-        //          recPurchaseLine."Description 2" := FORMAT(recPurchaseLine."Description 2");
-        //          recPurchaseLine."Unit of Measure Code" := 'PCS';
-        //          recPurchaseLine."Currency Code" := CurrencyCode;
-        //          recPurchaseLine."Vendor Invoice No" := receCommercePayments."Order ID";
-        //          recPurchaseLine.VALIDATE(Quantity,1);
-        //
-        //          IF DocType = DocType::Invoice THEN
-        //            recPurchaseLine.VALIDATE("Direct Unit Cost",-receCommercePayments.Amount)
-        //          ELSE
-        //            recPurchaseLine.VALIDATE("Direct Unit Cost",receCommercePayments.Amount);
-        //            //Amount := -receCommercePayments.Amount;  // LD - is added.
-        //          TotalAmount := TotalAmount + recPurchaseLine."Direct Unit Cost";
-        //          //recPurchaseLine.VALIDATE("Direct Unit Cost", Amount);
-        //          recPurchaseLine."Location Code" := '';
-        //          recPurchaseLine.INSERT;
-        //
-        //          //>> 13-02-18 ZY-LD 001
-        //          CountryDim := GetCountryDimension(receCommercePayments."Order ID");
-        //          IF CountryDim <> '' THEN BEGIN
-        //            recPurchaseLine.ValidateShortcutDimCode(3,CountryDim);
-        //            recPurchaseLine.MODIFY;
-        //          END;
-        //          //<< 13-02-18 ZY-LD 001
-        //
-        //          receCommercePayments."Fee Purchase Invoice No." := PurchaseNo;
-        //          receCommercePayments.MODIFY;
-        //          LineNo := LineNo + 10000;
-        //        END;
-        //
-        //        receCommercePayments.Open := FALSE;
-        //        receCommercePayments.MODIFY;
-        //      UNTIL receCommercePayments.Next() = 0;
-        //    END;
-        //    receCommerceTransactionSummary."Fee Purchase Invoice No." := PurchaseNo;
-        //    receCommerceTransactionSummary.Amount := TotalAmount;
-        //    receCommerceTransactionSummary.Open := FALSE;
-        //    receCommerceTransactionSummary.MODIFY;
-        //
-        //    IF TotalAmount <> 0 THEN BEGIN
-        //      DocNo := NoSeriesMangement.GetNextNo(recAmzCompMap."Payment Number Series",TODAY,TRUE);
-        //      recGenJnl.VALIDATE("Journal Template Name",recAmzCompMap."Payment G/L Template");
-        //      recGenJnl.VALIDATE("Journal Batch Name",recAmzCompMap."Payment G/L Batch");
-        //      recGenJnl.VALIDATE("Line No.",GetNextJournalLineNo(recAmzCompMap."Payment G/L Template",recAmzCompMap."Payment G/L Batch"));
-        //      recGenJnl.VALIDATE("Posting Date",TODAY);
-        //      recGenJnl.VALIDATE("Document Type",recGenJnl."Document Type"::Payment);
-        //      recGenJnl.VALIDATE("Document No.",DocNo);
-        //      recGenJnl.VALIDATE("Account Type",recGenJnl."Account Type"::Vendor);
-        //      recGenJnl.VALIDATE("Account No.",Vendor);
-        //      recGenJnl.VALIDATE(Amount,TotalAmount);
-        //      recGenJnl.VALIDATE("Applies-to Doc. Type",recPurchaseHeader."Document Type");
-        //      recGenJnl.VALIDATE("Applies-to Doc. No.",recPurchaseHeader."No.");
-        //      recGenJnl.INSERT;
-        //
-        //      CLEAR(recGenJnl);
-        //      recGenJnl.VALIDATE("Journal Template Name",recAmzCompMap."Payment G/L Template");
-        //      recGenJnl.VALIDATE("Journal Batch Name",recAmzCompMap."Payment G/L Batch");
-        //      recGenJnl.VALIDATE("Line No.",GetNextJournalLineNo(recAmzCompMap."Payment G/L Template",recAmzCompMap."Payment G/L Batch"));
-        //      recGenJnl.VALIDATE("Posting Date",TODAY);
-        //      recGenJnl.VALIDATE("Document Type",recGenJnl."Document Type"::Payment);
-        //      recGenJnl.VALIDATE("Document No.",DocNo);
-        //      recGenJnl.VALIDATE("Account Type",recGenJnl."Account Type"::Customer);
-        //      recGenJnl.VALIDATE("Account No.",recAmzCompMap."Periodic Account No.");
-        //      recGenJnl.VALIDATE(Amount,-TotalAmount);
-        //      recGenJnl.Description :=
-        //        COPYSTR(
-        //          FORMAT(recGenJnl."Account Type"::Vendor) + ': ' +
-        //          COPYSTR(receCommerceTransactionSummary."Transaction Summary",25,STRLEN(receCommerceTransactionSummary."Transaction Summary")),1,MAXSTRLEN(recGenJnl.Description));
-        //      recGenJnl.INSERT;
-        //    END;
-        //  UNTIL receCommerceTransactionSummary.Next() = 0;
-        // END;
-        // Window.CLOSE;
-    end;
-
     local procedure CreateSalesInvoice(Rec: Record "eCommerce Payment")
     var
         recAmzPay: Record "eCommerce Payment";
@@ -967,10 +745,6 @@ codeunit 50064 "eCommerce Update Payments"
             recAmzPay.SetRange("Posting Type", recAmzPay."posting type"::Sale);
             if recAmzPay.FindSet(true) then begin
                 if ZGT.IsZNetCompany then begin
-                    //leCommerceCompMap.SETRANGE("Marketplace ID",'DE');
-                    //IF NOT leCommerceCompMap.FINDFIRST THEN;
-
-                    //IF leCommerceCompMap."Marketplace ID" = 'DE' THEN BEGIN
                     repeat
                         Clear(recSalesHeader);
                         Clear(recSalesLine);
@@ -982,7 +756,6 @@ codeunit 50064 "eCommerce Update Payments"
                         recSalesHeader.Insert(true);
                         recSalesHeader.SetHideValidationDialog(true);
                         recSalesHeader.Validate("Sales Order Type", recSalesHeader."sales order type"::Normal);
-                        //recSalesHeader.VALIDATE("Sell-to Customer No.",leCommerceCompMap."Customer No.");
                         recSalesHeader.Validate("Sell-to Customer No.", Customer);
                         recSalesHeader.Validate("Posting Date", Today);
                         recSalesHeader.Validate("Document Date", Today);
@@ -994,9 +767,7 @@ codeunit 50064 "eCommerce Update Payments"
                             recSalesHeader."External Document No." :=
                               CopyStr(Format(recAmzPay."Payment Type"), StrPos(Format(recAmzPay."Payment Type"), '-') + 2, StrLen(Format(recAmzPay."Payment Type")));
                         recSalesHeader."Posting Description" := 'eCommerce : ' + CopyStr(receCommerceTransactionSummary."Transaction Summary", 25, StrLen(receCommerceTransactionSummary."Transaction Summary"));
-                        //recSalesHeader."Vendor Invoice No." := 'eCommerce: ' + PurchaseNo;
                         recSalesHeader."eCommerce Order" := true;
-                        //recSalesHeader.VALIDATE("Location Code", leCommerceCompMap."Location Code");
                         recSalesHeader.Validate("Location Code", LocationCode);
                         recSalesHeader.Modify(true);
 
@@ -1013,82 +784,11 @@ codeunit 50064 "eCommerce Update Payments"
                         LineNo := LineNo + 10000;
                     until recAmzPay.Next() = 0;
                     Message(lText002);
-                    //END ELSE
-                    //  MESSAGE(lText001);
+
                 end else
                     Message(lText001);
             end;
         end;
-    end;
-
-    local procedure OLD_CreateSalesInvoice()
-    var
-        receCommercePayments: Record "eCommerce Payment";
-        receCommercePaymentsMatrix: Record "eCommerce Payment Matrix";
-        leCommerceCompMap: Record "eCommerce Market Place";
-        RecNo: Integer;
-        RowCount: Integer;
-        receCommerceTransactionSummary: Record "eCommerce Transaction Summary";
-        Amount: Decimal;
-        recSalesHeader: Record "Sales Header";
-        PurchaseNo: Code[20];
-        recSalesLine: Record "Sales Line";
-        LineNo: Integer;
-        TotalAmount: Decimal;
-        lText001: Label 'There are sales invices to be created in RHQ.';
-        lText002: Label 'Sales invoice is created, and must be posted.';
-        lText003: Label 'There are lines with posting type "Sale" who needs to be handled.';
-    begin
-        // receCommercePayments.SETRANGE(Open,TRUE);
-        // receCommercePayments.SETRANGE("Posting Type",receCommercePayments."Posting Type"::Sale);
-        // IF receCommercePayments.FINDSET THEN BEGIN
-        //  leCommerceCompMap.SETRANGE("Marketplace ID",'DE');
-        //  IF NOT leCommerceCompMap.FINDFIRST THEN;
-        //
-        //  IF leCommerceCompMap."Marketplace ID" = 'DE' THEN BEGIN
-        //    REPEAT
-        //      CLEAR(recSalesHeader);
-        //      CLEAR(recSalesLine);
-        //      Amount := 0;
-        //      TotalAmount := 0;
-        //
-        //      recSalesHeader.INIT;
-        //      recSalesHeader.VALIDATE("Document Type",recSalesHeader."Document Type"::Invoice);
-        //      recSalesHeader.INSERT(TRUE);
-        //      recSalesHeader.SetHideValidationDialog(TRUE);
-        //      recSalesHeader.VALIDATE("Sales Order Type",recSalesHeader."Sales Order Type"::Normal);
-        //      recSalesHeader.VALIDATE("Sell-to Customer No.",leCommerceCompMap."Customer No.");
-        //      recSalesHeader.VALIDATE("Posting Date",TODAY);
-        //      recSalesHeader.VALIDATE("Document Date",TODAY);
-        //      recSalesHeader.VALIDATE("Due Date",TODAY);
-        //      recSalesHeader."eCommerce Order" := TRUE;
-        //      IF receCommercePayments."Order ID" <> '' THEN
-        //        recSalesHeader."External Document No." := receCommercePayments."Order ID"
-        //      ELSE
-        //        recSalesHeader."External Document No." :=
-        //          COPYSTR(FORMAT(receCommercePayments."Payment Type"),StrPos(FORMAT(receCommercePayments."Payment Type"),'-') + 2,STRLEN(FORMAT(receCommercePayments."Payment Type")));
-        //      recSalesHeader."Posting Description" := 'eCommerce : ' + COPYSTR(receCommerceTransactionSummary."Transaction Summary",25,STRLEN(receCommerceTransactionSummary."Transaction Summary"));
-        //      //recSalesHeader."Vendor Invoice No." := 'eCommerce: ' + PurchaseNo;
-        //      recSalesHeader."eCommerce Order" := TRUE;
-        //      recSalesHeader.VALIDATE("Location Code",leCommerceCompMap."Location Code");
-        //      recSalesHeader.MODIFY(TRUE);
-        //
-        //      LineNo := 10000;
-        //      recSalesLine.INIT;
-        //      recSalesLine.VALIDATE("Document Type",recSalesHeader."Document Type");
-        //      recSalesLine.VALIDATE("Document No.",recSalesHeader."No.");
-        //      recSalesLine.VALIDATE("Line No.",LineNo);
-        //      recSalesLine.VALIDATE(Type,recSalesLine.Type::Item);
-        //      recSalesLine.VALIDATE("No.",receCommercePayments."Item No.");
-        //      recSalesLine.VALIDATE(Quantity,receCommercePayments.Quantity);
-        //      recSalesLine.VALIDATE("Unit Price",receCommercePayments.Amount / (1 + (recSalesLine."VAT %" / 100)));
-        //      recSalesLine.INSERT;
-        //      LineNo := LineNo + 10000;
-        //    UNTIL receCommercePayments.Next() = 0;
-        //    MESSAGE(lText002);
-        //  END ELSE
-        //    MESSAGE(lText001);
-        // END;
     end;
 
     local procedure GetNextNumber() LineNo: Code[20]
@@ -1096,7 +796,7 @@ codeunit 50064 "eCommerce Update Payments"
         recPurchasesPayablesSetup: Record "Purchases & Payables Setup";
         recNoSeries: Record "No. Series";
         NoSer: Code[20];
-        NoSeriesMangement: Codeunit NoSeriesManagement;
+        NoSeriesMangement: Codeunit "No. Series"; //UpgradeReady
     begin
         if recPurchasesPayablesSetup.FindFirst() then NoSer := recPurchasesPayablesSetup."Invoice Nos.";
         if NoSer <> '' then begin

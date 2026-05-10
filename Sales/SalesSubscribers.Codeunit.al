@@ -34,27 +34,24 @@ codeunit 50033 SalesSubscribers
     [EventSubscriber(ObjectType::Table, Database::"Sales Shipment Line", 'OnBeforeInsertInvLineFromShptLineBeforeInsertTextLine', '', false, false)]
     local procedure SalesShipmentLine_OnBeforeInsertInvLineFromShptLineBeforeInsertTextLine(var SalesShptLine: Record "Sales Shipment Line"; var SalesLine: Record "Sales Line"; var NextLineNo: Integer; var Handled: Boolean; TempSalesLine: Record "Sales Line" temporary; SalesInvHeader: Record "Sales Header")
     var
-        recInvSetup: Record "Inventory Setup";
         recSalesShipLine: Record "Sales Shipment Line";
         recSellToCust: Record Customer;
         TranslationHelper: Codeunit "Translation Helper";
+        Location: Record Location; //22-04-2026 BK #561934
         Text000: Label 'Shipment No. %1:';
         zText001: Label 'Shipment No. %1, Order No. %2:';
     begin
-        //RD 1.0
-        //>> 19-08-19 ZY-LD 005
-        //IF "Location Code" = 'EU2' THEN
-        recInvSetup.Get();
-        //>> 23-09-20 ZY-LD 008
+        if Location.Get(SalesShptLine."Location Code") then; //Not blank 22-04-2026 BK #561934
+
         recSalesShipLine.SetRange("Document No.", SalesShptLine."Document No.");
         recSalesShipLine.SetRange(Type, recSalesShipLine.Type::Item);
         recSalesShipLine.SetFilter("Qty. Shipped Not Invoiced", '<>0');
         if not recSalesShipLine.FindFirst() then;
         //<< 23-09-20 ZY-LD 008
         TranslationHelper.SetGlobalLanguageByCode(SalesInvHeader."Language Code");
-        if recSalesShipLine."Location Code" = recInvSetup."AIT Location Code" then begin  //<< 19-08-19 ZY-LD 005
+        if Location.Warehouse <> 0 then begin  //Not blank 22-04-2026 BK #561934
             if recSellToCust.Get(recSalesShipLine."Sell-to Customer No.") and recSellToCust."Create Invoice pr. Order" and (recSalesShipLine."Order No." <> '') then  // 18-06-20 ZY-LD 006
-                SalesLine.Description := StrSubstNo(zText001, recSalesShipLine."Picking List No.", recSalesShipLine."Order No.")  // 18-06-20 ZY-LD 006
+                SalesLine.Description := StrSubstNo(zText001, recSalesShipLine."Picking List No.", recSalesShipLine."Order No.")
             else
                 SalesLine.Description := StrSubstNo(Text000, recSalesShipLine."Picking List No.");
         end else
@@ -66,14 +63,14 @@ codeunit 50033 SalesSubscribers
     [EventSubscriber(ObjectType::Table, Database::"Sales Shipment Line", 'OnBeforeInsertInvLineFromShptLine', '', false, false)]
     local procedure SalesShipmentLine_OnBeforeInsertInvLineFromShptLine(var SalesShptLine: Record "Sales Shipment Line"; var SalesLine: Record "Sales Line"; SalesOrderLine: Record "Sales Line"; var IsHandled: Boolean; var TransferOldExtTextLines: Codeunit "Transfer Old Ext. Text Lines")
     begin
-        //ZL100805A+
+
         SalesLine."Picking List No." := SalesShptLine."Picking List No.";
         SalesLine."Packing List No." := SalesShptLine."Packing List No.";
         SalesLine."External Document No." := SalesShptLine."External Document No.";
-        SalesLine."Sales Order Type" := SalesShptLine."Sales Order Type"; //RD
-        SalesLine."Ship-to Code" := SalesShptLine."Ship-to Code";  //RD
-        //ZL100805A-
-        SalesLine."Hide Line" := SalesShptLine."Hide Line";  // 18-09-20 ZY-LD 007
-        SalesLine."External Document Position No." := SalesShptLine."External Document Position No.";  // 04-08-21 ZY-LD 010
+        SalesLine."Sales Order Type" := SalesShptLine."Sales Order Type";
+        SalesLine."Ship-to Code" := SalesShptLine."Ship-to Code";
+
+        SalesLine."Hide Line" := SalesShptLine."Hide Line";
+        SalesLine."External Document Position No." := SalesShptLine."External Document Position No.";
     end;
 }

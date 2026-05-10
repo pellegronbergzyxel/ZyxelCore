@@ -22,7 +22,7 @@ table 50088 "Customer Credit Limited"
             Caption = 'Customer No.';
             TableRelation = Customer;
         }
-        field(4; "Customer Name"; Text[50])
+        field(4; "Customer Name"; Text[100]) //01-05-2026 BK #Efe running the report 
         {
             Caption = 'Customer Name';
             Description = 'PAB 1.0';

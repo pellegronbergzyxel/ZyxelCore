@@ -155,7 +155,8 @@ codeunit 50035 "Exch. Rate Adjmt. Proc. Zyxel"
                 Currency."Last Date Adjusted" := ExchRateAdjmtParameters."Posting Date";
                 Currency.Modify();
 
-                Currency."Currency Factor" := CurrExchRate.ExchangeRateAdjmt(ExchRateAdjmtParameters."Posting Date", Currency.Code);
+                Currency."Currency Factor" := CurrExchRate.ExchangeRateAdjmt(ExchRateAdjmtParameters."Exchange Rate Date", Currency.Code); //BK 567818 27-04-2026
+                //Currency."Currency Factor" := CurrExchRate.ExchangeRateAdjmt(ExchRateAdjmtParameters."Posting Date", Currency.Code);
 
                 TempCurrencyToAdjust := Currency;
                 TempCurrencyToAdjust.Insert();

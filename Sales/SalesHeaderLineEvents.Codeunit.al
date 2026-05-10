@@ -371,7 +371,7 @@ codeunit 50067 "Sales Header/Line Events"
     begin
         recCust.Get(Rec."Sell-to Customer No.");
 
-        if Rec."Document Type" = Rec."document type"::Order then
+        if Rec."Document Type" in [Rec."document type"::Order, Rec."document type"::"Return Order"] then //23-04-2026 BK #568444
             Rec.Validate(Rec."Currency Code", recCust."Currency Code");  // We have to show the "Order Confirmation" in the customers currency, therefore we overwrite the currency code on the sales order
         Rec."Salesperson Code" := "GetSale/PurchCode"(recCust."Salesperson Code", 0);
         Rec."Order Desk Resposible Code" := "GetSale/PurchCode"(recCust."Order Desk Resposible Code", 1);
@@ -1076,6 +1076,8 @@ codeunit 50067 "Sales Header/Line Events"
                 if (Rec."Currency Code Sales Doc SUB" <> lSalesHeader."Currency Code Sales Doc SUB") and (lSalesHeader."Currency Code Sales Doc SUB" <> '') then
                     Rec.Validate(Rec."Currency Code Sales Doc SUB", lSalesHeader."Currency Code Sales Doc SUB");
 
+                if (Rec."Currency Code" <> lSalesHeader."Currency Code") and (lSalesHeader."Currency Code" <> '') then
+                    Rec.Validate(Rec."Currency Code", lSalesHeader."Currency Code"); //05-05-2026 BK #Hej
                 SI.SetKeepLocationCode(false);
             end;
     end;
@@ -1515,10 +1517,19 @@ codeunit 50067 "Sales Header/Line Events"
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeValidateEvent', 'Shipment Date', false, false)]
     local procedure OnBeforeValidateSLShipmentDate(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
     var
+        SalesSetup: Record "Sales & Receivables Setup"; //30-04-2026 BK #571428
+        ZGT: Codeunit "ZyXEL General Tools";
         lText001: Label '"Shipment Date" is trying to be changed from %1 to %2 on Sales Order %3 %4';
+
     begin
         if Rec."Shipment Date" = 99990101D then
             Error(Text001, Rec.FieldCaption(Rec."Shipment Date"), Rec."Shipment Date");
+
+        if rec."Line No." = 0 then
+            if ZGT.IsZComCompany() then
+                if SalesSetup.Get() then
+                    if SalesSetup."Default Shipment Date" <> 0D then
+                        Rec."Shipment Date" := SalesSetup."Default Shipment Date"; //30-04-2026 BK #571428   
 
         if not GuiAllowed then
             if Rec."Sales Order Type" = Rec."Sales Order Type"::Eicard then

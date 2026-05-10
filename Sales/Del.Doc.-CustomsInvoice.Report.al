@@ -1304,14 +1304,6 @@ report 50185 "Del. Doc. - Customs Invoice"
     end;
 
     var
-        Text000: Label 'Salesperson';
-        Text001: Label 'Total %1';
-        Text002: Label 'Total %1 Incl. VAT';
-        Text003: Label 'COPY';
-        Text004: Label '%2 - Invoice %1';
-        Text005: Label 'Delivery Document';
-        PageCaptionCap: Label 'Page %1 of %2';
-        Text006: Label 'Total %1 Excl. VAT';
         GLSetup: Record "General Ledger Setup";
         ShipmentMethod: Record "Shipment Method";
         PaymentTerms: Record "Payment Terms";
@@ -1326,17 +1318,17 @@ report 50185 "Del. Doc. - Customs Invoice"
         DimSetEntry1: Record "Dimension Set Entry";
         DimSetEntry2: Record "Dimension Set Entry";
         RespCenter: Record "Responsibility Center";
-        LanguageCU: Codeunit Language;
         CountryRegionCustomsBroker: Record Customer;
         CurrExchRate: Record "Currency Exchange Rate";
         TempPostedAsmLine: Record "Posted Assembly Line" temporary;
         VATClause: Record "VAT Clause";
         TempLineFeeNoteOnReportHist: Record "Line Fee Note on Report Hist." temporary;
+        SalesShipmentBuffer: Record "Sales Shipment Buffer" temporary;
         SalesInvCountPrinted: Codeunit "Sales Inv.-Printed";
+        LanguageCU: Codeunit Language;
         FormatAddr: Codeunit "Format Address";
         FormatAddrExt: Codeunit "Format Address Extension";
         SegManagement: Codeunit SegManagement;
-        SalesShipmentBuffer: Record "Sales Shipment Buffer" temporary;
         recVATRegNoMatrix: Record "VAT Reg. No. pr. Location";
         PostedShipmentDate: Date;
         CustAddr: array[8] of Text[50];
@@ -1365,12 +1357,8 @@ report 50185 "Del. Doc. - Customs Invoice"
         VALVATBaseLCY: Decimal;
         VALVATAmountLCY: Decimal;
         VALSpecLCYHeader: Text[80];
-        Text007: Label 'VAT Amount Specification in ';
-        Text008: Label 'Local Currency';
         VALExchRate: Text[50];
-        Text009: Label 'Exchange rate: %1/%2';
         CalculatedExchRate: Decimal;
-        Text010: Label '%2 - Prepayment Invoice %1';
         OutputNo: Integer;
         TotalSubTotal: Decimal;
         TotalAmount: Decimal;
@@ -1378,6 +1366,19 @@ report 50185 "Del. Doc. - Customs Invoice"
         TotalAmountVAT: Decimal;
         TotalInvDiscAmount: Decimal;
         TotalPaymentDiscOnVAT: Decimal;
+        Text007: Label 'VAT Amount Specification in ';
+        Text008: Label 'Local Currency';
+        Text009: Label 'Exchange rate: %1/%2';
+        Text010: Label '%2 - Prepayment Invoice %1';
+        Text000: Label 'Salesperson';
+        Text001: Label 'Total %1';
+        Text002: Label 'Total %1 Incl. VAT';
+        Text003: Label 'COPY';
+        Text004: Label '%2 - Invoice %1';
+        Text005: Label 'Delivery Document';
+        PageCaptionCap: Label 'Page %1 of %2';
+        Text006: Label 'Total %1 Excl. VAT';
+
         [InDataSet]
         LogInteractionEnable: Boolean;
         DisplayAssemblyInformation: Boolean;

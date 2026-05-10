@@ -1,4 +1,4 @@
-Codeunit 50057 "VisionFTP Management"
+//Codeunit //50057 "VisionFTP Management"
 {
     // 001. 11-06-19 ZY-LD 2019061110000049 - Handling of error code. Locktable is set after Commit, because commit releases the table.
     // 002. 03-10-19 ZY-LD 2019100310000038 - Changed download to copy.
@@ -47,6 +47,8 @@ Codeunit 50057 "VisionFTP Management"
             FileHandle.CreateInStream(InStr);
 
             ResponseText := FileAPIMgt.FtpUploadFile(FTPConnectionString, recFtpFolder."Remote Folder", RemoteFileName, B64.ToBase64(InStr));
+
+            FileHandle.Close();
         end;
 
         if lErrText = '' then begin
@@ -154,12 +156,11 @@ Codeunit 50057 "VisionFTP Management"
             if not (FileName in ['.', '..']) then begin
                 recZyFileMgt.LockTable();
 
-                TempBlob.CreateOutStream(FileOutStream);
-                B64.FromBase64(FileApiMgt.FTPDownloadFile(FTPConnectionString, recFtpFolder."Remote Folder", FileName), FileOutStream);
-                TempBlob.CreateInStream(FileInStream);
-
                 FileHandle.Create(ArchiveFileName);
-                FileHandle.Write(FileInStream);
+                FileHandle.CreateOutStream(FileOutStream);
+                B64.FromBase64(FileApiMgt.FTPDownloadFile(FTPConnectionString, recFtpFolder."Remote Folder", FileName), FileOutStream);
+                //TempBlob.CreateInStream(FileInStream);
+                //FileHandle.Write(FileInStream);
                 FileHandle.Close();
 
                 recZyFileMgt.Init();

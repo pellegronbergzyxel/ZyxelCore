@@ -3,8 +3,6 @@ codeunit 50065 "eCommerce-Payment to Journal"
     TableNo = "eCommerce Payment";
 
     trigger OnRun()
-    var
-        GLEntry: Record "G/L Entry";
     begin
         Update(Rec);
     end;
@@ -12,35 +10,13 @@ codeunit 50065 "eCommerce-Payment to Journal"
     var
         recAmzPayHead: Record "eCommerce Payment Header";
         recAmzCompMap: Record "eCommerce Market Place";
-        Text001: Label 'Calculating eCommerce Payments.\';
         ZGT: Codeunit "ZyXEL General Tools";
+        NoSeriesMangement: Codeunit "No. Series"; //UpgradeReady
         RHQName: Text[250];
-        Err0001: Label 'The Company does not exist in the eCommerce Setup.';
-        Err0002: Label 'The Company is not Active in the eCommerce Setup.';
-        Err0003: Label 'The eCommerce Setup is not complete.';
-        Text002: Label 'Updating Posting Imformation.\';
-        Text003: Label 'Reseting Error Imformation.\';
-        Text004: Label 'Searching for Errors.\';
-        Text005: Label 'Checking Sales Invoice Headers.\';
-        Text006: Label 'Checking eCommerce Sales Header Buffer.\';
-        Text007: Label 'Writting General Journal Lines.\';
         Text008: Label 'eCommerce Payments have been Processed.';
-        Text009: Label 'Update eCommerce Transactions.\';
-        Text010: Label 'Creating Purchase Invoices.\';
         Text011: Label 'New "eCommerce Payment Matrix" is created.\Add "Posting Type" to the line, and run "Progress Fee" again.';
         Text012: Label 'Do you want to create purchase invoices on eCommerce Fees?';
-        Err004: Label 'Fee Account Number is missing in eCommerce Setup.';
-        Err005: Label 'Charge Account Number is missing in eCommerce Setup.';
-        Text013: Label 'Applying Vendor Ledger Entries.\';
-        Text014: Label 'Creating Cash Receipt Entries.\';
-        Err006: Label 'Payment Journal Template Name missing in eCommerce Setup.';
-        Err007: Label 'Payment Journal Batch Name missing in eCommerce Setup.';
-        Err008: Label 'eCommerce Customer No. missing in eCommerce Setup.';
-        Err009: Label 'eCommerce Payment Description missing in eCommerce Setup.';
-        Err010: Label 'eCommerce Periodic Account No. missing in eCommerce Setup.';
-        Err011: Label 'eCommerce Periodic Account Description missing in eCommerce Setup.';
-        Err012: Label 'eCommerce Payment Number Series missing in eCommerce Setup.';
-        NoSeriesMangement: Codeunit NoSeriesManagement;
+
 
     procedure RunWithConfirm(var Rec: Record "eCommerce Payment")
     begin
@@ -51,20 +27,21 @@ codeunit 50065 "eCommerce-Payment to Journal"
     local procedure Update(var Rec: Record "eCommerce Payment") rValue: Boolean
     var
         receCommercePayments: Record "eCommerce Payment";
-        RHQNo: Code[20];
         recCustomerLedgerEntries: Record "Cust. Ledger Entry";
         recCustLedgEntryDE: Record "Cust. Ledger Entry";
+        recGenJournalBatch: Record "Gen. Journal Batch";
+        recPurchInvHeader: Record "Purch. Inv. Header";
         InvNo: Code[20];
         CrNo: Code[20];
         eCommerceInvoice: Text[250];
-        recPurchInvHeader: Record "Purch. Inv. Header";
         PurchNo: Code[20];
         MarketPlace: Text[250];
         CountryCode: Text[250];
-        recGenJournalBatch: Record "Gen. Journal Batch";
+        RHQNo: Code[20];
+
     begin
         begin
-            RHQName := ZGT.GetRHQCompanyName;
+            RHQName := ZGT.GetRHQCompanyName();
             GetPostingInformation(Rec."Journal Batch No.");
 
             if ReadyToRun(Rec) then begin
@@ -91,11 +68,8 @@ codeunit 50065 "eCommerce-Payment to Journal"
         recAmzCompMap.Get(recAmzPayHead."Market Place ID");
         recAmzCompMap.TestField(Active);
 
-        //recAmzCompMap.TESTFIELD("Fee Account No.");
-        //recAmzCompMap.TESTFIELD("Charge Account No.");
         recAmzCompMap.TestField("Currency Code");
         recAmzCompMap.TestField("Vendor No.");
-        //recAmzCompMap.TESTFIELD("Posting Company");
         recAmzCompMap.TestField("Cach Recipt G/L Template");
         recAmzCompMap.TestField("Cash Recipt G/L Batch");
         recAmzCompMap.TestField("Customer No.");
@@ -335,8 +309,6 @@ codeunit 50065 "eCommerce-Payment to Journal"
                         ExtDocNo := CopyStr(recAmzPay."Amount Description", 1, MaxStrLen(ExtDocNo));
 
                     if recSalesHead."External Document No." <> ExtDocNo then begin
-                        //IF recSalesHead."No." <> '' THEN
-                        //SalesPost.RUN(recSalesHead);
 
                         Clear(recSalesHead);
                         recSalesHead.Init();
@@ -409,9 +381,6 @@ codeunit 50065 "eCommerce-Payment to Journal"
                     recAmzPay2."Sales Document No." := recSalesHead."No.";
                     recAmzPay2.Modify(true);
                 until recAmzPay.Next() = 0;
-
-                //IF recSalesHead."No." <> '' THEN
-                //SalesPost.RUN(recSalesHead);
 
                 SI.SetKeepLocationCode(false);
                 SI.SetHideSalesDialog(false);
@@ -975,14 +944,14 @@ codeunit 50065 "eCommerce-Payment to Journal"
 
         recAmzArch.SetRange("eCommerce Order Id", pAmzOrderId);
         if recAmzArch.FindFirst() then begin
-            recAmzCompMap.Get(recAmzArch."Marketplace ID");  // 10-04-19 ZY-LD 005
-            if recAmzCountryMapTmp.Get(recAmzCompMap."Customer No.", recAmzArch."Ship-to Country") then  // 10-04-19 ZY-LD 005
+            recAmzCompMap.Get(recAmzArch."Marketplace ID");
+            if recAmzCountryMapTmp.Get(recAmzCompMap."Customer No.", recAmzArch."Ship-to Country") then
                 rValue := recAmzCountryMapTmp."Country Dimension"
             else begin
-                if not recAmzCountryMap.Get(recAmzCompMap."Customer No.", recAmzArch."Ship-to Country") then begin  // 10-04-19 ZY-LD 005
+                if not recAmzCountryMap.Get(recAmzCompMap."Customer No.", recAmzArch."Ship-to Country") then begin
                     if Confirm(lText001, false, recAmzArch."Ship-to Country", recAmzCountryMap.TableCaption(), recAmzCountryMap.FieldCaption("Default Mapping")) then begin
                         recAmzCountryMap.Reset();
-                        recAmzCountryMap.SetRange("Customer No.", recAmzCompMap."Customer No.");  // 10-04-19 ZY-LD 005
+                        recAmzCountryMap.SetRange("Customer No.", recAmzCompMap."Customer No.");
                         recAmzCountryMap.SetRange("Default Mapping", true);
                         if recAmzCountryMap.FindFirst() then begin
                             Clear(recAmzCountryMapTmp);

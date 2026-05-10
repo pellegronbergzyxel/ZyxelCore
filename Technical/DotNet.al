@@ -1,42 +1,44 @@
 dotnet
 {
     // CLOUD READY DELETE
-    assembly("System")
+    /*assembly("System")
     {
 
         Culture = 'neutral';
         PublicKeyToken = 'b77a5c561934e089';
-        Version = '4.0.0.0';
+        Version = '4.0.0.0'; */
 
-        type("System.Net.WebClient"; "WebClient") { }
-        type("System.Net.ServicePointManager"; "ServicePointManager") { }
-        type("System.Net.SecurityProtocolType"; "SecurityProtocolType") { }
-     //   type("System.Net.WriteStreamClosedEventArgs"; "WriteStreamClosedEventArgs") { }
-     //   type("System.Net.OpenReadCompletedEventArgs"; "OpenReadCompletedEventArgs") { }
-     //   type("System.Net.OpenWriteCompletedEventArgs"; "OpenWriteCompletedEventArgs") { }
-     //   type("System.Net.DownloadStringCompletedEventArgs"; "DownloadStringCompletedEventArgs") { }
-     //   type("System.Net.DownloadDataCompletedEventArgs"; "DownloadDataCompletedEventArgs") { }
-     //   type("System.ComponentModel.AsyncCompletedEventArgs"; "AsyncCompletedEventArgs") { }
-     //   type("System.Net.UploadStringCompletedEventArgs"; "UploadStringCompletedEventArgs") { }
-     //   type("System.Net.UploadDataCompletedEventArgs"; "UploadDataCompletedEventArgs") { }
-     //   type("System.Net.UploadFileCompletedEventArgs"; "UploadFileCompletedEventArgs") { }
-     //   type("System.Net.UploadValuesCompletedEventArgs"; "UploadValuesCompletedEventArgs") { }
-     //   type("System.Net.DownloadProgressChangedEventArgs"; "DownloadProgressChangedEventArgs") { }
-        //    type("System.Net.UploadProgressChangedEventArgs"; "UploadProgressChangedEventArgs") { }
-    }
-    assembly("System.Xml")
-    {
+    // CLOUD READY DELETE
+    //Type("System.Net.WebClient"; "WebClient") { }
+    //type("System.Net.ServicePointManager"; "ServicePointManager") { }
+    //type("System.Net.SecurityProtocolType"; "SecurityProtocolType") { }
+    //   type("System.Net.WriteStreamClosedEventArgs"; "WriteStreamClosedEventArgs") { }
+    //   type("System.Net.OpenReadCompletedEventArgs"; "OpenReadCompletedEventArgs") { }
+    //   type("System.Net.OpenWriteCompletedEventArgs"; "OpenWriteCompletedEventArgs") { }
+    //   type("System.Net.DownloadStringCompletedEventArgs"; "DownloadStringCompletedEventArgs") { }
+    //   type("System.Net.DownloadDataCompletedEventArgs"; "DownloadDataCompletedEventArgs") { }
+    //   type("System.ComponentModel.AsyncCompletedEventArgs"; "AsyncCompletedEventArgs") { }
+    //   type("System.Net.UploadStringCompletedEventArgs"; "UploadStringCompletedEventArgs") { }
+    //   type("System.Net.UploadDataCompletedEventArgs"; "UploadDataCompletedEventArgs") { }
+    //   type("System.Net.UploadFileCompletedEventArgs"; "UploadFileCompletedEventArgs") { }
+    //   type("System.Net.UploadValuesCompletedEventArgs"; "UploadValuesCompletedEventArgs") { }
+    //   type("System.Net.DownloadProgressChangedEventArgs"; "DownloadProgressChangedEventArgs") { }
+    //    type("System.Net.UploadProgressChangedEventArgs"; "UploadProgressChangedEventArgs") { }
+    //}
+    //assembly("System.Xml")
+    //{
 
-        Culture = 'neutral';
-        PublicKeyToken = 'b77a5c561934e089';
-        Version = '4.0.0.0';
+    //Culture = 'neutral';
+    //PublicKeyToken = 'b77a5c561934e089';
+    //Version = '4.0.0.0';
 
-        type("System.Xml.XmlDocument"; "XmlDocument") { }
-        type("System.Xml.XmlNamespaceManager"; "XmlNamespaceManager") { }
-        type("System.Xml.XmlNodeList"; "XmlNodeList") { }
-        type("System.Xml.XmlNode"; "XmlNode") { }
-    }
-    assembly("System.IO.Compression.FileSystem")
+    // CLOUD READY DELETE
+    //type("System.Xml.XmlDocument"; "XmlDocument") { }
+    //type("System.Xml.XmlNamespaceManager"; "XmlNamespaceManager") { }
+    //type("System.Xml.XmlNodeList"; "XmlNodeList") { }
+    //type("System.Xml.XmlNode"; "XmlNode") { }
+    //}
+    /*assembly("System.IO.Compression.FileSystem")
     {
 
         Culture = 'neutral';
@@ -45,7 +47,7 @@ dotnet
 
         type("System.IO.Compression.ZipFile"; "ZipFile") { }
         type("System.IO.Compression.ZipFileExtensions"; "Zip") { }
-    }
+    }*/
     assembly("VisionPeople.Net.Ftp")
     {
 
