@@ -1,15 +1,13 @@
 report 50185 "Del. Doc. - Customs Invoice"
 {
-    // DD1.00 2021-09-15 Delta Design A/S
-    //  - Object created
-    // 001. 01-12-21 ZY-LD 2021113010000114 - Make sure that "VAT Registration No. Zyxel" is correct on the customs invoice.
-    // 002. 18-05-22 ZY-LD 2022011110000088 - Filtering on Freight Cost Item.
-    // 003. 03-10-22 ZY-LD 2022092010000047 - Use Gross Weight from the warehouse.
+
     DefaultLayout = RDLC;
     RDLCLayout = './Layouts/Del. Doc. - Customs Invoice.rdlc';
     Caption = 'Delivery Document - Customs Invoice';
     Permissions = TableData "Sales Shipment Buffer" = rimd;
     PreviewMode = PrintLayout;
+    usagecategory = Documents;
+    applicationarea = All;
 
     dataset
     {
@@ -97,7 +95,7 @@ report 50185 "Del. Doc. - Customs Invoice"
                     column(CompanyInfo3Picture; CompanyInfo3.Picture)
                     {
                     }
-                    column(DocumentCaptionCopyText; StrSubstNo(DocumentCaption, CopyText, InvoiceType))
+                    column(DocumentCaptionCopyText; StrSubstNo(CopyText, InvoiceType)) //11-05-2026 BK #570417
                     {
                     }
                     column(CustAddr1; CustAddr[1])
@@ -133,7 +131,7 @@ report 50185 "Del. Doc. - Customs Invoice"
                     column(CustAddr6; CustAddr[6])
                     {
                     }
-                    column(CompanyInfoVATRegNo; "VCK Delivery Document Header"."VAT Registration No. Zyxel")
+                    column(CompanyInfoVATRegNo; "VCK Delivery Document Header"."Ship-From TaxID") //11-05-2026 BK #570417
                     {
                     }
                     column(CompanyInfoGiroNo; CompanyInfo."Giro No.")
@@ -472,7 +470,7 @@ report 50185 "Del. Doc. - Customs Invoice"
                         {
                             AutoFormatType = 1;
                         }
-                        column(VATAmtLineVATAmtText; VATAmountLine.VATAmountText)
+                        column(VATAmtLineVATAmtText; VATAmountLine.VATAmountText())
                         {
                         }
                         column(LineAmtAfterInvDiscAmt; 0)
@@ -491,7 +489,7 @@ report 50185 "Del. Doc. - Customs Invoice"
                         column(TotalInclVATText_SalesInvLine; TotalInclVATText)
                         {
                         }
-                        column(VATAmtText_SalesInvLine; VATAmountLine.VATAmountText)
+                        column(VATAmtText_SalesInvLine; VATAmountLine.VATAmountText())
                         {
                         }
                         column(DocNo_SalesInvLine; "VCK Delivery Document Line"."Document No.")
@@ -628,17 +626,17 @@ report 50185 "Del. Doc. - Customs Invoice"
                         dataitem(AsmLoop; "Integer")
                         {
                             DataItemTableView = sorting(Number);
-                            column(TempPostedAsmLineNo; BlanksForIndent + TempPostedAsmLine."No.")
+                            column(TempPostedAsmLineNo; BlanksForIndent() + TempPostedAsmLine."No.")
                             {
                             }
                             column(TempPostedAsmLineQuantity; TempPostedAsmLine.Quantity)
                             {
                                 DecimalPlaces = 0 : 5;
                             }
-                            column(TempPostedAsmLineDesc; BlanksForIndent + TempPostedAsmLine.Description)
+                            column(TempPostedAsmLineDesc; BlanksForIndent() + TempPostedAsmLine.Description)
                             {
                             }
-                            column(TempPostAsmLineVartCode; BlanksForIndent + TempPostedAsmLine."Variant Code")
+                            column(TempPostAsmLineVartCode; BlanksForIndent() + TempPostedAsmLine."Variant Code")
                             {
                             }
                             column(TempPostedAsmLineUOM; GetUOMText(TempPostedAsmLine."Unit of Measure Code"))
@@ -660,7 +658,7 @@ report 50185 "Del. Doc. - Customs Invoice"
                                 Clear(TempPostedAsmLine);
                                 if not DisplayAssemblyInformation then
                                     CurrReport.Break();
-                                CollectAsmInformation;
+                                //CollectAsmInformation();
                                 Clear(TempPostedAsmLine);
                                 AsmLoop.SetRange(AsmLoop.Number, 1, TempPostedAsmLine.Count());
                             end;
@@ -674,7 +672,7 @@ report 50185 "Del. Doc. - Customs Invoice"
 
                             PostedShipmentDate := 0D;
                             if "VCK Delivery Document Line".Quantity <> 0 then
-                                PostedShipmentDate := FindPostedShipmentDate;
+                                PostedShipmentDate := FindPostedShipmentDate();
 
                             VATAmountLine.Init();
                             VATAmountLine."VAT %" := "VCK Delivery Document Line"."VAT %";
@@ -692,16 +690,6 @@ report 50185 "Del. Doc. - Customs Invoice"
                             TotalAmountVAT += "VCK Delivery Document Line"."Amount Including VAT" - "VCK Delivery Document Line".Amount;
                             TotalAmountInclVAT += "VCK Delivery Document Line"."Amount Including VAT";
 
-                            //The section below has been commented out as Gross weight calculation will be based on Item Masterdata instead of information from the shipment Response
-                            // //>> 03-10-22 ZY-LD 003
-                            // if "VCK Delivery Document Header".Weight <> 0 then
-                            //     TotalGrossWeight := "VCK Delivery Document Header".Weight
-                            // else  //<< 03-10-22 ZY-LD 003
-                            //     TotalGrossWeight += "VCK Delivery Document Line".Quantity * "VCK Delivery Document Line"."Gross Weight";
-                            // TotalNetWeight += "VCK Delivery Document Line".Quantity * "VCK Delivery Document Line"."Net Weight";
-
-
-
                             if ("VCK Delivery Document Line"."Item No." <> '') then begin
                                 recItem.Get("VCK Delivery Document Line"."Item No.");
                                 TarrifCode := '';
@@ -712,36 +700,21 @@ report 50185 "Del. Doc. - Customs Invoice"
 
                                 TotalGrossWeight += "VCK Delivery Document Line".Quantity * recItem."Gross Weight";
                                 TotalNetWeight += "VCK Delivery Document Line".Quantity * recItem."Net Weight";
-
-
-                                /*IF recItem."Gross Weight" <> 0 THEN BEGIN
-                                  TarrifCode := TarrifCode + STRSUBSTNO('; GW:%1',recItem."Gross Weight");
-                                  TotalGrossWeight += Quantity * recItem."Gross Weight";
-                                END;
-
-                                IF recItem."Net Weight" <> 0 THEN BEGIN
-                                  TarrifCode := TarrifCode + STRSUBSTNO('; NW:%1',recItem."Net Weight");
-                                  TotalNetWeight += Quantity * recItem."Net Weight";
-                                END;*/
-
                                 TotalNoOfItems += "VCK Delivery Document Line".Quantity;
                             end;
 
-                            //>> 15-11-21 ZY-LD 001
                             if not FirstLine then
                                 LineHeaderDescription := '';
                             FirstLine := false;
-                            //<< 15-11-21 ZY-LD 001
 
                         end;
 
                         trigger OnPostDataItem()
                         begin
-                            //TotalWeightText := STRSUBSTNO(Text50005,TotalNoOfItems,TotalGrossWeight,TotalNetWeight);
                             LineText[1] := StrSubstNo(Text50006, TotalNoOfItems);
                             if ShipToCountryRegion."Show Net Wgt. Total on Ctm.Inv" then
                                 LineText[2] := StrSubstNo(Text50008, TotalNetWeight);
-                            if ShipToCountryRegion."Show Grs Wgt. Total on Ctm.Inv" then  // 08-12-21 ZY-LD - Changed because of Turkey
+                            if ShipToCountryRegion."Show Grs Wgt. Total on Ctm.Inv" then  // Changed because of Turkey
                                 LineText[3] := StrSubstNo(Text50007, TotalGrossWeight);
                         end;
 
@@ -896,9 +869,6 @@ report 50185 "Del. Doc. - Customs Invoice"
                             else
                                 VALSpecLCYHeader := Text007 + Format(GLSetup."LCY Code");
 
-                            //CurrExchRate.FindCurrency("VCK Delivery Document Header"."Posting Date","VCK Delivery Document Header"."Currency Code",1);
-                            //CalculatedExchRate := ROUND(1 / "VCK Delivery Document Header"."Currency Factor" * CurrExchRate."Exchange Rate Amount",0.000001);
-                            //VALExchRate := STRSUBSTNO(Text009,CalculatedExchRate,CurrExchRate."Exchange Rate Amount");
                         end;
                     }
                     dataitem(Total; "Integer")
@@ -995,10 +965,9 @@ report 50185 "Del. Doc. - Customs Invoice"
                 if "VCK Delivery Document Header"."Salesperson Code" = '' then begin
                     SalesPurchPerson.Init();
                     SalesPersonText := '';
-                end else begin
+                end else
                     IF SalesPurchPerson.Get("VCK Delivery Document Header"."Salesperson Code") then
                         SalesPersonText := Text000;
-                end;
 
                 if "VCK Delivery Document Header"."Currency Code" = '' then begin
                     GLSetup.TestField("LCY Code");
@@ -1015,15 +984,6 @@ report 50185 "Del. Doc. - Customs Invoice"
 
                 if not Cust.Get("VCK Delivery Document Header"."Bill-to Customer No.") then
                     Clear(Cust);
-
-                /*
-                IF "Payment Terms Code" = '' THEN
-                  PaymentTerms.INIT
-                ELSE BEGIN
-                  PaymentTerms.GET("Payment Terms Code");
-                  PaymentTerms.TranslateDescription(PaymentTerms,"Language Code");
-                END;
-                */
 
                 if "VCK Delivery Document Header"."Delivery Terms Terms" = '' then
                     ShipmentMethod.Init()
@@ -1059,18 +1019,15 @@ report 50185 "Del. Doc. - Customs Invoice"
                     if "VCK Delivery Document Header"."Document Type" = "VCK Delivery Document Header"."document type"::Sales then
                         sellcust.Get("VCK Delivery Document Header"."Sell-to Customer No.");
 
-                //>> 01-12-21 ZY-LD 001
-                //CompVATRegNo := CompanyInfo."VAT Registration No.";
                 if "VCK Delivery Document Header"."VAT Registration No. Zyxel" = '' then
                     "VCK Delivery Document Header"."VAT Registration No. Zyxel" := recVATRegNoMatrix."GetZyxelVATReg/EoriNo"(0, "VCK Delivery Document Header"."Ship-From Code", "VCK Delivery Document Header"."Ship-to Country/Region Code", "VCK Delivery Document Header"."Sell-to Country/Region Code", "VCK Delivery Document Header"."Sell-to Customer No.");
                 "VCK Delivery Document Header".TestField("VCK Delivery Document Header"."VAT Registration No. Zyxel");
-                EoriNoCompany := recVATRegNoMatrix."GetZyxelVATReg/EoriNo"(1, "VCK Delivery Document Header"."Ship-From Code", "VCK Delivery Document Header"."Ship-to Country/Region Code", "VCK Delivery Document Header"."Sell-to Country/Region Code", "VCK Delivery Document Header"."Sell-to Customer No.");
+                //EoriNoCompany := recVATRegNoMatrix."GetZyxelVATReg/EoriNo"(1, "VCK Delivery Document Header"."Ship-From Code", "VCK Delivery Document Header"."Ship-to Country/Region Code", "VCK Delivery Document Header"."Sell-to Country/Region Code", "VCK Delivery Document Header"."Sell-to Customer No.");
+                EoriNoCompany := companyInfo."EORI No."; // 1105-2026 BK #570417
                 VatRegNoBillTo := "VCK Delivery Document Header"."Bill-to TaxID";
-                //<< 01-12-21 ZY-LD 001
 
                 EoriNoCaption := '';
                 EoriNoCustomer := '';
-                //EoriNoCompany := '';  // 01-12-21 ZY-LD 001
                 if recCountry.Get("VCK Delivery Document Header"."Ship-to Country/Region Code") and (recCountry."Customs Customer No." <> '') then begin
                     Clear(recCustomsBroker);
                     if (sellcust."Customs Broker" <> '') and (recCustomsBroker.Get(sellcust."Customs Broker")) then begin
@@ -1083,13 +1040,8 @@ report 50185 "Del. Doc. - Customs Invoice"
                         end;
 
                     Clear(CustAddr);
-                    //CompVATRegNo := CompanyInfo."VAT Registration No.";  // 01-12-21 ZY-LD 001
                     FormatAddrExt.DeliveryInvCustomsTo(CustAddr, recCountry."Customs Customer No.");
                     EoriNoCaption := EoriNoCaptionLbl;
-
-
-                    //EoriNoCompany := CompanyInfo."EORI No.";  // 01-12-21 ZY-LD 001
-
 
                     if recCountry."Shipment Method for Customs" <> '' then begin
                         ShipmentMethod.Get(recCountry."Shipment Method for Customs");
@@ -1108,10 +1060,8 @@ report 50185 "Del. Doc. - Customs Invoice"
                     end;
                 end;
 
-                //>> 01-12-21 ZY-LD 001
                 if EoriNoCompany <> '' then
                     EoriNoCaption := EoriNoCaptionLbl;
-                //<< 01-12-21 ZY-LD 001
 
                 if "VCK Delivery Document Header"."Ship-to TaxID" <> '' then
                     SellVATID := "VCK Delivery Document Header"."Ship-to TaxID"
@@ -1133,46 +1083,21 @@ report 50185 "Del. Doc. - Customs Invoice"
                 end else
                     i := 1;
 
-                if SalesSetup."Use Sell-to text code filter" then begin
-                    InvoiceText.SetRange(InvoiceText."Customer No.", "VCK Delivery Document Header"."Sell-to Customer No.");
-                end else begin
+                if SalesSetup."Use Sell-to text code filter" then
+                    InvoiceText.SetRange(InvoiceText."Customer No.", "VCK Delivery Document Header"."Sell-to Customer No.")
+                else
                     InvoiceText.SetRange(InvoiceText."Customer No.", "VCK Delivery Document Header"."Bill-to Customer No.");
-                end;
-                /*
-                InvoiceText.SETRANGE(InvoiceText.Location, "VCK Delivery Document Header"."Location Code");
-                InvoiceText.SETFILTER("Sales Order Type",'%1',"VCK Delivery Document Header"."Sales Order Type");
-                InvoiceText.SETFILTER("Text ID",'>%1','');
-                
-                IF InvoiceText.FINDFIRST THEN BEGIN
-                   InvoiceLineText.SETFILTER(InvoiceLineText."Invoice Description Code", InvoiceText."Text ID");
-                   IF InvoiceLineText.FINDSET THEN BEGIN
-                     //i := 1;  // 28-10-19 ZY-LD 007
-                     REPEAT
-                       i := i + 1;  // 28-10-19 ZY-LD 007
-                       LineText[i] := InvoiceLineText."Line text";
-                       //i := i+1;  // 28-10-19 ZY-LD 007
-                     UNTIL InvoiceLineText.Next() = 0;
-                   END;
-                END;
-                */
+
 
                 Clear(ShipToCountryRegion);
                 if "VCK Delivery Document Header"."Ship-to Country/Region Code" <> '' then
                     ShipToCountryRegion.Get("VCK Delivery Document Header"."Ship-to Country/Region Code");
 
-                //>> 15-11-21 ZY-LD 001
                 if ShipToCountryRegion."Line Head Desc. on Custom Inv." <> '' then begin
                     LineHeaderDescription := ShipToCountryRegion."Line Head Desc. on Custom Inv.";
                     FirstLine := true;
                 end;
-                //<< 15-11-21 ZY-LD 001
 
-                /*
-                if "VCK Delivery Document Header"."Currency Code" <> '' then
-                    recBankAcc.SetRange("Currency Code", "VCK Delivery Document Header"."Currency Code")
-                else
-                    recBankAcc.SetRange("Currency Code", GLSetup."LCY Code");
-                */
                 if ("Currency Code" = GLSetup."LCY Code") or ("Currency Code" = '') then
                     recBankAcc.SetFilter("Currency Code", '%1', '')
                 else
@@ -1211,27 +1136,32 @@ report 50185 "Del. Doc. - Customs Invoice"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'No. of Copies';
+                        ToolTip = 'Enter the number of copies to print. The total number of copies will be the sum of this field and the number of copies specified in the customer card.';
                     }
                     field(ShowInternalInfo; ShowInternalInfo)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Show Internal Information';
+                        toolTip = 'Select to show internal information on the invoice, such as item numbers and dimensions. This information is only visible on the printed invoice and will not be sent to the customer.';
                     }
                     field(LogInteraction; LogInteraction)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
+                        toolTip = 'Select to log the printing of the invoice as an interaction on the customer record. This allows you to keep track of when invoices were printed for each customer.';
                     }
                     field(DisplayAsmInformation; DisplayAssemblyInformation)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Show Assembly Components';
+                        toolTip = 'Select to show assembly component details on the invoice. This includes information about the individual components that make up an assembly item. This information is only visible on the printed invoice and will not be sent to the customer.';
                     }
                     field(DisplayAdditionalFeeNote; DisplayAdditionalFeeNote)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Show Additional Fee Note';
+                        toolTip = 'Select to show additional fee notes on the invoice. This includes any extra charges that may apply to the order, such as handling fees or special delivery charges. This information is only visible on the printed invoice and will not be sent to the customer.';
                     }
                 }
             }
@@ -1248,7 +1178,7 @@ report 50185 "Del. Doc. - Customs Invoice"
 
         trigger OnOpenPage()
         begin
-            InitLogInteraction;
+            InitLogInteraction();
             LogInteractionEnable := LogInteraction;
         end;
     }
@@ -1300,7 +1230,7 @@ report 50185 "Del. Doc. - Customs Invoice"
     trigger OnPreReport()
     begin
         if not CurrReport.UseRequestPage() then
-            InitLogInteraction;
+            InitLogInteraction();
     end;
 
     var
@@ -1317,19 +1247,23 @@ report 50185 "Del. Doc. - Customs Invoice"
         VATAmountLine: Record "VAT Amount Line" temporary;
         DimSetEntry1: Record "Dimension Set Entry";
         DimSetEntry2: Record "Dimension Set Entry";
-        RespCenter: Record "Responsibility Center";
         CountryRegionCustomsBroker: Record Customer;
-        CurrExchRate: Record "Currency Exchange Rate";
         TempPostedAsmLine: Record "Posted Assembly Line" temporary;
         VATClause: Record "VAT Clause";
         TempLineFeeNoteOnReportHist: Record "Line Fee Note on Report Hist." temporary;
         SalesShipmentBuffer: Record "Sales Shipment Buffer" temporary;
-        SalesInvCountPrinted: Codeunit "Sales Inv.-Printed";
+        recVATRegNoMatrix: Record "VAT Reg. No. pr. Location";
+        sellcust: Record Customer;
+        recItem: Record Item;
+        InvoiceText: Record "Customer Invoice Texts";
+        ShipToCountryRegion: Record "Country/Region";
+        recBankAcc: Record "Bank Account";
+        recCountry: Record "Country/Region";
+        recLocation: Record Location;
+        recCustomsBroker: Record "Customs Broker";
         LanguageCU: Codeunit Language;
         FormatAddr: Codeunit "Format Address";
-        FormatAddrExt: Codeunit "Format Address Extension";
         SegManagement: Codeunit SegManagement;
-        recVATRegNoMatrix: Record "VAT Reg. No. pr. Location";
         PostedShipmentDate: Date;
         CustAddr: array[8] of Text[50];
         ShipToAddr: array[8] of Text[50];
@@ -1358,7 +1292,6 @@ report 50185 "Del. Doc. - Customs Invoice"
         VALVATAmountLCY: Decimal;
         VALSpecLCYHeader: Text[80];
         VALExchRate: Text[50];
-        CalculatedExchRate: Decimal;
         OutputNo: Integer;
         TotalSubTotal: Decimal;
         TotalAmount: Decimal;
@@ -1368,8 +1301,6 @@ report 50185 "Del. Doc. - Customs Invoice"
         TotalPaymentDiscOnVAT: Decimal;
         Text007: Label 'VAT Amount Specification in ';
         Text008: Label 'Local Currency';
-        Text009: Label 'Exchange rate: %1/%2';
-        Text010: Label '%2 - Prepayment Invoice %1';
         Text000: Label 'Salesperson';
         Text001: Label 'Total %1';
         Text002: Label 'Total %1 Incl. VAT';
@@ -1382,10 +1313,22 @@ report 50185 "Del. Doc. - Customs Invoice"
         [InDataSet]
         LogInteractionEnable: Boolean;
         DisplayAssemblyInformation: Boolean;
+        DisplayAdditionalFeeNote: Boolean;
+        SellVATID: Text[20];
+        TarrifCode: Text;
+        LineText: array[8] of Text[80];
+        InvoiceType: Text[10];
+        HideServiceText: Boolean;
+        EoriNoCaption: Text[10];
+        EoriNoCompany: Code[15];
+        EoriNoCustomer: Code[15];
+        TotalGrossWeight: Decimal;
+        TotalNetWeight: Decimal;
+        TotalNoOfItems: Decimal;
+        LineHeaderDescription: Text;
+        VatRegNoBillTo: Code[20];
+        FirstLine: Boolean;
         Text011: Label 'Total quantity of items: %1.';
-        Text012: Label 'Commercial';
-        Text013: Label 'Sales';
-        Text014: Label 'VCK';
         CompanyInfoPhoneNoCaptionLbl: Label 'Phone No.';
         CompanyInfoVATRegNoCptnLbl: Label 'VAT Reg. No.';
         CompanyInfoGiroNoCaptionLbl: Label 'Giro No.';
@@ -1419,47 +1362,11 @@ report 50185 "Del. Doc. - Customs Invoice"
         VATIdentifierCaptionLbl: Label 'VAT Identifier';
         HomePageCaptionCap: Label 'Home Page';
         EMailCaptionLbl: Label 'E-Mail';
-        DisplayAdditionalFeeNote: Boolean;
-        sellcust: Record Customer;
-        SellVATID: Text[20];
-        recItem: Record Item;
-        TarrifCode: Text;
-        InvoiceText: Record "Customer Invoice Texts";
-        InvoiceLineText: Record "Invoice Line Text";
-        LineText: array[8] of Text[80];
-        VATRegistrationRec: Record "IC Vendors";
-        CompVATRegNo: Text[50];
-        ShipToCountryRegion: Record "Country/Region";
-        ItemCountryRegion: Record "Country/Region";
-        InvoiceType: Text[10];
         EoriNoCaptionLbl: Label 'EORI No.';
-        Text50001: Label 'Sales Invoice';
-        Text50002: Label 'Commercial invoice';
-        recBankAcc: Record "Bank Account";
         Text50003: Label 'There are more than one "%1" with "%2" %3.';
-        ZGT: Codeunit "ZyXEL General Tools";
-        recCountry: Record "Country/Region";
-        recVatPostSetup: Record "VAT Posting Setup";
-        recLocation: Record Location;
-        HideServiceText: Boolean;
-        Text50004: Label 'Amount incl. VAT on the header and lines does not match.\Header: %1.\Lines: %2.';
-        EoriNoCaption: Text[10];
-        EoriNoCompany: Code[15];
-        EoriNoCustomer: Code[15];
-        recCustomsBroker: Record "Customs Broker";
-        TotalGrossWeight: Decimal;
-        TotalNetWeight: Decimal;
-        TotalNoOfItems: Decimal;
-        TotalWeightText: Text;
-        Text50005: Label 'Number of Items: %1; Total Gross Weight: %2 kg; Total Net Weight: %3 kg.';
         Text50006: Label 'Total number of Items: %1';
         Text50007: Label 'Total Gross Weight: %1 kg';
         Text50008: Label 'Total Net Weight: %1 kg.';
-        Text50009: Label '"%1" is blank. Do you want to continue?';
-        FirstLine: Boolean;
-        LineHeaderDescription: Text;
-        VatRegNoBillTo: Code[20];
-
 
     procedure InitLogInteraction()
     begin
@@ -1473,69 +1380,10 @@ report 50185 "Del. Doc. - Customs Invoice"
         SalesShipmentBuffer2: Record "Sales Shipment Buffer" temporary;
     begin
         NextEntryNo := 1;
-        /*
-        IF "VCK Delivery Document Line"."Shipment No." <> '' THEN
-          IF SalesShipmentHeader.GET("VCK Delivery Document Line"."Shipment No.") THEN
-            EXIT(SalesShipmentHeader."Posting Date");
-        
-        IF "VCK Delivery Document Header"."Order No." = '' THEN
-          EXIT("VCK Delivery Document Header"."Posting Date");
-        
-        CASE "VCK Delivery Document Line".Type OF
-          "VCK Delivery Document Line".Type::Item:
-            GenerateBufferFromValueEntry("VCK Delivery Document Line");
-          "VCK Delivery Document Line".Type::"G/L Account","VCK Delivery Document Line".Type::Resource,
-          "VCK Delivery Document Line".Type::"Charge (Item)","VCK Delivery Document Line".Type::"Fixed Asset":
-            GenerateBufferFromShipment("VCK Delivery Document Line");
-          "VCK Delivery Document Line".Type::" ":
-            EXIT(0D);
-        END;
-        
-        SalesShipmentBuffer.RESET;
-        SalesShipmentBuffer.SETRANGE("Document No.","VCK Delivery Document Line"."Document No.");
-        SalesShipmentBuffer.SETRANGE("Line No." ,"VCK Delivery Document Line"."Line No.");
-        IF SalesShipmentBuffer.FIND('-') THEN BEGIN
-          SalesShipmentBuffer2 := SalesShipmentBuffer;
-          IF SalesShipmentBuffer.Next() = 0 THEN BEGIN
-            SalesShipmentBuffer.GET(
-              SalesShipmentBuffer2."Document No.",SalesShipmentBuffer2."Line No.",SalesShipmentBuffer2."Entry No.");
-            SalesShipmentBuffer.DELETE;
-            EXIT(SalesShipmentBuffer2."Posting Date");
-          END ;
-          SalesShipmentBuffer.CALCSUMS(Quantity);
-          IF SalesShipmentBuffer.Quantity <> "VCK Delivery Document Line".Quantity THEN BEGIN
-            SalesShipmentBuffer.DELETEALL;
-            EXIT("VCK Delivery Document Header"."Posting Date");
-          END;
-        END ELSE
-          EXIT("VCK Delivery Document Header"."Posting Date");
-        */
+
         exit(0D);
 
     end;
-
-
-    procedure GenerateBufferFromValueEntry(VCKDeliveryDocumentLine2: Record "VCK Delivery Document Line")
-    var
-        ValueEntry: Record "Value Entry";
-        ItemLedgerEntry: Record "Item Ledger Entry";
-        TotalQuantity: Decimal;
-        Quantity: Decimal;
-    begin
-    end;
-
-
-    procedure GenerateBufferFromShipment(VCKDeliveryDocumentLine: Record "VCK Delivery Document Line")
-    var
-        VCKDeliveryDocumentHeader: Record "VCK Delivery Document Header";
-        VCKDeliveryDocumentLine2: Record "VCK Delivery Document Line";
-        SalesShipmentHeader: Record "Sales Shipment Header";
-        SalesShipmentLine: Record "Sales Shipment Line";
-        TotalQuantity: Decimal;
-        Quantity: Decimal;
-    begin
-    end;
-
 
     procedure CorrectShipment(var SalesShipmentLine: Record "Sales Shipment Line")
     var
@@ -1549,54 +1397,6 @@ report 50185 "Del. Doc. - Customs Invoice"
                 SalesShipmentLine.Quantity := SalesShipmentLine.Quantity - SalesInvoiceLine.Quantity;
             until SalesInvoiceLine.Next() = 0;
     end;
-
-
-    procedure AddBufferEntry(VCKDeliveryDocumentLine: Record "VCK Delivery Document Line"; QtyOnShipment: Decimal; PostingDate: Date)
-    begin
-    end;
-
-    local procedure DocumentCaption(): Text[250]
-    var
-        BillToCountryRegion: Record "Country/Region";
-    begin
-        /*IF CustomsInvoice THEN
-          InvoiceType := Text014
-        ELSE BEGIN
-          BillToCountryRegion.GET("VCK Delivery Document Header"."Bill-to Country/Region Code");
-          IF BillToCountryRegion."Commercial Invoice" THEN
-            InvoiceType := Text012
-          ELSE
-            InvoiceType := Text013;
-        END;
-        EXIT(Text004);*/
-
-    end;
-
-
-    procedure InitializeRequest(NewNoOfCopies: Integer; NewShowInternalInfo: Boolean; NewLogInteraction: Boolean; DisplayAsmInfo: Boolean)
-    begin
-        NoOfCopies := NewNoOfCopies;
-        ShowInternalInfo := NewShowInternalInfo;
-        LogInteraction := NewLogInteraction;
-        DisplayAssemblyInformation := DisplayAsmInfo;
-    end;
-
-
-    procedure CollectAsmInformation()
-    var
-        ValueEntry: Record "Value Entry";
-        ItemLedgerEntry: Record "Item Ledger Entry";
-        PostedAsmHeader: Record "Posted Assembly Header";
-        PostedAsmLine: Record "Posted Assembly Line";
-        SalesShipmentLine: Record "Sales Shipment Line";
-    begin
-    end;
-
-
-    procedure TreatAsmLineBuffer(PostedAsmLine: Record "Posted Assembly Line")
-    begin
-    end;
-
 
     procedure GetUOMText(UOMCode: Code[10]): Text[10]
     var
