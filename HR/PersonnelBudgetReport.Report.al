@@ -302,7 +302,8 @@ report 50112 "Personnel Budget Report"
 
     procedure CreateExcelbook()
     begin
-        ExcelBuf.CreateBook('', Text001);
+        //ExcelBuf.CreateBook('', Text001);CLOUD ready DELETE
+        ExcelBuf.CreateNewBook(Text001);
         ExcelBuf.WriteSheet(Text001, CompanyName(), UserId());
         ExcelBuf.CloseBook;
         if GuiAllowed() then begin

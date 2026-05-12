@@ -157,7 +157,7 @@ Table 66002 "Zyxel File Management"
 
         FileIn.Open(FilePath);
         FileIn.CreateInstream(FileStream);
-        filblob.ImportStream(FileStream, '');
+        rec.filblob.
         FileIn.Close;
         exit(true);
     end;
@@ -167,6 +167,7 @@ Table 66002 "Zyxel File Management"
         FileOut: File;
         FileStream: OutStream;
     begin
+        
         if filblob.HasValue then begin
             FileOut.Create(DownloadPath);
             FileOut.CreateOutstream(FileStream);

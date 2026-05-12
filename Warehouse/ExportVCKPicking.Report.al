@@ -150,7 +150,8 @@ Report 62034 "Export VCK Picking"
             until recDeliveryHeader.Next() = 0;
             window.Close;
         end;
-        ExcelBuf.CreateBook('', Title);
+        //ExcelBuf.CreateBook('', Title); CLOUD ready DELETE
+        ExcelBuf.CreateNewBook(Title);
         ExcelBuf.WriteSheet(Title, CompanyName(), UserId());
         ExcelBuf.CloseBook;
         ExcelBuf.OpenExcel;

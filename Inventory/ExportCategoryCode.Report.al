@@ -157,7 +157,8 @@ Report 50060 "Export Category Code"
     var
         lText001: label 'Item Category Code List.xlsx';
     begin
-        ExcelBuf.CreateBook('', Text002);
+        //ExcelBuf.CreateBook('', Text002);   CLOUD ready DELETE
+            ExcelBuf.CreateNewBook(Text002);
         ExcelBuf.WriteSheet(Text002, CompanyName(), UserId());
         ExcelBuf.CloseBook;
         if GuiAllowed then begin

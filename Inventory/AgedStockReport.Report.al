@@ -590,7 +590,8 @@ Report 50099 "Aged Stock Report"
         lText002: label 'Column %1';
         lText003: label 'RMA %1';
     begin
-        ExcelBuf.CreateBook('', StrSubstNo(lText001, AgingCode));
+        // ExcelBuf.CreateBook('', StrSubstNo(lText001, AgingCode)); CLOUD ready DELETE
+        ExcelBuf.CreateNewBook(StrSubstNo(lText001, AgingCode));
         ExcelBuf.WriteSheet(StrSubstNo(lText001, AgingCode), CompanyName(), UserId());
 
         ExcelBuf.CloseBook;
@@ -789,7 +790,8 @@ Report 50099 "Aged Stock Report"
 
     procedure CreateExcelbookColumn()
     begin
-        ExcelBuf.CreateBook('', 'MR Inventory Template');
+        //ExcelBuf.CreateBook('', 'MR Inventory Template'); CLOUD ready DELETE
+        ExcelBuf.CreateNewBook('MR Inventory Template');
         ExcelBuf.WriteSheet('MR Inventory Template', CompanyName(), UserId());
         ExcelBuf.CloseBook;
         if GuiAllowed then begin
