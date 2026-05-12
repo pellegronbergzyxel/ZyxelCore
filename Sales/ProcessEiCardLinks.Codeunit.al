@@ -600,7 +600,7 @@ Codeunit 50039 "Process EiCard Links"
         ZipFile.Close();
     end;
 
-
+    /*
     local procedure ExtractZipFileOld(ZipFilePath: Text; DestinationFolder: Text)
     var
         FileMgt: Codeunit "File Management";
@@ -621,5 +621,5 @@ Codeunit 50039 "Process EiCard Links"
         ZipArchive := ZipFile.Open(ZipFilePath, ZipArchiveMode.Read);
         Zip.ExtractToDirectory(ZipArchive, DestinationFolder);
         ZipArchive.Dispose;
-    end;
+    end;*/
 }

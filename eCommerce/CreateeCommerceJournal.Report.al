@@ -3,6 +3,7 @@ report 50135 "Create eCommerce Journal"
     Caption = 'Create eCommerce Journal';
     ProcessingOnly = true;
     UsageCategory = Tasks;
+    ApplicationArea = All;
 
     dataset
     {
@@ -15,7 +16,7 @@ report 50135 "Create eCommerce Journal"
                 ZGT.UpdateProgressWindow(Format("eCommerce Payment".UID), 0, true);
 
                 recAmzPayHead.SetRange("Transaction Summary", "eCommerce Payment"."Transaction Summary");
-                //recAmzPayHead.SETRANGE("Market Place ID","eCommerce Market Place");
+
                 if recAmzPayHead.FindFirst() then begin
                     "eCommerce Payment"."Journal Batch No." := recAmzPayHead."No.";
                     "eCommerce Payment".Modify();
@@ -27,10 +28,10 @@ report 50135 "Create eCommerce Journal"
 
                 end else begin
                     recAmzPayHead.Reset();
-                    recAmzPayHead."No." := NoSeriesMgt.GetNextNo(recAmzSetup."Payment Batch Nos.", Today, true);
+                    recAmzPayHead."No." := Copystr(NoSeriesMgt.GetNextNo(recAmzSetup."Payment Batch Nos.", Today, true), 1, 20);
                     recAmzPayHead."Transaction Summary" := "eCommerce Payment"."Transaction Summary";
                     recAmzPayHead.Date := "eCommerce Payment".Date;
-                    recAmzPayHead."Market Place ID" := "eCommerce Payment"."eCommerce Market Place";
+                    recAmzPayHead."Market Place ID" := copystr("eCommerce Payment"."eCommerce Market Place", 1, 20);
                     recAmzPayHead.Insert();
 
                     "eCommerce Payment"."Journal Batch No." := recAmzPayHead."No.";
@@ -40,7 +41,7 @@ report 50135 "Create eCommerce Journal"
 
             trigger OnPostDataItem()
             begin
-                ZGT.CloseProgressWindow;
+                ZGT.CloseProgressWindow();
             end;
 
             trigger OnPreDataItem()
@@ -55,15 +56,14 @@ report 50135 "Create eCommerce Journal"
         recAmzSetup.Get();
         recAmzPayHead.DeleteAll();
 
-        SI.UseOfReport(3, 50135, 2);  // 14-10-20 ZY-LD 000
+        SI.UseOfReport(3, 50135, 2);
     end;
 
     var
         recAmzPayHead: Record "eCommerce Payment Header";
         recAmzSetup: Record "eCommerce Setup";
-        PrevMarketPlace: Code[10];
-        PrevSummary: Code[100];
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series"; //UpgradeReady
         ZGT: Codeunit "ZyXEL General Tools";
         SI: Codeunit "Single Instance";
+
 }

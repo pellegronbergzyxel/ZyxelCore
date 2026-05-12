@@ -249,7 +249,7 @@ report 50003 "Exch. Rate Adjustment Zyxel"
         GenJnlBatch: Record "Gen. Journal Batch";
         GenJnlLineReq: Record "Gen. Journal Line";
         GLSetup: Record "General Ledger Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series"; //Upgrade Ready
         PostingDate: Date;
         ExchRateDate: Date;
         PostingDescription: Text[100];

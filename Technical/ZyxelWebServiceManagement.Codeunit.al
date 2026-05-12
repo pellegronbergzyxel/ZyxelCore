@@ -83,6 +83,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         end;
     end;
 
+    /*
     procedure ReplicateGlAccountsOLD(pCompanyName: Text[80]; pNo: Code[20])
     var
         recRepComp: Record "Replication Company";
@@ -130,7 +131,7 @@ Codeunit 50083 "Zyxel Web Service Management"
             until recRepComp.Next() = 0;
             ZGT.CloseProgressWindow;
         end;
-    end;
+    end; */
 
     procedure ReplicateCostTypeName(pCompanyName: Text[80]; pNo: Code[20])
     var
@@ -194,6 +195,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         end;
     end;
 
+    /*
     procedure ReplicateCostTypeNameOLD(pCompanyName: Text[80]; pNo: Code[20])
     var
         recRepComp: Record "Replication Company";
@@ -241,7 +243,7 @@ Codeunit 50083 "Zyxel Web Service Management"
             until recRepComp.Next() = 0;
             ZGT.CloseProgressWindow;
         end;
-    end;
+    end; */
 
     procedure ReplicateCustomers(pCompanyName: Text[30]; pCustNoFilter: Text; pForceReplication: Boolean)
     var
@@ -303,6 +305,7 @@ Codeunit 50083 "Zyxel Web Service Management"
             until recRepComp.Next() = 0;
     end;
 
+    /*
     procedure ReplicateCustomersOLD(pCompanyName: Text[30]; pCustNoFilter: Text; pForceReplication: Boolean)
     var
         recRepComp: Record "Replication Company";
@@ -349,7 +352,7 @@ Codeunit 50083 "Zyxel Web Service Management"
                     ZyWebServReq.ReplicateCustomer(recRepComp."Company Name", rValue);
                 end;
             until recRepComp.Next() = 0;
-    end;
+    end; */
 
     procedure ReplicateItems(pCompanyName: Text[30]; pItemNoFilter: Text; pReplicateDummy: Boolean; pForceReplication: Boolean)
     var
@@ -453,6 +456,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         end;
     end;
 
+    /*
     procedure ReplicateItemsOLD(pCompanyName: Text[30]; pItemNoFilter: Text; pReplicateDummy: Boolean; pForceReplication: Boolean)
     var
         recRepComp: Record "Replication Company";
@@ -530,7 +534,7 @@ Codeunit 50083 "Zyxel Web Service Management"
                     end;
                 until recRepComp.Next() = 0;
         end;
-    end;
+    end; */
 
     procedure ReplicateEmailAddress(pCompany: Text[80]; pCode: Code[20])
     var
@@ -598,6 +602,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         end;
     end;
 
+    /*
     procedure ReplicateEmailAddressOLD(pCompany: Text[80]; pCode: Code[20])
     var
         recRepComp: Record "Replication Company";
@@ -647,7 +652,7 @@ Codeunit 50083 "Zyxel Web Service Management"
             until recRepComp.Next() = 0;
             ZGT.CloseProgressWindow;
         end;
-    end;
+    end; */
 
     procedure ReplicateUserSetup(pCode: Code[50])
     var
@@ -713,6 +718,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         //>> 06-12-18 ZY-LD 001
     end;
 
+    /*
     procedure ReplicateUserSetupOLD(pCode: Code[50])
     var
         recRepComp: Record "Replication Company";
@@ -760,7 +766,7 @@ Codeunit 50083 "Zyxel Web Service Management"
             ZGT.CloseProgressWindow;
         end;
         //>> 06-12-18 ZY-LD 001
-    end;
+    end; */
 
     procedure ReplicateExchangeRate(var pExchRateTmp: Record "Currency Exchange Rate Buffer" temporary) rValue: Boolean
     var
@@ -829,6 +835,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         end;
     end;
 
+    /*
     procedure ReplicateExchangeRateOLD(var pExchRateTmp: Record "Currency Exchange Rate Buffer" temporary) rValue: Boolean
     var
         recRepComp: Record "Replication Company";
@@ -880,7 +887,7 @@ Codeunit 50083 "Zyxel Web Service Management"
 
             ZGT.CloseProgressWindow;
         end;
-    end;
+    end; */
 
     procedure GetCustomerCreditLimits()
     var
@@ -907,7 +914,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         end;
     end;
 
-    procedure GetCustomerCreditLimitsOLD()
+    /*procedure GetCustomerCreditLimitsOLD()
     var
         recRepComp: Record "Replication Company";
         recItem: Record Item;
@@ -938,7 +945,7 @@ Codeunit 50083 "Zyxel Web Service Management"
 
             ZGT.CloseProgressWindow;
         end;
-    end;
+    end; */
 
     procedure GetAccountPay_Receivable(pType: Option Payable,Receivable; pCompanyName: Text[30]; EndDate: Date; CurrencyDate: Date; ReportingCurrency: Code[10]; var AccPayBuff: Record "Account Pay./Receiv Buffer" temporary)
     var
@@ -998,7 +1005,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         ZGT.CloseProgressWindow;
     end;
 
-    procedure GetAccountPay_ReceivableOLD(pType: Option Payable,Receivable; pCompanyName: Text[30]; EndDate: Date; CurrencyDate: Date; ReportingCurrency: Code[10]; var AccPayBuff: Record "Account Pay./Receiv Buffer" temporary)
+    /*procedure GetAccountPay_ReceivableOLD(pType: Option Payable,Receivable; pCompanyName: Text[30]; EndDate: Date; CurrencyDate: Date; ReportingCurrency: Code[10]; var AccPayBuff: Record "Account Pay./Receiv Buffer" temporary)
     var
         recRepSetup: Record "Replication Company";
         StreamOut: OutStream;
@@ -1039,7 +1046,8 @@ Codeunit 50083 "Zyxel Web Service Management"
         else  // Receivable
             ZyWebServReq.GetAccountPay_Receivable(pCompanyName, 'GetAccountReceivable', 'accountReceivables', InnerText, AccPayBuff);  // Change call of function here
         ZGT.CloseProgressWindow;
-    end;
+    end; */
+
     //CLOUD READY DELETE
     /*
     procedure GetCustomerOverdueBalance(pCustNo: Code[20]; pDueDate: Date; pShowOpenPayments: Boolean): Decimal
@@ -1131,7 +1139,7 @@ Codeunit 50083 "Zyxel Web Service Management"
             Evaluate(rValue, CopyStr(DecimalText, 4, StrLen(DecimalText)), 9);
         end;
     end;
-
+    /*
     procedure GetIcReconciliationOLD(IcReconName: Record "IC Reconciliation Name"; IcReconLine: Record "IC Reconciliation Line"; Level: Integer; StartDate: Date; EndDate: Date; var ReportingCurrency: Code[10]) rValue: Decimal
     var
         StreamOut: OutStream;
@@ -1169,7 +1177,7 @@ Codeunit 50083 "Zyxel Web Service Management"
             ReportingCurrency := CopyStr(DecimalText, 1, 3);
             Evaluate(rValue, CopyStr(DecimalText, 4, StrLen(DecimalText)), 9);
         end;
-    end;
+    end; */
 
     procedure GetExchangeInfo(pCompany: Text[80]; pCurrencyCode: Code[10]; var pExchRateTmp: Record "Currency Exchange Rate Buffer" temporary)
     var
@@ -1252,7 +1260,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         end;
     end;
 
-    procedure GetExchangeInfoOLD(pCompany: Text[80]; pCurrencyCode: Code[10]; var pExchRateTmp: Record "Currency Exchange Rate Buffer" temporary)
+    /*procedure GetExchangeInfoOLD(pCompany: Text[80]; pCurrencyCode: Code[10]; var pExchRateTmp: Record "Currency Exchange Rate Buffer" temporary)
     var
         recCurrExchRateBuf: Record "Currency Exchange Rate Buffer" temporary;
         recRepComp: Record "Replication Company";
@@ -1316,7 +1324,7 @@ Codeunit 50083 "Zyxel Web Service Management"
 
             ZGT.CloseProgressWindow;
         end;
-    end;
+    end; */
 
     // procedure GetConcurVendor(pCompany: Text[80]; var pVendTmp: Record Vendor temporary; pVendorNo: Code[20])
     // var
@@ -1435,8 +1443,6 @@ Codeunit 50083 "Zyxel Web Service Management"
         TempBlob: Codeunit "Temp Blob";
         Item: Record Item;
         WsXmlPort: XmlPort "WS Customer Credit Limit";
-        // XDoc: dotnet XmlDocument;
-        // NS: dotnet XmlNamespaceManager;
         rValue: Text;
         CrFilter: Text;
         lText001: label 'Invoice No. could not be updated in "%1".';
@@ -1512,6 +1518,7 @@ Codeunit 50083 "Zyxel Web Service Management"
             Message(lText002, pPurchOrderNo);
     end;
 
+    /*
     procedure SendPurchasOrdersOLD(pCompany: Text[50]; pPurchOrderNo: Code[20]; pCustomerNo: Code[20]) rValue: Boolean
     var
         recItem: Record Item;
@@ -1558,7 +1565,7 @@ Codeunit 50083 "Zyxel Web Service Management"
             end;
         end else
             Message(lText002, pPurchOrderNo);
-    end;
+    end; */
 
     procedure SendTravelExpense(var pTrExpHead: Record "Travel Expense Header"; NewPostDocument: Boolean) rValue: Boolean
     var
@@ -1620,6 +1627,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         end;
     end;
 
+    /*
     procedure SendTravelExpenseOLD(var pTrExpHead: Record "Travel Expense Header"; NewPostDocument: Boolean) rValue: Boolean
     var
         recItem: Record Item;
@@ -1666,7 +1674,7 @@ Codeunit 50083 "Zyxel Web Service Management"
                 rValue := true;
             end;
         end;
-    end;
+    end; */
 
     procedure SendUnshippedQuantity(pCompany: Text[50]; pCustomerNo: Code[20]) rValue: Boolean
     var
@@ -1722,6 +1730,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         end;
     end;
 
+    /*
     procedure SendUnshippedQuantityOLD(pCompany: Text[50]; pCustomerNo: Code[20]) rValue: Boolean
     var
         recItem: Record Item;
@@ -1762,7 +1771,7 @@ Codeunit 50083 "Zyxel Web Service Management"
             // Replicate
             rValue := ZyWebServReq.SendUnshippedQuantity(pCompany, InnerText);  // Change call of function here
         end;
-    end;
+    end; */
 
     procedure SendContainerDetails(pCompany: Text[50]; pSourceType: Option "Sales Invoice","Sales Return Order","Purchase Order","Transfer Order"; pSourceNo: Code[20]) rValue: Boolean
     var
@@ -1833,7 +1842,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         end;
     end;
 
-    procedure SendContainerDetailsOLD(pCompany: Text[50]; pSourceType: Option "Sales Invoice","Sales Return Order","Purchase Order","Transfer Order"; pSourceNo: Code[20]) rValue: Boolean
+    /*procedure SendContainerDetailsOLD(pCompany: Text[50]; pSourceType: Option "Sales Invoice","Sales Return Order","Purchase Order","Transfer Order"; pSourceNo: Code[20]) rValue: Boolean
     var
         recItem: Record Item;
         recPurchHead: Record "Purchase Header";
@@ -1888,7 +1897,7 @@ Codeunit 50083 "Zyxel Web Service Management"
             // Replicate
             rValue := ZyWebServReq.SendContainerDetails(pCompany, InnerText);  // Change call of function here
         end;
-    end;
+    end; */
 
     //CLOUD READY DELETE
     /*procedure SendSalesOrderFrance(pPurchOrderNo: Code[20]) rValue: Boolean
@@ -2040,6 +2049,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         end;
     end;
 
+    /*
     procedure SendPurchasePriceOLD(pCompany: Text[50]; pVendorCode: Code[10]; var pPurchPriceTmp: Record "Price List Line" temporary) rValue: Boolean
     var
         recItem: Record Item;
@@ -2080,7 +2090,7 @@ Codeunit 50083 "Zyxel Web Service Management"
             // Replicate
             rValue := ZyWebServReq.SendPurchasePrice(pCompany, InnerText);  // Change call of function here
         end;
-    end;
+    end; */
 
     procedure SendSalesPrice(pCompany: Text[50]; var pSalesPriceTmp: Record "Price List Line" temporary) rValue: Boolean
     var
@@ -2136,6 +2146,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         end;
     end;
 
+    /*
     procedure SendSalesPriceOLD(pCompany: Text[50]; var pSalesPriceTmp: Record "Price List Line" temporary) rValue: Boolean
     var
         recItem: Record Item;
@@ -2176,7 +2187,7 @@ Codeunit 50083 "Zyxel Web Service Management"
             // Replicate
             rValue := ZyWebServReq.SendSalesPrice(pCompany, InnerText);  // Change call of function here
         end;
-    end;
+    end; */
 
     procedure SendPhasesPurchaseOrder(pPurchOrderNo: Code[20]) rValue: Boolean
     var
@@ -2232,6 +2243,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         end;
     end;
 
+    /*
     procedure SendPhasesPurchaseOrderOLD(pPurchOrderNo: Code[20]) rValue: Boolean
     var
         recItem: Record Item;
@@ -2270,7 +2282,7 @@ Codeunit 50083 "Zyxel Web Service Management"
             // Send
             rValue := ZyWebServReq.SendRequestBoolean('ZNet DK', 'SendPhasesPurchaseOrder', 'purchaseOrders', InnerText, '');  // Change call of function here
         end;
-    end;
+    end; /*
 
     // procedure SendConcurPurchaseDocument(pCompanyName: Text; var pInvCapHead: Record "CC Inv. Capture Header" temporary; PostDocument: Boolean) rValue: Boolean
     // var
@@ -2370,7 +2382,8 @@ Codeunit 50083 "Zyxel Web Service Management"
         end;
         //<< 16-10-20 ZY-LD 006
     end;
-    */
+    *
+    /*
     procedure SendUseOfReportOLD(var pUseOfReportTmp: Record "Use of Report Entry" temporary)
     var
         recRepComp: Record "Replication Company";
@@ -2408,7 +2421,7 @@ Codeunit 50083 "Zyxel Web Service Management"
             ZyWebServReq.SendRequestBoolean(ZGT.GetCompanyName(1), 'SendUseOfReport', 'useOfReports', rValue, '');
         end;
         //<< 16-10-20 ZY-LD 006
-    end;
+    end; */
 
     procedure ProcessHqSalesDocument()
     var
@@ -2575,6 +2588,7 @@ Codeunit 50083 "Zyxel Web Service Management"
         end;
     end; */
 
+    /*
     procedure ReplicateItemBudgetEntriesOLD(pCompanyName: Text[30])
     var
         recRepComp: Record "Replication Company";
@@ -2628,7 +2642,7 @@ Codeunit 50083 "Zyxel Web Service Management"
 
             ZGT.CloseProgressWindow;
         end;
-    end;
+    end; */
 
     procedure VendorCreatedInConcur(pVendorNo: Code[20]) rValue: Boolean
     var

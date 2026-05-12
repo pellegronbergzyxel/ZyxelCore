@@ -71,7 +71,7 @@ Codeunit 50084 "Zyxel Web Service Request"
             Error(ErrorTxt);
         end;
     end;
-
+    /*
     procedure ReplicateItemOLD(pCompany: Text[80]; pInnerText: Text) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -153,7 +153,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
-    end;
+    end; */
 
 
     procedure ReplicateGlAccount(pCompany: Text[80]; pInnerXML: Text) rValue: Text
@@ -220,6 +220,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
     end;
 
+    /*
     procedure ReplicateGlAccountOLD(pCompany: Text[80]; pInnerXML: Text) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -301,7 +302,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
-    end;
+    end; */
 
 
     procedure ReplicateCostTypeName(pCompany: Text[80]; pInnerXML: Text) rValue: Text
@@ -367,6 +368,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
     end;
 
+    /*
     procedure ReplicateCostTypeNameOLD(pCompany: Text[80]; pInnerXML: Text) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -447,7 +449,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
-    end;
+    end; */
 
 
     procedure ReplicateCustomer(pCompany: Text[80]; pInnerXML: Text) rValue: Text
@@ -514,6 +516,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
     end;
 
+    /*
     procedure ReplicateCustomerOLD(pCompany: Text[80]; pInnerXML: Text) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -595,7 +598,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
-    end;
+    end; */
 
 
     procedure ReplicateEmailAddress(pCompany: Text[80]; pInnerXML: Text) rValue: Text
@@ -661,6 +664,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
     end;
 
+    /*
     procedure ReplicateEmailAddressOLD(pCompany: Text[80]; pInnerXML: Text) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -741,7 +745,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
-    end;
+    end; */
 
 
     procedure ReplicateUserSetup(pCompany: Text[80]; pInnerXML: Text) rValue: Text
@@ -807,7 +811,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
     end;
 
-    procedure ReplicateUserSetupOLD(pCompany: Text[80]; pInnerXML: Text) rValue: Text
+    /* procedure ReplicateUserSetupOLD(pCompany: Text[80]; pInnerXML: Text) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
         WebServiceRequestMgt: Codeunit "SOAP Web Service Request Mgt.";
@@ -887,7 +891,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
-    end;
+    end; */
 
 
     procedure ReplicateICInboxPurchHead(pCompany: Text[80]; pInnerXML: Text) rValue: Text
@@ -954,7 +958,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
     end;
 
-    procedure ReplicateICInboxPurchHeadOLD(pCompany: Text[80]; pInnerXML: Text) rValue: Text
+    /* procedure ReplicateICInboxPurchHeadOLD(pCompany: Text[80]; pInnerXML: Text) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
         WebServiceRequestMgt: Codeunit "SOAP Web Service Request Mgt.";
@@ -1035,7 +1039,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
-    end;
+    end; */
 
     local procedure ReplicatePermission(pCompany: Text[80]; pInnerXML: Text) rValue: Text
     var
@@ -1101,7 +1105,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
     end;
 
-    local procedure ReplicatePermissionOLD(pCompany: Text[80]; pInnerXML: Text) rValue: Text
+    /* local procedure ReplicatePermissionOLD(pCompany: Text[80]; pInnerXML: Text) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
         WebServiceRequestMgt: Codeunit "SOAP Web Service Request Mgt.";
@@ -1183,6 +1187,7 @@ Codeunit 50084 "Zyxel Web Service Request"
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
     end;
+     */
     // CLOUD READY DELETE
     procedure ReplicateItemBudgetEntry(pCompany: Text[80]; pInnerText: Text) rValue: Text
     var
@@ -1247,7 +1252,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
     end;
 
-    procedure ReplicateItemBudgetEntryOLD(pCompany: Text[80]; pInnerText: Text) rValue: Text
+    /* procedure ReplicateItemBudgetEntryOLD(pCompany: Text[80]; pInnerText: Text) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
         WebServiceRequestMgt: Codeunit "SOAP Web Service Request Mgt.";
@@ -1333,7 +1338,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
-    end;
+    end; */
 
 
     procedure GetCustomerCreditLimit(pCompany: Text[80]; pInnerText: Text) rValue: Text
@@ -1423,7 +1428,7 @@ Codeunit 50084 "Zyxel Web Service Request"
                     recCustCredLimit."Customer No." := CustNo;
                     recCustCredLimit.Company := pCompany;
                     if WorkNode.SelectSingleNode('s:Name', XMLNsMgr, FieldNode) then
-                        recCustCredLimit."Customer Name" := FieldNode.AsXmlElement().InnerXml();
+                        recCustCredLimit."Customer Name" := CopyStr(FieldNode.AsXmlElement().InnerXml(), 1, 50);
                     if WorkNode.SelectSingleNode('s:CreditLimitLCY', XMLNsMgr, FieldNode) then
                         recCustCredLimit."Credit Limit Sub (LCY)" := EvaluateAmount(FieldNode.AsXmlElement().InnerXml());
                     if WorkNode.SelectSingleNode('s:BalanceDueLCY', XMLNsMgr, FieldNode) then
@@ -1469,6 +1474,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
     end;
 
+    /*
     procedure GetCustomerCreditLimitOLD(pCompany: Text[80]; pInnerText: Text) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -1603,7 +1609,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
-    end;
+    end; */
 
 
     procedure GetAccountPay_Receivable(pCompany: Text[80]; pWsFunctionName: Text; pWsHeader: Text; pInnerText: Text; var AccPayBuff: Record "Account Pay./Receiv Buffer" temporary) rValue: Text
@@ -1730,7 +1736,7 @@ Codeunit 50084 "Zyxel Web Service Request"
 
     end;
 
-
+    /*
     procedure GetAccountPay_ReceivableOLD(pCompany: Text[80]; pWsFunctionName: Text; pWsHeader: Text; pInnerText: Text; var AccPayBuff: Record "Account Pay./Receiv Buffer" temporary) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -1800,7 +1806,7 @@ Codeunit 50084 "Zyxel Web Service Request"
             ClientFilename := FileMgt.ClientTempFileName('xml');
             ResponseXmlDoc.Save(ServerFilename);
             FileMgt.DownloadToFile(ServerFilename,ClientFilename);
-            HYPERLINK(ClientFilename);*/
+            HYPERLINK(ClientFilename);
 
             if AccPayBuff.FindLast then
                 NextEntryNo := AccPayBuff."Entry No.";
@@ -1850,7 +1856,7 @@ Codeunit 50084 "Zyxel Web Service Request"
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
 
-    end;
+    end; */
 
     //CLOUD READY DELETE
     /*procedure GetSalesInvoiceNo(pCompany: Text[80]; var pSalesInvNo: Code[20]) rValue: Text
@@ -1916,7 +1922,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         //<< 11-04-19 ZY-LD 001
     end; */
 
-
+    /*
     procedure GetSalesInvoiceNoOLD(pCompany: Text[80]; var pSalesInvNo: Code[20]) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -1998,7 +2004,7 @@ Codeunit 50084 "Zyxel Web Service Request"
             Error(ErrorTxt);
         end;
         //<< 11-04-19 ZY-LD 001
-    end;
+    end; */
 
 
     procedure GetExchangeInfo(pCompany: Text[80]; pWsFunctionName: Text; pWsHeader: Text; pInnerText: Text; var pCurrExchRateBuf: Record "Currency Exchange Rate Buffer" temporary)
@@ -2069,7 +2075,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
     end;
 
-
+    /*
     procedure GetExchangeInfoOLD(pCompany: Text[80]; pWsFunctionName: Text; pWsHeader: Text; pInnerText: Text; var pCurrExchRateBuf: Record "Currency Exchange Rate Buffer" temporary)
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -2150,7 +2156,7 @@ Codeunit 50084 "Zyxel Web Service Request"
             WebServiceRequestMgt.ProcessFaultResponse(ErrorTxt);
             Error(ErrorTxt);
         end;
-    end;
+    end; */
 
 
     procedure GetConcurVendor(pCompany: Text[80]; pWsFunctionName: Text; pWsHeader: Text; pInnerText: Text; var pVendTmp: Record Vendor temporary; pVendorNo: Code[20])
@@ -2258,7 +2264,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
     end;
 
-
+    /*
     procedure GetConcurVendorOLD(pCompany: Text[80]; pWsFunctionName: Text; pWsHeader: Text; pInnerText: Text; var pVendTmp: Record Vendor temporary; pVendorNo: Code[20])
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -2358,7 +2364,7 @@ Codeunit 50084 "Zyxel Web Service Request"
             WebServiceRequestMgt.ProcessFaultResponse(ErrorTxt);
             Error(ErrorTxt);
         end;
-    end;
+    end; */
 
 
     procedure SendSalesInvoiceNo(pCompany: Text[80]; pRHQSalesInvNo: Code[20]; pSubSalesInvNo: Code[20]) rValue: Boolean
@@ -2425,7 +2431,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         //<< 11-04-19 ZY-LD 001
     end;
 
-
+    /*
     procedure SendSalesInvoiceNoOLD(pCompany: Text[80]; pRHQSalesInvNo: Code[20]; pSubSalesInvNo: Code[20]) rValue: Boolean
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -2508,7 +2514,7 @@ Codeunit 50084 "Zyxel Web Service Request"
             Error(ErrorTxt);
         end;
         //<< 11-04-19 ZY-LD 001
-    end;
+    end; */
 
 
     procedure SendPurchaseOrder(pCompany: Text[80]; pInnerText: Text) rValue: Boolean
@@ -2575,7 +2581,7 @@ Codeunit 50084 "Zyxel Web Service Request"
 
     end;
 
-
+    /*
     procedure SendPurchaseOrderOLD(pCompany: Text[80]; pInnerText: Text) rValue: Boolean
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -2656,7 +2662,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
-    end;
+    end; */
 
 
     procedure SendUnshippedQuantity(pCompany: Text[80]; pInnerText: Text) rValue: Boolean
@@ -2723,7 +2729,7 @@ Codeunit 50084 "Zyxel Web Service Request"
 
     end;
 
-
+    /*
     procedure SendUnshippedQuantityOLD(pCompany: Text[80]; pInnerText: Text) rValue: Boolean
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -2804,7 +2810,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
-    end;
+    end; */
 
 
     procedure SendContainerDetails(pCompany: Text[80]; pInnerText: Text) rValue: Boolean
@@ -2871,7 +2877,7 @@ Codeunit 50084 "Zyxel Web Service Request"
 
     end;
 
-
+    /*
     procedure SendContainerDetailsOLD(pCompany: Text[80]; pInnerText: Text) rValue: Boolean
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -2952,7 +2958,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
-    end;
+    end; */
 
     // CLOUD READY DELETE
     /*procedure SendSalesOrderFrance(pCompany: Text[80]; pInnerXml: Text) rValue: Boolean
@@ -3020,7 +3026,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
     end;*/
 
-
+    /*
     procedure SendSalesOrderFranceOLD(pCompany: Text[80]; pInnerXml: Text) rValue: Boolean
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -3100,7 +3106,7 @@ Codeunit 50084 "Zyxel Web Service Request"
             WebServiceRequestMgt.ProcessFaultResponse(ErrorTxt);
             Error(ErrorTxt);
         end;
-    end;
+    end; */
 
 
     procedure SendRequestBoolean(pCompany: Text[80]; pWsFunctionName: Text; pWsHeader: Text; pInnerText: Text; pTopHeader: Text) rValue: Boolean
@@ -3177,6 +3183,7 @@ Codeunit 50084 "Zyxel Web Service Request"
     end;
 
 
+    /*
     procedure SendRequestBooleanOLD(pCompany: Text[80]; pWsFunctionName: Text; pWsHeader: Text; pInnerText: Text; pTopHeader: Text) rValue: Boolean
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -3265,7 +3272,7 @@ Codeunit 50084 "Zyxel Web Service Request"
             WebServiceRequestMgt.ProcessFaultResponse(ErrorTxt);
             Error(ErrorTxt);
         end;
-    end;
+    end; */
 
     // CLOUD READY DELETE
     /*
@@ -3470,7 +3477,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
     end;
 
-
+    /*
     procedure SendRequestDecimalOLD(pCompany: Text[80]; pWsFunctionName: Text; pWsHeader: Text; pInnerText: Text) rValue: Decimal
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -3549,7 +3556,7 @@ Codeunit 50084 "Zyxel Web Service Request"
             WebServiceRequestMgt.ProcessFaultResponse(ErrorTxt);
             Error(ErrorTxt);
         end;
-    end;
+    end; */
 
 
     procedure SendRequestDecimalText(pCompany: Text[80]; pWsFunctionName: Text; pWsHeader: Text; pInnerText: Text) rValue: Text
@@ -3615,7 +3622,7 @@ Codeunit 50084 "Zyxel Web Service Request"
     end;
 
 
-    procedure SendRequestDecimalTextOLD(pCompany: Text[80]; pWsFunctionName: Text; pWsHeader: Text; pInnerText: Text) rValue: Text
+    /* procedure SendRequestDecimalTextOLD(pCompany: Text[80]; pWsFunctionName: Text; pWsHeader: Text; pInnerText: Text) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
         WebServiceRequestMgt: Codeunit "SOAP Web Service Request Mgt.";
@@ -3692,12 +3699,12 @@ Codeunit 50084 "Zyxel Web Service Request"
             WebServiceRequestMgt.ProcessFaultResponse(ErrorTxt);
             Error(ErrorTxt);
         end;
-    end;
+    end; */
 
 
-    procedure OutboxSalesHdrToInbox()
-    begin
-    end;
+    //procedure OutboxSalesHdrToInbox()
+    //begin
+    //end;
 
 
     procedure SendPurchasePrice(pCompany: Text[80]; pInnerText: Text) rValue: Boolean
@@ -3764,7 +3771,7 @@ Codeunit 50084 "Zyxel Web Service Request"
 
     end;
 
-
+    /*
     procedure SendPurchasePriceOLD(pCompany: Text[80]; pInnerText: Text) rValue: Boolean
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -3845,7 +3852,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
-    end;
+    end; */
 
 
     procedure SendSalesPrice(pCompany: Text[80]; pInnerText: Text) rValue: Boolean
@@ -3912,7 +3919,7 @@ Codeunit 50084 "Zyxel Web Service Request"
 
     end;
 
-
+    /*
     procedure SendSalesPriceOLD(pCompany: Text[80]; pInnerText: Text) rValue: Boolean
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -3993,7 +4000,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
-    end;
+    end; */
 
     local procedure GetSetupCode(): Code[2]
     begin
@@ -4069,7 +4076,7 @@ Codeunit 50084 "Zyxel Web Service Request"
 
     end;
 
-
+    /*
     procedure ICPartnerExistsInSubOLD(pCompany: Text[80]; pICPartnerCode: Code[20]) rValue: Text
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -4149,7 +4156,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
-    end;
+    end; */
 
     //CLOUD READY DELETE
     /*
@@ -4218,7 +4225,7 @@ Codeunit 50084 "Zyxel Web Service Request"
 
     end; */
 
-
+    /*
     procedure GetCustomerOverdueBalanceOLD(pCompany: Text[80]; pCustNo: Code[20]; pDueDate: Date; pShowOpenPayments: Boolean) rValue: Decimal
     var
         recWebServiceSetup: Record "Web Service Setup";
@@ -4301,7 +4308,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         end;
 
         //MESSAGE('Time: %1',CURRENTDATETIME - CurDT);
-    end;
+    end; */
 
     local procedure EvaluateAmount(pAmount: Text) rValue: Decimal
     begin
