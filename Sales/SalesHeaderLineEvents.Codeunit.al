@@ -1707,7 +1707,13 @@ codeunit 50067 "Sales Header/Line Events"
     local procedure OnBeforeValidateSLUnitPriceExclVAT(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
     var
         ZGT: Codeunit "ZyXEL General Tools";
+        Amazonhelper: codeunit AmazonHelper;
     begin
+        if (rec."Unit Price" <> xrec."Unit Price") and (CurrFieldNo = rec.FieldNo("Unit price")) then
+            if Amazonhelper.MarginapprovalRequiredSalesorder(rec) then
+                Amazonhelper.MarginapprovalSalesorder(rec);
+
+
         UpdateUnitPrice(Rec, Xrec, CurrFieldNo, false);
 
         // This code can be removed, when sales to eCommerce is done direct from ZNet DK.
@@ -1717,6 +1723,8 @@ codeunit 50067 "Sales Header/Line Events"
                (not Rec."Hide Line")
             then
                 Rec."Unit Price" := GetZyxelUnitCost(Rec);
+
+
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterValidateEvent', 'Unit Price', false, false)]

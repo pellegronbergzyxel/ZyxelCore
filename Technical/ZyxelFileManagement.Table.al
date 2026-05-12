@@ -49,6 +49,12 @@ Table 66002 "Zyxel File Management"
         {
             Caption = 'Error Date';
         }
+        // CLOUD READY
+        field(100; filblob; blob)
+        {
+
+            Caption = 'Fil blob';
+        }
     }
 
     keys
@@ -67,9 +73,13 @@ Table 66002 "Zyxel File Management"
     }
 
     trigger OnDelete()
+
     begin
-        if recServEnviron.ProductionEnvironment then  // 09-01-20 ZY-LD 001
-            FileMgt.DeleteServerFile(Filename);
+        // CLOUD READY DELETE
+        //if recServEnviron.ProductionEnvironment then  // 09-01-20 ZY-LD 001
+        //   FileMgt.DeleteServerFile(Filename);
+
+
     end;
 
     trigger OnInsert()
@@ -137,4 +147,114 @@ Table 66002 "Zyxel File Management"
                             Type := Type::LMR;  //<< 25-05-24 ZY-LD 003
 
     end;
+ procedure LoadFileToBlob(FilePath: Text): Boolean
+    var
+        FileIn: File;
+        FileStream: InStream;
+    begin
+        if not File.Exists(FilePath) then
+            exit(false);
+
+        FileIn.Open(FilePath);
+        FileIn.CreateInstream(FileStream);
+        filblob.ImportStream(FileStream, '');
+        FileIn.Close;
+        exit(true);
+    end;
+
+    procedure DownloadBlobToFile(DownloadPath: Text): Boolean
+    var
+        FileOut: File;
+        FileStream: OutStream;
+    begin
+        if filblob.HasValue then begin
+            FileOut.Create(DownloadPath);
+            FileOut.CreateOutstream(FileStream);
+            filblob.ExportStream(FileStream);
+            FileOut.Close;
+            exit(true);
+        end;
+        exit(false);
+    end;
+
+    procedure GetBlobInStream(var BlobStream: InStream): Boolean
+    begin
+        if filblob.HasValue then begin
+            filblob.CreateInStream(BlobStream);
+            exit(true);
+        end;
+        exit(false);
+    end;
+
+    procedure GetBlobOutStream(var BlobStream: OutStream): Boolean
+    begin
+        filblob.CreateOutStream(BlobStream);
+        exit(true);
+    end;
+
+    procedure LoadFileToBase64(FilePath: Text): Boolean
+    var
+        FileIn: File;
+        FileStream: InStream;
+        Base64: Codeunit "Base64 Convert";
+        BlobStream: OutStream;
+        Base64Content: Text;
+    begin
+        if not File.Exists(FilePath) then
+            exit(false);
+
+        FileIn.Open(FilePath);
+        FileIn.CreateInstream(FileStream);
+        Base64Content := Base64.ToBase64(FileStream);
+        FileIn.Close;
+
+        filblob.CreateOutStream(BlobStream);
+        BlobStream.WriteText(Base64Content);
+        exit(true);
+    end;
+
+    procedure DownloadBlobFromBase64(DownloadPath: Text): Boolean
+    var
+        FileOut: File;
+        FileStream: OutStream;
+        Base64: Codeunit "Base64 Convert";
+        BlobStream: InStream;
+        Base64Content: Text;
+    begin
+        if not filblob.HasValue then
+            exit(false);
+
+        filblob.CreateInStream(BlobStream);
+        BlobStream.ReadText(Base64Content);
+
+        FileOut.Create(DownloadPath);
+        FileOut.CreateOutstream(FileStream);
+        Base64.FromBase64(Base64Content, FileStream);
+        FileOut.Close;
+        exit(true);
+    end;
+
+    procedure GetBlobAsBase64(var Base64Content: Text): Boolean
+    var
+        Base64: Codeunit "Base64 Convert";
+        BlobStream: InStream;
+    begin
+        if filblob.HasValue then begin
+            filblob.CreateInStream(BlobStream);
+            Base64Content := Base64.ToBase64(BlobStream);
+            exit(true);
+        end;
+        exit(false);
+    end;
+
+    procedure SetBlobFromBase64(Base64Content: Text): Boolean
+    var
+        Base64: Codeunit "Base64 Convert";
+        BlobStream: OutStream;
+    begin
+        filblob.CreateOutStream(BlobStream);
+        Base64.FromBase64(Base64Content, BlobStream);
+        exit(true);
+    end;
+
 }

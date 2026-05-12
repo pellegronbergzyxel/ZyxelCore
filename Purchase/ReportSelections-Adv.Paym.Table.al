@@ -20,7 +20,7 @@ Table 75063 "Report Selections - Adv.Paym."
         field(3; "Report ID"; Integer)
         {
             Caption = 'Report ID';
-            TableRelation = Object.ID where(Type = const(Report));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(report)); // Object.ID where(Type = const(Report));
 
             trigger OnValidate()
             begin

@@ -160,7 +160,8 @@ Report 50094 "Zyxel Item list"
 
     procedure CreateExcelbook()
     begin
-        TempExcelBuf.CreateBook('', Text002);
+       // TempExcelBuf.CreateBook('', Text002); CLOUD ready DELETE
+        TempExcelBuf.CreateNewBook(Text002);
         TempExcelBuf.WriteSheet(Text002, CompanyName(), UserId());
         TempExcelBuf.CloseBook();
         if GuiAllowed() then begin

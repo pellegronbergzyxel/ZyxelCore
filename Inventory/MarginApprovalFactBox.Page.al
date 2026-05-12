@@ -17,7 +17,7 @@ page 50134 "Margin Approval FactBox"
                 group(Approver)
                 {
                     Caption = 'Approver';
-                    field(ApproverComment; ApproverComment)
+                    field(ApproverComment; rec."Approver Comment")
                     {
                         ApplicationArea = Basic, Suite;
                         MultiLine = true;
@@ -30,42 +30,37 @@ page 50134 "Margin Approval FactBox"
                 {
                     Caption = 'User';
 
-                    field(UserComment; UserComment)
+                    field(UserComment; rec."User Comment")
                     {
                         ApplicationArea = Basic, Suite;
                         MultiLine = true;
                         ShowCaption = false;
                         Editable = true;
                         ToolTip = 'Specifies the user comment.';
-
-                        trigger OnValidate()
-                        begin
-                            Rec.SetComment(CommentType::User, UserComment);
-                        end;
-                    }
+                                            }
                 }
             }
         }
     }
 
-    actions
-    {
-        area(Processing)
-        {
-            action(EnterUserComment)
-            {
-                Caption = 'Enter User Comment';
-                Image = Comment;
-                Enabled = EnterUserCommentEnabled;
-                ToolTip = 'Allows the user to enter a comment regarding the margin approval request.';
+    // actions
+    // {
+    //     area(Processing)
+    //     {
+    //         action(EnterUserComment)
+    //         {
+    //             Caption = 'Enter User Comment';
+    //             Image = Comment;
+    //             Enabled = EnterUserCommentEnabled;
+    //             ToolTip = 'Allows the user to enter a comment regarding the margin approval request.';
 
-                trigger OnAction()
-                begin
-                    Rec.EnterUserComment();
-                end;
-            }
-        }
-    }
+    //             trigger OnAction()
+    //             begin
+    //                 Rec.EnterUserComment();
+    //             end;
+    //         }
+    //     }
+    // }
 
     var
         CommentType: Option User,Approver;
@@ -81,9 +76,6 @@ page 50134 "Margin Approval FactBox"
     begin
         SetActions();
 
-        // Read comments
-        ApproverComment := Rec.GetComment(CommentType::Approver);
-        UserComment := Rec.GetComment(CommentType::User);
     end;
 
     var

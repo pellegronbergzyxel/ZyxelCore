@@ -447,9 +447,10 @@ Report 50026 "WEEE Excel Export"
 
     procedure CreateExcelbook(SheetName: Text[30])
     var
-        FileManagement: Codeunit "File Management";
+     
     begin
-        ExcelBuf2.CreateBook('', SheetName);
+       // ExcelBuf2.CreateBook('', SheetName); CLOUD ready DELETE
+        ExcelBuf2.CreateNewBook(SheetName);
         ExcelBuf2.WriteSheet(SheetName, SheetName, UserId());
         ExcelBuf2.ClearNewRow;
     end;

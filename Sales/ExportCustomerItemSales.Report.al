@@ -209,7 +209,7 @@ Report 50004 "Export Customer/Item Sales"
 
     trigger OnPostReport()
     begin
-        TempExcelBuffer.CreateBook('', 'Customer Item Sales');
+        TempExcelBuffer.CreateNewBook('Customer Item Sales');
         TempExcelBuffer.WriteSheet('Customer Item Sales', CompanyName(), UserId());
         TempExcelBuffer.CloseBook();
         TempExcelBuffer.OpenExcel();

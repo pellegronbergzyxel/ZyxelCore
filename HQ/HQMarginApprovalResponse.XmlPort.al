@@ -85,13 +85,9 @@ xmlport 50011 "HQ Margin Approval Response"
                 MarginApp.get(MarginApproval."Entry No.");
                 MarginApp.Validate(Status, MarginApproval.Status);
                 MarginApp."Approved/Rejected by" := MarginApproval."Approved/Rejected by";
-                if Comment <> '' then begin
-                    ReceivedComment := StrSubstNo('%1 %2:%3"%4".', Format(CurrDT, 0, 0), MarginApproval.Status, CrLf, Comment);
-                    if MarginApp.GetComment(1) <> '' then
-                        MarginApp.SetComment(1, StrSubstNo('%1 %2%2 %3', ReceivedComment, CrLf, MarginApp.GetComment(1)))
-                    else
-                        MarginApp.SetComment(1, ReceivedComment);
-                end;
+                if Comment <> '' then 
+                        MarginApp."Approver Comment" := CopyStr(Comment,1,250);
+                
                 MarginApp.requeststatusDT := CurrentDateTime;
                 MarginApp.Status := MarginApproval.Status;
                 MarginApp.requeststatus := MarginApproval.requeststatus;

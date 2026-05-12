@@ -280,7 +280,8 @@ Report 50023 "Exp. Acc. Sched. Entry to Ex."
                     if not TestMode then
                         TempExcelBuffer.DownloadAndOpenExcel
                 end else begin
-                    TempExcelBuffer.CreateBook(ServerFileName, AccSchedName.Name);
+                    TempExcelBuffer.CreateNewBook(AccSchedName.Name);
+                    
                     TempExcelBuffer.WriteSheet(AccSchedName.Description, CompanyName(), UserId());
                     TempExcelBuffer.CloseBook;
                     if not TestMode then

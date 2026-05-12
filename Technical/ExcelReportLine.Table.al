@@ -23,7 +23,7 @@ Table 60006 "Excel Report Line"
         field(4; "Table No."; Integer)
         {
             BlankZero = true;
-            TableRelation = Object.ID where(Type = const(Table));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Table)); // Object.ID where(Type = const(Table));
         }
         field(5; "Field No."; Integer)
         {

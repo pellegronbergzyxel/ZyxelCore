@@ -123,6 +123,18 @@ pageextension 50129 SalesOrderSubformZX extends "Sales Order Subform"
                 Visible = false;
                 Editable = false;
             }
+            field(MarginApprovalSOStatus;Rec.MarginApprovalSOStatus)
+            {
+                ApplicationArea = Basic, Suite;
+                Visible = false;
+                Editable = false;
+            }
+            field(MarginApprovalEntryNo;Rec.MarginApprovalEntryNo)
+            {
+                ApplicationArea = Basic, Suite;
+                Visible = false;
+                Editable = false;
+            }
         }
         addafter("No.")
         {

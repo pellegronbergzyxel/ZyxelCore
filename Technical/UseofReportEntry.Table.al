@@ -42,8 +42,8 @@ Table 50081 "Use of Report Entry"
         }
         field(8; "Object Description"; Text[30])
         {
-            CalcFormula = lookup(Object.Name where(Type = field("Object Type"),
-                                                    ID = field("Object Id")));
+            CalcFormula = lookup(AllObj."Object Name" where("Object Type" = field("Object Type"),
+                                                    "Object ID" = field("Object Id")));
             Caption = 'Object Description';
             Editable = false;
             FieldClass = FlowField;

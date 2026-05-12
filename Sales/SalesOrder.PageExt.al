@@ -568,6 +568,21 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
 
                     end;
                 }
+                    action(Submitshippinglabelrequest)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Submit Shipping Label Request';
+                    Image = PostMail;
+
+                    trigger OnAction()
+                    var
+                        AmazonHelper: Codeunit AmazonHelper;
+                        
+                    begin
+                        AmazonHelper.SubmitShippingLabelRequest(rec);
+                        
+                    end;
+                }
 
                 action(packingSlips)
                 {

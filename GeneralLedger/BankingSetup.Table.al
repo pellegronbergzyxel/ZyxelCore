@@ -108,28 +108,23 @@ table 75200 "Banking Setup"
 
             trigger OnLookup()
             var
-                lreObject: Record "Object";
-                lfoObject: Page Objects;
+                lreObject: Record AllObj;
+                lfoObject: Page "All Objects";
             begin
                 if lreObject.Get("Export Object Type", '', "Export Object No.") then
                     lfoObject.SetRecord(lreObject);
                 lreObject.FilterGroup(2);
-                lreObject.SetRange(Type, "Export Object Type");
-                lreObject.SetRange("Company Name", '');
+                lreObject.SetRange("Object Type", "Export Object Type");
+                //   lreObject.SetRange("Company Name", '');
                 lfoObject.SetTableView(lreObject);
                 lfoObject.LookupMode(true);
                 if lfoObject.RunModal = Action::LookupOK then begin
                     lfoObject.GetRecord(lreObject);
-                    "Export Object No." := lreObject.ID;
+                    "Export Object No." := lreObject."Object ID";
                 end else
                     Error('');
             end;
 
-            trigger OnValidate()
-            var
-                lreObject: Record "Object";
-            begin
-            end;
         }
         field(25; "Import Path"; Text[250])
         {
@@ -160,19 +155,19 @@ table 75200 "Banking Setup"
 
             trigger OnLookup()
             var
-                lreObject: Record "Object";
-                lfoObject: Page Objects;
+                lreObject: Record AllObj;
+                lfoObject: Page "All Objects";
             begin
                 if lreObject.Get("Import Object Type", '', "Import Object No.") then
                     lfoObject.SetRecord(lreObject);
                 lreObject.FilterGroup(2);
-                lreObject.SetRange(Type, "Import Object Type");
-                lreObject.SetRange("Company Name", '');
+                lreObject.SetRange("Object Type", "Import Object Type");
+                //  lreObject.SetRange("Company Name", '');
                 lfoObject.SetTableView(lreObject);
                 lfoObject.LookupMode(true);
                 if lfoObject.RunModal = Action::LookupOK then begin
                     lfoObject.GetRecord(lreObject);
-                    "Import Object No." := lreObject.ID;
+                    "Import Object No." := lreObject."Object ID";
                 end else
                     Error('');
             end;
@@ -184,19 +179,19 @@ table 75200 "Banking Setup"
 
             trigger OnLookup()
             var
-                lreObject: Record "Object";
-                lfoObject: Page Objects;
+                lreObject: Record AllObj;
+                lfoObject: Page "All Objects";
             begin
                 if lreObject.Get("import object type"::Report, '', "Payment Order Domectics") then
                     lfoObject.SetRecord(lreObject);
                 lreObject.FilterGroup(2);
-                lreObject.SetRange(Type, lreObject.Type::Report);
-                lreObject.SetRange("Company Name", '');
+                lreObject.SetRange("Object Type", lreObject."Object Type"::Report);
+                // lreObject.SetRange("Company Name", '');
                 lfoObject.SetTableView(lreObject);
                 lfoObject.LookupMode(true);
                 if lfoObject.RunModal = Action::LookupOK then begin
                     lfoObject.GetRecord(lreObject);
-                    "Payment Order Domectics" := lreObject.ID;
+                    "Payment Order Domectics" := lreObject."Object ID";
                 end else
                     Error('');
             end;
@@ -208,19 +203,19 @@ table 75200 "Banking Setup"
 
             trigger OnLookup()
             var
-                lreObject: Record "Object";
-                lfoObject: Page Objects;
+                lreObject: Record AllObj;
+                lfoObject: Page "All Objects";
             begin
                 if lreObject.Get("import object type"::Report, '', "Payment Order International") then
                     lfoObject.SetRecord(lreObject);
                 lreObject.FilterGroup(2);
-                lreObject.SetRange(Type, "import object type"::Report);
-                lreObject.SetRange("Company Name", '');
+                lreObject.SetRange("Object Type", "import object type"::Report);
+                //     lreObject.SetRange("Company Name", '');
                 lfoObject.SetTableView(lreObject);
                 lfoObject.LookupMode(true);
                 if lfoObject.RunModal = Action::LookupOK then begin
                     lfoObject.GetRecord(lreObject);
-                    "Payment Order International" := lreObject.ID;
+                    "Payment Order International" := lreObject."Object ID";
                 end else
                     Error('');
             end;
@@ -253,19 +248,19 @@ table 75200 "Banking Setup"
 
             trigger OnLookup()
             var
-                lreObject: Record "Object";
-                lfoObject: Page Objects;
+                lreObject: Record AllObj;
+                lfoObject: Page "All Objects";
             begin
                 if lreObject.Get("Import Pay. Ord. Object Type", '', "Import Payment Order Object No") then
                     lfoObject.SetRecord(lreObject);
                 lreObject.FilterGroup(2);
-                lreObject.SetRange(Type, "Import Pay. Ord. Object Type");
-                lreObject.SetRange("Company Name", '');
+                lreObject.SetRange("Object Type", "Import Pay. Ord. Object Type");
+                //lreObject.SetRange("Company Name", '');
                 lfoObject.SetTableView(lreObject);
                 lfoObject.LookupMode(true);
                 if lfoObject.RunModal = Action::LookupOK then begin
                     lfoObject.GetRecord(lreObject);
-                    "Import Payment Order Object No" := lreObject.ID;
+                    "Import Payment Order Object No" := lreObject."Object ID";
                 end else
                     Error('');
             end;
@@ -373,19 +368,19 @@ table 75200 "Banking Setup"
 
             trigger OnLookup()
             var
-                lreObject: Record "Object";
-                lfoObject: Page Objects;
+                lreObject: Record AllObj;
+                lfoObject: Page "All Objects";
             begin
                 if lreObject.Get("Foreign Export Object Type", '', "Foreign Export Object No.") then
                     lfoObject.SetRecord(lreObject);
                 lreObject.FilterGroup(2);
-                lreObject.SetRange(Type, "Foreign Export Object Type");
-                lreObject.SetRange("Company Name", '');
+                lreObject.SetRange("Object Type", "Foreign Export Object Type");
+                //lreObject.SetRange("Company Name", '');
                 lfoObject.SetTableView(lreObject);
                 lfoObject.LookupMode(true);
                 if lfoObject.RunModal = Action::LookupOK then begin
                     lfoObject.GetRecord(lreObject);
-                    "Foreign Export Object No." := lreObject.ID;
+                    "Foreign Export Object No." := lreObject."Object ID";
                 end else
                     Error('');
             end;

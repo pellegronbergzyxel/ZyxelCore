@@ -1,4 +1,4 @@
- table 50071 "Margin Approval"
+table 50071 "Margin Approval"
 {
     //30-10-2025 BK #MarginApproval          
     Caption = 'Margin Approval';
@@ -87,11 +87,11 @@
         {
             Caption = 'Status Date';
         }
-        field(15; "User Comment"; Blob)
+        field(15; "User Comment"; text[250])
         {
             Caption = 'User Comment';
         }
-        field(16; "Approver Comment"; Blob)
+        field(16; "Approver Comment"; text[250])
         {
             Caption = 'Approver Comment';
         }
@@ -107,7 +107,7 @@
         field(19; "Approved by Entry No."; Integer)
         {
             Caption = 'Approved by Entry No.';
-            Description = 'When sales order line is created, the price needs to be registered if it´s approved or not. We will find the approved price book and relate here.';
+            Description = 'When sales order line is created, the price needs to be registered if its approved or not. We will find the approved price book and relate here.';
             BlankZero = true;
         }
         field(20; "Currency Code"; Code[10])
@@ -330,6 +330,7 @@
             MarginApp.Validate("Item No.", pItemNo);
             MarginApp.Validate("Unit Price", pUnitPrice);
             MarginApp.Validate(Status, MarginApp.Status::Approved);
+            MarginApp.requeststatus := MarginApp.requeststatus::closed;
             MarginApp."Approved/Rejected by" := '';
             If Not MarginApp.Insert(true) then
                 MarginApp.modify;
@@ -342,7 +343,7 @@
         SalesSetup: Record "Sales & Receivables Setup";
     begin
         SalesSetup.get();
-        exit(SalesSetup."Margin Approval");
+        exit(SalesSetup."Margin Approval" <> SalesSetup."Margin Approval"::inActive);
     end;
 
     procedure GetEntryNo(pSourceNo: Code[20]; pSourceLineNo: Integer): Integer
@@ -350,6 +351,17 @@
         MarginApp: Record "Margin Approval";
     begin
         MarginApp.SetRange("Source Type", MarginApp."Source Type"::"Price Book");
+        MarginApp.SetRange("Source No.", pSourceNo);
+        MarginApp.SetRange("Source Line No.", pSourceLineNo);
+        if not MarginApp.FindFirst() then;  // If there is no price book, it can be a sample.
+        Exit(MarginApp."Entry No.");
+    end;
+
+    procedure GetEntryNoSales(pSourceNo: Code[20]; pSourceLineNo: Integer): Integer
+    var
+        MarginApp: Record "Margin Approval";
+    begin
+        MarginApp.SetRange("Source Type", MarginApp."Source Type"::Sales);
         MarginApp.SetRange("Source No.", pSourceNo);
         MarginApp.SetRange("Source Line No.", pSourceLineNo);
         if not MarginApp.FindFirst() then;  // If there is no price book, it can be a sample.
@@ -390,90 +402,90 @@
             end;
     end;
 
-    procedure SetComment(CommentType: Option User,Approver; NewComment: Text)
-    var
-        OutStream: OutStream;
-    begin
-        Case CommentType of
-            CommentType::Approver:
-                begin
-                    Clear("Approver Comment");
-                    "Approver Comment".CreateOutStream(OutStream, TEXTENCODING::UTF8);
-                    OutStream.WriteText(NewComment);
-                    Modify();
-                end;
-            CommentType::User:
-                begin
-                    Clear("User Comment");
-                    "User Comment".CreateOutStream(OutStream, TEXTENCODING::UTF8);
-                    OutStream.WriteText(NewComment);
-                    Modify();
-                end;
-        end;
-    end;
+    // procedure SetComment(CommentType: Option User,Approver; NewComment: Text)
+    // var
+    //     OutStream: OutStream;
+    // begin
+    //     Case CommentType of
+    //         CommentType::Approver:
+    //             begin
+    //                 Clear("Approver Comment");
+    //                 "Approver Comment".CreateOutStream(OutStream, TEXTENCODING::UTF8);
+    //                 OutStream.WriteText(NewComment);
+    //                 Modify();
+    //             end;
+    //         CommentType::User:
+    //             begin
+    //                 Clear("User Comment");
+    //                 "User Comment".CreateOutStream(OutStream, TEXTENCODING::UTF8);
+    //                 OutStream.WriteText(NewComment);
+    //                 Modify();
+    //             end;
+    //     end;
+    // end;
 
-    procedure GetComment(CommentType: Option User,Approver): Text
-    var
-        TypeHelper: Codeunit "Type Helper";
-        InStream: InStream;
-    begin
-        Case CommentType of
-            CommentType::Approver:
-                begin
-                    CalcFields("Approver Comment");
-                    "Approver Comment".CreateInStream(InStream, TEXTENCODING::UTF8);
-                    exit(TypeHelper.TryReadAsTextWithSepAndFieldErrMsg(InStream, TypeHelper.LFSeparator(), FieldName("Approver Comment")));
-                end;
-            CommentType::User:
-                begin
-                    CalcFields("User Comment");
-                    "User Comment".CreateInStream(InStream, TEXTENCODING::UTF8);
-                    exit(TypeHelper.TryReadAsTextWithSepAndFieldErrMsg(InStream, TypeHelper.LFSeparator(), FieldName("User Comment")));
-                end;
-        end;
-    end;
+    // procedure GetComment(CommentType: Option User,Approver): Text
+    // var
+    //     TypeHelper: Codeunit "Type Helper";
+    //     InStream: InStream;
+    // begin
+    //     Case CommentType of
+    //         CommentType::Approver:
+    //             begin
+    //                 CalcFields("Approver Comment");
+    //                 "Approver Comment".CreateInStream(InStream, TEXTENCODING::UTF8);
+    //                 exit(TypeHelper.TryReadAsTextWithSepAndFieldErrMsg(InStream, TypeHelper.LFSeparator(), FieldName("Approver Comment")));
+    //             end;
+    //         CommentType::User:
+    //             begin
+    //                 CalcFields("User Comment");
+    //                 "User Comment".CreateInStream(InStream, TEXTENCODING::UTF8);
+    //                 exit(TypeHelper.TryReadAsTextWithSepAndFieldErrMsg(InStream, TypeHelper.LFSeparator(), FieldName("User Comment")));
+    //             end;
+    //     end;
+    // end;
 
-    procedure EnterUserComment()
-    var
-        MarginApp: Record "Margin Approval";
-        MarginAppUpdate: Page "Margin App. Update User Com.";
-        PreviousComment: Text;
-        ApprovalReqSent: Boolean;
-    begin
-        PreviousComment := Rec.GetComment(0);
-        MarginApp.SetRange("Entry No.", Rec."Entry No.");
-        MarginAppUpdate.SetTableView(MarginApp);
-        MarginAppUpdate.RunModal();
+    // procedure EnterUserComment()
+    // var
+    //     MarginApp: Record "Margin Approval";
+    //     MarginAppUpdate: Page "Margin App. Update User Com.";
+    //     PreviousComment: Text;
+    //     ApprovalReqSent: Boolean;
+    // begin
+    //     PreviousComment := Rec.GetComment(0);
+    //     MarginApp.SetRange("Entry No.", Rec."Entry No.");
+    //     MarginAppUpdate.SetTableView(MarginApp);
+    //     MarginAppUpdate.RunModal();
 
-        if Rec.GetComment(0) <> PreviousComment then begin
-            case Rec."Source Type" of
-                Rec."Source Type"::"Price Book":
-                    begin
-                        // Send Approval Request here;
-                        ApprovalReqSent := false;
-                    end;
-                Rec."Source Type"::Sales:
-                    begin
-                        case Rec."Sales Document Type" of
-                            Rec."Sales Document Type"::Order:
-                                begin
-                                    // Send Approval Request here;
-                                    ApprovalReqSent := false;
-                                end;
-                            Rec."Sales Document Type"::Invoice:
-                                begin
-                                    // Send Approval Request here;
-                                    ApprovalReqSent := false;
-                                end;
-                        end;
-                    end;
-            end;
-            if ApprovalReqSent then begin
-                Rec.Validate(Status, Rec.Status::"Waiting for Approval");
-                Rec.Modify(true);
-            end;
-        end;
-    end;
+    //     if Rec.GetComment(0) <> PreviousComment then begin
+    //         case Rec."Source Type" of
+    //             Rec."Source Type"::"Price Book":
+    //                 begin
+    //                     // Send Approval Request here;
+    //                     ApprovalReqSent := false;
+    //                 end;
+    //             Rec."Source Type"::Sales:
+    //                 begin
+    //                     case Rec."Sales Document Type" of
+    //                         Rec."Sales Document Type"::Order:
+    //                             begin
+    //                                 // Send Approval Request here;
+    //                                 ApprovalReqSent := false;
+    //                             end;
+    //                         Rec."Sales Document Type"::Invoice:
+    //                             begin
+    //                                 // Send Approval Request here;
+    //                                 ApprovalReqSent := false;
+    //                             end;
+    //                     end;
+    //                 end;
+    //         end;
+    //         if ApprovalReqSent then begin
+    //             Rec.Validate(Status, Rec.Status::"Waiting for Approval");
+    //             Rec.Modify(true);
+    //         end;
+    //     end;
+    // end;
 
     procedure UserCommentEnabled(): Boolean
     Begin
@@ -483,6 +495,7 @@
     procedure Setapprovedpricebookline(marginapproval: Record "Margin Approval")
     var
         pricelist: record "Price List Line";
+        SalesLine: Record "Sales Line";
     begin
         if (marginapproval.Status = marginapproval.Status::Approved) and (marginapproval."Source Type" = marginapproval."Source Type"::"Price Book") then begin
 
@@ -496,6 +509,16 @@
                     pricelist.TestField("Asset No.");
                 pricelist.Status := pricelist.Status::Active;
                 pricelist.Modify(false);
+            end
+        end;
+        if (marginapproval.Status = marginapproval.Status::Approved) and (marginapproval."Source Type" = marginapproval."Source Type"::Sales) then begin
+            SalesLine.setrange("Document Type", SalesLine."Document Type"::Order);
+            Salesline.setrange("Document No.", marginapproval."Source No.");
+            Salesline.setrange("Line No.", marginapproval."Source Line No.");
+            Salesline.setrange(MarginApprovalEntryNo, marginapproval."Entry No.");
+            if Salesline.FindSet() then begin
+                Salesline.MarginApprovalSOStatus := Salesline.MarginApprovalSOStatus::Approved;
+                Salesline.Modify(false);
             end
         end;
     end;

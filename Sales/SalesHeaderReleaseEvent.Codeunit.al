@@ -117,6 +117,7 @@ codeunit 50052 SalesHeaderReleaseEvent
             end;
 
             amazon.AllowReleaseamazonorder(SalesHeader);// amazon 20250703 
+            amazon.AllowReleaseMarginOrder(SalesHeader);
 
             if SalesHeader."External Document No." = '' then
                 Error(lText009);

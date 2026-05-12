@@ -222,12 +222,27 @@ Table 50073 "Web Service Setup"
 
     local procedure GetWebServiceName(pObjectID: Integer): Text
     var
-        recWebService: Record "Web Service";
+
+    //recWebService: Record "Web Service";
+    //x: record "Tenant Web Service";
     begin
-        recWebService.SetRange("Object Type", recWebService."object type"::Codeunit);
-        recWebService.SetRange("Object ID", pObjectID);
-        recWebService.FindFirst;
-        exit(recWebService."Service Name");
+        // CLOUD READY DELETE
+        // recWebService.SetRange("Object Type", recWebService."object type"::Codeunit);
+        // recWebService.SetRange("Object ID", pObjectID);
+        // recWebService.FindFirst;
+        // exit(recWebService."Service Name");
+
+        // CLOUD READY NEW
+        // ONLY HARDCODE
+        case pObjectID OF
+            50076:
+                exit('ZYHQ');
+            50082:
+                exit('ZyWS');
+            63000:
+                exit('ZyRMA');
+        end;
+        exit('Missing');
     end;
 
 

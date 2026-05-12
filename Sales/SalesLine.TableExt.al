@@ -511,6 +511,16 @@ tableextension 50117 SalesLineZX extends "Sales Line"
         {
             Description = 'Remember Unit price';
         }
+        field(66013;MarginApprovalSOStatus; enum MarginApprovalSOStatus)
+        {
+            Caption = 'Margin Approval status';
+            
+        }
+        field(66014;MarginApprovalEntryNo; integer)
+        {
+            Caption = 'Margin Approval Entry No.';
+            TableRelation = "Margin Approval";
+        }
     }
 
     keys

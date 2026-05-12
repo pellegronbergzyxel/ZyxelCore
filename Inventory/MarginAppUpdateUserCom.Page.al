@@ -19,7 +19,7 @@ page 50140 "Margin App. Update User Com."
                 group(Approver)
                 {
                     Caption = 'Approver Comment';
-                    field(ApproverComment; ApproverComment)
+                    field(ApproverComment; rec."Approver Comment")
                     {
                         ShowCaption = false;
                         MultiLine = true;
@@ -30,15 +30,12 @@ page 50140 "Margin App. Update User Com."
                 group(User)
                 {
                     Caption = 'User Comment';
-                    field(UserComment; UserComment)
+                    field(UserComment; rec."User Comment")
                     {
                         ShowCaption = false;
                         MultiLine = true;
                         ToolTip = 'Specifies the value of the User Comment field.', Comment = '%';
-                        trigger OnValidate()
-                        begin
-                            Rec.SetComment(0, UserComment);
-                        end;
+                        
                     }
                 }
             }
@@ -46,16 +43,9 @@ page 50140 "Margin App. Update User Com."
     }
     trigger OnAfterGetCurrRecord()
     begin
-        UserComment := Rec.GetComment(0);
-        ApproverComment := rec.GetComment(1);
+        
     end;
 
     var
-        UserComment: Text;
-        ApproverComment: Text;
-
-    procedure GetUserComment()
-    begin
-        Message(UserComment);
-    end;
+        
 }

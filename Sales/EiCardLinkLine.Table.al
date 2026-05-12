@@ -107,24 +107,24 @@ Table 76153 "EiCard Link Line"
         FileMgt: Codeunit "File Management";
 
 
-    procedure DownloadFileOLD() // CLOUD READY DELETE
-    var
-        WebClient: dotnet WebClient;
-        ServicePointManager: dotnet ServicePointManager;
-        SecurityProtocolType: dotnet SecurityProtocolType;
-        FileMgt: Codeunit "File Management";
-        Filename: Text;
-    begin
-        //>> 20-04-22 ZY-LD 002
-        Filename := FileMgt.ServerTempFileName('');
-        if StrPos(Link, 'https') <> 0 then
-            ServicePointManager.SecurityProtocol := SecurityProtocolType.Tls12;
-        WebClient := WebClient.WebClient;
-        WebClient.DownloadFile(Lowercase(Link), Filename);
-        Hyperlink(Filename);
-        FileMgt.DeleteServerFile(Filename);
-        //<< 20-04-22 ZY-LD 002
-    end;
+    // procedure DownloadFileOLD() // CLOUD READY DELETE
+    // var
+    //     WebClient: dotnet WebClient;
+    //     ServicePointManager: dotnet ServicePointManager;
+    //     SecurityProtocolType: dotnet SecurityProtocolType;
+    //     FileMgt: Codeunit "File Management";
+    //     Filename: Text;
+    // begin
+    //     //>> 20-04-22 ZY-LD 002
+    //     Filename := FileMgt.ServerTempFileName('');
+    //     if StrPos(Link, 'https') <> 0 then
+    //         ServicePointManager.SecurityProtocol := SecurityProtocolType.Tls12;
+    //     WebClient := WebClient.WebClient;
+    //     WebClient.DownloadFile(Lowercase(Link), Filename);
+    //     Hyperlink(Filename);
+    //     FileMgt.DeleteServerFile(Filename);
+    //     //<< 20-04-22 ZY-LD 002
+    // end;
 
     procedure DownloadFile() // CLOUD READY NEW
     var

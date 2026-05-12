@@ -156,7 +156,7 @@ tableextension 50155 SalesReceivablesSetupZX extends "Sales & Receivables Setup"
             Caption = 'Skip Salesperson Dimension';
             Description = 'The field can be deleted. It´s not in use.';
         }
-        field(50033; "Margin Approval"; Boolean)  //30-10-25 BK #MarginApproval
+        field(50033; "Margin Approval"; enum Marginapprovalsetup)  //30-10-25 BK #MarginApproval
         {
             Caption = 'Margin Approval';
         }
@@ -315,7 +315,9 @@ tableextension 50155 SalesReceivablesSetupZX extends "Sales & Receivables Setup"
     var
         MarginApp: Record "Margin Approval";
     begin
-        if Rec."Margin Approval" and not xRec."Margin Approval" then
+        if (Rec."Margin Approval" <> xRec."Margin Approval") and 
+           (rec."Margin Approval" <> rec."Margin Approval"::inActive)
+         then
             MarginApp.UpdateOnSetup();
     end;
 
