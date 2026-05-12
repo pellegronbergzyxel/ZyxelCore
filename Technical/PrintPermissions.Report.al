@@ -131,7 +131,8 @@ Report 50002 "Print Permissions"
     var
         lText001: label 'User Permissions';
     begin
-        ExcelBuf.CreateBook('', lText001);
+        //ExcelBuf.CreateBook('', lText001); CLOUD ready DELETE
+        ExcelBuf.CreateNewBook(lText001);
         ExcelBuf.WriteSheet(lText001, CompanyName(), UserId());
 
         ExcelBuf.CloseBook;

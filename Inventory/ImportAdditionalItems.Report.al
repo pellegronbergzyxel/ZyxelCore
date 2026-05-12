@@ -45,7 +45,7 @@ Report 50058 "Import Additional Items"
                         var
                             ExcelBuf: Record "Excel Buffer";
                         begin
-                            SheetName := ExcelBuf.SelectSheetsName(UploadedFileName)
+                            SheetName := ExcelBuf.SelectSheetsName(uploadedFileName);
                         end;
                     }
                     field(SheetContainesHeaderRow; SheetContainesHeaderRow)

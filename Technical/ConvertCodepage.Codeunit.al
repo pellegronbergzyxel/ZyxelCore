@@ -10,32 +10,32 @@ Codeunit 50015 "Convert Codepage"
         FileMgt: Codeunit "File Management";
 
 
-    procedure ConvertCodepageOld(pInputFileName: Text; pOutPutExt: Text[5]; pFromCodePage: Code[10]; pToCodePage: Code[10])
-    var
-        lOutputFileName: Text[250];
-        f: dotnet File;
-        InEnc: dotnet Encoding;
-        OutEnc: dotnet Encoding;
-    begin
-        // CLOUD READY DELETE
-        if not Exists(pInputFileName) then
-            Error(Text50000, pInputFileName);
+    // procedure ConvertCodepageOld(pInputFileName: Text; pOutPutExt: Text[5]; pFromCodePage: Code[10]; pToCodePage: Code[10])
+    // var
+    //     lOutputFileName: Text[250];
+    //     f: dotnet File;
+    //     InEnc: dotnet Encoding;
+    //     OutEnc: dotnet Encoding;
+    // begin
+    //     // CLOUD READY DELETE
+    //     if not Exists(pInputFileName) then
+    //         Error(Text50000, pInputFileName);
 
-        // Set default
-        if pFromCodePage = '' then
-            pFromCodePage := CodepageANSI;
-        if pToCodePage = '' then
-            pToCodePage := CodepageUTF8;
-        if pOutPutExt = '' then
-            pOutPutExt := FileMgt.GetExtension(pInputFileName);
-        if CopyStr(pOutPutExt, 1, 1) <> '.' then
-            pOutPutExt := '.' + pOutPutExt;
+    //     // Set default
+    //     if pFromCodePage = '' then
+    //         pFromCodePage := CodepageANSI;
+    //     if pToCodePage = '' then
+    //         pToCodePage := CodepageUTF8;
+    //     if pOutPutExt = '' then
+    //         pOutPutExt := FileMgt.GetExtension(pInputFileName);
+    //     if CopyStr(pOutPutExt, 1, 1) <> '.' then
+    //         pOutPutExt := '.' + pOutPutExt;
 
-        InEnc := InEnc.GetEncoding(pFromCodePage);
-        OutEnc := OutEnc.GetEncoding(pToCodePage);
-        lOutputFileName := FileMgt.GetDirectoryName(pInputFileName) + '\' + FileMgt.GetFileNameWithoutExtension(pInputFileName) + pOutPutExt;
-        f.WriteAllLines(lOutputFileName, f.ReadAllLines(pInputFileName, InEnc), OutEnc);
-    end;
+    //     InEnc := InEnc.GetEncoding(pFromCodePage);
+    //     OutEnc := OutEnc.GetEncoding(pToCodePage);
+    //     lOutputFileName := FileMgt.GetDirectoryName(pInputFileName) + '\' + FileMgt.GetFileNameWithoutExtension(pInputFileName) + pOutPutExt;
+    //     f.WriteAllLines(lOutputFileName, f.ReadAllLines(pInputFileName, InEnc), OutEnc);
+    // end;
 
    procedure ConvertCodepage(pInputFileName: Text; pOutPutExt: Text[5]; pFromCodePage: Code[10]; pToCodePage: Code[10])
     var

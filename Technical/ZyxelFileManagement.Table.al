@@ -168,6 +168,7 @@ Table 66002 "Zyxel File Management"
         FileOut: File;
         FileStream: OutStream;
     begin
+
         if filblob.HasValue then begin
             FileOut.Create(DownloadPath);
             FileOut.CreateOutstream(FileStream);

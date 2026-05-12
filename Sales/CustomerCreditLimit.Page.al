@@ -264,19 +264,10 @@ page 50034 "Customer Credit Limit"
     procedure CreateExcelbook(SheetName: Text[30])
     var
     begin
-        //>> 11-10-17 ZY-LD 001
         //ExcelBuf.CreateBook('', SheetName);     CLOUD ready DELETE
         ExcelBuf.CreateNewBook(SheetName);
         ExcelBuf.WriteSheet(SheetName, CompanyName(), UserId());
         ExcelBuf.ClearNewRow();
-
-        // ExcelBuf.CreateBook('',Text002);
-        // ExcelBuf.WriteSheet(Text003,CompanyName(),UserId());
-        // ExcelBuf.CloseBook;
-        // ExcelBuf.OpenExcel;
-        // ExcelBuf.GiveUserControl;
-        // ERROR('');
-        //<< 11-10-17 ZY-LD 001
     end;
 
     local procedure AddNewSheet(SheetName: Text[30])

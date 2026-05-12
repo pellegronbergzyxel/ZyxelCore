@@ -466,7 +466,8 @@ Report 50168 "Export Zyxel Employee"
 
     procedure CreateExcelbook()
     begin
-        ExcelBuf.CreateBook('', "ZyXEL Employee".TableCaption);
+        //ExcelBuf.CreateBook('', "ZyXEL Employee".TableCaption);      CLOUD ready DELETE
+        ExcelBuf.CreateNewBook("ZyXEL Employee".TableCaption);
         ExcelBuf.WriteSheet("ZyXEL Employee".TableCaption, CompanyName(), UserId());
         ExcelBuf.CloseBook;
         if GuiAllowed then begin

@@ -315,7 +315,8 @@ Page 50080 "Availability pr Location"
             //  rExcelBuf.CreateBook;
             //  rExcelBuf.CreateSheet(TABLECAPTION, CurrPage.OBJECTID, CompanyName(), UserId());
             //  rExcelBuf.GiveUserControl;
-            rExcelBuf.CreateBook('', Rec.TableCaption);
+            //rExcelBuf.CreateBook('', Rec.TableCaption); CLOUD ready DELETE
+            rExcelBuf.CreateNewBook(Rec.TableCaption);
             rExcelBuf.WriteSheet(CurrPage.ObjectId, CompanyName(), UserId());
             rExcelBuf.CloseBook;
             rExcelBuf.OpenExcel;

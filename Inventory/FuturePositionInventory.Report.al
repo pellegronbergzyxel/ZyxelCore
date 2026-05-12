@@ -597,7 +597,8 @@ report 50093 "Future Position Inventory"
     var
         lText001: Label 'Aged Stock %1';
     begin
-        ExcelBuf.CreateBook('', StrSubstNo(lText001, AgingCode));
+        //ExcelBuf.CreateBook('', StrSubstNo(lText001, AgingCode)); CLOUD ready DELETE
+        ExcelBuf.CreateNewBook(StrSubstNo(lText001, AgingCode));
         ExcelBuf.WriteSheet(StrSubstNo(lText001, AgingCode), CompanyName(), UserId());
 
         ExcelBuf.CloseBook;

@@ -611,7 +611,8 @@ Page 50087 "VCK Delivery Document Subform"
             until recDeliveryDocumentLine.Next() = 0;
         end;
         Window.Close;
-        TempExcelBuffer.CreateBook('', 'Delivery Document Lines');
+        //TempExcelBuffer.CreateBook('', 'Delivery Document Lines'); CLOUD ready DELETE
+        TempExcelBuffer.CreateNewBook( 'Delivery Document Lines');
         TempExcelBuffer.WriteSheet('Delivery Document Lines', CompanyName(), UserId());
         TempExcelBuffer.CloseBook;
         TempExcelBuffer.OpenExcel;

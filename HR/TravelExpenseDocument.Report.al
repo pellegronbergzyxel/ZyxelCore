@@ -163,7 +163,8 @@ Report 50061 "Travel Expense Document"
     procedure CreateExcelbook(SheetName: Text)
     begin
         if not ExcelBookCreated then begin
-            ExcelBuf.CreateBook('', SheetName);
+            // ExcelBuf.CreateBook('', SheetName); CLOUD ready DELETE
+            ExcelBuf.CreateNewBook(SheetName);
             ExcelBuf.WriteSheet(SheetName, CompanyName(), UserId());
             ExcelBookCreated := true;
         end else begin

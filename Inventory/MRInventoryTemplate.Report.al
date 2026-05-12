@@ -767,7 +767,8 @@ Report 50098 "MR Inventory Template"
         lText002: label 'Summed Up %1';
         lText003: label 'RMA %1';
     begin
-        ExcelBuf.CreateBook('', StrSubstNo(lText001, AgingCode));
+        //ExcelBuf.CreateBook('', StrSubstNo(lText001, AgingCode)); CLOUD ready DELETE
+            ExcelBuf.CreateNewBook(StrSubstNo(lText001, AgingCode));
         // Detailed
         ExcelBuf.WriteSheet(StrSubstNo(lText001, AgingCode), CompanyName(), UserId());
 
@@ -949,7 +950,8 @@ Report 50098 "MR Inventory Template"
 
     local procedure CreateExcelbookColumn()
     begin
-        ExcelBuf2.CreateBook('', 'MR Inventory Template');
+        //ExcelBuf2.CreateBook('', 'MR Inventory Template'); CLOUD ready DELETE
+        ExcelBuf2.CreateNewBook('MR Inventory Template');
         ExcelBuf2.WriteSheet('MR Inventory Template', CompanyName(), UserId());
         ExcelBuf2.CloseBook;
         if GuiAllowed then begin

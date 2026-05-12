@@ -263,7 +263,8 @@ Report 50102 "Sales Order Recived - Excel"
 
     procedure CreateExcelbook()
     begin
-        ExcelBuf.CreateBook('', "Sales Header".GetFilter("Create Date"));
+        //ExcelBuf.CreateBook('', "Sales Header".GetFilter("Create Date")); CLOUD ready DELETE
+        ExcelBuf.CreateNewBook("Sales Header".GetFilter("Create Date"));
         ExcelBuf.WriteSheet('abc', CompanyName(), UserId());
         ExcelBuf.CloseBook;
         if GuiAllowed then begin
