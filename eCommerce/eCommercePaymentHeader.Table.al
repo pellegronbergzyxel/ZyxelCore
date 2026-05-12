@@ -336,13 +336,11 @@ table 50112 "eCommerce Payment Header"
     trigger OnDelete()
     begin
         //>> 08-01-19 ZY-LD 002
-        recAmzPayJnl.SETRANGE("Journal Batch No.", "No.");  // 22-09-22 ZY-LD 003
+        recAmzPayJnl.SETRANGE("Journal Batch No.", "No.");
         CalcFields(Open);
         if recServEnviron.ProductionEnvironment and (recAmzPayJnl.COUNT > 0) then
             Error(Text001);
-        //<< 08-01-19 ZY-LD 002
-        //recAmzPayJnl.SETRANGE("Transaction Summary","Transaction Summary");  // 22-09-22 ZY-LD 003
-        recAmzPayJnl.SetRange("Journal Batch No.", "No.");  // 22-09-22 ZY-LD 003
+        recAmzPayJnl.SetRange("Journal Batch No.", "No.");
         recAmzPayJnl.DeleteAll();
     end;
 
