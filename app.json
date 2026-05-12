@@ -35,17 +35,6 @@
     "publisher": "Vision People A/S",
     "version": "20.2.1.63"
     }
-<<<<<<< HEAD
-    ,
-    {
-      "id": "8cc7b394-6661-4d12-97e0-6c3d982ac9c2",
-      "name": "VisionEssentials",
-      "publisher": "Vision People A/S",
-      "version": "20.2.1.60"
-    }
-=======
-
->>>>>>> 034b02829a06ade3e03ad32f0dbe433f5e833bdf
   ],
   "screenshots": [],
   "platform": "1.0.0.0",
@@ -66,5 +55,5 @@
     "NoImplicitWith"
   ],
   
-  "target": "Cloud"
+  "target": "OnPrem"
 }

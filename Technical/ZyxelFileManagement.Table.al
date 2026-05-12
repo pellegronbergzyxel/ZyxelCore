@@ -147,7 +147,8 @@ Table 66002 "Zyxel File Management"
                             Type := Type::LMR;  //<< 25-05-24 ZY-LD 003
 
     end;
- procedure LoadFileToBlob(FilePath: Text): Boolean
+
+    procedure LoadFileToBlob(FilePath: Text): Boolean
     var
         FileIn: File;
         FileStream: InStream;
@@ -157,7 +158,7 @@ Table 66002 "Zyxel File Management"
 
         FileIn.Open(FilePath);
         FileIn.CreateInstream(FileStream);
-        filblob.ImportStream(FileStream, '');
+        //filblob.ImportStream(FileStream, '');
         FileIn.Close;
         exit(true);
     end;
@@ -170,7 +171,7 @@ Table 66002 "Zyxel File Management"
         if filblob.HasValue then begin
             FileOut.Create(DownloadPath);
             FileOut.CreateOutstream(FileStream);
-            filblob.ExportStream(FileStream);
+            //filblob.ExportStream(FileStream);
             FileOut.Close;
             exit(true);
         end;

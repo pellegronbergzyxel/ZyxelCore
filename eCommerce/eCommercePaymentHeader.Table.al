@@ -349,12 +349,26 @@ table 50112 "eCommerce Payment Header"
     trigger OnInsert()
     var
         eCommerceSetup: Record "eCommerce Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series"; //UpgradeReady
+        Ishandled: Boolean; //UpgradeReady
+        NoSeriesCode: Code[10]; //UpgradeReady
     begin
         if "No." = '' then begin
             eCommerceSetup.Get();
             eCommerceSetup.TestField("Payment Batch Nos.");
-            NoSeriesMgt.InitSeries(eCommerceSetup."Payment Batch Nos.", xRec."No. Series", 0D, "No.", "No. Series");
+            //SeriesMgt.InitSeries(eCommerceSetup."Payment Batch Nos.", xRec."No. Series", 0D, "No.", "No. Series");
+            //UpgradeReady
+            Ishandled := false;
+            if not Ishandled then
+                if "No." = '' then begin
+                    NoSeriesCode := eCommerceSetup."Payment Batch Nos.";
+                    rec."No. Series" := NoSeriesCode;
+
+                    if NoSeriesMgt.AreRelated("No. Series", xRec."No. Series") then
+                        "No. Series" := xRec."No. Series";
+
+                    "No." := NoSeriesMgt.GetNextNo("No. Series", 0D);
+                End;
         end;
 
         Date := Today;
