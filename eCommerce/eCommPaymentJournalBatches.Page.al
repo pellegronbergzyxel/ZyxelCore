@@ -113,11 +113,11 @@ page 50260 "eComm. Payment Journal Batches"
                 RunPageLink = "Journal Batch No." = field("No.");
                 ShortCutKey = 'Return';
 
-                trigger OnAction()
-                begin
-                    if Rec."Transaction Summary" <> '' then
-                        TemplateSelectionFromBatch(Rec);
-                end;
+                //trigger OnAction()
+                //begin
+                //    if Rec."Transaction Summary" <> '' then
+                //        TemplateSelectionFromBatch(Rec);
+                //pend;
             }
             Action(Action14)
             {
@@ -231,25 +231,6 @@ page 50260 "eComm. Payment Journal Batches"
 
     var
         StyleText: Text;
-
-    procedure TemplateSelectionFromBatch(var recAmzPayBatch: Record "eCommerce Payment Header")
-    var
-        recAmzPayLine: Record "eCommerce Payment";
-        pageeCommercePaymentJournal: Page "eCommerce Payment Journal";
-    begin
-        //OpenFromBatch := TRUE;
-        /*recAmzPayBatch.TESTFIELD("Transaction Summary");
-        
-        recAmzPayLine.FILTERGROUP := 2;
-        recAmzPayLine.SETRANGE("Transaction Summary",recAmzPayBatch."Transaction Summary");
-        recAmzPayLine.FILTERGROUP := 0;
-        
-        recAmzPayLine."Transaction Summary" := recAmzPayBatch."Transaction Summary";
-        CLEAR(pageeCommercePaymentJournal);
-        pageeCommercePaymentJournal.Init(recAmzPayBatch."No.");
-        pageeCommercePaymentJournal.RUNMODAL;*/
-        //PAGE.RUN(PAGE::"eCommerce Payment Journal",recAmzPayLine);
-    end;
 
     local procedure SetActions()
     begin

@@ -336,25 +336,37 @@ table 50112 "eCommerce Payment Header"
     trigger OnDelete()
     begin
         //>> 08-01-19 ZY-LD 002
-        recAmzPayJnl.SETRANGE("Journal Batch No.", "No.");  // 22-09-22 ZY-LD 003
+        recAmzPayJnl.SETRANGE("Journal Batch No.", "No.");
         CalcFields(Open);
         if recServEnviron.ProductionEnvironment and (recAmzPayJnl.COUNT > 0) then
             Error(Text001);
-        //<< 08-01-19 ZY-LD 002
-        //recAmzPayJnl.SETRANGE("Transaction Summary","Transaction Summary");  // 22-09-22 ZY-LD 003
-        recAmzPayJnl.SetRange("Journal Batch No.", "No.");  // 22-09-22 ZY-LD 003
+        recAmzPayJnl.SetRange("Journal Batch No.", "No.");
         recAmzPayJnl.DeleteAll();
     end;
 
     trigger OnInsert()
     var
         eCommerceSetup: Record "eCommerce Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series"; //UpgradeReady
+        Ishandled: Boolean; //UpgradeReady
+        NoSeriesCode: Code[10]; //UpgradeReady
     begin
         if "No." = '' then begin
             eCommerceSetup.Get();
             eCommerceSetup.TestField("Payment Batch Nos.");
-            NoSeriesMgt.InitSeries(eCommerceSetup."Payment Batch Nos.", xRec."No. Series", 0D, "No.", "No. Series");
+            //SeriesMgt.InitSeries(eCommerceSetup."Payment Batch Nos.", xRec."No. Series", 0D, "No.", "No. Series");
+            //UpgradeReady
+            Ishandled := false;
+            if not Ishandled then
+                if "No." = '' then begin
+                    NoSeriesCode := eCommerceSetup."Payment Batch Nos.";
+                    rec."No. Series" := NoSeriesCode;
+
+                    if NoSeriesMgt.AreRelated("No. Series", xRec."No. Series") then
+                        "No. Series" := xRec."No. Series";
+
+                    "No." := NoSeriesMgt.GetNextNo("No. Series", 0D);
+                End;
         end;
 
         Date := Today;
