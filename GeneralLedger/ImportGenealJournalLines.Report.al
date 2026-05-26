@@ -22,33 +22,34 @@ report 50038 "Import Geneal Journal Lines"
                 group(Options)
                 {
                     Caption = 'Options';
-                    group("Import from")
-                    {
-                        Caption = 'Import from';
-                        field(FileName; FileName)
-                        {
-                            ApplicationArea = Basic, Suite;
-                            AssistEdit = true;
-                            Caption = 'Workbook File Name';
+                    // CLOUD READY DELETE
+                    // group("Import from")
+                    // {
+                    //     Caption = 'Import from';
+                    //     field(FileName; FileName)
+                    //     {
+                    //         ApplicationArea = Basic, Suite;
+                    //         AssistEdit = true;
+                    //         Caption = 'Workbook File Name';
 
-                            trigger OnAssistEdit()
-                            begin
-                                UploadFile;
-                            end;
-                        }
-                    }
-                    field(SheetName; SheetName)
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Worksheet Name';
+                    //         trigger OnAssistEdit()
+                    //         begin
+                    //             UploadFile;
+                    //         end;
+                    //     }
+                    // }
+                    // field(SheetName; SheetName)
+                    // {
+                    //     ApplicationArea = Basic, Suite;
+                    //     Caption = 'Worksheet Name';
 
-                        trigger OnAssistEdit()
-                        var
-                            ExcelBuf: Record "Excel Buffer";
-                        begin
-                            SheetName := ExcelBuf.SelectSheetsName(UploadedFileName);
-                        end;
-                    }
+                    //     trigger OnAssistEdit()
+                    //     var
+                    //         ExcelBuf: Record "Excel Buffer";
+                    //     begin
+                    //         SheetName := ExcelBuf.SelectSheetsName(UploadedFileName);
+                    //     end;
+                    // }
                     field(SheetContainesHeaderRow; SheetContainesHeaderRow)
                     {
                         ApplicationArea = Basic, Suite;
@@ -57,12 +58,38 @@ report 50038 "Import Geneal Journal Lines"
                 }
             }
         }
+        trigger OnQueryClosePage(CloseAction: Action): Boolean
+        var
+            UploadExcelMsg: Label 'Please Choose the Excel file';
+            NofileMsg: Label 'Please select file';
+            FileMgt: Codeunit "File Management";
+            iStream: InStream;
+            fromfile: text[250];
+        begin
+            UploadIntoStream(UploadExcelMsg, '', '', fromfile, iStream);
+            if fromfile <> '' then begin
+                FileName := FileMgt.GetFileName(fromfile);
+                SheetName := ExcelBuf.SelectSheetsNameStream(iStream);
+
+            end else
+                message(NofileMsg);
+            if SheetName <> '' then begin
+                ExcelBuf.reset();
+                ExcelBuf.DeleteAll();
+                ExcelBuf.OpenBookStream(iStream, SheetName);
+                ExcelBuf.ReadSheet();
+            end;
+
+
+        end;
     }
 
     trigger OnInitReport()
     begin
         SheetContainesHeaderRow := true;
     end;
+
+
 
     trigger OnPreReport()
     var
@@ -99,15 +126,16 @@ report 50038 "Import Geneal Journal Lines"
         Direction := '>';
         Precision := 0.1;
 
-        if UploadedFileName = '' then begin
-            Message(Text001);
-            exit;
-        end;
-        if SheetName = '' then begin
-            Message(Text002);
-            exit;
-        end;
-        ReadExcelSheet();
+        // CLOUD READY DELETE
+        // if UploadedFileName = '' then begin
+        //     Message(Text001);
+        //     exit;
+        // end;
+        // if SheetName = '' then begin
+        //     Message(Text002);
+        //     exit;
+        // end;
+        // ReadExcelSheet();
 
         Window.Open(Text003 + '@1@@@@@@@@@@@@@@@@@@@@@@@@@\');
         Window.Update(1, 0);
@@ -205,27 +233,28 @@ report 50038 "Import Geneal Journal Lines"
         CosttypeDim: Code[20];
         SI: Codeunit "Single Instance";
 
-    procedure UploadFile()
-    var
-        FileMgt: Codeunit "File Management";
-    begin
-        //UploadedFileName := CommonDialogMgt.OpenFile(Text006,'',2,'',0);
-        //UploadedFileName := FileMgt.OpenFileDialog(Text006,'','');
+    // procedure UploadFile()
+    // var
+    //     FileMgt: Codeunit "File Management";
+    // begin
+    //     //UploadedFileName := CommonDialogMgt.OpenFile(Text006,'',2,'',0);
+    //     //UploadedFileName := FileMgt.OpenFileDialog(Text006,'','');
 
-        Upload('Upload', 'C:\', 'Excel file(*.xlsx)|*.xlsx', '', UploadedFileName);
-        FileName := UploadedFileName;
-    end;
+    //     Upload('Upload', 'C:\', 'Excel file(*.xlsx)|*.xlsx', '', UploadedFileName);
+    //     FileName := UploadedFileName;
+    // end;
 
-    local procedure ReadExcelSheet()
-    begin
-        if UploadedFileName = '' then
-            UploadFile()
-        else
-            FileName := UploadedFileName;
+    // CLOUD READY DELETE
+    // local procedure ReadExcelSheet()
+    // begin
+    //     if UploadedFileName = '' then
+    //         UploadFile()
+    //     else
+    //         FileName := UploadedFileName;
 
-        ExcelBuf.OpenBook(FileName, SheetName);
-        ExcelBuf.ReadSheet();
-    end;
+    //     ExcelBuf.OpenBook(FileName, SheetName);
+    //     ExcelBuf.ReadSheet();
+    // end;
 
     local procedure FormatData(TextToFormat: Text[250]): Text[250]
     var

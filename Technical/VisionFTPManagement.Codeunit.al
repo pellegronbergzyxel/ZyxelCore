@@ -18,45 +18,86 @@ Codeunit 50057 "VisionFTP Management"
         Text50003: label 'The file %1 does not exists.';
         Text50005: label 'An error occured at file download.';
 
-    procedure UploadFile("Code": Code[20]; ServerPathAndFileName: Text; RemoteFileName: Text) rValue: Boolean
+    // procedure UploadFile("Code": Code[20]; ServerPathAndFileName: Text; RemoteFileName: Text) rValue: Boolean
+    // var
+    //     FileAPIMgt: Codeunit FileAPIMgtHLPVPE;
+    //     FileMgt: Codeunit "File Management";
+    //     B64: Codeunit "Base64 Convert";
+    //     FileHandle: File;
+    //     InStr: InStream;
+    //     FTPConnectionString: Text;
+    //     ResponseText: Text;
+    //     lErrText: Text[250];
+    // begin
+    //     GetFtpFolder(Code);
+
+    //     if recFtpFolder.Direction = recFtpFolder.Direction::Receive then
+    //         Error(Text001, Code, recFtpFolder.Direction);
+
+    //     if not Exists(ServerPathAndFileName) then
+    //         lErrText := StrSubstNo(Text50003, ServerPathAndFileName);
+
+    //     if lErrText = '' then begin
+    //         if SubFolder <> '' then
+    //             recFtpFolder."Remote Folder" := FileMgt.CombinePath(recFtpFolder."Remote Folder", SubFolder);
+
+    //         FTPConnectionString := GetFTPConnectionString(FileMgt.GetExtension(ServerPathAndFileName) <> '.txt');
+
+    //         FileHandle.Open(ServerPathAndFileName);
+    //         FileHandle.CreateInStream(InStr);
+
+    //         ResponseText := FileAPIMgt.FtpUploadFile(FTPConnectionString, recFtpFolder."Remote Folder", RemoteFileName, B64.ToBase64(InStr));
+
+    //         FileHandle.Close();
+    //     end;
+
+    //     if lErrText = '' then begin
+    //         if recFtpFolder."Archive Local File" and (recFtpFolder."Archive Folder" <> '') and (FileMgt.ServerDirectoryExists(recFtpFolder."Archive Folder")) then
+    //             FileMgt.CopyServerFile(ServerPathAndFileName, recFtpFolder."Archive Folder" + RemoteFileName, true);  // 03-10-19 ZY-LD 002
+    //                                                                                                                   //FileMgt.DownloadToFile(ServerPathAndFileName,recFtpFolder."Archive Folder" + RemoteFileName);  // 03-10-19 ZY-LD 002
+    //         FileMgt.DeleteServerFile(ServerPathAndFileName);
+    //         rValue := true;
+    //     end else
+    //         if GuiAllowed then
+    //             Error(lErrText)
+    //         else begin
+    //             // Send e-mail to nav support
+    //             rValue := false;
+    //         end;
+    // end;
+
+
+    procedure UploadFileStream("Code": Code[20]; var tempblob: codeunit "Temp Blob"; filename: text[250]; RemoteFileName: Text) rValue: Boolean
     var
         FileAPIMgt: Codeunit FileAPIMgtHLPVPE;
         FileMgt: Codeunit "File Management";
         B64: Codeunit "Base64 Convert";
-        FileHandle: File;
         InStr: InStream;
         FTPConnectionString: Text;
         ResponseText: Text;
         lErrText: Text[250];
+        base64text: text;
     begin
         GetFtpFolder(Code);
 
         if recFtpFolder.Direction = recFtpFolder.Direction::Receive then
             Error(Text001, Code, recFtpFolder.Direction);
-
-        if not Exists(ServerPathAndFileName) then
-            lErrText := StrSubstNo(Text50003, ServerPathAndFileName);
-
         if lErrText = '' then begin
+            tempblob.CreateInStream(InStr);
+            base64text := B64.ToBase64(InStr);
             if SubFolder <> '' then
                 recFtpFolder."Remote Folder" := FileMgt.CombinePath(recFtpFolder."Remote Folder", SubFolder);
+            FTPConnectionString := GetFTPConnectionString(FileMgt.GetExtension(filename) <> '.txt');
+            ResponseText := FileAPIMgt.FtpUploadFile(FTPConnectionString, recFtpFolder."Remote Folder", RemoteFileName, base64text);
 
-            FTPConnectionString := GetFTPConnectionString(FileMgt.GetExtension(ServerPathAndFileName) <> '.txt');
-
-            FileHandle.Open(ServerPathAndFileName);
-            FileHandle.CreateInStream(InStr);
-
-            ResponseText := FileAPIMgt.FtpUploadFile(FTPConnectionString, recFtpFolder."Remote Folder", RemoteFileName, B64.ToBase64(InStr));
-
-            FileHandle.Close();
         end;
 
         if lErrText = '' then begin
             if recFtpFolder."Archive Local File" and (recFtpFolder."Archive Folder" <> '') and (FileMgt.ServerDirectoryExists(recFtpFolder."Archive Folder")) then
-                FileMgt.CopyServerFile(ServerPathAndFileName, recFtpFolder."Archive Folder" + RemoteFileName, true);  // 03-10-19 ZY-LD 002
-                                                                                                                      //FileMgt.DownloadToFile(ServerPathAndFileName,recFtpFolder."Archive Folder" + RemoteFileName);  // 03-10-19 ZY-LD 002
-            FileMgt.DeleteServerFile(ServerPathAndFileName);
-            rValue := true;
+                //  FileMgt.CopyServerFile(ServerPathAndFileName, recFtpFolder."Archive Folder" + RemoteFileName, true);  // 03-10-19 ZY-LD 002
+                //FileMgt.DownloadToFile(ServerPathAndFileName,recFtpFolder."Archive Folder" + RemoteFileName);  // 03-10-19 ZY-LD 002
+                //FileMgt.DeleteServerFile(ServerPathAndFileName);
+                rValue := true;
         end else
             if GuiAllowed then
                 Error(lErrText)
@@ -69,6 +110,11 @@ Codeunit 50057 "VisionFTP Management"
     procedure DownloadFile("Code": Code[20]; RemoteFileName: Text; ShowError: Boolean) ArchiveFilename: Text[250]
     begin
         ArchiveFilename := DownloadFile2(Code, RemoteFileName, RemoteFileName, ShowError);  // 21-04-21 ZY-LD 005
+    end;
+
+    procedure DownloadFilestream("Code": Code[20]; RemoteFileName: Text; ShowError: Boolean; var OutStr: OutStream): Text[250]
+    begin
+        exit(DownloadFile2stream(Code, RemoteFileName, RemoteFileName, ShowError, OutStr));  // 21-04-21 ZY-LD 005
     end;
 
     procedure DownloadAndRenameFile("Code": Code[20]; RemoteFilename: Text; DestinationFilename: Text; ShowError: Boolean) ArchiveFilename: Text[250]
@@ -121,6 +167,45 @@ Codeunit 50057 "VisionFTP Management"
                 Error(Text50005);
     end;
 
+
+    local procedure DownloadFile2stream("Code": Code[20]; RemoteFilename: Text; DestinationFilename: Text; ShowError: Boolean; var OutStr: OutStream): text[250]
+    var
+        FileAPIMgt: Codeunit FileAPIMgtHLPVPE;
+        FileMgt: Codeunit "File Management";
+        B64: Codeunit "Base64 Convert";
+        FileHandle: File;
+        //  OutStr: OutStream;
+        FTPConnectionString: Text;
+        ResponseText: Text;
+    begin
+        GetFtpFolder(Code);
+
+        //if SubFolder <> '' then
+        //    ArchiveFilename := FileMgt.CombinePath(FileMgt.CombinePath(recFtpFolder."Archive Folder", SubFolder), DestinationFilename)
+        //else
+        //    ArchiveFilename := FileMgt.CombinePath(recFtpFolder."Archive Folder", DestinationFilename);
+
+
+
+        FTPConnectionString := GetFTPConnectionString(FileMgt.GetExtension(RemoteFilename) <> '.txt');
+
+        ResponseText := FileAPIMgt.FtpDownloadFile(FTPConnectionString, FileMgt.GetDirectoryName(RemoteFilename), FileMgt.GetFileName(RemoteFilename));
+        if ResponseText <> '' then begin
+            //FileHandle.Create(ArchiveFilename);
+            //FileHandle.CreateOutStream(OutStr);
+            OutStr.Write(B64.FromBase64(ResponseText));
+            //FileHandle.Close();
+
+            if recFtpFolder."Delete Remote" then
+                FileAPIMgt.FtpDeleteFile(FTPConnectionString, FileMgt.GetDirectoryName(RemoteFilename), FileMgt.GetFileName(RemoteFilename));
+
+            exit(DestinationFilename);
+
+        end else
+            if ShowError then  // 27-02-20 ZY-LD 004
+                Error(Text50005);
+    end;
+
     procedure DownloadFolder("Code": Code[20])
     var
         recZyFileMgt: Record "Zyxel File Management";
@@ -153,7 +238,7 @@ Codeunit 50057 "VisionFTP Management"
             FileArray.Get(I, FileToken);
             FileName := FileToken.AsValue().AsText();
             ArchiveFileName := FileMgt.CombinePath(recFtpFolder."Archive Folder", FileName);
-            if not (FileName in ['.', '..']) then begin
+            if not (FileName in ['.', '..']) and (filename.Contains('.')) then begin
                 recZyFileMgt.LockTable();
 
                 FileHandle.Create(ArchiveFileName);
@@ -165,6 +250,67 @@ Codeunit 50057 "VisionFTP Management"
 
                 recZyFileMgt.Init();
                 recZyFileMgt.Validate(Filename, ArchiveFileName);
+
+                recZyFileMgt.Insert(true);
+
+                if recFtpFolder."Delete Remote" then
+                    FileAPIMgt.FtpDeleteFile(FTPConnectionString, recFtpFolder."Remote Folder", FileName);
+
+                Commit();
+            end;
+        end;
+    end;
+
+    procedure DownloadFolderStream("Code": Code[20])
+    var
+        recZyFileMgt: Record "Zyxel File Management";
+        TempBlob: Codeunit "Temp Blob";
+        FileAPIMgt: Codeunit FileAPIMgtHLPVPE;
+        FileMgt: Codeunit "File Management";
+        B64: Codeunit "Base64 Convert";
+        FileHandle: File;
+        FileArray: JsonArray;
+        FileToken: JsonToken;
+        FileOutStream: OutStream;
+        FileInStream: InStream;
+        FTPConnectionString: Text;
+        FileName: Text;
+        ArchiveFileName: Text;
+        I: Integer;
+    begin
+        GetFtpFolder(Code);
+
+        if recFtpFolder.Direction = recFtpFolder.Direction::Send then
+            Error(Text001, Code, recFtpFolder.Direction);
+
+        if SubFolder <> '' then
+            recFtpFolder."Remote Folder" := FileMgt.CombinePath(recFtpFolder."Remote Folder", SubFolder);
+
+        FTPConnectionString := GetFTPConnectionString(true);
+
+        FileArray := FileAPIMgt.FtpGetFileList(FTPConnectionString, recFtpFolder."Remote Folder");
+        for I := 0 to FileArray.Count() - 1 do begin
+            FileArray.Get(I, FileToken);
+            FileName := FileToken.AsValue().AsText();
+            ArchiveFileName := FileMgt.CombinePath(recFtpFolder."Archive Folder", FileName);
+            if not (FileName in ['.', '..']) and (filename.Contains('.')) then begin
+                recZyFileMgt.LockTable();
+
+
+                recZyFileMgt.Init();
+                recZyFileMgt.filblob.CreateOutStream(FileOutStream);
+
+                //FileHandle.Create(ArchiveFileName);
+                //FileHandle.CreateOutStream(FileOutStream);
+                B64.FromBase64(FileApiMgt.FTPDownloadFile(FTPConnectionString, recFtpFolder."Remote Folder", FileName), FileOutStream);
+                //TempBlob.CreateInStream(FileInStream);
+                //FileHandle.Write(FileInStream);
+                //FileHandle.Close();
+
+                //recZyFileMgt.Init();
+                recZyFileMgt.Validate(Filename, FileName);
+
+
                 recZyFileMgt.Insert(true);
 
                 if recFtpFolder."Delete Remote" then

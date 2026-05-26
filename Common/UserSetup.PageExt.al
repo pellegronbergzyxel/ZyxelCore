@@ -179,6 +179,12 @@ pageextension 50144 UserSetupZX extends "User Setup"
                 ToolTip = 'Specifies Allow Froce Validation of eCommerse Orders';
                 Visible = false;
             }
+            field("Allow Force Margin Approval";Rec."Allow Force Margin Approval")
+            {
+                ApplicationArea = Basic, Suite; 
+                
+                Visible = false;
+            }
         }
     }
 

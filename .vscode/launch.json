@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Zyxel TESTEMEA ZCom",
+            "name": "Zyxel TESTEMEA ZCom DK",
             "type": "al",
             "request": "launch",
             "server": "http://ZyEU-D365BC02.zyeu.zyxel.eu",

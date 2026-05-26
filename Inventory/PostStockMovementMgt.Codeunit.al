@@ -17,7 +17,7 @@ Codeunit 50092 "Post Stock Movement Mgt."
     var
         recZyFileMgt: Record "Zyxel File Management";
         recAutoSetup: Record "Automation Setup";
-        ArchiveFile: File;
+        //ArchiveFile: File;
         InStream: InStream;
         xmlStockCorr: XmlPort "Read Stock Correction";
         lText001: label 'Import VCK Stock Movement';
@@ -33,8 +33,18 @@ Codeunit 50092 "Post Stock Movement Mgt."
             ZGT.OpenProgressWindow(lText001, recZyFileMgt.Count);
             repeat
                 ZGT.UpdateProgressWindow(lText001, 0, true);
-                if ArchiveFile.Open(recZyFileMgt.Filename) then begin
-                    ArchiveFile.CreateInstream(InStream);
+
+
+
+                // CLOUD READY 
+                recZyFileMgt.calcfields(filblob);
+                // Clear(ArchiveFile);
+                //if ArchiveFile.Open(recZyFileMgt.Filename) then begin
+                //    ArchiveFile.CreateInstream(InStream);
+                if recZyFileMgt.filblob.HasValue then begin
+                    recZyFileMgt.filblob.CreateInstream(InStream);
+                    // CLOUD READY >>
+
                     Clear(xmlStockCorr);
                     xmlStockCorr.SetSource(InStream);
                     xmlStockCorr.Init(recZyFileMgt."Entry No.");
@@ -52,7 +62,7 @@ Codeunit 50092 "Post Stock Movement Mgt."
 
                     // temp >>
                     recZyFileMgt.Modify;
-                    ArchiveFile.Close;
+                    //ArchiveFile.Close;  /CLOUD READY DELETE
 
                     Commit;
                 end else begin
@@ -89,7 +99,8 @@ Codeunit 50092 "Post Stock Movement Mgt."
             recWarehouse.SetRange(Warehouse, recWarehouse.Warehouse::VCK);
             recWarehouse.FindFirst;
             recWarehouse.TestField("Warehouse Outbound FTP Code");
-            FtpMgt.DownloadFolder(recWarehouse."Warehouse Outbound FTP Code");
+            //FtpMgt.DownloadFolder(recWarehouse."Warehouse Outbound FTP Code");  // CLOUD READY OLD
+            FtpMgt.DownloadFolderstream(recWarehouse."Warehouse Outbound FTP Code");// CLOUD READY new
             ZGT.CloseProgressWindow;
 
             if Import then

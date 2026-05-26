@@ -20,21 +20,21 @@ Report 50122 "Import LMR Sheet"
                 group(Options)
                 {
                     Caption = 'Options';
-                    group("Import from")
-                    {
-                        Caption = 'Import from';
-                        field(Filename; Filename)
-                        {
-                            ApplicationArea = Basic, Suite;
-                            AssistEdit = true;
-                            Caption = 'Workbook File Name';
+                    // group("Import from")
+                    // {
+                    //     Caption = 'Import from';
+                    //     field(Filename; Filename)
+                    //     {
+                    //         ApplicationArea = Basic, Suite;
+                    //         AssistEdit = true;
+                    //         Caption = 'Workbook File Name';
 
-                            trigger OnAssistEdit()
-                            begin
-                                UploadFile;
-                            end;
-                        }
-                    }
+                    //         trigger OnAssistEdit()
+                    //         begin
+                    //             UploadFile;
+                    //         end;
+                    //     }
+                    // }
                 }
             }
         }
@@ -42,6 +42,31 @@ Report 50122 "Import LMR Sheet"
         actions
         {
         }
+
+         trigger OnQueryClosePage(CloseAction: Action): Boolean
+        var
+            UploadExcelMsg: Label 'Please Choose the Excel file';
+            NofileMsg: Label 'Please select file';
+            FileMgt: Codeunit "File Management";
+            iStream: InStream;
+            fromfile: text[250];
+        begin
+            UploadIntoStream(UploadExcelMsg, '', '', fromfile, iStream);
+            if fromfile <> '' then begin
+                FileName := FileMgt.GetFileName(fromfile);
+                SheetName := ExcelBuffer.SelectSheetsNameStream(iStream);
+
+            end else
+                message(NofileMsg);
+            if SheetName <> '' then begin
+                ExcelBuffer.reset();
+                ExcelBuffer.DeleteAll();
+                ExcelBuffer.OpenBookStream(iStream, SheetName);
+                ExcelBuffer.ReadSheet();
+            end;
+
+
+        end;
     }
 
     labels
@@ -73,6 +98,7 @@ Report 50122 "Import LMR Sheet"
         Text005: label 'LMR Stock';
         Sheet001: label 'LMR Good Stock';
         ShortFilename: Text;
+        SheetName: Text[250];
         Text015: label 'The file has already been imported. Do you want to import again?';
         Text016: label 'You must be in the ZNet DK Company to Import LMR Sheets.';
         SI: Codeunit "Single Instance";
@@ -93,7 +119,7 @@ Report 50122 "Import LMR Sheet"
 
     begin
         SalesSetup.get;  //>> 09-09-24 ZY-LD 003
-        ReadExcelSheet(Sheet001);
+        //ReadExcelSheet(Sheet001);
 
         recLMRStock.SetRange(Filename, ShortFilename);
         if recLMRStock.FindSet then
@@ -152,13 +178,14 @@ Report 50122 "Import LMR Sheet"
         end;
     end;
 
-    local procedure UploadFile()
-    var
-        FileMgt: Codeunit "File Management";
-    begin
-        Upload('Upload', 'C:\', 'Excel file(*.xlsx)|*.xlsx', '', FileName);
-        //Filename := UploadedFileName
-    end;
+// CLOUD READY DELTE
+    // local procedure UploadFile()
+    // var
+    //     FileMgt: Codeunit "File Management";
+    // begin
+    //     Upload('Upload', 'C:\', 'Excel file(*.xlsx)|*.xlsx', '', FileName);
+    //     //Filename := UploadedFileName
+    // end;
 
     local procedure SplitFilename(Filename: Text) Name: Text
     var
@@ -193,15 +220,15 @@ Report 50122 "Import LMR Sheet"
         exit(recItem.FindFirst)
     end;
 
-    local procedure ReadExcelSheet(SheetName: Text[100])
-    begin
-        if FileName = '' then
-            UploadFile;
-        //else
-        //    Filename := UploadedFileName;
-        ExcelBuffer.OpenBook(Filename, SheetName);
-        ExcelBuffer.ReadSheet;
-    end;
+    // local procedure ReadExcelSheet(SheetName: Text[100])
+    // begin
+    //     if FileName = '' then
+    //         UploadFile;
+    //     //else
+    //     //    Filename := UploadedFileName;
+    //     ExcelBuffer.OpenBook(Filename, SheetName);
+    //     ExcelBuffer.ReadSheet;
+    // end;
 
     local procedure GetGoodStockLast(): Integer
     var
