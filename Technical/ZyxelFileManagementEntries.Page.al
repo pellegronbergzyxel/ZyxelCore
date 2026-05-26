@@ -208,7 +208,7 @@ Page 50042 "Zyxel File Management Entries"
                 begin
                     if Confirm(Text002, false, Rec.Filename) then begin
                         PostShipResp.ShipOrderRespImport(Rec."Entry No.");
-                        CurrPage.Update();
+                        //CurrPage.Update();
                     end;
                 end;
             }

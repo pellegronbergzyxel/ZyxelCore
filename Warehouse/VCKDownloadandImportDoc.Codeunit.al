@@ -36,7 +36,7 @@ Codeunit 50099 "VCK Download and  Import Doc."
     var
         recZyFileMgt: Record "Zyxel File Management";
         recAutoSetup: Record "Automation Setup";
-        ArchiveFile: File;
+        //ArchiveFile: File;
         InStream: InStream;
         xmlStockInbound: XmlPort "Read Stock Level Response";
         xmlReadStockReq: XmlPort "Read Stock Level Request";
@@ -53,8 +53,17 @@ Codeunit 50099 "VCK Download and  Import Doc."
             recZyFileMgt.SetRange("Entry No.", pEntryNo);
         if recZyFileMgt.FindSet(true) then begin
             repeat
-                if ArchiveFile.Open(recZyFileMgt.Filename) then begin
-                    ArchiveFile.CreateInstream(InStream);
+
+                // CLOUD READY DELETE
+                //                if ArchiveFile.Open(recZyFileMgt.Filename) then begin   
+                //                  ArchiveFile.CreateInstream(InStream);
+                // CLOUD READY NEW
+                recZyFileMgt.calcfields(filblob);
+
+                if recZyFileMgt.filblob.HasValue then begin
+                    recZyFileMgt.filblob.CreateInstream(InStream);
+                    // CLOUD READY NEW <<
+
 
                     //>> 05-04-22 ZY-LD 004
                     FilenameXml := recZyFileMgt.Filename;
@@ -95,7 +104,7 @@ Codeunit 50099 "VCK Download and  Import Doc."
                     end else
                         recZyFileMgt."Error Text" := CopyStr(GetLastErrorText, 1, MaxStrLen(recZyFileMgt."Error Text"));
                     recZyFileMgt.Modify;
-                    ArchiveFile.Close;
+                 //   ArchiveFile.Close;  /CLOUD READY DELTE
                 end;
 
                 //>> 21-12-21 ZY-LD 003
