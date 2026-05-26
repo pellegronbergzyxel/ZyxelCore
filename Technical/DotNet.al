@@ -48,24 +48,24 @@ dotnet
         type("System.IO.Compression.ZipFile"; "ZipFile") { }
         type("System.IO.Compression.ZipFileExtensions"; "Zip") { }
     }*/
-    // assembly("VisionPeople.Net.Ftp")
-    // {
+    assembly("VisionPeople.Net.Ftp")
+    {
 
-    //     Culture = 'neutral';
-    //     PublicKeyToken = '412850cb332a1da5';
-    //     Version = '1.0.0.0';
+        Culture = 'neutral';
+        PublicKeyToken = '412850cb332a1da5';
+        Version = '1.0.0.0';
 
-    //     type("VisionPeople.Net.Ftp.ComFtpClient"; "ComFtpClient") { }
-    // }
-    // assembly("VisionPeople.Net.FtpSecure")
-    // {
+        type("VisionPeople.Net.Ftp.ComFtpClient"; "ComFtpClient") { }
+    }
+    assembly("VisionPeople.Net.FtpSecure")
+    {
 
-    //     Culture = 'neutral';
-    //     PublicKeyToken = '412850cb332a1da5';
-    //     Version = '1.0.0.0';
+        Culture = 'neutral';
+        PublicKeyToken = '412850cb332a1da5';
+        Version = '1.0.0.0';
 
-    //     type("VisionPeople.Net.Ftp.ComFtpSecure"; "ComFtpSecure") { }
-    // }
+        type("VisionPeople.Net.Ftp.ComFtpSecure"; "ComFtpSecure") { }
+    }
     // 2026-03-03:  Not used
     // assembly("Microsoft.VisualBasic")
     // {

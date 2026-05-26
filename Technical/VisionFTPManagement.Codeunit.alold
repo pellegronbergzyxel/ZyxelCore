@@ -1,4 +1,4 @@
-Codeunit 50057 "VisionFTP Management"
+//Codeunit //50057 "VisionFTP Management"
 {
     // 001. 11-06-19 ZY-LD 2019061110000049 - Handling of error code. Locktable is set after Commit, because commit releases the table.
     // 002. 03-10-19 ZY-LD 2019100310000038 - Changed download to copy.
@@ -16,10 +16,10 @@ Codeunit 50057 "VisionFTP Management"
         recFtpFolder: Record "FTP Folder";
         recServEnviron: Record "Server Environment";
         FTP: dotnet ComFtpClient;
-        SFTP: dotnet ComFtpSecure;
-        ZGT: Codeunit "ZyXEL General Tools";
-        FileMgt: Codeunit "File Management";
-        Text50000: label 'Files were not deleted from the FTP-server, bechause you are on the %1-server.';
+                 SFTP: dotnet ComFtpSecure;
+                 ZGT: Codeunit "ZyXEL General Tools";
+                 FileMgt: Codeunit "File Management";
+                 Text50000: label 'Files were not deleted from the FTP-server, bechause you are on the %1-server.';
         FileTmp: Record File temporary;
         Text50001: label 'Clips\%1 created\%2 rejected';
         Text50002: label 'An error occured at file upload.';
@@ -307,8 +307,8 @@ Codeunit 50057 "VisionFTP Management"
     local procedure CountRemoteFiles("Code": Code[20]; Binary: Boolean) rValue: Integer
     var
         lFTP: dotnet ComFtpClient;
-        lSFTP: dotnet ComFtpSecure;
-        lErrText: Text;
+                  lSFTP: dotnet ComFtpSecure;
+                  lErrText: Text;
     begin
         GetFtpFolder(Code);
 
@@ -443,7 +443,7 @@ Codeunit 50057 "VisionFTP Management"
     local procedure IsAFolder(Filename: Text; Binary: Boolean) rValue: Boolean
     var
         lFTP: dotnet ComFtpClient;
-        lSFTP: dotnet ComFtpSecure;
+                  lSFTP: dotnet ComFtpSecure;
     begin
         if recFtpFolder.Secure then begin
             lSFTP := lSFTP.ComFtpSecure;
