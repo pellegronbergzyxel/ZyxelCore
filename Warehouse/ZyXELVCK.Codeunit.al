@@ -26,15 +26,20 @@ Codeunit 50004 "ZyXEL VCK"
 
     procedure SendToHQ(PurchaseOrderNo: Code[20]; Override: Boolean) rValue: Boolean
     var
-        CurrFile: File;
+        // CurrFile: File;
         recPurchSetup: Record "Purchases & Payables Setup";
         recPurchHead: Record "Purchase Header";
         recPurchLine: Record "Purchase Line";
         recServEnviron: Record "Server Environment";
-        ServerFilename: Text;
+        //ServerFilename: Text;
         RemoteFilename: Text;
-        FileMgt: Codeunit "File Management";
+        FileContent: Text;
+        Cr: Char;
+        Lf: Char;
+        //FileMgt: Codeunit "File Management";
         FTPMgt: Codeunit "VisionFTP Management";
+        TempBlob: Codeunit "Temp Blob";
+        varOutputStream: OutStream;
         lText001: label 'Order %1 could not upload to eShop.';
         lText002: label 'Do you want to send "%1" to eShop from "%2"?';
         ConvCodePage: Codeunit "Convert Codepage";
@@ -62,40 +67,39 @@ Codeunit 50004 "ZyXEL VCK"
               (recPurchHead."Vendor Status" <> recPurchHead."vendor status"::Dispatched) and
               (recPurchHead."Vendor Status" <> recPurchHead."vendor status"::"Order Sent")
             then begin
-                //>> 04-11-19 ZY-LD 006
-                //    CASE recPurchHead."Buy-from Vendor No." OF
-                //      recPurchSetup."EShop Vendor No." :
-                //        BEGIN
-                //          recPurchSetup.TESTFIELD("EShop Vendor No.");
-                //          recPurchSetup.TESTFIELD("EShop FTP Folder");
-                //          FTPFolder := recPurchSetup."EShop FTP Folder";
-                //        END;
-                //      recPurchSetup."EShop Vendor No. CH" :
-                //        BEGIN
-                //          recPurchSetup.TESTFIELD("EShop Vendor No. CH");
-                //          recPurchSetup.TESTFIELD("EShop FTP Folder CH");
-                //          FTPFolder := recPurchSetup."EShop FTP Folder CH";
-                //        END;
-                //    END;
+
                 recPurchHead.TestField("FTP Code");
                 //<< 04-11-19 ZY-LD 006
 
 
-                ServerFilename := FileMgt.ServerTempFileName('');
+                //   ServerFilename := FileMgt.ServerTempFileName('');
                 RemoteFilename := StrSubstNo('%1.txt', recPurchHead."No.");
-                CurrFile.TextMode(true);
-                CurrFile.Create(ServerFilename);
-                CurrFile.Write('Order Header,,');
-                CurrFile.Write(recPurchHead."Transport Method");
-                CurrFile.Write(',');
-                CurrFile.Write(StrSubstNo('Purchase Order No (*),%1,', recPurchHead."No."));
-                CurrFile.Write(StrSubstNo('Shipping Mark,"%1 SO#%2 / %3, %4"', recPurchHead."Shipping Request Notes", recPurchHead."From SO No.", recPurchHead."SO Sell-to Customer Name", recPurchHead."Dist. Purch. Order No."));
-                CurrFile.Write(StrSubstNo('Special Instruction,,%1 %2', recPurchHead."SO Sell-to Customer No", recPurchHead."SO Sell-to Customer Name"));
-                CurrFile.Write('Additional E-mail List,,');
-                CurrFile.Write(StrSubstNo('Distributor PO#,%1,', recPurchHead."Dist. Purch. Order No."));
-                CurrFile.Write(',,');
-                CurrFile.Write('Order Line,,');
-                CurrFile.Write('Line Number (*),Part Number (*),Quantity (*),Request Date (*)');
+                // CLOUD READY DELETE
+                // CurrFile.TextMode(true);
+                // CurrFile.Create(ServerFilename);
+                // CurrFile.Write('Order Header,,');
+                // CurrFile.Write(recPurchHead."Transport Method");
+                // CurrFile.Write(',');
+                // CurrFile.Write(StrSubstNo('Purchase Order No (*),%1,', recPurchHead."No."));
+                // CurrFile.Write(StrSubstNo('Shipping Mark,"%1 SO#%2 / %3, %4"', recPurchHead."Shipping Request Notes", recPurchHead."From SO No.", recPurchHead."SO Sell-to Customer Name", recPurchHead."Dist. Purch. Order No."));
+                // CurrFile.Write(StrSubstNo('Special Instruction,,%1 %2', recPurchHead."SO Sell-to Customer No", recPurchHead."SO Sell-to Customer Name"));
+                // CurrFile.Write('Additional E-mail List,,');
+                // CurrFile.Write(StrSubstNo('Distributor PO#,%1,', recPurchHead."Dist. Purch. Order No."));
+                // CurrFile.Write(',,');
+                // CurrFile.Write('Order Line,,');
+                // CurrFile.Write('Line Number (*),Part Number (*),Quantity (*),Request Date (*)');
+
+                FileContent := 'Order Header,,' + Cr + Lf;
+                FileContent += recPurchHead."Transport Method" + Cr + Lf;
+                FileContent += ' , ' + Cr + Lf;
+                FileContent += StrSubstNo('Purchase Order No (*),%1,', recPurchHead."No.") + Cr + Lf;
+                FileContent += StrSubstNo('Shipping Mark,"%1 SO#%2 / %3, %4"', recPurchHead."Shipping Request Notes", recPurchHead."From SO No.", recPurchHead."SO Sell-to Customer Name", recPurchHead."Dist. Purch. Order No.") + Cr + Lf;
+                FileContent += StrSubstNo('Special Instruction,,%1 %2', recPurchHead."SO Sell-to Customer No", recPurchHead."SO Sell-to Customer Name") + Cr + Lf;
+                FileContent += 'Additional E-mail List,,' + Cr + Lf;
+                FileContent += StrSubstNo('Distributor PO#,%1,', recPurchHead."Dist. Purch. Order No.") + Cr + Lf;
+                FileContent += ',,' + Cr + Lf;
+                FileContent += 'Order Line,,' + Cr + Lf;
+                FileContent += 'Line Number (*),Part Number (*),Quantity (*),Request Date (*)' + Cr + Lf;
 
                 recPurchLine.SetRange("Document Type", recPurchLine."document type"::Order);
                 recPurchLine.SetRange("Document No.", recPurchHead."No.");
@@ -113,21 +117,29 @@ Codeunit 50004 "ZyXEL VCK"
                         recPurchLine."Vendor Status" := recPurchLine."vendor status"::"Order Created";
                         recPurchLine.Modify;
 
-                        CurrFile.Write(
-                          StrSubstNo('%1,%2,%3,%4',
-                            recPurchLine."Line No.",
-                            recPurchLine."No.",
-                            Format(recPurchLine.Quantity, 0, 9),
-                            Format(recPurchLine."Requested Date From Factory", 0, 9)));
+                        // CurrFile.Write(
+                        //   StrSubstNo('%1,%2,%3,%4',
+                        //     recPurchLine."Line No.",
+                        //     recPurchLine."No.",
+                        //     Format(recPurchLine.Quantity, 0, 9),
+                        //     Format(recPurchLine."Requested Date From Factory", 0, 9)));
+                        FileContent +=
+                     StrSubstNo('%1,%2,%3,%4',
+                       recPurchLine."Line No.",
+                       recPurchLine."No.",
+                       Format(recPurchLine.Quantity, 0, 9),
+                       Format(recPurchLine."Requested Date From Factory", 0, 9)) + Cr + Lf;
                     //END;
                     until recPurchLine.Next() = 0;
                     recPurchLine.SuspendStatusCheck(false);  // 17-04-24 ZY-LD 008
                 end;
-                CurrFile.Close;
-                ConvCodePage.ConvertCodepage(ServerFilename, '', '', ConvCodePage.CodepageUTF8);  // 08-11-19 ZY-LD 006
+                //CurrFile.Close;
+                //ConvCodePage.ConvertCodepage(ServerFilename, '', '', ConvCodePage.CodepageUTF8);  // 08-11-19 ZY-LD 006
+                TempBlob.CreateOutStream(varOutputStream);
+                varOutputStream.WriteText(FileContent);
 
                 //IF FTPMgt.UploadFile(FTPFolder,ServerFilename,RemoteFilename) THEN BEGIN  // 04-11-19 ZY-LD 006
-                if FTPMgt.UploadFile(recPurchHead."FTP Code", ServerFilename, RemoteFilename) then begin  // 04-11-19 ZY-LD 006
+                if FTPMgt.UploadFilestream(recPurchHead."FTP Code", TempBlob,RemoteFilename, RemoteFilename) then begin  // CLOUD READY NEW
                     recPurchHead."Vendor Status" := recPurchHead."vendor status"::"Order Created";
                     recPurchHead."EShop Order Sent" := true;
                     recPurchHead.Modify;

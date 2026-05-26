@@ -522,4 +522,22 @@ table 50071 "Margin Approval"
             end
         end;
     end;
+
+
+    procedure forceapproval(marginapproval: Record "Margin Approval")
+    var
+        UserSetup: Record "User Setup";
+    begin
+        if marginapproval.Status = marginapproval.Status::Approved then
+            exit;
+
+        if UserSetup.get(UserId) then;
+        if UserSetup."Allow Force Margin Approval" then begin
+            marginapproval.Status := marginapproval.Status::Approved;
+            marginapproval."Approved/Rejected by" := USERID;
+            marginapproval."Approver Comment" := 'Forced: ' + userid;
+            marginapproval.modify();
+            Setapprovedpricebookline(marginapproval);
+        end;
+    end;
 }

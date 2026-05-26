@@ -48,6 +48,11 @@ Page 50042 "Zyxel File Management Entries"
                 {
                     ApplicationArea = Basic, Suite;
                 }
+                field(filblob; Rec.filblob)
+                {
+                    ApplicationArea = Basic, Suite;
+                }
+
             }
         }
         area(factboxes)
@@ -71,8 +76,20 @@ Page 50042 "Zyxel File Management Entries"
                 var
                     FileMgt: Codeunit "File Management";
                     lText001: Label 'Download Document';
+                    InStr: instream;
                 begin
-                    FileMgt.DownloadHandler(Rec.Filename, lText001, '', 'PDF(*.pdf)|*.pdf|All files(*.*)|*.*', FileMgt.GetFileName(Rec.Filename));
+                    //FileMgt.DownloadHandler(Rec.Filename, lText001, '', 'PDF(*.pdf)|*.pdf|All files(*.*)|*.*', FileMgt.GetFileName(Rec.Filename));
+                    
+
+
+                      Rec.CalcFields("Filblob");
+                    if rec.filblob.HasValue then begin
+                        //    FileOut.Create(DownloadPath);
+                        //  FileOut.CreateOutstream(FileStream);
+                        Rec.filblob.CreateInStream(InStr, TextEncoding::Windows);
+                        DownloadFromStream(InStr, 'Download', '', '', rec.Filename);
+                    end;
+
                 end;
             }
             action("VCK Purchase Order Response")
@@ -148,6 +165,18 @@ Page 50042 "Zyxel File Management Entries"
                     begin
                         if Confirm(Text004, true) then
                             VckPostMgt.DownloadVCK(0, true);
+                    end;
+                }
+                action(testgettype)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Run gettype on OPen';
+                    Image = WorkCenterLoad;
+
+                    trigger OnAction()
+                    begin
+                        if rec.Open then
+                            rec.GetFileType();
                     end;
                 }
             }

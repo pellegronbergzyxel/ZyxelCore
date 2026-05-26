@@ -226,11 +226,16 @@ Codeunit 50001 "ZyXEL EiCards"
 
         FileMgt: Codeunit "File Management";
         FTPMgt: Codeunit "VisionFTP Management";
+        TempBlob: Codeunit "Temp Blob";
+        varOutputStream: OutStream;
 
         lText001: label 'Order %1 could not upload to eShop.';
         lText002: label 'Do you want to send "%1" to eShop from "%2"?';
         HQMISSPP: label 'HQMISSPP';
-        CurrFile: File;
+        //CurrFile: File;
+        FileContent: Text;
+        Cr: Char;
+        Lf: Char;
 
         SendFromTest: Boolean;
         PurchasePriceIsEmpty: Boolean;
@@ -258,34 +263,32 @@ Codeunit 50001 "ZyXEL EiCards"
                 recPurchHead.TestField("FTP Code");
                 pEiCardQueue."Error Description" := '';
 
-                ServerFilename := FileMgt.ServerTempFileName('');
+                //ServerFilename := FileMgt.ServerTempFileName('');
                 RemoteFilename := StrSubstNo('%1.txt', recPurchHead."No.");
-                CurrFile.TextMode(true);
-                CurrFile.Create(ServerFilename);
-                CurrFile.Write('Order Header,,');
-                CurrFile.Write(recPurchSetup."EiCar Default Transport Method");
-                CurrFile.Write(',');
-
-                CurrFile.Write(StrSubstNo('Purchase Order No (*),%1,', recPurchHead."No."));
-                CurrFile.Write(StrSubstNo('Shipping Mark,"SO#%1 / %2, %3",', recPurchHead."From SO No.", recPurchHead."SO Sell-to Customer Name", recConvChar.ConvertCharacters(recPurchHead."Dist. Purch. Order No.")));
+                // CLOUD READY NEW
+                FileContent := 'Order Header,,' + Cr + Lf;
+                FileContent += recPurchSetup."EiCar Default Transport Method" + Cr + Lf;
+                FileContent += ', ' + Cr + Lf;
+                FileContent += StrSubstNo('Purchase Order No (*),%1,', recPurchHead."No.") + Cr + Lf;
+                FileContent += StrSubstNo('Shipping Mark,"SO#%1 / %2, %3",', recPurchHead."From SO No.", recPurchHead."SO Sell-to Customer Name", recConvChar.ConvertCharacters(recPurchHead."Dist. Purch. Order No.")) + Cr + Lf;
 
                 case pEiCardQueue."Eicard Type" of
                     pEiCardQueue."eicard type"::Consignment:
                         case pEiCardQueue."Customer No." of
                             '200001':
-                                CurrFile.Write(StrSubstNo('Special Instruction,"%1 %2",', '', 'Studerus AG (licenses)'));
+                                FileContent += StrSubstNo('Special Instruction,"%1 %2",', '', 'Studerus AG (licenses)') + Cr + Lf;
                         end;
                     pEiCardQueue."eicard type"::eCommerce:
-                        CurrFile.Write(StrSubstNo('Special Instruction,$B!H(B%1 EC order$B!I(B),', pEiCardQueue."Customer No."));
+                        FileContent += StrSubstNo('Special Instruction,$B!H(B%1 EC order$B!I(B),', pEiCardQueue."Customer No.") + Cr + Lf;
                     else
-                        CurrFile.Write(StrSubstNo('Special Instruction,"%1 %2",', '', pEiCardQueue."Customer Name"));
+                        FileContent += StrSubstNo('Special Instruction,"%1 %2",', '', pEiCardQueue."Customer Name") + Cr + Lf;
                 end;
 
-                CurrFile.Write(StrSubstNo('Additional E-mail List,%1,', ''));
-                CurrFile.Write(StrSubstNo('Distributor PO#,%1,', recConvChar.ConvertCharacters(recPurchHead."Dist. Purch. Order No.")));
-                CurrFile.Write(',,');
-                CurrFile.Write('Order Line,,');
-                CurrFile.Write('Part Number (*),Quantity (*),Request Date (*)');
+                FileContent += StrSubstNo('Additional E-mail List,%1,', '') + Cr + Lf;
+                FileContent += StrSubstNo('Distributor PO#,%1,', recConvChar.ConvertCharacters(recPurchHead."Dist. Purch. Order No.")) + Cr + Lf;
+                FileContent += ',,' + Cr + Lf;
+                FileContent += 'Order Line,,' + Cr + Lf;
+                FileContent += 'Part Number (*),Quantity (*),Request Date (*)' + Cr + Lf;
 
                 recPurchLine.SetRange("Document Type", recPurchHead."Document Type");
                 recPurchLine.SetRange("Document No.", recPurchHead."No.");
@@ -308,18 +311,20 @@ Codeunit 50001 "ZyXEL EiCards"
                                 recPurchLine."Requested Date From Factory" := Today;
                                 recPurchLine.Modify();
                             end;
-                            CurrFile.Write(
+                            FileContent +=
                               StrSubstNo('%1,%2,%3,%4,%5,%6',
                                 recPurchLine."No.",
                                 Format(recPurchLine.Quantity, 0, 9),
                                 Format(recPurchLine."Requested Date From Factory", 0, 9),
                                 recPurchLine."EMS Machine Code",
                                 recPurchLine."GLC Serial No.",
-                                recPurchLine."GLC Mac Address"));
+                                recPurchLine."GLC Mac Address") + Cr + Lf;
                         end;
                     until recPurchLine.Next() = 0;
-                CurrFile.Close();
-                ConvCodePage.ConvertCodepage(ServerFilename, '', '', ConvCodePage.CodepageUTF8());
+
+                //ConvCodePage.ConvertCodepage(ServerFilename, '', '', ConvCodePage.CodepageUTF8());
+                TempBlob.CreateOutStream(varOutputStream);
+                varOutputStream.WriteText(FileContent);
 
                 if PurchasePriceIsEmpty then begin
 
@@ -335,7 +340,8 @@ Codeunit 50001 "ZyXEL EiCards"
 
                     FileMgt.DeleteServerFile(ServerFilename)
                 end else
-                    if FTPMgt.UploadFile(recPurchHead."FTP Code", ServerFilename, RemoteFilename) then begin
+
+                    if FTPMgt.UploadFilestream(recPurchHead."FTP Code", TempBlob, ServerFilename, RemoteFilename) then begin
                         pEiCardQueue.Validate("Purchase Order Status", pEiCardQueue."purchase order status"::"EiCard Order Sent to HQ");
                         pEiCardQueue.Modify(true);
 

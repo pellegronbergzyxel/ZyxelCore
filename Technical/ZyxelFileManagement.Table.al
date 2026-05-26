@@ -53,7 +53,7 @@ Table 66002 "Zyxel File Management"
         field(100; filblob; blob)
         {
 
-            Caption = 'Fil blob';
+            Caption = 'File blob';
         }
     }
 
@@ -109,9 +109,9 @@ Table 66002 "Zyxel File Management"
             exit(1);
     end;
 
-    local procedure GetFileType(): Integer
+    procedure GetFileType(): Integer
     var
-        MyFile: File;
+        //MyFile: File;
         StreamInTest: InStream;
         Buffer: Text;
         SOType: Integer;
@@ -121,13 +121,19 @@ Table 66002 "Zyxel File Management"
         lText004: label 'StockCorrectionNotification';
         lText005: label 'Zyxel_20';
     begin
-        MyFile.Open(Filename);
-        MyFile.CreateInstream(StreamInTest);
+        // CLOUD READY DELETE >>
+        // MyFile.Open(Filename);
+        //MyFile.CreateInstream(StreamInTest);
+        // CLOUD READY NEW >>
+        
+        rec.filblob.CreateInStream(StreamInTest);
+        
         while not StreamInTest.eos do begin
             StreamInTest.ReadText(Buffer);
             break;
         end;
-        MyFile.Close;
+        //MyFile.Close; //
+        
 
         if StrPos(UpperCase(Buffer), UpperCase(lText001)) > 0 then
             Type := Type::"VCK Purch. Response"
@@ -152,13 +158,16 @@ Table 66002 "Zyxel File Management"
     var
         FileIn: File;
         FileStream: InStream;
+        outstream: OutStream;
     begin
         if not File.Exists(FilePath) then
             exit(false);
 
         FileIn.Open(FilePath);
         FileIn.CreateInstream(FileStream);
-        //filblob.ImportStream(FileStream, '');
+        filblob.CreateOutStream(outstream);
+        CopyStream(outstream, FileStream);
+        modify();
         FileIn.Close;
         exit(true);
     end;
@@ -167,14 +176,14 @@ Table 66002 "Zyxel File Management"
     var
         FileOut: File;
         FileStream: OutStream;
+        InStr: instream;
     begin
-
+        Rec.CalcFields("Filblob");
         if filblob.HasValue then begin
-            FileOut.Create(DownloadPath);
-            FileOut.CreateOutstream(FileStream);
-            //filblob.ExportStream(FileStream);
-            FileOut.Close;
-            exit(true);
+        //    FileOut.Create(DownloadPath);
+          //  FileOut.CreateOutstream(FileStream);
+          Rec.filblob.CreateInStream(InStr, TextEncoding::Windows);
+                    DownloadFromStream(InStr, 'Download', '', '', Filename);
         end;
         exit(false);
     end;
@@ -258,5 +267,24 @@ Table 66002 "Zyxel File Management"
         Base64.FromBase64(Base64Content, BlobStream);
         exit(true);
     end;
+
+
+    procedure LoadAllFilesToBlob()
+    var
+        recZyFileMgt: Record "Zyxel File Management";
+        checkfile: file;
+    begin
+        if recZyFileMgt.FindSet() then
+            repeat
+                if recZyFileMgt.Filename <> '' then
+                if file.Exists(recZyFileMgt.Filename) then
+                    if recZyFileMgt.LoadFileToBlob(recZyFileMgt.Filename) then begin
+                        recZyFileMgt.Modify(true);
+
+                    end;
+            until recZyFileMgt.Next() = 0;
+    end;
+
+
 
 }

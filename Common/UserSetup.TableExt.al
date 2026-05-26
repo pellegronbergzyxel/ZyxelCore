@@ -142,5 +142,10 @@ tableextension 50125 UserSetupZX extends "User Setup"
         {
             Caption = 'Allow Force Validation'; //05-05-2025 BK #485255
         }
+
+         field(50072; "Allow Force Margin Approval"; Boolean)
+        {
+            Caption = 'Allow Force Margin Approval'; 
+        }
     }
 }

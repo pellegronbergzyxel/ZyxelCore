@@ -34,29 +34,30 @@ Report 62018 "Import Sales Order Lines"
                     group("Import from")
                     {
                         Caption = 'Import from';
-                        field(FileName; FileName)
-                        {
-                            ApplicationArea = Basic, Suite;
-                            AssistEdit = true;
-                            Caption = 'Workbook File Name';
+                        // CLOUD READY DELETE
+                        // field(FileName; FileName)
+                        // {
+                        //     ApplicationArea = Basic, Suite;
+                        //     AssistEdit = true;
+                        //     Caption = 'Workbook File Name';
 
-                            trigger OnAssistEdit()
-                            begin
-                                UploadFile;
-                            end;
-                        }
-                        field(SheetName; SheetName)
-                        {
-                            ApplicationArea = Basic, Suite;
-                            Caption = 'Worksheet Name';
+                        //     trigger OnAssistEdit()
+                        //     begin
+                        //         UploadFile;
+                        //     end;
+                        // }
+                        // field(SheetName; SheetName)
+                        // {
+                        //     ApplicationArea = Basic, Suite;
+                        //     Caption = 'Worksheet Name';
 
-                            trigger OnAssistEdit()
-                            var
-                                ExcelBuf: Record "Excel Buffer";
-                            begin
-                                SheetName := ExcelBuf.SelectSheetsName(UploadedFileName);
-                            end;
-                        }
+                        //     trigger OnAssistEdit()
+                        //     var
+                        //         ExcelBuf: Record "Excel Buffer";
+                        //     begin
+                        //         SheetName := ExcelBuf.SelectSheetsName(UploadedFileName);
+                        //     end;
+                        // }
                         field(SheetContainesHeaderRow; SheetContainesHeaderRow)
                         {
                             ApplicationArea = Basic, Suite;
@@ -79,6 +80,30 @@ Report 62018 "Import Sales Order Lines"
         actions
         {
         }
+        trigger OnQueryClosePage(CloseAction: Action): Boolean
+        var
+            UploadExcelMsg: Label 'Please Choose the Excel file';
+            NofileMsg: Label 'Please select file';
+            FileMgt: Codeunit "File Management";
+            iStream: InStream;
+            fromfile: text[250];
+        begin
+            UploadIntoStream(UploadExcelMsg, '', '', fromfile, iStream);
+            if fromfile <> '' then begin
+                FileName := FileMgt.GetFileName(fromfile);
+                SheetName := ExcelBuf.SelectSheetsNameStream(iStream);
+
+            end else
+                message(NofileMsg);
+            if SheetName <> '' then begin
+                ExcelBuf.reset();
+                ExcelBuf.DeleteAll();
+                ExcelBuf.OpenBookStream(iStream, SheetName);
+                ExcelBuf.ReadSheet();
+            end;
+
+
+        end;
     }
 
     labels
@@ -104,14 +129,14 @@ Report 62018 "Import Sales Order Lines"
     begin
         SI.UseOfReport(3, 62018, 3);  // 14-10-20 ZY-LD 000
 
-        if UploadedFileName = '' then
-            Error(Text001);
-        if SheetName = '' then
-            Error(Text002);
+        // if UploadedFileName = '' then
+        //     Error(Text001);
+        // if SheetName = '' then
+        //     Error(Text002);
         if DocumentNo = '' then
             Error(Text005);
 
-        ReadExcelSheet;
+        //   ReadExcelSheet;
         LineNo := GetLastLineNo(DocumentNo);
         if ExcelBuf.FindLast then begin
             ZGT.OpenProgressWindow('', ExcelBuf."Row No.");
@@ -174,26 +199,26 @@ Report 62018 "Import Sales Order Lines"
         Text004: label 'Sales Order Lines Imported';
         Text005: label 'You must create an order header first.';
 
+    // CLOUD READY DELETE
+    // procedure UploadFile()
+    // var
+    //     FileMgt: Codeunit "File Management";
+    // begin
 
-    procedure UploadFile()
-    var
-        FileMgt: Codeunit "File Management";
-    begin
+    //     Upload('Upload', 'C:\', 'Excel file(*.xlsx)|*.xlsx', '', UploadedFileName);
+    //     FileName := UploadedFileName;
+    //     SheetName := ExcelBuf.SelectSheetsName(UploadedFileName)
+    // end;
 
-        Upload('Upload', 'C:\', 'Excel file(*.xlsx)|*.xlsx', '', UploadedFileName);
-        FileName := UploadedFileName;
-        SheetName := ExcelBuf.SelectSheetsName(UploadedFileName)
-    end;
-
-    local procedure ReadExcelSheet()
-    begin
-        if UploadedFileName = '' then
-            UploadFile
-        else
-            FileName := UploadedFileName;
-        ExcelBuf.OpenBook(FileName, SheetName);
-        ExcelBuf.ReadSheet;
-    end;
+    // local procedure ReadExcelSheet()
+    // begin
+    //     if UploadedFileName = '' then
+    //         UploadFile
+    //     else
+    //         FileName := UploadedFileName;
+    //     ExcelBuf.OpenBook(FileName, SheetName);
+    //     ExcelBuf.ReadSheet;
+    // end;
 
     local procedure GetLastLineNo(DocNo: Code[20]) LineNo: Integer
     var

@@ -39,7 +39,7 @@ codeunit 50089 "Post Ship Response Mgt."
         FileMgt: Codeunit "File Management";
         EmailAddMgt: Codeunit "E-mail Address Management";
         xmlShipOrderResp: XmlPort "Read Shipping Order Response";
-        ArchiveFile: File;
+        //   ArchiveFile: File;
         NVInStream: InStream;
         lText001: Label 'Import VCK Response';
         lText002: Label 'Document could not open.';
@@ -60,10 +60,14 @@ codeunit 50089 "Post Ship Response Mgt."
                 ZGT.UpdateProgressWindow(lText001, 0, true);
                 recZyFileMgt2.Get(recZyFileMgt."Entry No.");
 
-                Clear(ArchiveFile);
-                if ArchiveFile.Open(recZyFileMgt.Filename, TextEncoding::UTF8) then begin
-                    ArchiveFile.CreateInstream(NVInStream);
-
+                // CLOUD READY 
+                recZyFileMgt2.calcfields(filblob);
+                // Clear(ArchiveFile);
+                // if ArchiveFile.Open(recZyFileMgt.Filename, TextEncoding::UTF8) then begin
+                //     ArchiveFile.CreateInstream(NVInStream);   
+                if recZyFileMgt2.filblob.HasValue then begin
+                    recZyFileMgt2.filblob.CreateInstream(NVInStream);
+                    // CLOUD READY >>
                     Clear(xmlShipOrderResp);
                     xmlShipOrderResp.Init(recZyFileMgt."Entry No.");
                     xmlShipOrderResp.SetSource(NVInStream);
@@ -111,7 +115,7 @@ codeunit 50089 "Post Ship Response Mgt."
                         recZyFileMgt2."Error Text" := CopyStr(LastErrorText, 1, MaxStrLen(recZyFileMgt2."Error Text"));
 
                     recZyFileMgt2.Modify();
-                    ArchiveFile.Close();
+                    //ArchiveFile.Close();  // CLOUD READY DELETE
                 end else begin
                     recZyFileMgt2."Error Text" := lText002;
                     recZyFileMgt2.Modify();
@@ -878,7 +882,8 @@ codeunit 50089 "Post Ship Response Mgt."
             recWarehouse.SetRange(Warehouse, recWarehouse.Warehouse::VCK);
             recWarehouse.FindFirst();
             recWarehouse.TestField("Warehouse Outbound FTP Code");
-            FtpMgt.DownloadFolder(recWarehouse."Warehouse Outbound FTP Code");
+            //FtpMgt.DownloadFolder(recWarehouse."Warehouse Outbound FTP Code");  // CLOUD READY DELETE
+            FtpMgt.DownloadFolderStream(recWarehouse."Warehouse Outbound FTP Code");  // CLOUD READY NEW
             ZGT.CloseProgressWindow();
 
             if Import then

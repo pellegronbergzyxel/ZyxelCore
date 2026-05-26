@@ -3,6 +3,8 @@ codeunit 50055 AmazonHelper
     TableNo = "Job Queue Entry";
 
     trigger OnRun()
+    var
+        zyxelfilmgt: record "Zyxel File Management";
     begin
         CASE rec."Parameter String" OF
 
@@ -33,6 +35,10 @@ codeunit 50055 AmazonHelper
             'ORDERAPPROVAL':
                 begin
                     PRICEAPPROVAL();
+                END;
+            'FILLOADZYXEL':
+                begin
+                    zyxelfilmgt.LoadAllFilesToBlob();
                 end;
         end;
     end;
@@ -2551,7 +2557,7 @@ codeunit 50055 AmazonHelper
         margin_info.add('currency', tempcurr);
         margin_info.add('selling_price', MarginApproval."Unit Price");
         margin_info.add('qty', tempqty);
-        
+
         margin_info.Add('comment', MarginApproval."User Comment");
         margin_infoArray.add(margin_info);
         // loop >>
@@ -3233,13 +3239,16 @@ codeunit 50055 AmazonHelper
         SL: Record "Sales Line";
         salessetups: record "Sales & Receivables Setup";
         Errorlabel: Label 'Margin approval is not done please await approval on %1';
+        Confirmlabel: Label 'Margin approval is not done, do still want to release the order?';
         NotAllrejected: Boolean;
+        UserSetup: Record "User Setup";
     begin
 
 
         begin
             salessetups.get();
-            if salessetups."Margin Approval" = salessetups."Margin Approval"::OrdersAndPricelist then begin
+            if UserSetup.get(UserId) then;
+            if (salessetups."Margin Approval" = salessetups."Margin Approval"::OrdersAndPricelist) then begin
                 SL.setrange("Document No.", sh."No.");
                 SL.SetRange("Document Type", sh."Document Type");
                 SL.setrange(Type, SL.type::Item);
@@ -3247,7 +3256,10 @@ codeunit 50055 AmazonHelper
                 IF SL.findset then
                     repeat
                         IF not (SL.MarginApprovalSOStatus IN [SL.MarginApprovalSOStatus::Inactive, SL.MarginApprovalSOStatus::Approved]) then
-                            error(Errorlabel, sl."No.");
+                            IF not UserSetup."Allow Force Margin Approval" then
+                                error(Errorlabel, sl."No.")
+                            else if not Confirm(Confirmlabel, false) then
+                                error(Errorlabel, sl."No.");
                     until SL.next = 0;
 
             end;

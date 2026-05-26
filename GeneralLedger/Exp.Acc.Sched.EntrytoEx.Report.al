@@ -22,9 +22,10 @@ Report 50023 "Exp. Acc. Sched. Entry to Ex."
                 ClientFileName: Text;
                 ShortcutDimCode: array[8] of Code[20];
             begin
-                if DoUpdateExistingWorksheet then
-                    if not UploadClientFile(ClientFileName, ServerFileName) then
-                        exit;
+                // CLOUD READY DELETE
+                // if DoUpdateExistingWorksheet then
+                //     if not UploadClientFile(ClientFileName, ServerFileName) then
+                //         exit;
 
                 Window.Open(
                   Text000 +
@@ -272,21 +273,23 @@ Report 50023 "Exp. Acc. Sched. Entry to Ex."
                 */
 
                 Window.Close;
+                // CLOUD READY DELETE >>
+                // NOT USED
+                //               if DoUpdateExistingWorksheet then begin
+                //                  TempExcelBuffer.UpdateBook(ServerFileName, SheetName);
+                //                 TempExcelBuffer.WriteSheet('', CompanyName(), UserId());
+                //                TempExcelBuffer.CloseBook;
+                //                if not TestMode then
+                //                    TempExcelBuffer.DownloadAndOpenExcel
+                //           end else begin
+                // CLOUD READY DELETE >>                    
+                TempExcelBuffer.CreateNewBook(AccSchedName.Name);
 
-                if DoUpdateExistingWorksheet then begin
-                    TempExcelBuffer.UpdateBook(ServerFileName, SheetName);
-                    TempExcelBuffer.WriteSheet('', CompanyName(), UserId());
-                    TempExcelBuffer.CloseBook;
-                    if not TestMode then
-                        TempExcelBuffer.DownloadAndOpenExcel
-                end else begin
-                    TempExcelBuffer.CreateNewBook(AccSchedName.Name);
-                    
-                    TempExcelBuffer.WriteSheet(AccSchedName.Description, CompanyName(), UserId());
-                    TempExcelBuffer.CloseBook;
-                    if not TestMode then
-                        TempExcelBuffer.OpenExcel;
-                end;
+                TempExcelBuffer.WriteSheet(AccSchedName.Description, CompanyName(), UserId());
+                TempExcelBuffer.CloseBook;
+                if not TestMode then
+                    TempExcelBuffer.OpenExcel;
+                // end;
             end;
         }
     }
@@ -432,17 +435,17 @@ Report 50023 "Exp. Acc. Sched. Entry to Ex."
         TestMode := NewTestMode;
     end;
 
-    local procedure UploadClientFile(var ClientFileName: Text; var ServerFileName: Text): Boolean
-    begin
-        ServerFileName := FileMgt.UploadFile(Text002, ExcelFileExtensionTok);
+    // local procedure UploadClientFile(var ClientFileName: Text; var ServerFileName: Text): Boolean
+    // begin
+    //     ServerFileName := FileMgt.UploadFile(Text002, ExcelFileExtensionTok);
 
-        if ServerFileName = '' then
-            exit(false);
+    //     if ServerFileName = '' then
+    //         exit(false);
 
-        SheetName := TempExcelBuffer.SelectSheetsName(ServerFileName);
-        if SheetName = '' then
-            exit(false);
+    //     SheetName := TempExcelBuffer.SelectSheetsName(ServerFileName);
+    //     if SheetName = '' then
+    //         exit(false);
 
-        exit(true);
-    end;
+    //     exit(true);
+    // end;
 }

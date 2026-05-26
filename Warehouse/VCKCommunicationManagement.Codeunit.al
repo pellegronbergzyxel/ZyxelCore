@@ -114,14 +114,14 @@ Codeunit 50062 "VCK Communication Management"
     var
         recItem: Record Item;
         recInvSetup: Record "Inventory Setup";
-        varOutputStream: OutStream;
-        varXmlFile: File;
-        MessageNo: Code[20];
-        XmlPortSendReq: XmlPort "Send Items to VCK";
-        ServerFilename: Text;
-        FileMgt: Codeunit "File Management";
-        RemoteFilename: Text;
-        FtpMgt: Codeunit "VisionFTP Management";
+        //varOutputStream: OutStream;
+        //varXmlFile: File;
+        //MessageNo: Code[20];
+        //XmlPortSendReq: XmlPort "Send Items to VCK";
+        //ServerFilename: Text;
+        //FileMgt: Codeunit "File Management";
+        //RemoteFilename: Text;
+        //FtpMgt: Codeunit "VisionFTP Management";
         lText001: label 'It was not possible to upload the file %1%2 to the warehouse. (SendItem).';
         i: Integer;
         StartNo: Code[20];
@@ -163,104 +163,212 @@ Codeunit 50062 "VCK Communication Management"
         end else
             rValue := UploadFile(recItem);
 
-        /*IF recItem.FINDFIRST THEN BEGIN
-          recInvSetup.GET;
-          recInvSetup.TESTFIELD("AIT Location Code");
-          GetWarehouse(recInvSetup."AIT Location Code");
-        
-          MessageNo := GetNextMessageNo(recWarehouse."Message Number Series");
-          ServerFilename := FileMgt.ServerTempFileName('xml');
-          RemoteFilename := MessageNo + '.xml';
-        
-          varXmlFile.CREATE(ServerFilename);
-          varXmlFile.CREATEOUTSTREAM(varOutputStream);
-          XmlPortSendReq.SETDESTINATION(varOutputStream);
-          XmlPortSendReq.SETTABLEVIEW(recItem);
-          XmlPortSendReq.SetParameters(recWarehouse."Customer ID",recWarehouse."Project ID",MessageNo);
-          XmlPortSendReq.EXPORT;
-          varXmlFile.CLOSE;
-          IF NOT FtpMgt.UploadFile(recWarehouse."Warehouse Inbound FTP Code",ServerFilename,RemoteFilename) THEN
-            ERROR(lText001,MessageNo,'.xml')  // 12-02-20 ZY-LD 003
-          ELSE
-            EXIT(TRUE);
-        //    WriteLogMessage(0,1,0,MessageNo + '.xml',recItem."No.",Text003);
-        //    EXIT(TRUE);
-        //  END ELSE BEGIN
-        //    WriteLogMessage(1,1,0,MessageNo + '.xml',recItem."No.",Text018);
-        //    EXIT(FALSE);
-        //  END;
-        END;*/
-        //<< 20-02-23 ZY-LD 008
 
     end;
+
+    // local procedure UploadFileOld(var pItem: Record Item): Boolean
+    // var
+    //     recInvSetup: Record "Inventory Setup";
+    //     varOutputStream: OutStream;
+    //     varXmlFile: File;
+    //     MessageNo: Code[20];
+    //     XmlPortSendReq: XmlPort "Send Items to VCK";
+    //     ServerFilename: Text;
+    //     FileMgt: Codeunit "File Management";
+    //     RemoteFilename: Text;
+    //     FtpMgt: Codeunit "VisionFTP Management";
+    //     lText001: label 'It was not possible to upload the file %1%2 to the warehouse. (SendItem).';
+    // begin
+    //     // CLOUD READY DELETE
+    //     recInvSetup.Get;
+    //     recInvSetup.TestField("AIT Location Code");
+    //     GetWarehouse(recInvSetup."AIT Location Code");
+
+    //     MessageNo := GetNextMessageNo(recWarehouse."Message Number Series");
+    //     ServerFilename := FileMgt.ServerTempFileName('xml');
+    //     RemoteFilename := MessageNo + '.xml';
+
+    //     varXmlFile.Create(ServerFilename);
+    //     varXmlFile.CreateOutstream(varOutputStream);
+    //     XmlPortSendReq.SetDestination(varOutputStream);
+    //     XmlPortSendReq.SetTableview(pItem);
+    //     XmlPortSendReq.SetParameters(recWarehouse."Customer ID", recWarehouse."Project ID", MessageNo);
+    //     XmlPortSendReq.Export;
+    //     varXmlFile.Close;
+    //     if not FtpMgt.UploadFile(recWarehouse."Warehouse Inbound FTP Code", ServerFilename, RemoteFilename) then
+    //         Error(lText001, MessageNo, '.xml')  // 12-02-20 ZY-LD 003
+    //     else
+    //         exit(true);
+    // end;
 
     local procedure UploadFile(var pItem: Record Item): Boolean
     var
         recInvSetup: Record "Inventory Setup";
         varOutputStream: OutStream;
-        varXmlFile: File;
+        varInStream: inStream;
+        //varXmlFile: File;
         MessageNo: Code[20];
         XmlPortSendReq: XmlPort "Send Items to VCK";
         ServerFilename: Text;
-        FileMgt: Codeunit "File Management";
+        // FileMgt: Codeunit "File Management";
         RemoteFilename: Text;
         FtpMgt: Codeunit "VisionFTP Management";
+        tempblob: codeunit "Temp Blob";
+        base64: codeunit "Base64 Convert";
+        base64text: text;
         lText001: label 'It was not possible to upload the file %1%2 to the warehouse. (SendItem).';
     begin
+        // CLOUD READY NEW
         recInvSetup.Get;
         recInvSetup.TestField("AIT Location Code");
         GetWarehouse(recInvSetup."AIT Location Code");
-
         MessageNo := GetNextMessageNo(recWarehouse."Message Number Series");
-        ServerFilename := FileMgt.ServerTempFileName('xml');
         RemoteFilename := MessageNo + '.xml';
-
-        varXmlFile.Create(ServerFilename);
-        varXmlFile.CreateOutstream(varOutputStream);
-        XmlPortSendReq.SetDestination(varOutputStream);
+        tempblob.CreateOutstream(varOutputStream);
         XmlPortSendReq.SetTableview(pItem);
         XmlPortSendReq.SetParameters(recWarehouse."Customer ID", recWarehouse."Project ID", MessageNo);
-        XmlPortSendReq.Export;
-        varXmlFile.Close;
-        if not FtpMgt.UploadFile(recWarehouse."Warehouse Inbound FTP Code", ServerFilename, RemoteFilename) then
+        XmlPortSendReq.SetDestination(varOutputStream);
+        XmlPortSendReq.Export();
+        if not FtpMgt.UploadFilestream(recWarehouse."Warehouse Inbound FTP Code", tempblob, ServerFilename, RemoteFilename) then
             Error(lText001, MessageNo, '.xml')  // 12-02-20 ZY-LD 003
         else
             exit(true);
     end;
 
 
+    // procedure SendStockLevelRequestOld(): Boolean
+    // var
+    //     varOutputStream: OutStream;
+    //     varXmlFile: File;
+    //     MessageNo: Code[20];
+    //     XmlPortSendReq: XmlPort "Send Stock Level Request";
+    //     ServerFilename: Text;
+    //     FileMgt: Codeunit "File Management";
+    //     RemoteFilename: Text;
+    //     FtpMgt: Codeunit "VisionFTP Management";
+    //     recInvSetup: Record "Inventory Setup";
+    // begin
+    //     // CLOUD ready Delete
+    //     recInvSetup.Get;
+    //     recInvSetup.TestField("AIT Location Code");
+    //     GetWarehouse(recInvSetup."AIT Location Code");
+
+    //     MessageNo := GetNextMessageNo(recWarehouse."Message Number Series");
+    //     ServerFilename := FileMgt.ServerTempFileName('xml');
+    //     RemoteFilename := MessageNo + '.xml';
+
+    //     varXmlFile.Create(ServerFilename);
+    //     varXmlFile.CreateOutstream(varOutputStream);
+    //     XmlPortSendReq.SetDestination(varOutputStream);
+    //     XmlPortSendReq.SetParameters(recWarehouse."Customer ID", recWarehouse."Project ID", MessageNo);
+    //     XmlPortSendReq.Export;
+    //     varXmlFile.Close;
+    //     if FtpMgt.UploadFile(recWarehouse."Warehouse Inbound FTP Code", ServerFilename, RemoteFilename) then
+    //         exit(true)
+    //     else
+    //         exit(false);
+    // end;
+
+
     procedure SendStockLevelRequest(): Boolean
     var
         varOutputStream: OutStream;
-        varXmlFile: File;
+        varInStream: instream;
+        //varXmlFile: File;
         MessageNo: Code[20];
         XmlPortSendReq: XmlPort "Send Stock Level Request";
         ServerFilename: Text;
-        FileMgt: Codeunit "File Management";
+        // FileMgt: Codeunit "File Management";
         RemoteFilename: Text;
         FtpMgt: Codeunit "VisionFTP Management";
         recInvSetup: Record "Inventory Setup";
+        tempblob: codeunit "Temp Blob";
     begin
+        // CLOUD ready new
         recInvSetup.Get;
         recInvSetup.TestField("AIT Location Code");
         GetWarehouse(recInvSetup."AIT Location Code");
 
         MessageNo := GetNextMessageNo(recWarehouse."Message Number Series");
-        ServerFilename := FileMgt.ServerTempFileName('xml');
+        //ServerFilename := FileMgt.ServerTempFileName('xml');
         RemoteFilename := MessageNo + '.xml';
-
-        varXmlFile.Create(ServerFilename);
-        varXmlFile.CreateOutstream(varOutputStream);
+        tempblob.CreateOutstream(varOutputStream);
         XmlPortSendReq.SetDestination(varOutputStream);
         XmlPortSendReq.SetParameters(recWarehouse."Customer ID", recWarehouse."Project ID", MessageNo);
         XmlPortSendReq.Export;
-        varXmlFile.Close;
-        if FtpMgt.UploadFile(recWarehouse."Warehouse Inbound FTP Code", ServerFilename, RemoteFilename) then
+        if FtpMgt.UploadFilestream(recWarehouse."Warehouse Inbound FTP Code", tempblob, ServerFilename, RemoteFilename) then
             exit(true)
         else
             exit(false);
     end;
 
+
+
+    // procedure SendWhseOutbOrderRequestOLD(var pDelDocHead: Record "VCK Delivery Document Header") rValue: Boolean
+    // var
+    //     recLocation: Record Location;
+    //     recDDHeader: Record "VCK Delivery Document Header";
+    //     recDelDocLine: Record "VCK Delivery Document Line";
+    //     varOutputStream: OutStream;
+    //     varXmlFile: File;
+    //     MessageNo: Code[20];
+    //     XmlPortSendReq: XmlPort "Send Delivery Document";
+    //     ServerFilename: Text;
+    //     FileMgt: Codeunit "File Management";
+    //     RemoteFilename: Text;
+    //     FtpMgt: Codeunit "VisionFTP Management";
+    //     lText001: label 'Document No. %1 has been uploaded to %2.';
+    //     ItemNoFilter: Text;
+    // begin
+    //     // Cloud ready old
+    //     CheckSettings;
+    //     if not pDelDocHead.SentToAllIn and (pDelDocHead."Document Status" = pDelDocHead."document status"::Released) then begin
+    //         //>> 24-06-19 ZY-LD 002
+    //         // Send the items to the warehouse
+    //         recDelDocLine.SetRange("Document No.", pDelDocHead."No.");
+    //         if recDelDocLine.FindSet then begin
+    //             repeat
+    //                 if ItemNoFilter = '' then
+    //                     ItemNoFilter := recDelDocLine."Item No."
+    //                 else
+    //                     if StrPos(ItemNoFilter, recDelDocLine."Item No.") = 0 then
+    //                         ItemNoFilter += '|' + recDelDocLine."Item No.";
+    //             until recDelDocLine.Next() = 0;
+    //             SendItem(ItemNoFilter, false);
+    //         end;
+    //         //<< 24-06-19 ZY-LD 002
+
+    //         recLocation.Get(pDelDocHead."Ship-From Code");
+    //         recLocation.TestField(Warehouse);
+    //         recLocation.TestField("Warehouse Inbound FTP Code");
+    //         recLocation.TestField("Customer ID");
+    //         recLocation.TestField("Project ID");
+    //         recLocation.TestField("Message Number Series");
+
+    //         MessageNo := GetNextMessageNo(recLocation."Message Number Series");
+    //         ServerFilename := FileMgt.ServerTempFileName('xml');
+    //         RemoteFilename := MessageNo + '.xml';
+    //         recDDHeader.SetRange("No.", pDelDocHead."No.");
+    //         varXmlFile.Create(ServerFilename);
+    //         varXmlFile.CreateOutstream(varOutputStream);
+    //         XmlPortSendReq.SetDestination(varOutputStream);
+    //         XmlPortSendReq.SetTableview(recDDHeader);
+    //         XmlPortSendReq.SetParameters(recLocation."Customer ID", recLocation."Project ID", MessageNo);
+    //         XmlPortSendReq.Export;
+    //         varXmlFile.Close;
+
+    //         if FtpMgt.UploadFile(recLocation."Warehouse Inbound FTP Code", ServerFilename, RemoteFilename) then begin
+    //             pDelDocHead.SentToAllIn := true;
+    //             pDelDocHead.Modify(true);
+    //             Commit;
+    //             rValue := true;
+
+    //             if GuiAllowed then
+    //                 Message(lText001, pDelDocHead."No.", recLocation.Name);
+    //         end;
+    //         FileMgt.DeleteServerFile(ServerFilename);
+    //     end;
+    // end;
 
     procedure SendWhseOutbOrderRequest(var pDelDocHead: Record "VCK Delivery Document Header") rValue: Boolean
     var
@@ -268,16 +376,21 @@ Codeunit 50062 "VCK Communication Management"
         recDDHeader: Record "VCK Delivery Document Header";
         recDelDocLine: Record "VCK Delivery Document Line";
         varOutputStream: OutStream;
-        varXmlFile: File;
+        varInStream: InStream;
+        // varXmlFile: File;
         MessageNo: Code[20];
         XmlPortSendReq: XmlPort "Send Delivery Document";
         ServerFilename: Text;
-        FileMgt: Codeunit "File Management";
+        //FileMgt: Codeunit "File Management";
+        XMLdoc: XmlDocument;
         RemoteFilename: Text;
         FtpMgt: Codeunit "VisionFTP Management";
+        tempblob: codeunit "Temp Blob";
+
         lText001: label 'Document No. %1 has been uploaded to %2.';
         ItemNoFilter: Text;
     begin
+        // cloud ready new
         CheckSettings;
         if not pDelDocHead.SentToAllIn and (pDelDocHead."Document Status" = pDelDocHead."document status"::Released) then begin
             //>> 24-06-19 ZY-LD 002
@@ -303,18 +416,23 @@ Codeunit 50062 "VCK Communication Management"
             recLocation.TestField("Message Number Series");
 
             MessageNo := GetNextMessageNo(recLocation."Message Number Series");
-            ServerFilename := FileMgt.ServerTempFileName('xml');
+            //ServerFilename := FileMgt.ServerTempFileName('xml');
             RemoteFilename := MessageNo + '.xml';
             recDDHeader.SetRange("No.", pDelDocHead."No.");
-            varXmlFile.Create(ServerFilename);
-            varXmlFile.CreateOutstream(varOutputStream);
+            //varXmlFile.Create(ServerFilename);
+            //varXmlFile.CreateOutstream(varOutputStream);
+            tempblob.CreateOutstream(varOutputStream);
+
+
             XmlPortSendReq.SetDestination(varOutputStream);
             XmlPortSendReq.SetTableview(recDDHeader);
             XmlPortSendReq.SetParameters(recLocation."Customer ID", recLocation."Project ID", MessageNo);
             XmlPortSendReq.Export;
-            varXmlFile.Close;
+            //            varXmlFile.Close;
+          //  tempblob.CreateInStream(varInStream);
+          //  CopyStream(varOutputStream, varInStream);
 
-            if FtpMgt.UploadFile(recLocation."Warehouse Inbound FTP Code", ServerFilename, RemoteFilename) then begin
+            if FtpMgt.UploadFilestream(recLocation."Warehouse Inbound FTP Code", tempblob, ServerFilename, RemoteFilename) then begin
                 pDelDocHead.SentToAllIn := true;
                 pDelDocHead.Modify(true);
                 Commit;
@@ -323,9 +441,93 @@ Codeunit 50062 "VCK Communication Management"
                 if GuiAllowed then
                     Message(lText001, pDelDocHead."No.", recLocation.Name);
             end;
-            FileMgt.DeleteServerFile(ServerFilename);
+            //FileMgt.DeleteServerFile(ServerFilename);
         end;
     end;
+
+
+    // procedure SendInboundOrderRequestOld(var pWhseInbHead: Record "Warehouse Inbound Header") rValue: Boolean
+    // var
+    //     recWarehouse: Record Location;
+    //     recWhseInbLine: Record "VCK Shipping Detail";
+    //     recWhseInbHead: Record "Warehouse Inbound Header";
+    //     recItem: Record Item;
+    //     varOutputStream: OutStream;
+    //     varXmlFile: File;
+    //     XmlPortSendReq: XmlPort "Send Inbound Order Request";
+    //     ServerFilename: Text;
+    //     FileMgt: Codeunit "File Management";
+    //     RemoteFilename: Text;
+    //     FtpMgt: Codeunit "VisionFTP Management";
+    //     ItemNoFilter: Text;
+    //     lText001: label '"Item No." %1 is unknown. You have to create it as an item or you have to rename it to a known item no.';
+    // begin
+    //     begin
+    //         //IF "Document Status" = "Document Status"::Open THEN BEGIN  // 14-10-21 ZY-LD 005
+    //         if pWhseInbHead."Document Status" in [pWhseInbHead."document status"::Open, pWhseInbHead."document status"::Error] then begin  // 14-10-21 ZY-LD 005
+    //                                                                                                                                        // Check the document before sending to the warehouse
+    //                                                                                                                                        //>> 14-10-21 ZY-LD 005
+    //             pWhseInbHead."Document Status" := pWhseInbHead."document status"::Open;
+    //             pWhseInbHead."Error Description" := '';
+
+    //             recWhseInbLine.SetCurrentkey("Document No.", "Line No.");
+    //             recWhseInbLine.SetRange("Document No.", pWhseInbHead."No.");
+    //             if recWhseInbLine.FindSet then
+    //                 repeat
+    //                     if not recItem.Get(recWhseInbLine."Item No.") then begin
+    //                         pWhseInbHead."Document Status" := pWhseInbHead."document status"::Error;
+    //                         pWhseInbHead."Error Description" := StrSubstNo(lText001, recWhseInbLine."Item No.");
+    //                         pWhseInbHead.Modify(true);
+    //                     end;
+    //                 until recWhseInbLine.Next() = 0;
+    //             //<< 14-10-21 ZY-LD 005
+
+    //             if pWhseInbHead."Document Status" = pWhseInbHead."document status"::Open then begin
+    //                 // Update Items at the VCK
+    //                 //recWhseInbLine.SetCurrentKey("Document No.","Line No.");  // 14-10-21 ZY-LD 005
+    //                 //recWhseInbLine.SETRANGE("Document No.","No.");  // 14-10-21 ZY-LD 005
+    //                 if recWhseInbLine.FindSet then begin
+    //                     repeat
+    //                         if ItemNoFilter = '' then
+    //                             ItemNoFilter := recWhseInbLine."Item No."
+    //                         else
+    //                             if StrPos(ItemNoFilter, recWhseInbLine."Item No.") = 0 then
+    //                                 ItemNoFilter += '|' + recWhseInbLine."Item No.";
+    //                     until recWhseInbLine.Next() = 0;
+    //                     SendItem(ItemNoFilter, false);
+    //                 end;
+
+    //                 recWarehouse.Get(pWhseInbHead."Location Code");
+    //                 recWarehouse.TestField(Warehouse);
+    //                 recWarehouse.TestField("Warehouse Inbound FTP Code");
+    //                 recWarehouse.TestField("Message Number Series");
+
+    //                 // Create XML file
+    //                 pWhseInbHead."Message No." := GetNextMessageNo(recWarehouse."Message Number Series");
+    //                 pWhseInbHead.Modify(true);
+    //                 ServerFilename := FileMgt.ServerTempFileName('xml');
+    //                 RemoteFilename := pWhseInbHead."Message No." + '.xml';
+
+    //                 recWhseInbHead.SetRange("No.", pWhseInbHead."No.");
+    //                 varXmlFile.Create(ServerFilename);
+    //                 varXmlFile.CreateOutstream(varOutputStream);
+    //                 XmlPortSendReq.SetDestination(varOutputStream);
+    //                 XmlPortSendReq.SetTableview(recWhseInbHead);
+    //                 XmlPortSendReq.Export;
+    //                 varXmlFile.Close;
+
+    //                 // Upload file
+    //                 if FtpMgt.UploadFile(recWarehouse."Warehouse Inbound FTP Code", ServerFilename, RemoteFilename) then
+    //                     rValue := true
+    //                 else begin
+    //                     pWhseInbHead."Message No." := '';
+    //                     pWhseInbHead.Modify(true);
+    //                 end;
+    //                 FileMgt.DeleteServerFile(ServerFilename);
+    //             end;
+    //         end;
+    //     end;
+    // end;
 
 
     procedure SendInboundOrderRequest(var pWhseInbHead: Record "Warehouse Inbound Header") rValue: Boolean
@@ -335,12 +537,14 @@ Codeunit 50062 "VCK Communication Management"
         recWhseInbHead: Record "Warehouse Inbound Header";
         recItem: Record Item;
         varOutputStream: OutStream;
-        varXmlFile: File;
+        varInStream: instream;
+        //varXmlFile: File;
         XmlPortSendReq: XmlPort "Send Inbound Order Request";
         ServerFilename: Text;
-        FileMgt: Codeunit "File Management";
+        // FileMgt: Codeunit "File Management";
         RemoteFilename: Text;
         FtpMgt: Codeunit "VisionFTP Management";
+        tempblob: codeunit "Temp Blob";
         ItemNoFilter: Text;
         lText001: label '"Item No." %1 is unknown. You have to create it as an item or you have to rename it to a known item no.';
     begin
@@ -387,29 +591,26 @@ Codeunit 50062 "VCK Communication Management"
                     // Create XML file
                     pWhseInbHead."Message No." := GetNextMessageNo(recWarehouse."Message Number Series");
                     pWhseInbHead.Modify(true);
-                    ServerFilename := FileMgt.ServerTempFileName('xml');
                     RemoteFilename := pWhseInbHead."Message No." + '.xml';
-
                     recWhseInbHead.SetRange("No.", pWhseInbHead."No.");
-                    varXmlFile.Create(ServerFilename);
-                    varXmlFile.CreateOutstream(varOutputStream);
+                    tempblob.CreateOutstream(varOutputStream);
+                   
                     XmlPortSendReq.SetDestination(varOutputStream);
                     XmlPortSendReq.SetTableview(recWhseInbHead);
                     XmlPortSendReq.Export;
-                    varXmlFile.Close;
-
                     // Upload file
-                    if FtpMgt.UploadFile(recWarehouse."Warehouse Inbound FTP Code", ServerFilename, RemoteFilename) then
+                    if FtpMgt.UploadFileStream(recWarehouse."Warehouse Inbound FTP Code", tempblob, ServerFilename, RemoteFilename) then
                         rValue := true
                     else begin
                         pWhseInbHead."Message No." := '';
                         pWhseInbHead.Modify(true);
                     end;
-                    FileMgt.DeleteServerFile(ServerFilename);
+
                 end;
             end;
         end;
     end;
+
 
     local procedure GetWarehouse(pLocationCode: Code[10])
     begin

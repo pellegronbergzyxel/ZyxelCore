@@ -327,9 +327,11 @@ Table 50078 "Rcpt. Response Header"
     var
         FileMgt: Codeunit "File Management";
         lText001: label 'Download document';
+        ZyxelFileManagement: record "Zyxel File Management";
     begin
-        CalcFields(Filename);
-        FileMgt.DownloadHandler(Filename, lText001, '', 'XML(*.xml)|*.xml|All files(*.*)|*.*', FileMgt.GetFileName(Filename));
+        // Cloud ready new
+        if ZyxelFileManagement.get(rec."Entry No.") then
+            ZyxelFileManagement.DownloadBlobToFile(ZyxelFileManagement.Filename);
     end;
 
     procedure UpdateWarehouseStatus()  // 04-04-24 ZY-LD 007

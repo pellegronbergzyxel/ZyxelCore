@@ -140,7 +140,8 @@ Codeunit 50099 "VCK Download and  Import Doc."
             recWarehouse.SetRange(Warehouse, recWarehouse.Warehouse::VCK);
             recWarehouse.FindFirst;
             recWarehouse.TestField("Warehouse Outbound FTP Code");
-            FtpMgt.DownloadFolder(recWarehouse."Warehouse Outbound FTP Code");
+            //FtpMgt.DownloadFolder(recWarehouse."Warehouse Outbound FTP Code");  // CLOUD READY DELETE
+            FtpMgt.DownloadFolderStream(recWarehouse."Warehouse Outbound FTP Code");  // CLOUD READY New
             ZGT.CloseProgressWindow;
 
             if Import then

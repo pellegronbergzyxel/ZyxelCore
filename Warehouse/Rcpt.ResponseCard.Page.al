@@ -319,15 +319,17 @@ Page 50298 "Rcpt. Response Card"
                     newFilename: text;
                 begin
                     if recZyFileMgt.Get(Rec."File Management Entry No.") then begin
-                        Hyperlink(recZyFileMgt.Filename);
-                        if FILE.Exists(recZyFileMgt.Filename) then begin
-                            serverFile.Open(recZyFileMgt.Filename);
-                            serverFile.CreateInStream(ContentInStream);
-                            Filename := FileMgt.GetFileName(recZyFileMgt.Filename);
-                            if DownloadFromStream(ContentInStream, 'Export', '', 'All Files (*.*)|*.*', newFilename) then
-                                message('fil downloaded');
-                            serverFile.Close();
-                        end;
+                        recZyFileMgt.DownloadBlobToFile(recZyFileMgt.Filename);
+// Cloud Ready DELETE   
+                        // Hyperlink(recZyFileMgt.Filename);
+                        // if FILE.Exists(recZyFileMgt.Filename) then begin
+                        //     serverFile.Open(recZyFileMgt.Filename);
+                        //     serverFile.CreateInStream(ContentInStream);
+                        //     Filename := FileMgt.GetFileName(recZyFileMgt.Filename);
+                        //     if DownloadFromStream(ContentInStream, 'Export', '', 'All Files (*.*)|*.*', newFilename) then
+                        //         message('fil downloaded');
+                        //     serverFile.Close();
+                        // end;
                     end;
                 end;
             }

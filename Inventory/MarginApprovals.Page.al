@@ -254,6 +254,21 @@ ApplicationArea = all;
                     rec.Setapprovedpricebookline(rec);
                 end;
             }
+            action(force)
+              {
+                Caption = 'Force approval';
+                Image = Approval;
+ApplicationArea = all;
+
+                trigger OnAction()
+                var
+                    
+
+                begin
+                    rec.Setapprovedpricebookline(rec);
+                end;
+            }
+
         }
     }
 

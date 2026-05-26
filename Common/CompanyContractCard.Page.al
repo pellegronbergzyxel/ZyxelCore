@@ -115,6 +115,7 @@ page 50226 "Company Contract Card"
 
                 trigger OnAction()
                 begin
+                    // Pelle
                     FileMgt.DownloadHandler(Rec.GetFilename, Text001, '', 'PDF(*.pdf)|*.pdf|All files(*.*)|*.*', FileMgt.GetFileName(Rec."Folder and Filename"));
                 end;
             }
