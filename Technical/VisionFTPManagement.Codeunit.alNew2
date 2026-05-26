@@ -1,4 +1,4 @@
-//Codeunit //50057 "VisionFTP Management"
+Codeunit 50057 "VisionFTP Management"
 {
     // 001. 11-06-19 ZY-LD 2019061110000049 - Handling of error code. Locktable is set after Commit, because commit releases the table.
     // 002. 03-10-19 ZY-LD 2019100310000038 - Changed download to copy.
