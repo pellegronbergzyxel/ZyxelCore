@@ -93,11 +93,11 @@ Codeunit 50057 "VisionFTP Management"
         end;
 
         if lErrText = '' then begin
-            if recFtpFolder."Archive Local File" and (recFtpFolder."Archive Folder" <> '') and (FileMgt.ServerDirectoryExists(recFtpFolder."Archive Folder")) then
-                //  FileMgt.CopyServerFile(ServerPathAndFileName, recFtpFolder."Archive Folder" + RemoteFileName, true);  // 03-10-19 ZY-LD 002
-                //FileMgt.DownloadToFile(ServerPathAndFileName,recFtpFolder."Archive Folder" + RemoteFileName);  // 03-10-19 ZY-LD 002
-                //FileMgt.DeleteServerFile(ServerPathAndFileName);
-                rValue := true;
+            //if recFtpFolder."Archive Local File" and (recFtpFolder."Archive Folder" <> '') and (FileMgt.ServerDirectoryExists(recFtpFolder."Archive Folder")) then
+            //  FileMgt.CopyServerFile(ServerPathAndFileName, recFtpFolder."Archive Folder" + RemoteFileName, true);  // 03-10-19 ZY-LD 002
+            //FileMgt.DownloadToFile(ServerPathAndFileName,recFtpFolder."Archive Folder" + RemoteFileName);  // 03-10-19 ZY-LD 002
+            //FileMgt.DeleteServerFile(ServerPathAndFileName);
+            rValue := true;
         end else
             if GuiAllowed then
                 Error(lErrText)
@@ -124,13 +124,13 @@ Codeunit 50057 "VisionFTP Management"
     begin
         //>> 21-04-21 ZY-LD 005
         if DestinationFilename = '' then begin
-            TempFilename := FileMgt.ServerTempFileName(FileMgt.GetExtension(RemoteFilename));
+            //mpFilename := FileMgt.ServerTempFileName(FileMgt.GetExtension(RemoteFilename));
             DestinationFilename := FileMgt.GetFileName(TempFilename);
             DestinationFilename := DelStr(DestinationFilename, 1, 8);
             DestinationFilename := DelStr(DestinationFilename, StrPos(DestinationFilename, '.'), 4);
             DestinationFilename := StrSubstNo('%1_%2', DelChr(Format(CurrentDatetime, 0, 9), '=', '/\-,.: APMTZ'), DestinationFilename);
         end;
-        ArchiveFilename := DownloadFile2(Code, RemoteFilename, DestinationFilename, ShowError);
+        //ArchiveFilename := DownloadFile2(Code, RemoteFilename, DestinationFilename, ShowError);
         //<< 21-04-21 ZY-LD 005
     end;
 
@@ -447,7 +447,7 @@ Codeunit 50057 "VisionFTP Management"
     local procedure GetFtpFolder("Code": Code[20])
     var
         recServEnviron: Record "Server Environment";
-        FileMgt: Codeunit "File Management";
+        //FileMgt: Codeunit "File Management";
         lText001: label '%1 %2 is not active.';
         lText002: label 'Folder "%1" does not exist.';
     begin
@@ -459,11 +459,11 @@ Codeunit 50057 "VisionFTP Management"
         recFtpFolder.TestField(Hostname);
         recFtpFolder.TestField(Username);
         recFtpFolder.TestField(Password);
-        if recFtpFolder.Direction = recFtpFolder.Direction::Receive then begin
-            recFtpFolder.TestField("Archive Folder");
-            if not FileMgt.ServerDirectoryExists(recFtpFolder."Archive Folder") then
-                Error(lText002, recFtpFolder."Archive Folder");
-        end;
+        // if recFtpFolder.Direction = recFtpFolder.Direction::Receive then begin
+        //     recFtpFolder.TestField("Archive Folder");
+        //     if not FileMgt.ServerDirectoryExists(recFtpFolder."Archive Folder") then
+        //         Error(lText002, recFtpFolder."Archive Folder");
+        // end;
     end;
 
     procedure SetSubFolder(NewSubFolder: Text)
