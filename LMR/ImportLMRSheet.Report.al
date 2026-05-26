@@ -43,21 +43,25 @@ Report 50122 "Import LMR Sheet"
         {
         }
 
-         trigger OnQueryClosePage(CloseAction: Action): Boolean
+        trigger OnQueryClosePage(CloseAction: Action): Boolean
         var
             UploadExcelMsg: Label 'Please Choose the Excel file';
             NofileMsg: Label 'Please select file';
             FileMgt: Codeunit "File Management";
-            iStream: InStream;
+
             fromfile: text[250];
         begin
-            UploadIntoStream(UploadExcelMsg, '', '', fromfile, iStream);
-            if fromfile <> '' then begin
-                FileName := FileMgt.GetFileName(fromfile);
-                SheetName := ExcelBuffer.SelectSheetsNameStream(iStream);
+            if iStreamimport then begin
+                SheetName := ExcelBuffer.SelectSheetsNameStream(iStream);  // PELLE 
+            end else begin
+                UploadIntoStream(UploadExcelMsg, '', '', fromfile, iStream);
+                if fromfile <> '' then begin
+                    FileName := FileMgt.GetFileName(fromfile);
+                    SheetName := ExcelBuffer.SelectSheetsNameStream(iStream);
 
-            end else
-                message(NofileMsg);
+                end else
+                    message(NofileMsg);
+            END;
             if SheetName <> '' then begin
                 ExcelBuffer.reset();
                 ExcelBuffer.DeleteAll();
@@ -102,6 +106,10 @@ Report 50122 "Import LMR Sheet"
         Text015: label 'The file has already been imported. Do you want to import again?';
         Text016: label 'You must be in the ZNet DK Company to Import LMR Sheets.';
         SI: Codeunit "Single Instance";
+        iStream: InStream;
+
+        iStreamimport: Boolean;
+
 
     local procedure LMRGoodStock()
     var
@@ -178,7 +186,7 @@ Report 50122 "Import LMR Sheet"
         end;
     end;
 
-// CLOUD READY DELTE
+    // CLOUD READY DELTE
     // local procedure UploadFile()
     // var
     //     FileMgt: Codeunit "File Management";

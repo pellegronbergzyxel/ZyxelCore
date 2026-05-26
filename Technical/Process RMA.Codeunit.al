@@ -40,6 +40,7 @@ codeunit 50049 "Process RMA"
         ImportLMRSheet: Report "Import LMR Sheet";
         FilenameForDate: Text;
         lText001: Label 'Import LMR';
+        InStream: InStream;
     begin
         AutoSetup.get;
 
@@ -53,22 +54,35 @@ codeunit 50049 "Process RMA"
             repeat
                 IF GetDateOutOfText(recZyFileMgt.Filename) > AutoSetup."Last LMR Date" then begin
                     ZGT.UpdateProgressWindow(lText001, 0, true);
+
                     recZyFileMgt2.Get(recZyFileMgt."Entry No.");
+                    // CLOUD READY NEW
+                    recZyFileMgt.calcfields(filblob);
+                    if recZyFileMgt.filblob.HasValue then begin
+                        recZyFileMgt.filblob.CreateInstream(InStream);
+                        // CLOUD READY NEW <<
+                        // MANGLER MANGLER:
+                        // importlmrsheet skal tage en insteam i stedet
 
-                    Clear(ImportLMRSheet);
-                    ImportLMRSheet.InitReport(recZyFileMgt.Filename);
-                    ImportLMRSheet.useRequestPage(false);
-                    ImportLMRSheet.RunModal();
 
-                    recZyFileMgt2.Open := false;
-                    recZyFileMgt2."Error Text" := '';
-                    recZyFileMgt2.Modify();
 
-                    Commit();
-                    PostRMAJnl();
+                        Clear(ImportLMRSheet);
 
-                    AutoSetup.Modify();
-                    Commit();
+
+                        ImportLMRSheet.InitReport(recZyFileMgt.Filename);
+                        ImportLMRSheet.useRequestPage(false);
+                        ImportLMRSheet.RunModal();
+
+                        recZyFileMgt2.Open := false;
+                        recZyFileMgt2."Error Text" := '';
+                        recZyFileMgt2.Modify();
+
+                        Commit();
+                        PostRMAJnl();
+
+                        AutoSetup.Modify();
+                        Commit();
+                    end;
                 end;
             until recZyFileMgt.next = 0;
         end else begin
