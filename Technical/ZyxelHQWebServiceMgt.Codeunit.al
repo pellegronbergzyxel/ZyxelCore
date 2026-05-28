@@ -173,6 +173,9 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
         ItemNotCreatedLbl: Label '"Item No." %1 is not created in our system "%2" %3, "%4" %5.<br>';
         ContainerNoMustOnlyNumbersErr: Label '"Container No." must only contain one number "%1".';
         LinesBothWithWithoutContainerNoErr: Label 'For the shipment "%1" we have received lines both with and without "Container No.".';
+        Dummy: text;
+        TempBlob: codeunit "Temp Blob";
+        varoutstream: outstream;
 
     begin
         // Update container details
@@ -309,19 +312,21 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
 
                 // Send e-mail with attached document to VCK
                 Commit();
-
-                ServerFilename := FileMgt.ServerTempFileName('xlsx');
+                // CLOUD READY DELETE
+                // ServerFilename := FileMgt.ServerTempFileName('xlsx');
+                TempBlob.CreateOutStream(varoutstream);
                 ReportFilter := StrSubstNo('*%1*', BatchNo);
                 ContainerDetailRec.Reset();
                 ContainerDetailRec.SetFilter("Batch No.", ReportFilter);
                 ContainerDetailRec.SetRange("Data Received Created", CDT);
                 ContainerDetailReport.SetTableView(ContainerDetailRec);
-                ContainerDetailReport.SaveAsExcel(ServerFilename);
+                ContainerDetailReport.SaveAs(dummy, ReportFormat::Excel, varoutstream);
+                //ContainerDetailReport.SaveAsExcel(ServerFilename);
 
                 Clear(EmailAddMgt);
                 SI.SetMergefield(100, BatchNo);
                 SI.SetMergefield(101, HqInvoiceNo);
-                EmailAddMgt.CreateEmailWithAttachment('HQCONTDET', '', '', ServerFilename, StrSubstNo(ExcelFileNameLbl, BatchNo), false);
+                EmailAddMgt.CreateEmailWithAttachment('HQCONTDET', '', '', TempBlob, StrSubstNo(ExcelFileNameLbl, BatchNo));
                 EmailAddMgt.Send();
 
                 if SendFraightWarning then begin
@@ -386,7 +391,6 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
     //     if pContainerDetail.FindSet() then begin
     //         BatchNo := NoSeriesMgt.GetNextNo('CDTBATCH', Today, true);
     //         CreateWebServiceLog(lText002, StrSubstNo(lText003, BatchNo));
-
     //         CDT := CurrentDatetime();
     //         recContainerDetail.LockTable();
     //         repeat
@@ -528,21 +532,23 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
     //                 EmailAddMgt.CreateSimpleEmail('HQCONTDETE', '', '');
     //                 EmailAddMgt.Send();
     //             end;
-
-    //             // Send e-mail with attached document to VCK
-    //             Commit();
-    //             ServerFilename := FileMgt.ServerTempFileName('xlsx');
-    //             ReportFilter := StrSubstNo('*%1*', BatchNo);
-    //             recContainerDetail.Reset();
-    //             recContainerDetail.SetFilter("Batch No.", ReportFilter);
-    //             recContainerDetail.SetRange("Data Received Created", CDT);
-    //             repContainerDetail.SetTableView(recContainerDetail);
-    //             repContainerDetail.SaveAsExcel(ServerFilename);
-    //             Clear(EmailAddMgt);
-    //             SI.SetMergefield(100, BatchNo);
-    //             SI.SetMergefield(101, HqInvoiceNo);
-    //             EmailAddMgt.CreateEmailWithAttachment('HQCONTDET', '', '', ServerFilename, StrSubstNo(lText001, BatchNo), false);
-    //             EmailAddMgt.Send();
+    // Send e-mail with attached document to VCK
+    // Commit();
+    // // CLOUD READY DELETE
+    // //ServerFilename := FileMgt.ServerTempFileName('xlsx');
+    // TempBlob.CreateOutStream(varoutstream);
+    // ReportFilter := StrSubstNo('*%1*', BatchNo);
+    // recContainerDetail.Reset();
+    // recContainerDetail.SetFilter("Batch No.", ReportFilter);
+    // recContainerDetail.SetRange("Data Received Created", CDT);
+    // repContainerDetail.SetTableView(recContainerDetail);
+    // repContainerDetail.SaveAs(dummy,ReportFormat::Excel,varoutstream);
+    // //repContainerDetail.SaveAsExcel(ServerFilename);
+    // Clear(EmailAddMgt);
+    // SI.SetMergefield(100, BatchNo);
+    // SI.SetMergefield(101, HqInvoiceNo);
+    // EmailAddMgt.CreateEmailWithAttachment('HQCONTDET', '', '', TempBlob, StrSubstNo(lText001, BatchNo));
+    // EmailAddMgt.Send();
 
     //             if SendFraightWarning then begin
     //                 Clear(EmailAddMgt);
