@@ -79,10 +79,10 @@ Page 50042 "Zyxel File Management Entries"
                     InStr: instream;
                 begin
                     //FileMgt.DownloadHandler(Rec.Filename, lText001, '', 'PDF(*.pdf)|*.pdf|All files(*.*)|*.*', FileMgt.GetFileName(Rec.Filename));
-                    
 
 
-                      Rec.CalcFields("Filblob");
+
+                    Rec.CalcFields("Filblob");
                     if rec.filblob.HasValue then begin
                         //    FileOut.Create(DownloadPath);
                         //  FileOut.CreateOutstream(FileStream);
@@ -255,16 +255,16 @@ Page 50042 "Zyxel File Management Entries"
                     end;
                 end;
             }
-            action("Get Response files for test")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Get Response files for test';
+            // action("Get Response files for test")
+            // {
+            //     ApplicationArea = Basic, Suite;
+            //     Caption = 'Get Response files for test';
 
-                trigger OnAction()
-                begin
-                    SetupTest;
-                end;
-            }
+            //     trigger OnAction()
+            //     begin
+            //         SetupTest;
+            //     end;
+            // }
         }
     }
 
@@ -301,16 +301,16 @@ Page 50042 "Zyxel File Management Entries"
         StockMovementImportVisible := Rec.Type = Rec.Type::"VCK Stock Correction";
     end;
 
-    local procedure SetupTest()
-    var
-        recFile: Record File;
-        FilterStr: Text;
-    begin
-        // recFile.SETRANGE(Path,'\\ZyEU-NAVSQL02\NAV Task Manager\AllIn\SavedReceivedFiles');
-        // recFile.SETFILTER(Date,'%1..',20190102D);
-        // FilterStr := STRSUBSTNO('*%1*.*','PurchaseOrderResponse');
-        // recFile.SETFILTER(Name,FilterStr);
-        recFile.SetRange(Path, 'H:\');
-        Message('%1', recFile.Count);
-    end;
+    // local procedure SetupTest()
+    // var
+    //     recFile: Record File;
+    //     FilterStr: Text;
+    // begin
+    //     // recFile.SETRANGE(Path,'\\ZyEU-NAVSQL02\NAV Task Manager\AllIn\SavedReceivedFiles');
+    //     // recFile.SETFILTER(Date,'%1..',20190102D);
+    //     // FilterStr := STRSUBSTNO('*%1*.*','PurchaseOrderResponse');
+    //     // recFile.SETFILTER(Name,FilterStr);
+    //     recFile.SetRange(Path, 'H:\');
+    //     Message('%1', recFile.Count);
+    // end;
 }

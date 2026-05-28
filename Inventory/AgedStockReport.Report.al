@@ -173,7 +173,9 @@ Report 50099 "Aged Stock Report"
                     if QtyLocation = 1 then
                         ZGT.UpdateProgressWindow(Item."No.", 0, true);
 
-                    if ZGT.TurkishServer then begin
+                    //27-05-2026 BK #Cloud Ready
+                    //if ZGT.TurkishServer then begin
+                    if ZGT.IsTRDatabaseServer() then begin
                         ConvItem.Get(Item."No.");
                         Item."Cost Posted to G/L" := Item."Cost Posted to G/L" + ConvItem."Cost Amount (Actual)";
                     end;
@@ -210,7 +212,9 @@ Report 50099 "Aged Stock Report"
 
                     Item.SetRange(Item."Date Filter", 0D, BaseDate);
                     Item.SetRange(Item."Location Filter", Location.Code);
-                    if ZGT.TurkishServer then begin
+                    //27-05-2026 BK #Cloud Ready
+                    //if ZGT.TurkishServer then begin
+                    if ZGT.IsTRDatabaseServer() then begin
                         ConvItem.SetRange("Date Filter", 0D, 20180930D);
                         ConvItem.SetRange("Location Filter", Location.Code);
                         ConvItem.SetAutocalcFields("Cost Amount (Actual)");

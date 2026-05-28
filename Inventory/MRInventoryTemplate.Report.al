@@ -172,7 +172,9 @@ Report 50098 "MR Inventory Template"
 
                 trigger OnAfterGetRecord()
                 begin
-                    if ZGT.TurkishServer then begin
+                    //27-05-2026 BK #Cloud Ready
+                    //if ZGT.TurkishServer then begin
+                    if ZGT.IsTRDatabaseServer() then begin
                         ConvItem.Get(Item."No.");
                         Item."Cost Posted to G/L" := Item."Cost Posted to G/L" + ConvItem."Cost Amount (Actual)";
                     end;
@@ -204,7 +206,9 @@ Report 50098 "MR Inventory Template"
 
                     Item.SetRange(Item."Date Filter", 0D, BaseDate);
                     Item.SetRange(Item."Location Filter", Location.Code);
-                    if ZGT.TurkishServer then begin
+                    //27-05-2026 BK #Cloud Ready
+                    //if ZGT.TurkishServer then begin
+                    if ZGT.IsTRDatabaseServer() then begin
                         ConvItem.SetRange("Date Filter", 0D, 20180930D);
                         ConvItem.SetRange("Location Filter", Location.Code);
                         ConvItem.SetAutocalcFields("Cost Amount (Actual)");
@@ -768,7 +772,7 @@ Report 50098 "MR Inventory Template"
         lText003: label 'RMA %1';
     begin
         //ExcelBuf.CreateBook('', StrSubstNo(lText001, AgingCode)); CLOUD ready DELETE
-            ExcelBuf.CreateNewBook(StrSubstNo(lText001, AgingCode));
+        ExcelBuf.CreateNewBook(StrSubstNo(lText001, AgingCode));
         // Detailed
         ExcelBuf.WriteSheet(StrSubstNo(lText001, AgingCode), CompanyName(), UserId());
 

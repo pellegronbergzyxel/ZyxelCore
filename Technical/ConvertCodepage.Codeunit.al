@@ -37,7 +37,7 @@ Codeunit 50015 "Convert Codepage"
     //     f.WriteAllLines(lOutputFileName, f.ReadAllLines(pInputFileName, InEnc), OutEnc);
     // end;
 
-   procedure ConvertCodepage(pInputFileName: Text; pOutPutExt: Text[5]; pFromCodePage: Code[10]; pToCodePage: Code[10])
+    procedure ConvertCodepage(pInputFileName: Text; pOutPutExt: Text[5]; pFromCodePage: Code[10]; pToCodePage: Code[10])
     var
         InFile: File;
         OutFile: File;
@@ -70,35 +70,35 @@ Codeunit 50015 "Convert Codepage"
         OutFile.Close();
     end;
 
-    local procedure ConvertCodepageStrOld(pInputFileName: Text; pOutPutExt: Text[5]; pFromCodePage: Code[10]; pToCodePage: Code[10])
-    var
-        lOutputFileName: Text[250];
-        f: dotnet File;
-        InEnc: dotnet Encoding;
-        OutEnc: dotnet Encoding;
-    begin
-        // CLOUD READY DELETE
-        if not Exists(pInputFileName) then
-            Error(Text50000);
+    // local procedure ConvertCodepageStrOld(pInputFileName: Text; pOutPutExt: Text[5]; pFromCodePage: Code[10]; pToCodePage: Code[10])
+    // var
+    //     lOutputFileName: Text[250];
+    //     f: dotnet File;
+    //     InEnc: dotnet Encoding;
+    //     OutEnc: dotnet Encoding;
+    // begin
+    //     // CLOUD READY DELETE
+    //     if not Exists(pInputFileName) then
+    //         Error(Text50000);
 
-        // Set default
-        if pFromCodePage = '' then
-            pFromCodePage := 'ISO-8859-1';  // ANSI
-        if pToCodePage = '' then
-            pToCodePage := 'UTF-8';
-        if pOutPutExt = '' then
-            pOutPutExt := FileMgt.GetExtension(pInputFileName)
-        else
-            if CopyStr(pOutPutExt, 1, 1) <> '.' then
-                pOutPutExt := '.' + pOutPutExt;
+    //     // Set default
+    //     if pFromCodePage = '' then
+    //         pFromCodePage := 'ISO-8859-1';  // ANSI
+    //     if pToCodePage = '' then
+    //         pToCodePage := 'UTF-8';
+    //     if pOutPutExt = '' then
+    //         pOutPutExt := FileMgt.GetExtension(pInputFileName)
+    //     else
+    //         if CopyStr(pOutPutExt, 1, 1) <> '.' then
+    //             pOutPutExt := '.' + pOutPutExt;
 
-        InEnc := InEnc.GetEncoding(pFromCodePage);
-        OutEnc := OutEnc.GetEncoding(pToCodePage);
-        lOutputFileName := CopyStr(pInputFileName, 1, StrPos(pInputFileName, '.') - 1) + pOutPutExt;
-        f.WriteAllLines(lOutputFileName, f.ReadAllLines(pInputFileName, InEnc), OutEnc);
-    end;
+    //     InEnc := InEnc.GetEncoding(pFromCodePage);
+    //     OutEnc := OutEnc.GetEncoding(pToCodePage);
+    //     lOutputFileName := CopyStr(pInputFileName, 1, StrPos(pInputFileName, '.') - 1) + pOutPutExt;
+    //     f.WriteAllLines(lOutputFileName, f.ReadAllLines(pInputFileName, InEnc), OutEnc);
+    // end;
 
-    
+
     local procedure ConvertCodepageStr(pInputFileName: Text; pOutPutExt: Text[5]; pFromCodePage: Code[10]; pToCodePage: Code[10])
     var
         InFile: File;

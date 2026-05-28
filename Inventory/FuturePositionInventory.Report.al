@@ -158,7 +158,9 @@ report 50093 "Future Position Inventory"
 
                 trigger OnAfterGetRecord()
                 begin
-                    if ZGT.TurkishServer then begin
+                    //27-05-2026 BK #Cloud Ready
+                    //if ZGT.TurkishServer then begin
+                    if zgt.isTRDatabaseServer() then begin
                         ConvItem.Get(Item."No.");
                         Item."Cost Posted to G/L" := Item."Cost Posted to G/L" + ConvItem."Cost Amount (Actual)";
                     end;
@@ -188,7 +190,9 @@ report 50093 "Future Position Inventory"
 
                     Item.SetRange(Item."Date Filter", 0D, BaseDate);
                     Item.SetRange(Item."Location Filter", Location.Code);
-                    if ZGT.TurkishServer then begin
+                    //27-05-2026 BK #Cloud Ready
+                    //if ZGT.TurkishServer then begin
+                    if ZGT.IsTRDatabaseServer() then begin
                         ConvItem.SetRange("Date Filter", 0D, 20180930D);
                         ConvItem.SetRange("Location Filter", Location.Code);
                         ConvItem.SetAutoCalcFields("Cost Amount (Actual)");

@@ -285,11 +285,15 @@ Codeunit 50054 "Single Instance"
     var
         ZGT: Codeunit "ZyXEL General Tools";
     begin
-        if ZGT.ItalianServer then begin
+        //27-05-2026 BK #Cloud Ready
+        //if ZGT.ItalianServer then begin
+        if ZGT.IsITDatabaseServer() then begin
             if StrPos('50023,50024,406,407', pReportNo) <> 0 then
                 pReportType := Preporttype::Document;
         end else
-            if ZGT.TurkishServer then begin
+            //27-05-2026 BK #Cloud Ready   
+            //if ZGT.TurkishServer then begin
+            if ZGT.IsTRDatabaseServer() then begin
                 if StrPos('206,207,406,407', pReportNo) <> 0 then
                     pReportType := Preporttype::Document;
             end else

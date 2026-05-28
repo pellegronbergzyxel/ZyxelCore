@@ -54,19 +54,26 @@ codeunit 50087 "Zyxel General Event"
         if Rec."User Name" = '' then
             exit;
 
-        if not ZGT.ItalianServer() and not ZGT.TurkishServer() then
+        //27-05-2026 BK #Cloud Ready
+        //if not ZGT.ItalianServer() and not ZGT.TurkishServer() then
+        if not ZGT.IsITDatabaseServer() and not ZGT.IsTRDatabaseServer() then
             recUserSetup.ChangeCompany(ZGT.GetRHQCompanyName());
         recUserSetup.Validate("User ID", Rec."User Name");
         if not recUserSetup.Insert(true) then;
 
-        if not ZGT.ItalianServer() and not ZGT.TurkishServer() then
+        //27-05-2026 BK #Cloud Ready
+        //if not ZGT.ItalianServer() and not ZGT.TurkishServer() then
+        if zgt.IsITDatabaseServer() or zgt.IsTRDatabaseServer() then
             recUserSetup.ChangeCompany(ZGT.GetSistersCompanyName(1))
         else
-
-            if ZGT.ItalianServer() then
+            //27-05-2026 BK #Cloud Ready
+            //if ZGT.ItalianServer() then
+            if ZGT.IsITDatabaseServer() then
                 recUserSetup.ChangeCompany(ZGT.GetSistersCompanyName(14))
             else
-                if ZGT.TurkishServer() then
+                //27-05-2026 BK #Cloud Ready
+                //if ZGT.TurkishServer() then
+                if ZGT.IsTRDatabaseServer() then
                     recUserSetup.ChangeCompany(ZGT.GetSistersCompanyName(15));
         if not recUserSetup.Insert(true) then;
 

@@ -25,25 +25,25 @@ Page 50184 "HR Employee Picture"
     {
         area(processing)
         {
-            action("New Picture")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'New Picture';
-                Image = Picture;
-                ToolTip = 'Assign a new picture to this employee';
+            // action("New Picture")
+            // {
+            //     ApplicationArea = Basic, Suite;
+            //     Caption = 'New Picture';
+            //     Image = Picture;
+            //     ToolTip = 'Assign a new picture to this employee';
 
-                trigger OnAction()
-                var
-                    FileMgt: Codeunit "File Management";
-                    SelectedFile: Text[250];
-                begin
-                    SelectedFile := FileMgt.UploadFileWithFilter('New Employee Picture', SelectedFile, 'Image Files(*.BMP;*.JPG;*.GIF)|*.BMP;*.JPG;*.GIF|Bitmap files (*.BMP)|*.BMP|PNG files (*.PNG)|*.PNG|JPEG files (*.JPG)|*.JPG|GIF files (*.GIF)|*.GIF|All files (*.*)|*.*', '*.BMP;*.JPG;*.GIF');
-                    if SelectedFile <> '' then begin
-                        Rec.Picture.Import(SelectedFile);
-                        Rec.Modify;
-                    end;
-                end;
-            }
+            //     trigger OnAction()
+            //     var
+            //         FileMgt: Codeunit "File Management";
+            //         SelectedFile: Text[250];
+            //     begin
+            //         SelectedFile := FileMgt.UploadFileWithFilter('New Employee Picture', SelectedFile, 'Image Files(*.BMP;*.JPG;*.GIF)|*.BMP;*.JPG;*.GIF|Bitmap files (*.BMP)|*.BMP|PNG files (*.PNG)|*.PNG|JPEG files (*.JPG)|*.JPG|GIF files (*.GIF)|*.GIF|All files (*.*)|*.*', '*.BMP;*.JPG;*.GIF');
+            //         if SelectedFile <> '' then begin
+            //             Rec.Picture.Import(SelectedFile);
+            //             Rec.Modify;
+            //         end;
+            //     end;
+            // }
             action(Delete)
             {
                 ApplicationArea = Basic, Suite;

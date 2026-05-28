@@ -117,7 +117,9 @@ XmlPort 50047 "WS Customer Credit Limit"
         ZGT: Codeunit "ZyXEL General Tools";
     begin
         if ZGT.IsZNetCompany then begin
-            if ZGT.CompanyNameIs(11) or ZGT.TurkishServer then  // ZyND DE |ZyND TR
+            //27-05-2026 BK #Cloud Ready
+            //if ZGT.CompanyNameIs(11) or ZGT.TurkishServer then  // ZyND DE |ZyND TR 
+            if ZGT.CompanyNameIs(11) or ZGT.IsTRDatabaseServer() then  // ZyND DE |ZyND TR
                 Cust.SetRange("No.", '200000', '299999')
         end else
             Cust.SetFilter("No.", '<%1|>%2', '200000', '299999');

@@ -493,15 +493,19 @@ XmlPort 50037 "WS Replicate G/L Account"
             until Dimension.Next() = 0;
 
         // In Italian and Tyrkish Navision the tables must be replaced with 50033
-        //if ZGT.ItalianServer or ZGT.TurkishServer then  // 06-02-24 ZY-LD 
-        if ZGT.TurkishServer then  // 06-02-24 ZY-LD 
+        //if ZGT.ItalianServer or ZGT.TurkishServer then
+        //27-05-2026 BK #Cloud Ready
+        //if ZGT.TurkishServer then  
+        if zgt.IsTRDatabaseServer() then
             if recICGLAcc.TableName = "IC G/L Account".TableName then
                 Error(lText001);
 
         if "IC G/L Account".FindSet then
             repeat
                 // In Turkey we will use the local Turkish account, but only if it's one to one.
-                if ZGT.TurkishServer then begin
+                //27-05-2026 BK #Cloud Ready
+                //if ZGT.TurkishServer then begin
+                if ZGT.IsTRDatabaseServer() then begin
                     recGLAcc.SetRange("RHQ G/L Account No.", "IC G/L Account"."No.");
                     if recGLAcc.Count = 1 then begin
                         recGLAcc.FindFirst;
