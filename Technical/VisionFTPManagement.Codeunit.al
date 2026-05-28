@@ -91,7 +91,6 @@ Codeunit 50057 "VisionFTP Management"
             ResponseText := FileAPIMgt.FtpUploadFile(FTPConnectionString, recFtpFolder."Remote Folder", RemoteFileName, base64text);
 
         end;
-
         if lErrText = '' then begin
             //if recFtpFolder."Archive Local File" and (recFtpFolder."Archive Folder" <> '') and (FileMgt.ServerDirectoryExists(recFtpFolder."Archive Folder")) then
             //  FileMgt.CopyServerFile(ServerPathAndFileName, recFtpFolder."Archive Folder" + RemoteFileName, true);  // 03-10-19 ZY-LD 002
