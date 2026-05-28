@@ -296,8 +296,9 @@ codeunit 50082 "Zyxel Web Service"
     var
         recSalesInvHead: Record "Sales Invoice Header";
     begin
-        //>> 11-04-19 ZY-LD 001
-        if ZGT.TurkishServer then begin
+        //27-05-2026 BK #Cloud Ready
+        //if ZGT.TurkishServer then begin
+        if ZGT.IsTRDatabaseServer() then begin
             recSalesInvHead.SetCurrentkey("Your Reference");
             recSalesInvHead.SetRange("Your Reference", pSalesInvNo);
         end else begin

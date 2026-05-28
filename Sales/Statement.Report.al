@@ -1037,14 +1037,12 @@ report 50024 "Statement ZX"
             if CustLedgEntry.Reversed then
                 exit(true);
         end;
-        //>> 25-10-18 ZY-LD 003
         if PrintOnlyOpenEntries then begin
             if PrintReversedEntries then
                 CustLedgEntry.Get(DetailedCustLedgEntry."Cust. Ledger Entry No.");
             if not CustLedgEntry.Open then
                 exit(true);
         end;
-        //<< 25-10-18 ZY-LD 003
         exit(false);
     end;
 
@@ -1063,7 +1061,7 @@ report 50024 "Statement ZX"
         LogInteraction := NewLogInteraction;
         StartDate := NewStartDate;
         EndDate := NewEndDate;
-        PrintOnlyOpenEntries := NewPrintOnlyOpenEntries;  // 16-10-18 ZY-LD 003
+        PrintOnlyOpenEntries := NewPrintOnlyOpenEntries;
     end;
 
     local procedure IsReportInPreviewMode(): Boolean
@@ -1091,9 +1089,11 @@ report 50024 "Statement ZX"
 
         PrintIfEmailIsMissing := SupportedOutputMethod = SupportedOutputMethod::Email;
 
-        RiBaDueDate := CalcDate('<CM>', TODAY);  // 16-10-18 ZY-LD 003
-        SI.SetDate(RiBaDueDate);  // 16-10-18 ZY-LD 003
-        RiBaDueDateVisible := ZGT.ItalianServer;  // 16-10-18 ZY-LD 003
+        RiBaDueDate := CalcDate('<CM>', TODAY);
+        SI.SetDate(RiBaDueDate);
+        //27-05-2026 BK #Cloud Ready
+        //RiBaDueDateVisible := ZGT.ItalianServer;  
+        riBaDueDateVisible := zgt.IsITDatabaseServer()
     end;
 
     local procedure VerifyDates()

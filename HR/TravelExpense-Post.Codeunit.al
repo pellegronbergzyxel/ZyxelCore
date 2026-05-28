@@ -102,7 +102,9 @@ Codeunit 50094 "TravelExpense-Post"
                         GenJnlManagement.CalcBalance(recGenJnl, xrecGenJnl, Balance, TotalBalance, ShowBalance, ShowTotalBalance);
                         recGenJnl.SetUpNewLine(xrecGenJnl, Balance, true);
                         recGenJnl.Validate("Line No.", GetNextJnlLine(recGenJnl));
-                        if ZGT.TurkishServer then
+                        //27-05-2026 BK #Cloud Ready
+                        //if ZGT.TurkishServer then
+                        if ZGT.IsTRDatabaseServer() then
                             recGenJnl."Document No." := pTrExpHead."No.";
 
                         recGenJnl.Validate("Posting Date", pTrExpHead."Posting Date");

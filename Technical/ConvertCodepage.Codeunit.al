@@ -37,15 +37,16 @@ Codeunit 50015 "Convert Codepage"
     //     f.WriteAllLines(lOutputFileName, f.ReadAllLines(pInputFileName, InEnc), OutEnc);
     // end;
 
-    //    procedure ConvertCodepage(pInputFileName: Text; pOutPutExt: Text[5]; pFromCodePage: Code[10]; pToCodePage: Code[10])
-    //     var
-    //         InFile: File;
-    //         OutFile: File;
-    //         lLine: Text;
-    //         lLines: List of [Text];
-    //     begin
-    //         if not Exists(pInputFileName) then
-    //             Error(Text50000, pInputFileName);
+
+    // local procedure ConvertCodepageStr(pInputFileName: Text; pOutPutExt: Text[5]; pFromCodePage: Code[10]; pToCodePage: Code[10])
+    // var
+    //     InFile: File;
+    //     OutFile: File;
+    //     lLine: Text;
+    //     lLines: List of [Text];
+    // begin
+    //     if not Exists(pInputFileName) then
+    //         Error(Text50000, pInputFileName);
 
     //         // Set default
     //         if pFromCodePage = '' then
@@ -99,6 +100,15 @@ Codeunit 50015 "Convert Codepage"
     // end;
 
 
+    // local procedure ConvertCodepageStr(pInputFileName: Text; pOutPutExt: Text[5]; pFromCodePage: Code[10]; pToCodePage: Code[10])
+    // var
+    //     InFile: File;
+    //     OutFile: File;
+    //     lLine: Text;
+    //     lLines: List of [Text];
+    // begin
+    //     if not Exists(pInputFileName) then
+    //         Error(Text50000);
     // local procedure ConvertCodepageStr(pInputFileName: Text; pOutPutExt: Text[5]; pFromCodePage: Code[10]; pToCodePage: Code[10])
     // var
     //     InFile: File;

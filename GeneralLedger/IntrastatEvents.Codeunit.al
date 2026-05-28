@@ -28,8 +28,10 @@ codeunit 50040 "Intrastat Events"
                         Rec."Opposite Country/Region Code" := PurchInvHeader."Ship-to Country/Region Code";
 
                         // In Italy we have an addon, where don´t set in certin values.
-                        if ZGT.ItalianServer then begin
-                            ICSetup.get;
+                        //27-05-2026 BK #Cloud Ready
+                        //if ZGT.ItalianServer then begin
+                        if zgt.IsITDatabaseServer() then begin
+                            ICSetup.get();
                             ICSetup.TestField("Sample Item");
                             if ItemLedgEntry."Item No." = ICSetup."Sample Item" then begin
                                 Item.get(ItemLedgEntry."Original No.");

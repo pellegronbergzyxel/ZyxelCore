@@ -1302,7 +1302,9 @@ xmlport 50036 "WS Replicate Customer"
                 if "Ship-to Address".FindSet() then
                     repeat
                         recShipToAdd := "Ship-to Address";
-                        if ZGT.TurkishServer then
+                        //27-05-2026 BK #Cloud Ready
+                        //if ZGT.TurkishServer then
+                        if recSrvEnviron.TurkishServer then
                             recShipToAdd."Location Code" := '';
                         recShipToAdd.Replicated := true;
                         //>> 07-03-23 ZY-LD 014

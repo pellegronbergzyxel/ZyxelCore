@@ -58,27 +58,27 @@ Codeunit 50000 "ZyXEL General Tools"
 
     procedure IsEMEADatabaseServer() rvalue: Boolean //12-01-2026 BK #Print User Permissions Report
     var
-        ServerInstance: Record "Server Instance";
+        ServerInstance: Record "Server Environment"; //27-05-2026 BK #Cloud Ready
     begin
-        ServerInstance.Setfilter("Service Name", '%1|%2', 'EMEA', 'TESTEMEA');
+        ServerInstance.Setfilter(serverinstance.Server, '%1|%2', serverinstance.Server::" ", serverinstance.Server::Main);
         if ServerInstance.FindFirst then
             exit(true);
     end;
 
     procedure IsITDatabaseServer() rvalue: Boolean //12-01-2026 BK #Print User Permissions Report
     var
-        ServerInstance: Record "Server Instance";
+        ServerInstance: Record "Server Environment"; //27-05-2026 BK #Cloud Ready
     begin
-        ServerInstance.Setfilter("Service Name", '%1|%2', 'IT', 'TESTIT');
+        ServerInstance.Setfilter(ServerInstance.Server, '%1', serverinstance.Server::Italian);
         if ServerInstance.FindFirst then
             exit(true);
     end;
 
     procedure IsTRDatabaseServer() rvalue: Boolean //12-01-2026 BK #Print User Permissions Report
     var
-        ServerInstance: Record "Server Instance";
+        ServerInstance: Record "Server Environment"; //27-05-2026 BK #Cloud Ready
     begin
-        ServerInstance.Setfilter("Service Name", '%1|%2', 'TR', 'TESTTR');
+        ServerInstance.Setfilter(serverinstance.Server, '%1', serverinstance.Server::Turkish);
         if ServerInstance.FindFirst then
             exit(true);
     end;
@@ -554,33 +554,38 @@ Codeunit 50000 "ZyXEL General Tools"
         //<< 11-04-19 ZY-LD 009
     end;
 
-    procedure EMEAServer(): Boolean
-    var
-        ServerInstance: Record "Server Instance";
-    begin
-        ServerInstance.Setfilter("Service Name", '%1|%2', 'EMEA-WS', 'TESTEMEA-WS');
-        if ServerInstance.FindFirst then
-            exit(true);
-    end;
+    // procedure EMEAServer(): Boolean
+    // var
+    //     EnvironmentInfo: codeunit "Environment Information"; //27-05-2026 BK #Cloud Ready
+    //     EnviromentText: Text;
+    // begin
+    //     EnviromentText := EnvironmentInfo.GetApplicationFamily();
+    //     IF EnviromentText = 'EMEA' THEN
+    //         exit(true);
+    //     //ServerInstance.SetFilter(ServerInstance.Server, '%1|%2', ServerInstance.Server::" ", ServerInstance.Server::Main);
+    //     //if ServerInstance.FindFirst then
+    //     //    exit(true);
+    // end;
 
-    procedure TurkishServer(): Boolean
-    var
-        ServerInstance: Record "Server Instance";
-    begin
-        ServerInstance.SetFilter("Service Name", '%1|%2', 'TR-WS', 'TESTTR-WS');
-        if ServerInstance.FindFirst then
-            exit(true);
-    end;
+    // procedure TurkishServer(): Boolean
+    // var
+    //     ServerInstance: Record "Server Instance";
+    // begin
+
+    //     ServerInstance.SetFilter("Service Name", '%1|%2', 'TR-WS', 'TESTTR-WS');
+    //     if ServerInstance.FindFirst then
+    //         exit(true);
+    // end;
 
 
-    procedure ItalianServer(): Boolean
-    var
-        ServerInstance: Record "Server Instance";
-    begin
-        ServerInstance.SetFilter("Service Name", '%1|%2', 'IT-WS', 'TESTIT-WS');
-        if ServerInstance.FindFirst then
-            exit(true);
-    end;
+    // procedure ItalianServer(): Boolean
+    // var
+    //     ServerInstance: Record "Server Instance";
+    // begin
+    //     ServerInstance.SetFilter("Service Name", '%1|%2', 'IT-WS', 'TESTIT-WS');
+    //     if ServerInstance.FindFirst then
+    //         exit(true);
+    // end;
 
 
     procedure GetMonthText(pMonthNo: Integer; pLowercase: Boolean; pUppercase: Boolean; pShortText: Boolean) rValue: Text

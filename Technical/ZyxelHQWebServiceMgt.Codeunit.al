@@ -353,231 +353,226 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
         end;
     end;
 
-    procedure ContainerDetail_OLD(var pContainerDetail: Record "VCK Shipping Detail" temporary): Boolean
-    var
-        recContainerDetail: Record "VCK Shipping Detail";
-        recPurchLine: Record "Purchase Line";
-        recServEnviron: Record "Server Environment";
-        recShipMethod: Record "Shipment Method";
-        recItem: Record Item;
-        recVessel: Record Vessel;
-        repContainerDetail: Report "Container Details";
-        FileMgt: Codeunit "File Management";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
-        ItemLogisticEvent: Codeunit "Item / Logistic Events";
-        CDT: DateTime;
-        SendEmail: Boolean;
-        ServerFilename: Text;
-        lText001: Label 'Zyxel Container Details, Batch No. %1.xlsx';
-        lText002: Label 'CONTAINER DETAILS';
-        BatchNo: Code[20];
-        lText003: Label 'Batch No.: %1';
-        ReportFilter: Text;
-        HqInvoiceNo: Text;
-        ItemMissingText: Text;
-        PurchOrderLineNo: Integer;
-        SaveBatchNo: Code[20];
-        SaveDocumentNo: Code[20];
-        SaveLineNo: Integer;
-        SaveEntryNo: Integer;
-        SendFraightWarning: Boolean;
-        lText004: Label '"Item No." %1 is not created in our system "%2" %3, "%4" %5.<br>';
-        lText006: Label '"Container No." must only contain one number "%1".';
-        SendContainerNoIsMissing: Boolean;
-        Dummy: text;
-        TempBlob: codeunit "Temp Blob";
-        varoutstream: outstream;
-    begin
-        // Update container details
-        pContainerDetail.SetCurrentkey("Purchase Order No.", "Purchase Order Line No.", "Invoice No.");
-        pContainerDetail.Ascending(false);
-        if pContainerDetail.FindSet() then begin
-            BatchNo := NoSeriesMgt.GetNextNo('CDTBATCH', Today, true);
-            CreateWebServiceLog(lText002, StrSubstNo(lText003, BatchNo));
+    // procedure ContainerDetail_OLD(var pContainerDetail: Record "VCK Shipping Detail" temporary): Boolean
+    // var
+    //     recContainerDetail: Record "VCK Shipping Detail";
+    //     recPurchLine: Record "Purchase Line";
+    //     recServEnviron: Record "Server Environment";
+    //     recShipMethod: Record "Shipment Method";
+    //     recItem: Record Item;
+    //     recVessel: Record Vessel;
+    //     repContainerDetail: Report "Container Details";
+    //     FileMgt: Codeunit "File Management";
+    //     NoSeriesMgt: Codeunit NoSeriesManagement;
+    //     ItemLogisticEvent: Codeunit "Item / Logistic Events";
+    //     CDT: DateTime;
+    //     SendEmail: Boolean;
+    //     ServerFilename: Text;
+    //     lText001: Label 'Zyxel Container Details, Batch No. %1.xlsx';
+    //     lText002: Label 'CONTAINER DETAILS';
+    //     BatchNo: Code[20];
+    //     lText003: Label 'Batch No.: %1';
+    //     ReportFilter: Text;
+    //     HqInvoiceNo: Text;
+    //     ItemMissingText: Text;
+    //     PurchOrderLineNo: Integer;
+    //     SaveBatchNo: Code[20];
+    //     SaveDocumentNo: Code[20];
+    //     SaveLineNo: Integer;
+    //     SaveEntryNo: Integer;
+    //     SendFraightWarning: Boolean;
+    //     lText004: Label '"Item No." %1 is not created in our system "%2" %3, "%4" %5.<br>';
+    //     lText006: Label '"Container No." must only contain one number "%1".';
+    //     SendContainerNoIsMissing: Boolean;
+    // begin
+    //     // Update container details
+    //     pContainerDetail.SetCurrentkey("Purchase Order No.", "Purchase Order Line No.", "Invoice No.");
+    //     pContainerDetail.Ascending(false);
+    //     if pContainerDetail.FindSet() then begin
+    //         BatchNo := NoSeriesMgt.GetNextNo('CDTBATCH', Today, true);
+    //         CreateWebServiceLog(lText002, StrSubstNo(lText003, BatchNo));
+    //         CDT := CurrentDatetime();
+    //         recContainerDetail.LockTable();
+    //         repeat
+    //             if (pContainerDetail."Container No." <> '') and
+    //                ((StrPos(pContainerDetail."Container No.", ',') <> 0) or
+    //                 (StrPos(pContainerDetail."Container No.", ';') <> 0))
+    //             then
+    //                 Error(lText006, pContainerDetail."Container No.");
 
-            CDT := CurrentDatetime();
-            recContainerDetail.LockTable();
-            repeat
-                if (pContainerDetail."Container No." <> '') and
-                   ((StrPos(pContainerDetail."Container No.", ',') <> 0) or
-                    (StrPos(pContainerDetail."Container No.", ';') <> 0))
-                then
-                    Error(lText006, pContainerDetail."Container No.");
+    //             PurchOrderLineNo := pContainerDetail."Purchase Order Line No.";
+    //             if (PurchOrderLineNo = 0) or
+    //                ((pContainerDetail."Order Type" = pContainerDetail."order type"::"Purchase Order") and
+    //                 (not recPurchLine.Get(recPurchLine."document type"::Order, pContainerDetail."Purchase Order No.", pContainerDetail."Purchase Order Line No.")))
+    //             then begin
+    //                 PurchOrderLineNo := GetPurchaseOrderLineNo(pContainerDetail."Purchase Order No.", pContainerDetail."Item No.", pContainerDetail.Quantity);
+    //                 pContainerDetail."P.O. Line No. Found by Us" := PurchOrderLineNo <> 0;
+    //             end;
 
-                PurchOrderLineNo := pContainerDetail."Purchase Order Line No.";
-                if (PurchOrderLineNo = 0) or
-                   ((pContainerDetail."Order Type" = pContainerDetail."order type"::"Purchase Order") and
-                    (not recPurchLine.Get(recPurchLine."document type"::Order, pContainerDetail."Purchase Order No.", pContainerDetail."Purchase Order Line No.")))
-                then begin
-                    PurchOrderLineNo := GetPurchaseOrderLineNo(pContainerDetail."Purchase Order No.", pContainerDetail."Item No.", pContainerDetail.Quantity);
-                    pContainerDetail."P.O. Line No. Found by Us" := PurchOrderLineNo <> 0;
-                end;
+    //             if pContainerDetail."Invoice No." <> '' then
+    //                 if StrPos(HqInvoiceNo, pContainerDetail."Invoice No.") = 0 then
+    //                     if HqInvoiceNo = '' then
+    //                         HqInvoiceNo := pContainerDetail."Invoice No."
+    //                     else
+    //                         HqInvoiceNo := HqInvoiceNo + ', ' + pContainerDetail."Invoice No.";
 
-                if pContainerDetail."Invoice No." <> '' then
-                    if StrPos(HqInvoiceNo, pContainerDetail."Invoice No.") = 0 then
-                        if HqInvoiceNo = '' then
-                            HqInvoiceNo := pContainerDetail."Invoice No."
-                        else
-                            HqInvoiceNo := HqInvoiceNo + ', ' + pContainerDetail."Invoice No.";
+    //             recContainerDetail.Reset();
+    //             recContainerDetail.SetRange("Container No.", pContainerDetail."Container No.");
+    //             recContainerDetail.SetRange("Invoice No.", pContainerDetail."Invoice No.");
+    //             recContainerDetail.SetRange("Purchase Order No.", pContainerDetail."Purchase Order No.");
+    //             recContainerDetail.SetRange("Purchase Order Line No.", PurchOrderLineNo);
+    //             recContainerDetail.SetRange("Item No.", pContainerDetail."Item No.");
+    //             recContainerDetail.SetRange("Pallet No.", pContainerDetail."Pallet No.");
+    //             recContainerDetail.SetRange("Shipping Method", pContainerDetail."Shipping Method");
+    //             recContainerDetail.SetRange("Order No.", pContainerDetail."Order No.");
+    //             recContainerDetail.SetRange(Archive, false);
+    //             if recContainerDetail.FindFirst() then begin
 
-                recContainerDetail.Reset();
-                recContainerDetail.SetRange("Container No.", pContainerDetail."Container No.");
-                recContainerDetail.SetRange("Invoice No.", pContainerDetail."Invoice No.");
-                recContainerDetail.SetRange("Purchase Order No.", pContainerDetail."Purchase Order No.");
-                recContainerDetail.SetRange("Purchase Order Line No.", PurchOrderLineNo);
-                recContainerDetail.SetRange("Item No.", pContainerDetail."Item No.");
-                recContainerDetail.SetRange("Pallet No.", pContainerDetail."Pallet No.");
-                recContainerDetail.SetRange("Shipping Method", pContainerDetail."Shipping Method");
-                recContainerDetail.SetRange("Order No.", pContainerDetail."Order No.");
-                recContainerDetail.SetRange(Archive, false);
-                if recContainerDetail.FindFirst() then begin
+    //                 if BatchNo = recContainerDetail."Batch No." then begin
+    //                     recContainerDetail.Quantity := recContainerDetail.Quantity + pContainerDetail.Quantity;
+    //                     recContainerDetail.Modify();
+    //                 end else begin
+    //                     recContainerDetail.SetRange("Batch No.", BatchNo);
+    //                     if recContainerDetail.FindFirst() then begin
+    //                         recContainerDetail.Quantity := recContainerDetail.Quantity + pContainerDetail.Quantity;
+    //                         recContainerDetail.Modify();
+    //                     end else begin
+    //                         SaveBatchNo := CopyStr(recContainerDetail."Batch No.", 1, 20);
+    //                         SaveDocumentNo := recContainerDetail."Document No.";
+    //                         SaveLineNo := recContainerDetail."Line No.";
+    //                         SaveEntryNo := recContainerDetail."Entry No.";
+    //                         recContainerDetail := pContainerDetail;
+    //                         recContainerDetail."Document No." := SaveDocumentNo;
+    //                         recContainerDetail."Line No." := SaveLineNo;
+    //                         recContainerDetail."Entry No." := SaveEntryNo;
+    //                         recContainerDetail."Purchase Order Line No." := PurchOrderLineNo;
+    //                         recContainerDetail."Batch No." := BatchNo;
+    //                         recContainerDetail."Previous Batch No." := copystr(DelChr(recContainerDetail."Previous Batch No." + '; ' + SaveBatchNo, '<', '; '), 1, 50);
+    //                         if recPurchLine.Get(recPurchLine."document type"::Order, recContainerDetail."Purchase Order No.", recContainerDetail."Purchase Order Line No.") then begin
+    //                             UpdatePurchaseOrderLine(recPurchLine, pContainerDetail);
 
-                    if BatchNo = recContainerDetail."Batch No." then begin
-                        recContainerDetail.Quantity := recContainerDetail.Quantity + pContainerDetail.Quantity;
-                        recContainerDetail.Modify();
-                    end else begin
-                        recContainerDetail.SetRange("Batch No.", BatchNo);
-                        if recContainerDetail.FindFirst() then begin
-                            recContainerDetail.Quantity := recContainerDetail.Quantity + pContainerDetail.Quantity;
-                            recContainerDetail.Modify();
-                        end else begin
-                            SaveBatchNo := CopyStr(recContainerDetail."Batch No.", 1, 20);
-                            SaveDocumentNo := recContainerDetail."Document No.";
-                            SaveLineNo := recContainerDetail."Line No.";
-                            SaveEntryNo := recContainerDetail."Entry No.";
-                            recContainerDetail := pContainerDetail;
-                            recContainerDetail."Document No." := SaveDocumentNo;
-                            recContainerDetail."Line No." := SaveLineNo;
-                            recContainerDetail."Entry No." := SaveEntryNo;
-                            recContainerDetail."Purchase Order Line No." := PurchOrderLineNo;
-                            recContainerDetail."Batch No." := BatchNo;
-                            recContainerDetail."Previous Batch No." := copystr(DelChr(recContainerDetail."Previous Batch No." + '; ' + SaveBatchNo, '<', '; '), 1, 50);
-                            if recPurchLine.Get(recPurchLine."document type"::Order, recContainerDetail."Purchase Order No.", recContainerDetail."Purchase Order Line No.") then begin
-                                UpdatePurchaseOrderLine(recPurchLine, pContainerDetail);
+    //                             recContainerDetail."Expected Receipt Date" := recPurchLine."Expected Receipt Date";
+    //                             recContainerDetail.Location := recPurchLine."Location Code";
+    //                         end;
+    //                         if recContainerDetail."Main Warehouse" then
+    //                             recContainerDetail.Location := ItemLogisticEvent.GetMainWarehouseLocation();
+    //                         recContainerDetail."Data Received Updated" := CDT;
+    //                         recContainerDetail.Modify();
+    //                         WebServiceLogEntry."Quantity Modified" += 1;
 
-                                recContainerDetail."Expected Receipt Date" := recPurchLine."Expected Receipt Date";
-                                recContainerDetail.Location := recPurchLine."Location Code";
-                            end;
-                            if recContainerDetail."Main Warehouse" then
-                                recContainerDetail.Location := ItemLogisticEvent.GetMainWarehouseLocation();
-                            recContainerDetail."Data Received Updated" := CDT;
-                            recContainerDetail.Modify();
-                            WebServiceLogEntry."Quantity Modified" += 1;
+    //                         if recContainerDetail."Purchase Order Line No." = 0 then
+    //                             SendEmail := true;
+    //                     end;
+    //                     recContainerDetail.SetRange("Batch No.");
+    //                 end;
+    //             end else begin
+    //                 recContainerDetail.SetRange(Archive, true);
+    //                 if not recContainerDetail.FindFirst() then begin
+    //                     recContainerDetail := pContainerDetail;
+    //                     recContainerDetail."Entry No." := 0;
+    //                     recContainerDetail."Purchase Order Line No." := PurchOrderLineNo;
+    //                     recContainerDetail."Batch No." := BatchNo;
+    //                     if recPurchLine.Get(recPurchLine."document type"::Order, recContainerDetail."Purchase Order No.", recContainerDetail."Purchase Order Line No.") then begin
+    //                         UpdatePurchaseOrderLine(recPurchLine, pContainerDetail);
 
-                            if recContainerDetail."Purchase Order Line No." = 0 then
-                                SendEmail := true;
-                        end;
-                        recContainerDetail.SetRange("Batch No.");
-                    end;
-                end else begin
-                    recContainerDetail.SetRange(Archive, true);
-                    if not recContainerDetail.FindFirst() then begin
-                        recContainerDetail := pContainerDetail;
-                        recContainerDetail."Entry No." := 0;
-                        recContainerDetail."Purchase Order Line No." := PurchOrderLineNo;
-                        recContainerDetail."Batch No." := BatchNo;
-                        if recPurchLine.Get(recPurchLine."document type"::Order, recContainerDetail."Purchase Order No.", recContainerDetail."Purchase Order Line No.") then begin
-                            UpdatePurchaseOrderLine(recPurchLine, pContainerDetail);
+    //                         recContainerDetail."Expected Receipt Date" := recPurchLine."Expected Receipt Date";
+    //                         recContainerDetail.Location := recPurchLine."Location Code";
+    //                     end;
 
-                            recContainerDetail."Expected Receipt Date" := recPurchLine."Expected Receipt Date";
-                            recContainerDetail.Location := recPurchLine."Location Code";
-                        end;
+    //                     if recContainerDetail."Main Warehouse" then begin
+    //                         recContainerDetail.Location := ItemLogisticEvent.GetMainWarehouseLocation();
 
-                        if recContainerDetail."Main Warehouse" then begin
-                            recContainerDetail.Location := ItemLogisticEvent.GetMainWarehouseLocation();
+    //                         if (recContainerDetail."Shipping Method" = 'SEA') and (recContainerDetail."Container No." = '') then  // Moved to this part of the code
+    //                             SendContainerNoIsMissing := true;
+    //                     end;
 
-                            if (recContainerDetail."Shipping Method" = 'SEA') and (recContainerDetail."Container No." = '') then  // Moved to this part of the code
-                                SendContainerNoIsMissing := true;
-                        end;
+    //                     recContainerDetail."Data Received Created" := CDT;
+    //                     recContainerDetail.Validate("Original ETA Date", recContainerDetail.ETA);
+    //                     recContainerDetail.Insert(true);  //  TRUE is added.
+    //                     WebServiceLogEntry."Quantity Inserted" += 1;
 
-                        recContainerDetail."Data Received Created" := CDT;
-                        recContainerDetail.Validate("Original ETA Date", recContainerDetail.ETA);
-                        recContainerDetail.Insert(true);  //  TRUE is added.
-                        WebServiceLogEntry."Quantity Inserted" += 1;
+    //                     if pContainerDetail."Vessel Code" <> recVessel.Code then
+    //                         if not recVessel.Get(pContainerDetail."Vessel Code") then begin
+    //                             Clear(recVessel);
+    //                             recVessel.Init();
+    //                             recVessel.Code := pContainerDetail."Vessel Code";
+    //                             recVessel.Description := pContainerDetail."Vessel Code";
+    //                             recVessel.Insert();
+    //                         end;
 
-                        if pContainerDetail."Vessel Code" <> recVessel.Code then
-                            if not recVessel.Get(pContainerDetail."Vessel Code") then begin
-                                Clear(recVessel);
-                                recVessel.Init();
-                                recVessel.Code := pContainerDetail."Vessel Code";
-                                recVessel.Description := pContainerDetail."Vessel Code";
-                                recVessel.Insert();
-                            end;
+    //                     if recContainerDetail."Purchase Order Line No." = 0 then
+    //                         SendEmail := true;
 
-                        if recContainerDetail."Purchase Order Line No." = 0 then
-                            SendEmail := true;
+    //                     if not SendFraightWarning then
+    //                         if recShipMethod.Get(recContainerDetail."Shipping Method") and (Format(recShipMethod."Send Warning for Freight Time") <> '') then
+    //                             if recContainerDetail.ETA - recContainerDetail.ETD < recShipMethod."Send Warning for Freight Time" then begin
+    //                                 SI.SetMergefield(102, Format(recShipMethod."Send Warning for Freight Time"));
+    //                                 SI.SetMergefield(103, Format(recContainerDetail.ETA));
+    //                                 SI.SetMergefield(104, Format(recContainerDetail.ETD));
+    //                                 SI.SetMergefield(105, Format(recContainerDetail.ETA - recContainerDetail.ETD));
+    //                                 SendFraightWarning := true;
+    //                             end;
+    //                 end;
+    //             end;
 
-                        if not SendFraightWarning then
-                            if recShipMethod.Get(recContainerDetail."Shipping Method") and (Format(recShipMethod."Send Warning for Freight Time") <> '') then
-                                if recContainerDetail.ETA - recContainerDetail.ETD < recShipMethod."Send Warning for Freight Time" then begin
-                                    SI.SetMergefield(102, Format(recShipMethod."Send Warning for Freight Time"));
-                                    SI.SetMergefield(103, Format(recContainerDetail.ETA));
-                                    SI.SetMergefield(104, Format(recContainerDetail.ETD));
-                                    SI.SetMergefield(105, Format(recContainerDetail.ETA - recContainerDetail.ETD));
-                                    SendFraightWarning := true;
-                                end;
-                    end;
-                end;
+    //             if not recItem.Get(pContainerDetail."Item No.") then
+    //                 ItemMissingText +=
+    //                   StrSubstNo(lText004,
+    //                     pContainerDetail."Item No.",
+    //                     pContainerDetail.FieldCaption("Purchase Order No."), pContainerDetail."Purchase Order No.",
+    //                     pContainerDetail.FieldCaption("Purchase Order Line No."), pContainerDetail."Purchase Order Line No.");
 
-                if not recItem.Get(pContainerDetail."Item No.") then
-                    ItemMissingText +=
-                      StrSubstNo(lText004,
-                        pContainerDetail."Item No.",
-                        pContainerDetail.FieldCaption("Purchase Order No."), pContainerDetail."Purchase Order No.",
-                        pContainerDetail.FieldCaption("Purchase Order Line No."), pContainerDetail."Purchase Order Line No.");
+    //         until pContainerDetail.Next() = 0;
+    //         CloseWebServiceLog();
 
-            until pContainerDetail.Next() = 0;
-            CloseWebServiceLog();
+    //         if recServEnviron.ProductionEnvironment() then begin
+    //             // Send an e-mail if purchase order line no. are blank.
+    //             if SendEmail then begin
+    //                 Clear(EmailAddMgt);
+    //                 EmailAddMgt.CreateSimpleEmail('HQCONTDETE', '', '');
+    //                 EmailAddMgt.Send();
+    //             end;
+    // Send e-mail with attached document to VCK
+    // Commit();
+    // // CLOUD READY DELETE
+    // //ServerFilename := FileMgt.ServerTempFileName('xlsx');
+    // TempBlob.CreateOutStream(varoutstream);
+    // ReportFilter := StrSubstNo('*%1*', BatchNo);
+    // recContainerDetail.Reset();
+    // recContainerDetail.SetFilter("Batch No.", ReportFilter);
+    // recContainerDetail.SetRange("Data Received Created", CDT);
+    // repContainerDetail.SetTableView(recContainerDetail);
+    // repContainerDetail.SaveAs(dummy,ReportFormat::Excel,varoutstream);
+    // //repContainerDetail.SaveAsExcel(ServerFilename);
+    // Clear(EmailAddMgt);
+    // SI.SetMergefield(100, BatchNo);
+    // SI.SetMergefield(101, HqInvoiceNo);
+    // EmailAddMgt.CreateEmailWithAttachment('HQCONTDET', '', '', TempBlob, StrSubstNo(lText001, BatchNo));
+    // EmailAddMgt.Send();
 
-            if recServEnviron.ProductionEnvironment() then begin
-                // Send an e-mail if purchase order line no. are blank.
-                if SendEmail then begin
-                    Clear(EmailAddMgt);
-                    EmailAddMgt.CreateSimpleEmail('HQCONTDETE', '', '');
-                    EmailAddMgt.Send();
-                end;
+    //             if SendFraightWarning then begin
+    //                 Clear(EmailAddMgt);
+    //                 EmailAddMgt.CreateSimpleEmail('LOGFRAWARN', '', '');
+    //                 EmailAddMgt.Send();
+    //             end;
 
-                // Send e-mail with attached document to VCK
-                Commit();
-                // CLOUD READY DELETE
-                //ServerFilename := FileMgt.ServerTempFileName('xlsx');
-                TempBlob.CreateOutStream(varoutstream);
-                ReportFilter := StrSubstNo('*%1*', BatchNo);
-                recContainerDetail.Reset();
-                recContainerDetail.SetFilter("Batch No.", ReportFilter);
-                recContainerDetail.SetRange("Data Received Created", CDT);
-                repContainerDetail.SetTableView(recContainerDetail);
-                repContainerDetail.SaveAs(dummy,ReportFormat::Excel,varoutstream);
-                //repContainerDetail.SaveAsExcel(ServerFilename);
-                Clear(EmailAddMgt);
-                SI.SetMergefield(100, BatchNo);
-                SI.SetMergefield(101, HqInvoiceNo);
-                EmailAddMgt.CreateEmailWithAttachment('HQCONTDET', '', '', TempBlob, StrSubstNo(lText001, BatchNo));
-                EmailAddMgt.Send();
+    //             if ItemMissingText <> '' then begin
+    //                 Clear(EmailAddMgt);
+    //                 EmailAddMgt.CreateEmailWithBodytext2('LOGITEMMIS', '', ItemMissingText, '');
+    //                 EmailAddMgt.Send();
+    //             end;
 
-                if SendFraightWarning then begin
-                    Clear(EmailAddMgt);
-                    EmailAddMgt.CreateSimpleEmail('LOGFRAWARN', '', '');
-                    EmailAddMgt.Send();
-                end;
+    //             if SendContainerNoIsMissing then begin
+    //                 Clear(EmailAddMgt);
+    //                 SI.SetMergefield(100, BatchNo);
+    //                 EmailAddMgt.CreateSimpleEmail('HQNOCONTNO', '', '');
+    //                 EmailAddMgt.Send();
+    //             end;
+    //         end;
 
-                if ItemMissingText <> '' then begin
-                    Clear(EmailAddMgt);
-                    EmailAddMgt.CreateEmailWithBodytext2('LOGITEMMIS', '', ItemMissingText, '');
-                    EmailAddMgt.Send();
-                end;
-
-                if SendContainerNoIsMissing then begin
-                    Clear(EmailAddMgt);
-                    SI.SetMergefield(100, BatchNo);
-                    EmailAddMgt.CreateSimpleEmail('HQNOCONTNO', '', '');
-                    EmailAddMgt.Send();
-                end;
-            end;
-
-            exit(true);
-        end;
-    end;
+    //         exit(true);
+    //     end;
+    // end;
 
     local procedure UpdatePurchaseOrderLine(var PurchaseLine: Record "Purchase Line"; ContainerDetailRec: Record "VCK Shipping Detail")
     var

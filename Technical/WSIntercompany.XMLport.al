@@ -417,7 +417,9 @@ XmlPort 50035 "WS Intercompany"
     begin
         // In Italian and Tyrkish Navision the tables must be replaced with 50018, 50027, 50028, 50029
         //if ZGT.ItalianServer or ZGT.TurkishServer then
-        if ZGT.TurkishServer then
+        //27-05-2026 BK #Cloud Ready
+        //if ZGT.TurkishServer then
+        if zgt.IsTRDatabaseServer() then
             if recICInboxTrans.TableName = "IC Inbox Transaction".TableName then
                 Error(lText001);
 
@@ -439,7 +441,9 @@ XmlPort 50035 "WS Intercompany"
                 "IC Inbox Purchase Line".SetRange("IC Transaction No.", "IC Inbox Purchase Header"."IC Transaction No.");
                 "IC Inbox Purchase Line".SetRange("IC Partner Code", "IC Inbox Purchase Header"."IC Partner Code");
                 "IC Inbox Purchase Line".SetRange("Transaction Source", "IC Inbox Purchase Header"."Transaction Source");
-                if ZGT.TurkishServer then
+                //27-05-2026 BK #Cloud Ready
+                //if ZGT.TurkishServer then
+                if zgt.IsTRDatabaseServer() then
                     "IC Inbox Purchase Line".SetRange("Hide Line", false);
                 if "IC Inbox Purchase Line".FindSet then
                     repeat
@@ -448,7 +452,9 @@ XmlPort 50035 "WS Intercompany"
                         recICInboxPurchLine."Hide Line" := "IC Inbox Purchase Line"."Hide Line";
                         recICInboxPurchLine."External Document No." := "IC Inbox Purchase Line"."External Document No.";
                         recICInboxPurchLine."Location Code" := "IC Inbox Purchase Line"."Location Code";
-                        if ZGT.ItalianServer or ZGT.TurkishServer then begin
+                        //27-05-2026 BK #Cloud Ready
+                        //if ZGT.ItalianServer or ZGT.TurkishServer then begin
+                        if ZGT.IsITDatabaseServer() or ZGT.IsTRDatabaseServer() then begin
                             recICInboxPurchLine."Return Shipment No." := '';
                             recICInboxPurchLine."Return Shipment Line No." := 0;
                         end;

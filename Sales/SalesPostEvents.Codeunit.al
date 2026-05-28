@@ -763,7 +763,9 @@ codeunit 50080 "Sales Post Events"
             if not ZGT.IsRhq() then
                 // Updates RHQ with end customer no.
                 if not "eCommerce Order" then
-                    if ZGT.TurkishServer() then
+                    //27-05-2026 BK #Cloud Ready
+                    //if ZGT.TurkishServer() then
+                    if zgt.IsITDatabaseServer() then
                         ZyWebServMgt.SendSalesInvoiceNo(CopyStr(ZGT.GetRHQCompanyName(), 1, 30), "Your Reference", "No.")
                     else
                         if "Location Code" <> '' then begin

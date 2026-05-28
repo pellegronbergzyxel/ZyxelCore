@@ -349,7 +349,9 @@ codeunit 50076 "Zyxel HQ Web Service"
         recDelNoteHeadTmp: Record "Sales Shipment Header" temporary;
         recDelNoteLineTmp: Record "Sales Shipment Line" temporary;
     begin
-        if ZGT.TurkishServer and ZGT.IsZComCompany then begin
+        //27-05-2026 BK #Cloud Ready
+        //if ZGT.TurkishServer and ZGT.IsZComCompany then begin
+        if ZGT.IsTRDatabaseServer() and ZGT.IsZComCompany then begin
             DeliveryNotes.Import();
             DeliveryNotes.GetData(recDelNoteHeadTmp, recDelNoteLineTmp);
             exit(ZyHqWebServMgt.eRMADeliveryNote(recDelNoteHeadTmp, recDelNoteLineTmp));
@@ -409,5 +411,5 @@ codeunit 50076 "Zyxel HQ Web Service"
     end;
 
 
- 
+
 }
