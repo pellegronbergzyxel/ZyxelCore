@@ -78,7 +78,7 @@ Codeunit 50088 "Post Rcpt. Response Mgt."
                     end else
                         recZyFileMgt."Error Text" := CopyStr(GetLastErrorText, 1, MaxStrLen(recZyFileMgt."Error Text"));
                     recZyFileMgt.Modify();
-//                    ArchiveFile.Close();
+                    //                    ArchiveFile.Close();
                 end else begin
                     recZyFileMgt."Error Text" := lText002;
                     recZyFileMgt.Modify();
@@ -598,6 +598,10 @@ Codeunit 50088 "Post Rcpt. Response Mgt."
         Recipents: Text;
         lText001: label 'Sales Credit Memo %1.pdf';
         lText002: label 'tim.may@zyxel.eu';
+        Dummy: text;
+        TempBlob: codeunit "Temp Blob";
+        varoutstream: outstream;
+        runreport: report "Sales - Credit Memo RHQ";
 
     begin
         // Post items to other locations
@@ -692,20 +696,28 @@ Codeunit 50088 "Post Rcpt. Response Mgt."
 
                         SalesPost.Run(recSalesHead);
                         if recCredMemoHead.Get(recSalesHead."No.") then begin
-                            ServerFilename := FileMgt.ServerTempFileName('');
+                            // CLOUD READY DELETE
+                            //ServerFilename := FileMgt.ServerTempFileName('');
+                            TempBlob.CreateOutStream(varoutstream);
+
                             ClientFilename := StrSubstNo(lText001, recCredMemoHead."No.");
                             SI.SetMergefield(100, recRespLine.Location);
                             if recRespLine.Location = LogisticEvent.GetMainWarehouseLocation() then
                                 Recipents := lText002;
 
                             recCredMemoHead.SetRange("No.", recCredMemoHead."No.");
-                            Report.SaveAsPdf(Report::"Sales - Credit Memo RHQ", ServerFilename, recCredMemoHead);
+                            runreport.SetTableView(recCredMemoHead);
+                            runreport.SaveAs(dummy, ReportFormat::Pdf, varoutstream);
+                            //Report.SaveAsPdf(Report::"Sales - Credit Memo RHQ", ServerFilename, recCredMemoHead);
+
+
                             Clear(EmailAddMgt);
                             EmailAddMgt.SetSalesHeaderMergeFields(recSalesOrderHead."Document Type", recSalesOrderHead."No.");
                             EmailAddMgt.SetCustomerMergefields(recSalesOrderHead."Sell-to Customer No.");
-                            EmailAddMgt.CreateEmailWithAttachment('VCKDAMCRM', '', Recipents, ServerFilename, ClientFilename, false);  //  Recipents added.
+                            EmailAddMgt.CreateEmailWithAttachment('VCKDAMCRM', '', Recipents, TempBlob, ClientFilename);  //  Recipents added.
                             EmailAddMgt.Send();
-                            FileMgt.DeleteServerFile(ServerFilename);
+                            // CLOUD READY DELETE
+                           // FileMgt.DeleteServerFile(ServerFilename);
                         end;
                     end;
                 end;
@@ -810,22 +822,29 @@ Codeunit 50088 "Post Rcpt. Response Mgt."
         ClientFilename: Text;
         Str: Text;
         FileLabel: label 'Sales Return Order %1.xlsx';
+        Dummy: text;
+        TempBlob: codeunit "Temp Blob";
+        varoutstream: outstream;
+        runreport: report "Rcpt. Inbound Document";
     begin
         if not precRespHead."Response Document Send" then begin
             recWhseIndbHead.Get(precRespHead."Customer Reference");
             recSalesHead.Get(recSalesHead."document type"::"Return Order", recWhseIndbHead."Shipment No.");
 
-            ServerFilename := FileMgt.ServerTempFileName('');
+            // CLOUD READY DELETE
+            //ServerFilename := FileMgt.ServerTempFileName('');
+            TempBlob.CreateOutStream(varoutstream);
             str := FileLabel;
             ClientFilename := StrSubstNo(Str, precRespHead."Shipment No.");
             recRcptRespHead.SetRange("No.", precRespHead."No.");
-            Report.SaveAsExcel(Report::"Rcpt. Inbound Document", ServerFilename, recRcptRespHead);
-
+            runreport.SetTableView(recRcptRespHead);
+            runreport.SaveAs(dummy, ReportFormat::Excel, varoutstream);
+            //Report.SaveAsExcel(Report::"Rcpt. Inbound Document", ServerFilename, recRcptRespHead);
             EmailAddMgt.SetSalesHeaderMergeFields(recSalesHead."Document Type", recSalesHead."No.");
-            EmailAddMgt.CreateEmailWithAttachment('VCKRESPONS', '', '', ServerFilename, ClientFilename, false);
+            EmailAddMgt.CreateEmailWithAttachment('VCKRESPONS', '', '', TempBlob, ClientFilename);
             EmailAddMgt.Send();
-
-            FileMgt.DeleteServerFile(ServerFilename);
+// CLOUD READY DELETE
+            //FileMgt.DeleteServerFile(ServerFilename);
 
             precRespHead."Response Document Send" := true;
             precRespHead.Modify();
@@ -1214,6 +1233,12 @@ Codeunit 50088 "Post Rcpt. Response Mgt."
         FileMgt: Codeunit "File Management";
         EmailAddMgt: Codeunit "E-mail Address Management";
         lText001: label 'Warehouse Status on WI is %1, and therefore not updated.';
+        Dummy: text;
+        TempBlob: codeunit "Temp Blob";
+        varoutstream: outstream;
+        varinstream: instream;
+        zyxelFilemgt: record "Zyxel File Management";
+    //CalcFormula = lookup("Zyxel File Management".Filename where("Entry No." = field("File Management Entry No.")));
     begin
         if not recRespHead."Lines With Error" then
             if recWhseInbHead.Get(recRespHead."Customer Reference") and (recRespHead."Warehouse Status" > recWhseInbHead."Warehouse Status") then begin
@@ -1239,7 +1264,16 @@ Codeunit 50088 "Post Rcpt. Response Mgt."
                                 SI.SetMergefield(103, recRespLine.Location);
                                 SI.SetMergefield(104, recRespLine."Response No.");
                                 SI.SetMergefield(105, Format(recRespLine."Response Line No."));
-                                EmailAddMgt.CreateEmailWithAttachment('VCKCNGLOC', '', '', recRespHead.Filename, FileMgt.GetFileName(recRespHead.Filename), false);
+                                // CLOUD READY NEW
+                                if zyxelFilemgt.get(recRespHead."File Management Entry No.") then begin
+                                    zyxelFilemgt.CalcFields(filblob);
+                                    if zyxelFilemgt.filblob.HasValue() THEN begin
+                                        zyxelFilemgt.filblob.CreateInStream(varinstream);
+                                        TempBlob.CreateOutStream(varoutstream);
+                                        CopyStream(varoutstream,varinstream);
+                                    end;
+                                end;
+                                EmailAddMgt.CreateEmailWithAttachment('VCKCNGLOC', '', '', TempBlob, FileMgt.GetFileName(recRespHead.Filename));
                                 EmailAddMgt.Send();
                             end;
 

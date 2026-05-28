@@ -25,29 +25,30 @@ Report 50058 "Import Additional Items"
                     {
                         Caption = 'Import from';
                     }
-                    field(FileName; FileName)
-                    {
-                        ApplicationArea = Basic, Suite;
-                        AssistEdit = true;
-                        Caption = 'Workbook File Name';
+                    // Cloud READY DELETE
+                    // field(FileName; FileName)
+                    // {
+                    //     ApplicationArea = Basic, Suite;
+                    //     AssistEdit = true;
+                    //     Caption = 'Workbook File Name';
 
-                        trigger OnAssistEdit()
-                        begin
-                            UploadFile;
-                        end;
-                    }
-                    field(SheetName; SheetName)
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Worksheet Name';
+                    //     trigger OnAssistEdit()
+                    //     begin
+                    //         UploadFile;
+                    //     end;
+                    // }
+                    // field(SheetName; SheetName)
+                    // {
+                    //     ApplicationArea = Basic, Suite;
+                    //     Caption = 'Worksheet Name';
 
-                        trigger OnAssistEdit()
-                        var
-                            ExcelBuf: Record "Excel Buffer";
-                        begin
-                            SheetName := ExcelBuf.SelectSheetsName(uploadedFileName);
-                        end;
-                    }
+                    //     trigger OnAssistEdit()
+                    //     var
+                    //         ExcelBuf: Record "Excel Buffer";
+                    //     begin
+                    //         SheetName := ExcelBuf.SelectSheetsName(uploadedFileName);
+                    //     end;
+                    // }
                     field(SheetContainesHeaderRow; SheetContainesHeaderRow)
                     {
                         ApplicationArea = Basic, Suite;
@@ -84,6 +85,30 @@ Report 50058 "Import Additional Items"
         actions
         {
         }
+          trigger OnQueryClosePage(CloseAction: Action): Boolean
+        var
+            UploadExcelMsg: Label 'Please Choose the Excel file';
+            NofileMsg: Label 'Please select file';
+            FileMgt: Codeunit "File Management";
+            iStream: InStream;
+            fromfile: text[250];
+        begin
+            UploadIntoStream(UploadExcelMsg, '', '', fromfile, iStream);
+            if fromfile <> '' then begin
+                FileName := FileMgt.GetFileName(fromfile);
+                SheetName := ExcelBuf.SelectSheetsNameStream(iStream);
+
+            end else
+                message(NofileMsg);
+            if SheetName <> '' then begin
+                ExcelBuf.reset();
+                ExcelBuf.DeleteAll();
+                ExcelBuf.OpenBookStream(iStream, SheetName);
+                ExcelBuf.ReadSheet();
+            end;
+
+
+        end;
     }
 
     labels
@@ -128,15 +153,15 @@ Report 50058 "Import Additional Items"
     begin
         SI.UseOfReport(3, 50058, 3);  // 14-10-20 ZY-LD 000
 
-        if UploadedFileName = '' then
-            Error(Text001);
-        if SheetName = '' then
-            Error(Text002);
+        // if UploadedFileName = '' then
+        //     Error(Text001);
+        // if SheetName = '' then
+        //     Error(Text002);
         if (CountryCode.Code = '') and (recForeTerr.Code = '') then
             Error(Text010);
 
-        ExcelBuf.LockTable;
-        ReadExcelSheet;
+        //ExcelBuf.LockTable;
+        //ReadExcelSheet;
         Window.Open(Text003 + '@1@@@@@@@@@@@@@@@@@@@@@@@@@\');
         Window.Update(1, 0);
 
@@ -219,25 +244,25 @@ Report 50058 "Import Additional Items"
         SI: Codeunit "Single Instance";
 
 
-    procedure UploadFile()
-    var
-        FileMgt: Codeunit "File Management";
-    begin
+    // procedure UploadFile()
+    // var
+    //     FileMgt: Codeunit "File Management";
+    // begin
 
-        Upload('Upload', 'C:\', 'Excel file(*.xlsx)|*.xlsx', '', UploadedFileName);
-        FileName := UploadedFileName;
-    end;
+    //     Upload('Upload', 'C:\', 'Excel file(*.xlsx)|*.xlsx', '', UploadedFileName);
+    //     FileName := UploadedFileName;
+    // end;
 
-    local procedure ReadExcelSheet()
-    begin
-        if UploadedFileName = '' then
-            UploadFile
-        else
-            FileName := UploadedFileName;
+    // local procedure ReadExcelSheet()
+    // begin
+    //     if UploadedFileName = '' then
+    //         UploadFile
+    //     else
+    //         FileName := UploadedFileName;
 
-        ExcelBuf.OpenBook(FileName, SheetName);
-        ExcelBuf.ReadSheet;
-    end;
+    //     ExcelBuf.OpenBook(FileName, SheetName);
+    //     ExcelBuf.ReadSheet;
+    // end;
 
     local procedure FormatData(TextToFormat: Text[250]): Text[250]
     var

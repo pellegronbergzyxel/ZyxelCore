@@ -14,6 +14,9 @@ codeunit 50096 EmailRMAStockControlZX
         ServerFileName: Text;
         I: Integer;
         FileNameLbl: Label 'RMA Stock Control.xlsx';
+        Dummy: text;
+        TempBlob: codeunit "Temp Blob";
+        varoutstream: outstream;
     begin
         Country.SetFilter("RMA Location Code", '<>''''');
         if Country.FindSet() then
@@ -39,13 +42,15 @@ codeunit 50096 EmailRMAStockControlZX
                 I += 1;
             until TempLocation.Next() = 0;
 
-        ServerFileName := FileMgt.ServerTempFileName('xlsx');
-        RMAStockControl.SaveAsExcel(ServerFileName);
+        // Cloud ready delete
+        //ServerFileName := FileMgt.ServerTempFileName('xlsx');
+        TempBlob.CreateOutStream(varoutstream);
+        RMAStockControl.SaveAs(Dummy,ReportFormat::Excel,varoutstream);
 
-        EmailAddrMgt.CreateEmailWithAttachment('LOGRMASTOK', '', '', ServerFilename, FileNameLbl, false);
+        EmailAddrMgt.CreateEmailWithAttachment('LOGRMASTOK', '', '', TempBlob, FileNameLbl);
         EmailAddrMgt.Send();
-
-        FileMgt.DeleteServerFile(ServerFileName);
+//Cloud ready
+      //   FileMgt.DeleteServerFile(ServerFileName);
     end;
 
     var

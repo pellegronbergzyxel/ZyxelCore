@@ -494,14 +494,10 @@ Table 66004 "Ship Response Header"
         FileMgt: Codeunit "File Management";
         lText001: label 'Save file';
         lText004: label 'GDPdU data for %1 %2 - %3';
+        dummy: text;
     begin
         if recZyFileMgt.Get("File Management Entry No.") then
-            FileMgt.DownloadHandler(
-              recZyFileMgt.Filename,
-              lText001,
-              '',
-              'XML(*.xml)|*.xml',
-              FileMgt.StripNotsupportChrInFileName(FileMgt.GetFileName(recZyFileMgt.Filename)));
+            if recZyFileMgt.DownloadBlobToFile(dummy) then;
     end;
 
 

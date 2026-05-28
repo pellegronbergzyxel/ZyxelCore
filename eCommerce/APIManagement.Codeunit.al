@@ -21,6 +21,9 @@ codeunit 50019 "API Management"
         ZGT: Codeunit "ZyXEL General Tools";
         EmailAddMgt: Codeunit "E-mail Address Management";
         lText001: Label '%1 new order(s) has been inserted.';
+          Dummy: text;
+        TempBlob: codeunit "Temp Blob";
+        varoutstream: outstream;
     begin
         Setup.Get();
         MyFile.SetRange(Path, Setup."API Import Path");
@@ -41,6 +44,10 @@ codeunit 50019 "API Management"
                         orderXML.InitXmlPort(MyFile.Size);
                         orderXML.SetSource(inputStream);
                         orderXML.Filename(Setup."API Import Path" + MyFile.Name);
+
+                        // CLOUD READY
+                        TempBlob.CreateOutStream(varoutstream);
+                        CopyStream(varoutstream,inputStream);
 
                         if orderXML.Import then begin
                             NewRecords += orderXML.GetQuantityImported;
@@ -66,7 +73,7 @@ codeunit 50019 "API Management"
 
                             if recServerEnviron.ProductionEnvironment then begin
                                 //>> 03-03-23 ZY-LD 003
-                                EmailAddMgt.CreateEmailWithAttachment('AMZERRIMP', '', '', Setup."API Import Path" + MyFile.Name, MyFile.Name, false);
+                                EmailAddMgt.CreateEmailWithAttachment('AMZERRIMP', '', '', TempBlob, MyFile.Name);
                                 EmailAddMgt.Send;
                                 //<< 03-03-23 ZY-LD 003
                                 orderFile.Close();
@@ -250,6 +257,7 @@ codeunit 50019 "API Management"
         ArchiveFilename: Text;
         FileMovedToError: Boolean;
         lText002: Label 'An error occured, and at least one file has been moved to "%1".\\%2';
+        
     begin
         Setup.Get();
         MyFile.SetRange(Path, Setup."API Import Payment Path");

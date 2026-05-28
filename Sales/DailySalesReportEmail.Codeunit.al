@@ -42,9 +42,14 @@ Codeunit 50044 "Daily Sales Report Email"
         xrecCust: Record Customer;
         recSaleInvHead: Record "Sales Invoice Header";
         recSaleInvLine: Record "Sales Invoice Line";
-        MyFile: File;
+  //      MyFile: File;
         MyOutStream: OutStream;
+        MyOutStream2: OutStream;
+        tempBlob: codeunit "Temp Blob";
+        tempBlob2: codeunit "Temp Blob";
         OutputLine: Text;
+        OutputLinetotal: Text;
+        Dummy:text;
     begin
         if pDailyEmailRep."Forecast Territory Filter" <> '' then begin
             cr := 13;
@@ -56,8 +61,9 @@ Codeunit 50044 "Daily Sales Report Email"
             recSaleInvHead.SetFilter("Sell-to Customer No.", pDailyEmailRep."Forecast Territory Filter");
             recSaleInvHead.SetRange("Specification is Sent", false);
             if recSaleInvHead.FindSet(true) then begin  //<< 17-02-22 ZY-LD 002
-                MyFile.Create(FilePath + '\' + pDailyEmailRep.Filename);
-                MyFile.CreateOutstream(MyOutStream);
+                // MyFile.Create(FilePath + '\' + pDailyEmailRep.Filename);
+                //MyFile.CreateOutstream(MyOutStream);
+                tempBlob.CreateOutstream(MyOutStream);
 
                 repeat
                     //recsaleinvline.SETRANGE("Sell-to Customer No.",recCust."No.");  // 17-02-22 ZY-LD 002
@@ -77,39 +83,42 @@ Codeunit 50044 "Daily Sales Report Email"
                             OutputLine := OutputLine + recSaleInvLine."No." + ';';
                             OutputLine := OutputLine + Format(recSaleInvLine.Quantity) + ';';
                             OutputLine := OutputLine + recSaleInvLine."External Document No.";
-                            MyOutStream.WriteText(OutputLine + Format(cr, 0, '<CHAR>') + Format(lf, 0, '<CHAR>'));
+                       //     MyOutStream.WriteText(OutputLine + Format(cr, 0, '<CHAR>') + Format(lf, 0, '<CHAR>'));
+                       OutputLinetotal := OutputLine + Format(cr, 0, '<CHAR>') + Format(lf, 0, '<CHAR>');
                         until recSaleInvLine.Next() = 0;
 
                     recSaleInvHead."Specification is Sent" := true;  // 17-02-22 ZY-LD 002
                     recSaleInvHead.Modify;  // 17-02-22 ZY-LD 002
                 until recSaleInvHead.Next() = 0;
-
-                MyFile.Close;
+             //  MyFile.Close;
             end;
+
+                MyOutStream.WriteText(OutputLinetotal);
+
 
             //>> 09-07-19 ZY-LD 001
             EmailAddMgt.CreateEmailWithAttachment(
               pDailyEmailRep."E-mail Address Code",
               '',
               pDailyEmailRep."E-mail",
-              FilePath + '\' + pDailyEmailRep.Filename,
-              pDailyEmailRep.Filename,
-              false);
+              tempBlob,
+              pDailyEmailRep.Filename);
 
             //>> 01-05-24 ZY-LD 003
             if Date2dmy(Today, 1) = 16 then begin
                 EndDate := Today;
                 StartDate := CalcDate('-1Y', EndDate);
-                ServerFilename := FileMkt.ServerTempFileName('');
+                //ServerFilename := FileMkt.ServerTempFileName('');
+                tempBlob2.CreateOutstream(MyOutStream2);
                 repMarketingReport.InitReport(StartDate, EndDate, 'CH', '54750|54825|54850|54860|54900|54950|55050|55100|55150|55200|54800|55000|55020|55250|55255|55300|55350');
-                repMarketingReport.SaveAsExcel(ServerFilename);
+                repMarketingReport.SaveAs(Dummy, ReportFormat::Excel, MyOutStream2);
 
-                EmailAddMgt.AddAttachment(ServerFilename, StrSubstNo(Text001, StartDate, EndDate), false);
+                EmailAddMgt.AddAttachment(tempBlob2, StrSubstNo(Text001, StartDate, EndDate));
             end;
             //<< 01-05-24 ZY-LD 003
 
             EmailAddMgt.Send;
-            FileMkt.DeleteServerFile(ServerFilename);  // 01-05-24 ZY-LD 003
+          //  FileMkt.DeleteServerFile(ServerFilename);  // 01-05-24 ZY-LD 003
                                                        //<< 09-07-19 ZY-LD 00
         end;
     end;

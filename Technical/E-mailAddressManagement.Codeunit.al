@@ -210,7 +210,7 @@ codeunit 50074 "E-mail Address Management"
             Error(Text001, pCode, lEmailAdd.TableCaption());
     end;
 
-    procedure CreateEmailWithAttachment(pCode: Code[10]; pLanguage: Code[10]; pRecipents: Text; pServerFilename: Text; pFilename: Text; pDeleteFile: Boolean)
+    procedure CreateEmailWithAttachment(pCode: Code[10]; pLanguage: Code[10]; pRecipents: Text; var tempblob: codeunit "Temp Blob"; pFilename: Text)
     var
         lEmailAdd: Record "E-mail address";
         recCustomer: Record Customer;
@@ -243,11 +243,11 @@ codeunit 50074 "E-mail Address Management"
                 AddRecipient(lEmailAdd.BCC, 2);  // 06-02-24 ZY-LD 014
             //EmailMsg.AddRecipient("EMail Recipient Type"::BCC, lEmailAdd.BCC);  // 06-02-24 ZY-LD 014
 
-            AddAttachment(pServerFilename, pFilename, pDeleteFile);
+            AddAttachment(tempblob, pFilename);
 
             //>> 14-11-19 ZY-LD 010
-            if pDeleteFile then
-                ServerFilenameToDelete := pServerFilename;
+            // if pDeleteFile then
+            //     ServerFilenameToDelete := pServerFilename;
             //<< 14-11-19 ZY-LD 01
         end else
             Error(Text001, pCode, lEmailAdd.TableCaption());
@@ -304,22 +304,31 @@ codeunit 50074 "E-mail Address Management"
         exit(BodyText);
     end;
 
-    procedure AddAttachment(pServerFilename: Text; pFilename: Text; pDeleteFile: Boolean)
+    // procedure AddAttachment_old(pServerFilename: Text; pFilename: Text; pDeleteFile: Boolean)
+    // var
+    //     FileMgt: Codeunit "File Management";
+    //     StreamIn: InStream;
+    //     f: File;
+    // begin
+    //     if FileMgt.ServerFileExists(pServerFilename) then begin
+    //         f.Open(pServerFilename);
+    //         f.CreateInStream(StreamIn);
+
+    //         EmailMsg.AddAttachment(pFilename, FileMgt.GetFileNameMimeType(pFilename), StreamIn);
+    //         f.Close();
+
+    //         //IF pDeleteFile THEN  // 14-11-19 ZY-LD 010
+    //         //  FileMgt.DeleteServerFile(pServerFilename);  // 14-11-19 ZY-LD 010
+    //     end;
+    // end;
+
+    procedure AddAttachment(Var tempblob: Codeunit "Temp Blob"; pFilename: text)
     var
-        FileMgt: Codeunit "File Management";
         StreamIn: InStream;
-        f: File;
+        FileMgt: Codeunit "File Management";
     begin
-        if FileMgt.ServerFileExists(pServerFilename) then begin
-            f.Open(pServerFilename);
-            f.CreateInStream(StreamIn);
-
-            EmailMsg.AddAttachment(pFilename, FileMgt.GetFileNameMimeType(pFilename), StreamIn);
-            f.Close();
-
-            //IF pDeleteFile THEN  // 14-11-19 ZY-LD 010
-            //  FileMgt.DeleteServerFile(pServerFilename);  // 14-11-19 ZY-LD 010
-        end;
+        tempblob.CreateInStream(StreamIn);
+        EmailMsg.AddAttachment(pFilename, FileMgt.GetFileNameMimeType(pFilename), StreamIn);
     end;
 
     procedure AddCC(Recipient: Text)
@@ -352,10 +361,10 @@ codeunit 50074 "E-mail Address Management"
         Clear(EmailAccounts);
 
         //>> 14-11-19 ZY-LD 010
-        if ServerFilenameToDelete <> '' then begin
-            FileMgt.DeleteServerFile(ServerFilenameToDelete);
-            ServerFilenameToDelete := '';
-        end;
+        // if ServerFilenameToDelete <> '' then begin
+        //     FileMgt.DeleteServerFile(ServerFilenameToDelete);
+        //     ServerFilenameToDelete := '';
+        // end;
         //<< 14-11-19 ZY-LD 010
     end;
 
@@ -676,78 +685,80 @@ codeunit 50074 "E-mail Address Management"
                 //Get the HTML File
                 recEmailHTMLfiles.SetRange(Code, recEmailaddress."E-mail HTML file");
                 if recEmailHTMLfiles.FindSet() then HTMLFileName := Text002 + recEmailHTMLfiles.Filename;
+
+                // CLOUD READY DELETE TEMP
                 // Error Checking
-                if StrLen(HTMLFileName) = 0 then Error(Err001);
-                if not Exists(HTMLFileName) then Error(Err002);
-                // String Replacement
-                if Exists(HTMLFileName) then begin
-                    File.TextMode(true);
-                    File.WriteMode(false);
-                    File.Open(HTMLFileName);
-                    repeat
-                        File.Read(Linestr);
-                        HTMLStr := HTMLStr + Linestr;
-                    until File.POS = File.LEN;
-                    File.Close();
-                    // CR and Tab
-                    HTMLStr := ReplaceString(HTMLStr, Text014, Text015);
-                    HTMLStr := ReplaceString(HTMLStr, Text016, Text017);
-                    // Title
-                    HTMLStr := ReplaceString(HTMLStr, Text005, Text006);
-                    // Body Text
-                    HTMLStr := ReplaceString(HTMLStr, Text007, BodyText);
-                    // Build Color
-                    ColorStr := 'rgb(' + Format(RValue) + ', ' + Format(GValue) + ', ' + Format(BValue) + ')';
-                    HTMLStr := ReplaceString(HTMLStr, Text003, ColorStr);
-                    // Images
-                    HTMLStr := ReplaceString(HTMLStr, Text004, Text002);
-                    //>> 03-01-18 ZY-LD 007
-                    if recUserSetup.Get(UserId()) and recUserSetup."Use User E-mail on Documents" then begin
-                        recUserSetup.TestField("E-Mail Footer Name");
-                        recUserSetup.TestField("E-mail Footer Address");
-                        recUserSetup.TestField("E-Mail");
-                        // Signature
-                        HTMLStr := ReplaceString(HTMLStr, Text008, recUserSetup."E-Mail Footer Name");
-                        HTMLStr := ReplaceString(HTMLStr, Text009, recUserSetup."E-Mail");
-                        // Company
-                        if recUserSetup."E-mail Footer Mobile Phone No." <> '' then
-                            Phone := recUserSetup."E-mail Footer Mobile Phone No."
-                        else
-                            Phone := recUserSetup."E-mail Footer Phone No.";
-                        Address1 := recUserSetup."E-mail Footer Address";
-                        Address2 := recUserSetup."E-mail Footer Address 2";
-                        Address3 := recUserSetup."E-mail Footer Address 3";
-                    end else begin  // Company Info  //<< 03-01-18 ZY-LD 007
-                                    // Signature
-                        HTMLStr := ReplaceString(HTMLStr, Text009, recEmailaddress."Footer E-Mail");
-                        // Company
-                        if recCompInfo.FindFirst() then begin
-                            Phone := recCompInfo."Finance Phone No.";
-                            HTMLStr := ReplaceString(HTMLStr, Text008, recCompInfo.Name);
-                            Address1 := recCompInfo.Address;
-                            if StrLen(recCompInfo."Address 2") > 0 then
-                                Address1 := Address1 + ', ' + recCompInfo."Address 2";
-                            Address2 := recCompInfo.City;
-                            if StrLen(recCompInfo."Post Code") > 0 then
-                                Address2 := Address2 + ', ' + recCompInfo."Post Code";
-                            //>> 03-01-18 ZY-LD 007
-                            if ZGT.IsRhq then
-                                recCountryRegionCode.Get('DK')
-                            else  //<< 03-01-18 ZY-LD 007
-                                recCountryRegionCode.Get(recCompInfo."Country/Region Code");
-                            Address3 := recCountryRegionCode.Name;
-                        end;
-                    end;
-                    HTMLStr := ReplaceString(HTMLStr, Text010, Phone);
-                    HTMLStr := ReplaceString(HTMLStr, Text011, Address1);
-                    HTMLStr := ReplaceString(HTMLStr, Text012, Address2);
-                    HTMLStr := ReplaceString(HTMLStr, Text013, Address3);
-                    // Additional Body Text
-                    HTMLStr := ReplaceString(HTMLStr, Text019, AdditionalText);
-                    // Table
-                    HTMLStr := ReplaceString(HTMLStr, Text018, Table);
-                    exit(HTMLStr);
-                end;
+                // if StrLen(HTMLFileName) = 0 then Error(Err001);
+                // if not Exists(HTMLFileName) then Error(Err002);
+                // // String Replacement
+                // if Exists(HTMLFileName) then begin
+                //     File.TextMode(true);
+                //     File.WriteMode(false);
+                //     File.Open(HTMLFileName);
+                //     repeat
+                //         File.Read(Linestr);
+                //         HTMLStr := HTMLStr + Linestr;
+                //     until File.POS = File.LEN;
+                //     File.Close();
+                //     // CR and Tab
+                //     HTMLStr := ReplaceString(HTMLStr, Text014, Text015);
+                //     HTMLStr := ReplaceString(HTMLStr, Text016, Text017);
+                //     // Title
+                //     HTMLStr := ReplaceString(HTMLStr, Text005, Text006);
+                //     // Body Text
+                //     HTMLStr := ReplaceString(HTMLStr, Text007, BodyText);
+                //     // Build Color
+                //     ColorStr := 'rgb(' + Format(RValue) + ', ' + Format(GValue) + ', ' + Format(BValue) + ')';
+                //     HTMLStr := ReplaceString(HTMLStr, Text003, ColorStr);
+                //     // Images
+                //     HTMLStr := ReplaceString(HTMLStr, Text004, Text002);
+                //     //>> 03-01-18 ZY-LD 007
+                //     if recUserSetup.Get(UserId()) and recUserSetup."Use User E-mail on Documents" then begin
+                //         recUserSetup.TestField("E-Mail Footer Name");
+                //         recUserSetup.TestField("E-mail Footer Address");
+                //         recUserSetup.TestField("E-Mail");
+                //         // Signature
+                //         HTMLStr := ReplaceString(HTMLStr, Text008, recUserSetup."E-Mail Footer Name");
+                //         HTMLStr := ReplaceString(HTMLStr, Text009, recUserSetup."E-Mail");
+                //         // Company
+                //         if recUserSetup."E-mail Footer Mobile Phone No." <> '' then
+                //             Phone := recUserSetup."E-mail Footer Mobile Phone No."
+                //         else
+                //             Phone := recUserSetup."E-mail Footer Phone No.";
+                //         Address1 := recUserSetup."E-mail Footer Address";
+                //         Address2 := recUserSetup."E-mail Footer Address 2";
+                //         Address3 := recUserSetup."E-mail Footer Address 3";
+                //     end else begin  // Company Info  //<< 03-01-18 ZY-LD 007
+                //                     // Signature
+                //         HTMLStr := ReplaceString(HTMLStr, Text009, recEmailaddress."Footer E-Mail");
+                //         // Company
+                //         if recCompInfo.FindFirst() then begin
+                //             Phone := recCompInfo."Finance Phone No.";
+                //             HTMLStr := ReplaceString(HTMLStr, Text008, recCompInfo.Name);
+                //             Address1 := recCompInfo.Address;
+                //             if StrLen(recCompInfo."Address 2") > 0 then
+                //                 Address1 := Address1 + ', ' + recCompInfo."Address 2";
+                //             Address2 := recCompInfo.City;
+                //             if StrLen(recCompInfo."Post Code") > 0 then
+                //                 Address2 := Address2 + ', ' + recCompInfo."Post Code";
+                //             //>> 03-01-18 ZY-LD 007
+                //             if ZGT.IsRhq then
+                //                 recCountryRegionCode.Get('DK')
+                //             else  //<< 03-01-18 ZY-LD 007
+                //                 recCountryRegionCode.Get(recCompInfo."Country/Region Code");
+                //             Address3 := recCountryRegionCode.Name;
+                //         end;
+                //     end;
+                //     HTMLStr := ReplaceString(HTMLStr, Text010, Phone);
+                //     HTMLStr := ReplaceString(HTMLStr, Text011, Address1);
+                //     HTMLStr := ReplaceString(HTMLStr, Text012, Address2);
+                //     HTMLStr := ReplaceString(HTMLStr, Text013, Address3);
+                //     // Additional Body Text
+                //     HTMLStr := ReplaceString(HTMLStr, Text019, AdditionalText);
+                //     // Table
+                //     HTMLStr := ReplaceString(HTMLStr, Text018, Table);
+                //     exit(HTMLStr);
+                // end;
             end;
         end;
     end;

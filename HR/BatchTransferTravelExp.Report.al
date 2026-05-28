@@ -14,6 +14,10 @@ Report 50055 "Batch Transfer Travel Exp."
                 RequestFilterFields = "No.", "Concur Company Name";
 
                 trigger OnAfterGetRecord()
+                var
+                    Dummy: text;
+                    TempBlob: codeunit "Temp Blob";
+                    varoutstream: outstream;
                 begin
                     if ValidateDocument then begin
                         recTrExpHead.CopyFilters("Travel Expense Header");
@@ -23,13 +27,14 @@ Report 50055 "Batch Transfer Travel Exp."
                             TravelExpDoc.UseRequestPage(false);
                             TravelExpDoc.InitReport(true);
                             TravelExpDoc.RunModal;
-                            ServerFilename := TravelExpDoc.GetFilename;
+                            // CLOUD READY DELETE
+                            //ServerFilename := TravelExpDoc.GetFilename;
+                            TravelExpDoc.Gettempblob(TempBlob);
                             if ServerFilename <> '' then begin
                                 Clear(EmailAddMgt);
-                                EmailAddMgt.CreateEmailWithAttachment("Replication Company"."Travel Expense E-mail Address", '', '', ServerFilename, StrSubstNo(Text001, Today), false);
+                                EmailAddMgt.CreateEmailWithAttachment("Replication Company"."Travel Expense E-mail Address", '', '', TempBlob, StrSubstNo(Text001, Today));
                                 EmailAddMgt.Send;
                                 recTrExpHead.ModifyAll("Document Status", recTrExpHead."document status"::Mailed);
-                                FileMgt.DeleteServerFile(ServerFilename);
                             end;
                         end else
                             ZyWebServMgt.SendTravelExpense(recTrExpHead, PostDocument);
