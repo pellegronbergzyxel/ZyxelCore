@@ -134,7 +134,7 @@ Codeunit 50004 "ZyXEL VCK"
                     recPurchLine.SuspendStatusCheck(false);  // 17-04-24 ZY-LD 008
                 end;
                 //CurrFile.Close;
-                //ConvCodePage.ConvertCodepage(ServerFilename, '', '', ConvCodePage.CodepageUTF8);  // 08-11-19 ZY-LD 006
+                
                 TempBlob.CreateOutStream(varOutputStream);
                 varOutputStream.WriteText(FileContent);
 

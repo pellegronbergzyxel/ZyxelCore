@@ -431,7 +431,9 @@ Page 50297 "Rcpt. Response List"
                     lText001: Label 'Download Document';
                 begin
                     if recZyFileMgt.Get(Rec."File Management Entry No.") then
-                        FileMgt.DownloadHandler(Rec.Filename, lText001, '', 'PDF(*.pdf)|*.pdf|All files(*.*)|*.*', FileMgt.GetFileName(Rec.Filename));
+                      recZyFileMgt.DownloadBlobToFile('');
+                      // CLOUD READY DELETE
+                        //FileMgt.DownloadHandler(Rec.Filename, lText001, '', 'PDF(*.pdf)|*.pdf|All files(*.*)|*.*', FileMgt.GetFileName(Rec.Filename));
                 end;
             }
             action("Show Warehouse Inbound Order")

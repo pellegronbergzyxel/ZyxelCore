@@ -14,6 +14,8 @@ report 50048 "Sales Order Received"
     ProcessingOnly = true;
 
     trigger OnPreReport()
+    var 
+    tempblob: codeunit "Temp Blob";
     begin
         recInvSetup.Get;  // 07-08-19 ZY-LD 004
         SalesHeader.SetRange("Document Type", SalesHeader."document type"::Order);
@@ -28,17 +30,17 @@ report 50048 "Sales Order Received"
         RepSalesOrderRecived.UseRequestPage(GuiAllowed);
         RepSalesOrderRecived.RunModal;
         if not GuiAllowed then begin
-            FilenameServer := RepSalesOrderRecived.GetFilename;
-            FilenameTarget := FileMgt.GetDirectoryName(FilenameServer) + '\' + StrSubstNo(Text001, Date2dwy(WorkDate, 2)) + Text002;
-            FileMgt.CopyServerFile(FilenameServer, FilenameTarget, true);
-            FileMgt.DeleteServerFile(FilenameServer);
+            RepSalesOrderRecived.GetFilename(tempblob);
+            //FilenameTarget := FileMgt.GetDirectoryName(FilenameServer) + '\' + StrSubstNo(Text001, Date2dwy(WorkDate, 2)) + Text002;
+            //FileMgt.CopyServerFile(FilenameServer, FilenameTarget, true);
+            //FileMgt.DeleteServerFile(FilenameServer);
 
             SI.SetMergefield(100, StrSubstNo(Text001, Date2dwy(WorkDate, 2)));
             SI.SetMergefield(101, Format(CalcDate('<-CW>', WorkDate)));
             EmailAddMgt.CreateSimpleEmail('REP50102', '', '');
-            EmailAddMgt.AddAttachment(FilenameTarget, FileMgt.GetFileName(FilenameTarget), false);
+            EmailAddMgt.AddAttachment(tempblob, FileMgt.GetFileName(FilenameTarget));
             EmailAddMgt.Send;
-            FileMgt.DeleteServerFile(FilenameTarget);
+//            FileMgt.DeleteServerFile(FilenameTarget);
         end;
     end;
 

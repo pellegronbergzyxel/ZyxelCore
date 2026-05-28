@@ -44,10 +44,10 @@ Table 76153 "EiCard Link Line"
             trigger OnValidate()
             begin
                 //>> 10-09-19 ZY-LD 001
-                if Filename = '' then
-                    if xRec.Filename <> '' then
-                        if FileMgt.ServerFileExists(xRec.Filename) then
-                            FileMgt.DeleteServerFile(xRec.Filename);
+                // if Filename = '' then
+                //     if xRec.Filename <> '' then
+                //         if FileMgt.ServerFileExists(xRec.Filename) then
+                //             FileMgt.DeleteServerFile(xRec.Filename);
                 //<< 10-09-19 ZY-LD 001
             end;
         }
@@ -77,6 +77,11 @@ Table 76153 "EiCard Link Line"
         {
             Caption = 'Reject Description';
         }
+        field(100; filblob; blob)
+        {
+
+            Caption = 'File blob';
+        }
     }
 
     keys
@@ -97,9 +102,9 @@ Table 76153 "EiCard Link Line"
     trigger OnDelete()
     begin
         //>> 10-09-19 ZY-LD 001
-        if Filename <> '' then
-            if FileMgt.ServerFileExists(Filename) then
-                FileMgt.DeleteServerFile(Filename);
+        // if Filename <> '' then
+        //     if FileMgt.ServerFileExists(Filename) then
+        //         FileMgt.DeleteServerFile(Filename);
         //<< 10-09-19 ZY-LD 001
     end;
 
@@ -131,24 +136,24 @@ Table 76153 "EiCard Link Line"
         HttpClient: HttpClient;
         HttpResponse: HttpResponseMessage;
         ContentInStream: InStream;
-        OutFile: File;
+        //OutFile: File;
         OutStream: OutStream;
         FileMgt: Codeunit "File Management";
         Filename: Text;
         newFilename: text;
     begin
         //>> 20-04-22 ZY-LD 002
-        Filename := FileMgt.ServerTempFileName('');
+      //  Filename := FileMgt.ServerTempFileName('');
         if HttpClient.Get(Link, HttpResponse) and HttpResponse.IsSuccessStatusCode() then begin
             HttpResponse.Content.ReadAs(ContentInStream);
-            OutFile.WriteMode(true);
-            OutFile.Create(Filename);
-            OutFile.CreateOutStream(OutStream);
-            CopyStream(OutStream, ContentInStream);
+         //   OutFile.WriteMode(true);
+         //   OutFile.Create(Filename);
+          //  OutFile.CreateOutStream(OutStream);
+            //CopyStream(OutStream, ContentInStream);
             newFilename := rec."Item No." + '_EICARD.xlsx';
             if DownloadFromStream(ContentInStream, 'Export', '', 'All Files (*.*)|*.*', newFilename) then
                 message('fil downloaded');
-            OutFile.Close();
+            //OutFile.Close();
         end;
         //Hyperlink(Filename);
         //FileMgt.DeleteServerFile(Filename);

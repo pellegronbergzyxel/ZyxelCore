@@ -47,6 +47,9 @@ codeunit 50089 "Post Ship Response Mgt."
         lText003: Label 'There are error(s) on serial no.';
         lText004: Label '%1 - %2.xlsx';
         LastErrorText: Text;
+        Dummy: text;
+        TempBlob: codeunit "Temp Blob";
+        varoutstream: outstream;
     begin
         recZyFileMgt.SetRange(Type, recZyFileMgt.Type::"VCK Ship. Response");
         recZyFileMgt.SetRange(Open, true);
@@ -80,20 +83,23 @@ codeunit 50089 "Post Ship Response Mgt."
                     if LastErrorText = '' then begin
                         if recRespHead2.FindLast() and (recRespHead2."Warehouse Status" = recRespHead2."Warehouse Status"::Packed) then begin
                             recRespHead2.SetRange("No.", recRespHead2."No.");
-
-                            ServerFilename := FileMgt.ServerTempFileName('');
+                            // Cloud ready delete
+                            TempBlob.CreateOutStream(varoutstream);
+                            //ServerFilename := FileMgt.ServerTempFileName('');
                             Clear(repIdentifyIdenticalSerialNo);
                             repIdentifyIdenticalSerialNo.SetTableView(recRespHead2);
-                            repIdentifyIdenticalSerialNo.SaveAsExcel(ServerFilename);
+                            repIdentifyIdenticalSerialNo.SaveAs(Dummy,ReportFormat::Excel,varoutstream);
+                            //repIdentifyIdenticalSerialNo.SaveAsExcel(ServerFilename);
                             if (recRespHead2."On Hold" = '') and repIdentifyIdenticalSerialNo.DifferenceLocated() then begin
                                 SI.SetMergefield(100, recRespHead2."Order No.");
                                 SI.SetMergefield(101, Format(recRespHead2."Warehouse Status"));
                                 SI.SetMergefield(102, recRespHead2."Customer Reference");
 
                                 Clear(EmailAddMgt);
-                                EmailAddMgt.CreateEmailWithAttachment('VCKSENOMIS', '', '', ServerFilename, StrSubstNo(lText004, recRespHead2."Order No.", recRespHead2."Customer Reference"), false);
+                                EmailAddMgt.CreateEmailWithAttachment('VCKSENOMIS', '', '', TempBlob, StrSubstNo(lText004, recRespHead2."Order No.", recRespHead2."Customer Reference"));
                                 EmailAddMgt.Send();
-                                FileMgt.DeleteServerFile(ServerFilename);
+                                // DELETE CLOUD READY
+                               // FileMgt.DeleteServerFile(ServerFilename);
 
                                 recRespHead2."On Hold" := 'ERR';
                                 recRespHead2."After Post Description" := lText003;

@@ -322,7 +322,7 @@ Codeunit 50001 "ZyXEL EiCards"
                         end;
                     until recPurchLine.Next() = 0;
 
-                //ConvCodePage.ConvertCodepage(ServerFilename, '', '', ConvCodePage.CodepageUTF8());
+
                 TempBlob.CreateOutStream(varOutputStream);
                 varOutputStream.WriteText(FileContent);
 
@@ -338,7 +338,7 @@ Codeunit 50001 "ZyXEL EiCards"
                     pEiCardQueue."Error Description" := lText003;
                     pEiCardQueue.Modify(true);
 
-                    FileMgt.DeleteServerFile(ServerFilename)
+                    //FileMgt.DeleteServerFile(ServerFilename)
                 end else
 
                     if FTPMgt.UploadFilestream(recPurchHead."FTP Code", TempBlob, ServerFilename, RemoteFilename) then begin

@@ -513,20 +513,27 @@ Table 50024 "Warehouse Inbound Header"
         recContainerDetail: Record "VCK Shipping Detail";
         repContainerDetail: Report "Container Details";
         lText001: label 'Zyxel Container Details, Inbound Order No. %1.xlsx';
+        Dummy: text;
+        TempBlob: codeunit "Temp Blob";
+        varoutstream: outstream;
     begin
         if recServerEnviron.ProductionEnvironment then begin
-            ServerFilename := FileMgt.ServerTempFileName('xlsx');
+            // CLOUD READY DELETE
+            //ServerFilename := FileMgt.ServerTempFileName('xlsx');
             recContainerDetail.Reset;
             recContainerDetail.SetRange("Document No.", "No.");
             repContainerDetail.SetTableview(recContainerDetail);
-            repContainerDetail.SaveAsExcel(ServerFilename);
+            TempBlob.CreateOutStream(varoutstream);
+            repContainerDetail.SaveAs(dummy,ReportFormat::Excel,varoutstream);
+            //repContainerDetail.SaveAsExcel(ServerFilename);
             Clear(EmailAddMgt);
             SI.SetMergefield(100, "No.");
             SI.SetMergefield(101, "Invoice No.");
             SI.SetMergefield(102, "Shipper Reference");
-            EmailAddMgt.CreateEmailWithAttachment('HQCONTDET2', '', '', ServerFilename, StrSubstNo(lText001, "No."), false);
+            EmailAddMgt.CreateEmailWithAttachment('HQCONTDET2', '', '', TempBlob, StrSubstNo(lText001, "No."));
             EmailAddMgt.Send;
-            FileMgt.DeleteServerFile(ServerFilename);
+            // CLOUD READY DELETE >> 
+            //FileMgt.DeleteServerFile(ServerFilename);
 
             "Container Details is Sent" := true;
             Modify;

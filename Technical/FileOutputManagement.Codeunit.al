@@ -57,51 +57,51 @@ Codeunit 50046 "File Output Management"
     end;
 
 
-    procedure CloseCsvAndShowFile(pClientFilename: Text; pShowFile: Boolean; pConvertFileTo: Option " ",Unicode,Ansi,"UTF-8")
-    var
-        FileMgt: Codeunit "File Management";
-        ZyxelFileMgt: Codeunit "Zyxel File Management";
-        ConvCodePage: Codeunit "Convert Codepage";
-        lText001: label 'Download file';
-    begin
-        CsvFile.Close;
+    // procedure CloseCsvAndShowFile(pClientFilename: Text; pShowFile: Boolean; pConvertFileTo: Option " ",Unicode,Ansi,"UTF-8")
+    // var
+    //     FileMgt: Codeunit "File Management";
+    //     ZyxelFileMgt: Codeunit "Zyxel File Management";
+    //     ConvCodePage: Codeunit "Convert Codepage";
+    //     lText001: label 'Download file';
+    // begin
+    //     CsvFile.Close;
 
-        case pConvertFileTo of
-            Pconvertfileto::Unicode:
-                ConvCodePage.ConvertCodepage(ServerFilename, FileMgt.GetExtension(pClientFilename), '', ConvCodePage.CodepageUnicode);
-            Pconvertfileto::Ansi:
-                ConvCodePage.ConvertCodepage(ServerFilename, FileMgt.GetExtension(pClientFilename), '', ConvCodePage.CodepageANSI);
-            Pconvertfileto::"UTF-8":
-                ConvCodePage.ConvertCodepage(ServerFilename, FileMgt.GetExtension(pClientFilename), '', ConvCodePage.CodepageUTF8);
-        end;
+    //     case pConvertFileTo of
+    //         Pconvertfileto::Unicode:
+    //             ConvCodePage.ConvertCodepage(ServerFilename, FileMgt.GetExtension(pClientFilename), '', ConvCodePage.CodepageUnicode);
+    //         Pconvertfileto::Ansi:
+    //             ConvCodePage.ConvertCodepage(ServerFilename, FileMgt.GetExtension(pClientFilename), '', ConvCodePage.CodepageANSI);
+    //         Pconvertfileto::"UTF-8":
+    //             ConvCodePage.ConvertCodepage(ServerFilename, FileMgt.GetExtension(pClientFilename), '', ConvCodePage.CodepageUTF8);
+    //     end;
 
-        FileMgt.DownloadHandler(ServerFilename, lText001, ZyxelFileMgt.GetClientDownloadFolder, 'Csv|*.csv|All files|*.*', pClientFilename);
-        FileMgt.DeleteServerFile(ServerFilename);
-        ServerFilename := '';
-        NoOfColumns := 0;
+    //     FileMgt.DownloadHandler(ServerFilename, lText001, ZyxelFileMgt.GetClientDownloadFolder, 'Csv|*.csv|All files|*.*', pClientFilename);
+    //     FileMgt.DeleteServerFile(ServerFilename);
+    //     ServerFilename := '';
+    //     NoOfColumns := 0;
 
-        if pShowFile and (pClientFilename <> '') then
-            Hyperlink(pClientFilename);
-    end;
+    //     if pShowFile and (pClientFilename <> '') then
+    //         Hyperlink(pClientFilename);
+    // end;
 
 
-    procedure CloseCsvFile(pConvertFileTo: Option " ",Unicode,Ascii,"UTF-8"): Text
-    var
-        FileMgt: Codeunit "File Management";
-        ConvCodePage: Codeunit "Convert Codepage";
-    begin
-        CsvFile.Close;
+    // procedure CloseCsvFile(pConvertFileTo: Option " ",Unicode,Ascii,"UTF-8"): Text
+    // var
+    //     FileMgt: Codeunit "File Management";
+    //     ConvCodePage: Codeunit "Convert Codepage";
+    // begin
+    //     CsvFile.Close;
 
-        case pConvertFileTo of
-            Pconvertfileto::Unicode:
-                ConvCodePage.ConvertCodepage(ServerFilename, FileMgt.GetExtension(ServerFilename), '', ConvCodePage.CodepageUnicode);
-            Pconvertfileto::Ascii:
-                ConvCodePage.ConvertCodepage(ServerFilename, FileMgt.GetExtension(ServerFilename), '', ConvCodePage.CodepageANSI);
-            Pconvertfileto::"UTF-8":
-                ConvCodePage.ConvertCodepage(ServerFilename, FileMgt.GetExtension(ServerFilename), '', ConvCodePage.CodepageUTF8);
-        end;
-        exit(ServerFilename);
-    end;
+    //     case pConvertFileTo of
+    //         Pconvertfileto::Unicode:
+    //             ConvCodePage.ConvertCodepage(ServerFilename, FileMgt.GetExtension(ServerFilename), '', ConvCodePage.CodepageUnicode);
+    //         Pconvertfileto::Ascii:
+    //             ConvCodePage.ConvertCodepage(ServerFilename, FileMgt.GetExtension(ServerFilename), '', ConvCodePage.CodepageANSI);
+    //         Pconvertfileto::"UTF-8":
+    //             ConvCodePage.ConvertCodepage(ServerFilename, FileMgt.GetExtension(ServerFilename), '', ConvCodePage.CodepageUTF8);
+    //     end;
+    //     exit(ServerFilename);
+    // end;
 
 
     procedure ClearContent()

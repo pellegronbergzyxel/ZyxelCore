@@ -202,8 +202,8 @@ Table 62016 "FTP Folder"
             if FtpMgt.TestLogin(Code) then
                 Message(lText001, Code);
 
-            if not FileMgt.ServerDirectoryExists("Archive Folder") then
-                Message(lText003, "Archive Folder");
+            // if not FileMgt.ServerDirectoryExists("Archive Folder") then
+            //     Message(lText003, "Archive Folder");
         end;
     end;
 }

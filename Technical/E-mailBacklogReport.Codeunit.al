@@ -7,56 +7,58 @@ Codeunit 50047 "E-mail Backlog Report"
     begin
         // All orders
         if recEmailAdd.Get('BACKLOG') and (recEmailAdd.Recipients <> '') then begin
-            ServerFilename := FileMgt.ServerTempFileName('');
+            tempBlob.CreateOutstream(varoutstream);
             BacklogReport.InitRequest(3, '');
-            BacklogReport.SaveAsExcel(ServerFilename);
-
+            BacklogReport.SaveAs(dummy,ReportFormat::Excel,varoutstream);
             EmailAddMgt.CreateSimpleEmail(recEmailAdd.Code, '', '');
-            EmailAddMgt.AddAttachment(ServerFilename, StrSubstNo(Text001, Text002, CurrentDatetime), false);
+            EmailAddMgt.AddAttachment(tempblob, StrSubstNo(Text001, Text002, CurrentDatetime));
             EmailAddMgt.Send;
-            FileMgt.DeleteServerFile(ServerFilename);
+
         end;
 
         // Sales Orders
         if recEmailAdd.Get('BACKLOGSAL') and (recEmailAdd.Recipients <> '') then begin
             Clear(BacklogReport);
             Clear(EmailAddMgt);
-            ServerFilename := FileMgt.ServerTempFileName('');
+            clear(tempblob);
+            clear(varoutstream);
+            tempBlob.CreateOutstream(varoutstream);
             BacklogReport.InitRequest(0, '');
-            BacklogReport.SaveAsExcel(ServerFilename);
-
+            BacklogReport.SaveAs(dummy,ReportFormat::Excel,varoutstream);
             EmailAddMgt.CreateSimpleEmail(recEmailAdd.Code, '', '');
-            EmailAddMgt.AddAttachment(ServerFilename, StrSubstNo(Text001, Text003, CurrentDatetime), false);
+            EmailAddMgt.AddAttachment(tempblob, StrSubstNo(Text001, Text003, CurrentDatetime));
             EmailAddMgt.Send;
-            FileMgt.DeleteServerFile(ServerFilename);
+            
         end;
 
         // Transfer Orders
         if recEmailAdd.Get('BACKLOGTRA') and (recEmailAdd.Recipients <> '') then begin
             Clear(BacklogReport);
             Clear(EmailAddMgt);
-            ServerFilename := FileMgt.ServerTempFileName('');
+            clear(tempblob);
+            clear(varoutstream);
+            tempBlob.CreateOutstream(varoutstream);
             BacklogReport.InitRequest(1, '200153');
-            BacklogReport.SaveAsExcel(ServerFilename);
-
+            BacklogReport.SaveAs(dummy,ReportFormat::Excel,varoutstream);
             EmailAddMgt.CreateSimpleEmail(recEmailAdd.Code, '', '');
-            EmailAddMgt.AddAttachment(ServerFilename, StrSubstNo(Text001, Text004, CurrentDatetime), false);
+            EmailAddMgt.AddAttachment(tempblob, StrSubstNo(Text001, Text004, CurrentDatetime));
             EmailAddMgt.Send;
-            FileMgt.DeleteServerFile(ServerFilename);
+            
         end;
 
         // Assembly Orders
         if recEmailAdd.Get('BACKLOGASS') and (recEmailAdd.Recipients <> '') then begin
             Clear(BacklogReport);
             Clear(EmailAddMgt);
-            ServerFilename := FileMgt.ServerTempFileName('');
+            clear(tempblob);
+            clear(varoutstream);
+            tempBlob.CreateOutstream(varoutstream);
             BacklogReport.InitRequest(2, '');
-            BacklogReport.SaveAsExcel(ServerFilename);
-
+            BacklogReport.SaveAs(dummy,ReportFormat::Excel,varoutstream);
             EmailAddMgt.CreateSimpleEmail(recEmailAdd.Code, '', '');
-            EmailAddMgt.AddAttachment(ServerFilename, StrSubstNo(Text001, Text005, CurrentDatetime), false);
+            EmailAddMgt.AddAttachment(tempblob, StrSubstNo(Text001, Text005, CurrentDatetime));
             EmailAddMgt.Send;
-            FileMgt.DeleteServerFile(ServerFilename);
+            
         end;
     end;
 
@@ -71,4 +73,9 @@ Codeunit 50047 "E-mail Backlog Report"
         Text003: label 'Sales Order';
         Text004: label 'Transfer Order';
         Text005: label 'Assembly Order';
+          tempblob: Codeunit "Temp Blob";
+        
+        varoutstream: outstream;
+        
+        dummy: text;
 }

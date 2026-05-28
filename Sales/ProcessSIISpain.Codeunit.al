@@ -16,13 +16,14 @@ Codeunit 50024 "Process SII Spain"
 
                 EmailAddMgt.CreateSimpleEmail('SII', '', '');
                 if SIServerFilename <> '' then
-                    EmailAddMgt.AddAttachment(SIServerFilename, StrSubstNo(Text001, Text002, DelChr(recCompInfo.Name, '=', '.')), false);
+                    EmailAddMgt.AddAttachment(tempBlob, StrSubstNo(Text001, Text002, DelChr(recCompInfo.Name, '=', '.')));
                 if PIServerFilename <> '' then
-                    EmailAddMgt.AddAttachment(PIServerFilename, StrSubstNo(Text001, Text003, DelChr(recCompInfo.Name, '=', '.')), false);
+                    EmailAddMgt.AddAttachment(tempBlob3, StrSubstNo(Text001, Text003, DelChr(recCompInfo.Name, '=', '.')));
 
                 EmailAddMgt.Send;
-                FileMgt.DeleteServerFile(SIServerFilename);
-                FileMgt.DeleteServerFile(PIServerFilename);
+                // CLOUD READY DELETE;
+                //  FileMgt.DeleteServerFile(SIServerFilename);
+                //FileMgt.DeleteServerFile(PIServerFilename);
             end;
         end;
     end;
@@ -37,17 +38,27 @@ Codeunit 50024 "Process SII Spain"
         Text003: label 'PURCHASES';
         ZGT: Codeunit "ZyXEL General Tools";
         ZyWebServMgt: Codeunit "Zyxel Web Service Management";
+        tempblob: Codeunit "Temp Blob";
+        tempblob3: codeunit "Temp Blob";
+        varoutstream: outstream;
+        varoutstream3: outstream;
+        dummy: text;
+
+
 
     local procedure SiiSalesInvoice()
     var
         recSalesInv: Record "Sales Invoice Header";
         FileMgt: Codeunit "File Management";
+        runReport: report "SII Spain - Sales Invoice";
     begin
         recSalesInv.SetFilter("Posting Date", '%1..', 20230101D);
         recSalesInv.SetRange("SII Spain - Document Sent", false);
         if recSalesInv.FindFirst then begin
-            SIServerFilename := FileMgt.ServerTempFileName('.xlsx');
-            Report.SaveAsExcel(Report::"SII Spain - Sales Invoice", SIServerFilename, recSalesInv);
+            SIServerFilename := 'Sales.xlsx';
+            tempBlob.CreateOutstream(varoutstream);
+            runReport.SetTableView(recSalesInv);
+            runReport.SaveAs(Dummy, ReportFormat::Excel, varoutstream);
         end;
     end;
 
@@ -55,13 +66,16 @@ Codeunit 50024 "Process SII Spain"
     var
         recPurchInv: Record "Purch. Inv. Header";
         FileMgt: Codeunit "File Management";
+        runReport: report "SII Spain - Purchase Invoice";
     begin
         recPurchInv.SetFilter("Posting Date", '%1..', 20230101D);
         recPurchInv.SetRange("Buy-from Country/Region Code", 'ES');
         recPurchInv.SetRange("SII Spain - Document Sent", false);
         if recPurchInv.FindFirst then begin
-            PIServerFilename := FileMgt.ServerTempFileName('.xlsx');
-            Report.SaveAsExcel(Report::"SII Spain - Purchase Invoice", PIServerFilename, recPurchInv);
+            PIServerFilename := 'Purchase.xlsx';
+            tempBlob3.CreateOutstream(varoutstream3);
+            runReport.SetTableView(recPurchInv);
+            runReport.SaveAs(Dummy, ReportFormat::Excel, varoutstream3);
         end;
     end;
 }

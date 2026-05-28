@@ -73,12 +73,16 @@ XmlPort 50018 "HQ Account Receivable"
         recAccReceivTmp: Record "Account Pay./Receiv Buffer" temporary;
         repAccRecDet: Report "HQ Account Receivable Details";
         FileMgt: Codeunit "File Management";
-        ServerFilename: Text;
+        //ServerFilename: Text;
+        dummy: text;
+        tempblob: codeunit "Temp Blob";
+        varoustream: OutStream;
     begin
-        ServerFilename := FileMgt.ServerTempFileName('');
+        //ServerFilename := FileMgt.ServerTempFileName('');
         // Get account receivable from all companies in either ZCom or ZNet.
         repAccRecDet.InitReqest(Today, 1);
-        repAccRecDet.SaveAsExcel(ServerFilename);
+        tempblob.CreateOutStream(varoustream);
+        repAccRecDet.SaveAs(dummy,ReportFormat::Excel,varoustream);
         repAccRecDet.GetData(recAccReceivTmp);
 
         // Merge the columns, because HQ needs it in another format.
@@ -136,6 +140,6 @@ XmlPort 50018 "HQ Account Receivable"
         end;
 
         // Delete the file. We don´t need it.
-        FileMgt.DeleteServerFile(ServerFilename);
+       // FileMgt.DeleteServerFile(ServerFilename);
     end;
 }

@@ -184,6 +184,15 @@ Report 50061 "Travel Expense Document"
     end;
 
 
+    procedure Gettempblob(var tempblob: Codeunit "Temp Blob")
+    var
+        varoutstream: OutStream;
+    begin
+        tempblob.CreateOutStream(varoutstream);
+        ExcelBuf.SaveToStream(varoutstream, false);
+
+    end;
+
     procedure GetFilename(): Text
     begin
         exit(ExcelBuf.GetFileNameServer);

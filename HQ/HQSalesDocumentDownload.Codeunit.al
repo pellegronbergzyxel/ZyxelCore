@@ -9,6 +9,10 @@ Codeunit 62012 "HQ Sales Document Download"
         SI: Codeunit "Single Instance";
         ZGT: Codeunit "ZyXEL General Tools";
         ZyWebServMgt: Codeunit "Zyxel Web Service Management";
+         Dummy: text;
+        TempBlob: codeunit "Temp Blob";
+        varoutstream: outstream;
+        varinstream: instream;
 
     begin
         begin
@@ -29,7 +33,12 @@ Codeunit 62012 "HQ Sales Document Download"
                             if (recHqInvHead.Type = recHqInvHead.Type::Normal) and (AutoSetup."Received HQ Sales Invoice Mail" <> '') then begin
                                 SI.SetMergefield(100, recHqInvHead."No.");
                                 Clear(EmailAdd);
-                                EmailAdd.CreateEmailWithAttachment(copystr(AutoSetup."Received HQ Sales Invoice Mail", 1, 10), '', '', recHqInvHead."File Path" + recHqInvHead.Filename, recHqInvHead.Filename, false);
+                                // CLOUD READY NEW 
+                                // MANGKLER FORDI HQ INVOICE IKKE ER KODET FÆRDIG
+                                // FIL SKAL I BLOB FELT
+                                TempBlob.CreateOutStream(varoutstream);
+                                //EmailAdd.CreateEmailWithAttachment(copystr(AutoSetup."Received HQ Sales Invoice Mail", 1, 10), '', '', recHqInvHead."File Path" + recHqInvHead.Filename, recHqInvHead.Filename, false);
+                                EmailAdd.CreateEmailWithAttachment(copystr(AutoSetup."Received HQ Sales Invoice Mail", 1, 10), '', '', TempBlob, recHqInvHead.Filename);
                                 EmailAdd.Send();
                             end;
                 until (recHqInvHead.Next() = 0); //0601-2026 BK #480772

@@ -113,6 +113,9 @@ codeunit 50049 "Process RMA"
         ItemRegQty: Report "Item Register - Quantity";
         ServerFilename: Text;
         lText001: Label 'Item register - Quantity';
+        Dummy: text;
+        TempBlob: codeunit "Temp Blob";
+        varoutstream: outstream;
     begin
         PostLMRStock.UseRequestPage(false);
         PostLMRStock.RunModal();
@@ -124,16 +127,17 @@ codeunit 50049 "Process RMA"
             ItemRegister.SetRange("Journal Batch Name", SalesSetup."LMR Item Journal Batch Name");
             ItemRegister.SetFilter("From Entry No.", '<>0');
             If ItemRegister.FindLast() then begin
-                ServerFilename := FileMgt.ServerTempFileName('');
+                // CLOUD READY NEW
+                TempBlob.CreateOutStream(varoutstream);
                 ItemRegister.FindLast();
                 ItemRegister.SetRange("No.", ItemRegister."No.");
                 ItemRegQty.SetTableView(ItemRegister);
-                ItemRegQty.SaveAsExcel(ServerFilename);
+                ItemRegQty.SaveAs(Dummy,ReportFormat::Excel,varoutstream);
 
                 AutoSetup.get;
                 SI.SetMergefield(100, Format(ItemRegister."To Entry No." - ItemRegister."From Entry No." + 1));
                 Clear(MailAddMgt);
-                MailAddMgt.CreateEmailWithAttachment('RMAJNLPOST', '', '', ServerFilename, StrSubstNo('%1 %2.xlsx', lText001, AutoSetup."Last LMR Date"), false);
+                MailAddMgt.CreateEmailWithAttachment('RMAJNLPOST', '', '', TempBlob, StrSubstNo('%1 %2.xlsx', lText001, AutoSetup."Last LMR Date"));
                 MailAddMgt.Send();
             end;
         end;

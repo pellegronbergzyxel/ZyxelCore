@@ -1020,6 +1020,10 @@ Table 50041 "VCK Delivery Document Header"
         lText001: label 'Shipping Invoice %1.pdf';
         lText002: Label 'Customs invoice has been sent to the warehouse.';
         lText003: Label 'Email was not sent.\The field "%1" must be ticked off in either "%2" %3 or on "%4" %5 in order to send the customs invoice.';
+        TempBlob: codeunit "Temp Blob";
+        dummy: text;
+        varoutstream: outstream;
+
 
     begin
         //>> 26-10-21 ZY-LD 029
@@ -1029,14 +1033,16 @@ Table 50041 "VCK Delivery Document Header"
             if recShipToCountry."E-mail Shipping Inv. to Whse." or
                recCust."E-mail Shipping Inv. to Whse."
             then begin
-                ServerFilename := FileMgt.ServerTempFileName('');
+                // CLOUD READY DELETE
+                //ServerFilename := FileMgt.ServerTempFileName('');
                 recDelDocHead.SetRange("No.", "No.");
                 repCustomsInv.SetTableview(recDelDocHead);
                 repCustomsInv.UseRequestPage(false);
-                repCustomsInv.SaveAsPdf(ServerFilename);
+                TempBlob.CreateOutStream(varoutstream);
+                repCustomsInv.SaveAs(dummy, ReportFormat::Pdf, varoutstream);
 
                 SI.SetMergefield(64, "No.");
-                EmailAddMgt.CreateEmailWithAttachment('VCKSHIPINV', '', '', ServerFilename, StrSubstNo(lText001, "No."), false);
+                EmailAddMgt.CreateEmailWithAttachment('VCKSHIPINV', '', '', TempBlob, StrSubstNo(lText001, "No."));
                 EmailAddMgt.Send;
 
                 "Customs/Shipping Invoice Sent" := true;
@@ -1072,19 +1078,24 @@ Table 50041 "VCK Delivery Document Header"
         CustReptMgt: Codeunit "Custom Report Management";
         ServerFilename: Text;
         OrderEmailAdd: Text;
+        TempBlob: codeunit "Temp Blob";
+        dummy: text;
+        varoutstream: outstream;
+
     begin
         //>> 03-03-22 ZY-LD 022
         if recCust.Get("Sell-to Customer No.") and (recCust."E-mail Deliv. Note at Release") then begin
             CustReptMgt.GetEmailAddress(Database::Customer, "Sell-to Customer No.", CustomReportSelection.Usage::"S.Order", OrderEmailAdd);
             if OrderEmailAdd <> '' then begin
-                ServerFilename := FileMgt.ServerTempFileName('');
+                // CLOUD READY DELETE
+                //ServerFilename := FileMgt.ServerTempFileName('');
                 recDelDocHead.SetRange("No.", "No.");
                 repDeliryNote.SetTableview(recDelDocHead);
                 repDeliryNote.UseRequestPage(false);
-                repDeliryNote.SaveAsPdf(ServerFilename);
-
+                TempBlob.CreateOutStream(varoutstream);
+                repDeliryNote.SaveAs(dummy, ReportFormat::Pdf, varoutstream);
                 SI.SetMergefield(64, "No.");
-                EmailAddMgt.CreateEmailWithAttachment('DELIRYNOTE', '', '', ServerFilename, StrSubstNo(lText001, "No."), false);
+                EmailAddMgt.CreateEmailWithAttachment('DELIRYNOTE', '', '', TempBlob, StrSubstNo(lText001, "No."));
                 EmailAddMgt.Send;
             end;
         end;

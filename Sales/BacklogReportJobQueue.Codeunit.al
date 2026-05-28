@@ -1,6 +1,8 @@
 codeunit 50027 BacklogReportJobQueue
 {
     trigger OnRun()
+    var 
+     Dummy: text;
     begin
         if not EmailAdd.Get('BACKLOGSAL') then
             exit;
@@ -33,8 +35,11 @@ codeunit 50027 BacklogReportJobQueue
                         repeat
                             Clear(BacklogReportAuto);
                             Clear(EmailAddMgt);
-
-                            ServerFileName := FileMgt.ServerTempFileName('');
+                            clear(tempblob);
+                            clear(varoutstream);
+                               tempBlob.CreateOutstream(varoutstream);
+                            // CLOUD READY DELETE
+                            //ServerFileName := FileMgt.ServerTempFileName('');
 
                             SalesLine.SetRange("Sell-to Customer No.", Cust."No.");
                             SalesLine.CalcSums("Outstanding Amount (LCY)");
@@ -42,19 +47,23 @@ codeunit 50027 BacklogReportJobQueue
                                 BacklogReportAuto.InitRequest(0, Cust."No.", BacklogComment)
                             else
                                 BacklogReportAuto.InitRequest(0, Cust."No.", '');
-                            BacklogReportAuto.SaveAsExcel(ServerFileName);
+                            BacklogReportAuto.SaveAs(Dummy, ReportFormat::Excel, varoutstream);
 
                             EmailAddMgt.CreateNewEmail(EmailAdd.Code, Cust."Language Code", Cust.BacklogEmailAddress);
-                            EmailAddMgt.AddAttachment(ServerFileName, StrSubstNo(BacklogReportExcelFileNameLbl, SalesOrderLbl, CurrentDateTime()), false);
+                            EmailAddMgt.AddAttachment(tempBlob, StrSubstNo(BacklogReportExcelFileNameLbl, SalesOrderLbl, CurrentDateTime()));
                             EmailAddMgt.Send();
 
-                            FileMgt.DeleteServerFile(ServerFileName);
+                            //FileMgt.DeleteServerFile(ServerFileName);
                         until Cust.Next() = 0;
                 until CountryPickingDay.Next() = 0;
         end;
     end;
 
     var
+        tempblob: Codeunit "Temp Blob";
+        tempblob3: codeunit "Temp Blob";
+        varoutstream: outstream;
+        varoutstream3: outstream;
         SalesSetup: Record "Sales & Receivables Setup";
         Cust: Record Customer;
         SalesLine: Record "Sales Line";

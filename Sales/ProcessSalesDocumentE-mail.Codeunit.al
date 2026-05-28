@@ -46,7 +46,9 @@ Codeunit 50045 "Process Sales Document E-mail"
         lText001: label 'Do you want to e-mail %1 invoice(s)?';
         ServerFilename: Text;
         EmailFilename: Text;
-
+        Dummy: text;
+        TempBlob: codeunit "Temp Blob";
+        varoutstream: outstream;
 
     begin
         recSaleDocEmail.SetRange("Document Type", recSaleDocEmail."document type"::"Posted Sales Invoice");
@@ -98,7 +100,9 @@ Codeunit 50045 "Process Sales Document E-mail"
                     end;
                 end else
                     if not SentWithCode then begin  // 02-04-24 ZY-LD 003
-                        ServerFilename := FileMgt.ServerTempFileName('');
+                        // CLODU READY DELETE
+                        //ServerFilename := FileMgt.ServerTempFileName('');
+                        TempBlob.CreateOutStream(varoutstream);
                         RecordVariant := recSaleDocEmail;
                         EmailFilename := recEltrDocFormat.GetAttachmentFileName(RecordVariant, recSaleDocEmail."Document No.", Format(recSaleDocEmail."Document Type"), 'pdf');
 
@@ -113,28 +117,22 @@ Codeunit 50045 "Process Sales Document E-mail"
                             CustomsInvZNet.SetTableview(recSaleInvHead);
                             CustomsInvZNet.UseRequestPage(false);
                             CustomsInvZNet.SetCustomsInvoice(true);
-                            CustomsInvZNet.SaveAsPdf(ServerFilename);
+                            CustomsInvZNet.SaveAs(Dummy,ReportFormat::Pdf,varoutstream);
+                            //CustomsInvZNet.SaveAsPdf(ServerFilename);
                         end else begin  //<< 28-01-21 ZY-LD 001
                             Clear(SalesInvoiceZNet);
                             recSaleInvHead.SetRange("No.", recSaleDocEmail."Document No.");
                             SalesInvoiceZNet.SetTableview(recSaleInvHead);
                             SalesInvoiceZNet.UseRequestPage(false);
-                            SalesInvoiceZNet.SaveAsPdf(ServerFilename);
+                            //SalesInvoiceZNet.SaveAsPdf(ServerFilename);
+                            SalesInvoiceZNet.SaveAs(Dummy,ReportFormat::Pdf,varoutstream);
                         end;
 
                         SI.SetMergefield(64, recSaleInvHead."Picking List No.");
-                        EmailAddMgt.CreateEmailWithAttachment(
-                          recSaleDocEmail."E-mail Address Code",
-                          '',
-                          '',
-                          ServerFilename,
-                          EmailFilename,
-                          true);
+                        EmailAddMgt.CreateEmailWithAttachment(recSaleDocEmail."E-mail Address Code",'','',TempBlob,EmailFilename);
                         EmailAddMgt.Send;
-
                         recSaleDocEmail.Validate(Sent, true);
                         recSaleDocEmail.Modify;
-
                         SentWithCode := true;  // 02-04-24 ZY-LD 003
                     end;
             until recSaleDocEmail.Next() = 0;

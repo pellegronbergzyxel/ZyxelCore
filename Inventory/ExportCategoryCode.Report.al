@@ -156,6 +156,8 @@ Report 50060 "Export Category Code"
     procedure CreateExcelbook()
     var
         lText001: label 'Item Category Code List.xlsx';
+        tempblob: codeunit "Temp Blob";
+        outstream: outstream;
     begin
         //ExcelBuf.CreateBook('', Text002);   CLOUD ready DELETE
             ExcelBuf.CreateNewBook(Text002);
@@ -166,7 +168,9 @@ Report 50060 "Export Category Code"
             Error('');
         end else begin
             EmailAddMgt.CreateSimpleEmail('CATEGORY', '', '');
-            EmailAddMgt.AddAttachment(ExcelBuf.GetFileNameServer, lText001, false);
+            tempblob.CreateOutStream(outstream);
+            ExcelBuf.SaveToStream(outstream,false);
+            EmailAddMgt.AddAttachment(tempblob, lText001);
             EmailAddMgt.Send;
         end;
     end;

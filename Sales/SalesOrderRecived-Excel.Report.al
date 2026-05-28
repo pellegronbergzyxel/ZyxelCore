@@ -190,6 +190,7 @@ Report 50102 "Sales Order Recived - Excel"
         Filename: Text;
         Text001: label 'Missing';
         SI: Codeunit "Single Instance";
+        globaltempblob: codeunit "Temp Blob";
 
 
     procedure Init(pFilename: Text)
@@ -261,7 +262,10 @@ Report 50102 "Sales Order Recived - Excel"
     end;
 
 
-    procedure CreateExcelbook()
+ 
+     procedure CreateExcelbook()
+     var 
+      varOutstream: outstream;
     begin
         //ExcelBuf.CreateBook('', "Sales Header".GetFilter("Create Date")); CLOUD ready DELETE
         ExcelBuf.CreateNewBook("Sales Header".GetFilter("Create Date"));
@@ -270,13 +274,18 @@ Report 50102 "Sales Order Recived - Excel"
         if GuiAllowed then begin
             ExcelBuf.OpenExcel;
             //Error('');
-        end else
-            FilenameServer := ExcelBuf.GetFileNameServer;
+        end else begin 
+            globaltempblob.CreateOutStream(varOutstream);
+            excelbuf.SaveToStream(varOutstream,false);
+            //FilenameServer := ExcelBuf.GetFileNameServer;
+        end;
+
     end;
 
 
-    procedure GetFilename(): Text
+    procedure GetFilename(var tempblob: codeunit "Temp Blob")
     begin
-        exit(FilenameServer);
+        tempblob := globaltempblob;
+        
     end;
 }

@@ -31,29 +31,30 @@ Report 62038 "Import Concur Travel Expense"
                     group("Import from")
                     {
                         Caption = 'Import from';
-                        field(FileName; FileName)
-                        {
-                            ApplicationArea = Basic, Suite;
-                            AssistEdit = true;
-                            Caption = 'Workbook File Name';
+                        // CLOUD READY DELETE
+                        // field(FileName; FileName)
+                        // {
+                        //     ApplicationArea = Basic, Suite;
+                        //     AssistEdit = true;
+                        //     Caption = 'Workbook File Name';
 
-                            trigger OnAssistEdit()
-                            begin
-                                UploadFile;
-                            end;
-                        }
-                        field(SheetName; SheetName)
-                        {
-                            ApplicationArea = Basic, Suite;
-                            Caption = 'Worksheet Name';
+                        //     trigger OnAssistEdit()
+                        //     begin
+                        //         UploadFile;
+                        //     end;
+                        // }
+                        // field(SheetName; SheetName)
+                        // {
+                        //     ApplicationArea = Basic, Suite;
+                        //     Caption = 'Worksheet Name';
 
-                            trigger OnAssistEdit()
-                            var
-                                ExcelBuf: Record "Excel Buffer";
-                            begin
-                                SheetName := ExcelBuf.SelectSheetsName(UploadedFileName)
-                            end;
-                        }
+                        //     trigger OnAssistEdit()
+                        //     var
+                        //         ExcelBuf: Record "Excel Buffer";
+                        //     begin
+                        //         SheetName := ExcelBuf.SelectSheetsName(UploadedFileName)
+                        //     end;
+                        // }
                     }
                 }
             }
@@ -62,6 +63,30 @@ Report 62038 "Import Concur Travel Expense"
         actions
         {
         }
+          trigger OnQueryClosePage(CloseAction: Action): Boolean
+        var
+            UploadExcelMsg: Label 'Please Choose the Excel file';
+            NofileMsg: Label 'Please select file';
+            FileMgt: Codeunit "File Management";
+            iStream: InStream;
+            fromfile: text[250];
+        begin
+            UploadIntoStream(UploadExcelMsg, '', '', fromfile, iStream);
+            if fromfile <> '' then begin
+                FileName := FileMgt.GetFileName(fromfile);
+                SheetName := ExcelBuf.SelectSheetsNameStream(iStream);
+
+            end else
+                message(NofileMsg);
+            if SheetName <> '' then begin
+                ExcelBuf.reset();
+                ExcelBuf.DeleteAll();
+                ExcelBuf.OpenBookStream(iStream, SheetName);
+                ExcelBuf.ReadSheet();
+            end;
+
+
+        end;
     }
 
     labels
@@ -70,17 +95,17 @@ Report 62038 "Import Concur Travel Expense"
 
     trigger OnPreReport()
     begin
-        if UploadedFileName = '' then
-            Error(Text001);
+        // if UploadedFileName = '' then
+        //     Error(Text001);
 
-        if SheetName = '' then
-            Error(Text002);
+        // if SheetName = '' then
+        //     Error(Text002);
 
         if ZGT.IsRhq and ZGT.IsZNetCompany then
             Error(Text004);
 
         CDT := CurrentDatetime;
-        ReadExcelSheet;
+        // ReadExcelSheet;
         ImportExcelSheet;
 
         recTrExpHead.SetRange("Importing Date", CDT);
@@ -127,7 +152,7 @@ Report 62038 "Import Concur Travel Expense"
     begin
         FileName := NewFilename;
         UploadedFileName := FileName;
-        SheetName := ExcelBuf.SelectSheetsName(FileName);
+     //   SheetName := ExcelBuf.SelectSheetsName(FileName);
     end;
 
     local procedure ImportExcelSheet()
@@ -490,29 +515,29 @@ Report 62038 "Import Concur Travel Expense"
         if ExcelBuf.FindLast then
             pRowCount := ExcelBuf."Row No.";
     end;
+// CLOUD READY
+    // local procedure ReadExcelSheet()
+    // begin
+    //     if UploadedFileName = '' then
+    //         UploadFile
+    //     else
+    //         FileName := UploadedFileName;
+    //     ExcelBuf.OpenBook(FileName, SheetName);
+    //     ExcelBuf.ReadSheet;
+    // end;
 
-    local procedure ReadExcelSheet()
-    begin
-        if UploadedFileName = '' then
-            UploadFile
-        else
-            FileName := UploadedFileName;
-        ExcelBuf.OpenBook(FileName, SheetName);
-        ExcelBuf.ReadSheet;
-    end;
-
-    local procedure UploadFile()
-    var
-        recConcurSetup: Record "Concur Setup";
-        FileMgt: Codeunit "File Management";
-    begin
-        recConcurSetup.Get;
-        if recConcurSetup."Import Folder - Travel Expense" = '' then
-            recConcurSetup."Import Folder - Travel Expense" := 'C:\';
-        Upload('Upload', recConcurSetup."Import Folder - Travel Expense", 'Excel file(*.xlsx)|*.xlsx', '', UploadedFileName);
-        FileName := UploadedFileName;
-        ExcelBuf.SelectSheetsName(UploadedFileName);
-    end;
+    // local procedure UploadFile()
+    // var
+    //     recConcurSetup: Record "Concur Setup";
+    //     FileMgt: Codeunit "File Management";
+    // begin
+    //     recConcurSetup.Get;
+    //     if recConcurSetup."Import Folder - Travel Expense" = '' then
+    //         recConcurSetup."Import Folder - Travel Expense" := 'C:\';
+    //     Upload('Upload', recConcurSetup."Import Folder - Travel Expense", 'Excel file(*.xlsx)|*.xlsx', '', UploadedFileName);
+    //     FileName := UploadedFileName;
+    //     ExcelBuf.SelectSheetsName(UploadedFileName);
+    // end;
 
     local procedure GetConcurID(pRow: Integer) rValue: Code[20]
     begin

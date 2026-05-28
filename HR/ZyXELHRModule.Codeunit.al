@@ -147,12 +147,13 @@ Codeunit 50041 "ZyXEL HR Module"
         recContent.RecordID := RecordID;
         recContent.Validate(recContent.Extension, Lowercase(CopyStr(FileManagement.GetExtension(FileName), 1, 20)));
         recContent.Name := CopyStr(FileManagement.GetFileNameWithoutExtension(FileName), 1, MaxStrLen(recContent.Name));
-        if not TempBlob.Hasvalue then begin
-            if FileManagement.ServerFileExists(FileName) then
-                FileManagement.BLOBImportFromServerFile(TempBlob, FileName)
-            else
-                FileManagement.BLOBImportFromServerFile(TempBlob, FileManagement.UploadFile('', FileName));
-        end;
+        // CLOUD READY ?????
+        // if not TempBlob.Hasvalue then begin
+        //     if FileManagement.ServerFileExists(FileName) then
+        //         FileManagement.BLOBImportFromServerFile(TempBlob, FileName)
+        //     else
+        //         FileManagement.BLOBImportFromServerFile(TempBlob, FileManagement.UploadFile('', FileName));
+        // end;
         RecRef.GetTable(recContent);
         TempBlob.ToRecordRef(RecRef, recContent.FieldNo(Content));
         recContent.Insert;
