@@ -53,76 +53,77 @@ Codeunit 50032 "Process Concur"
         LastModifyTime: Time;
         FileSize: BigInteger;
     begin
+        // CLOUD READY DELETE / NOT USED
         // Setup directory
-        recConcurSetup.Get;
-        ClientErrorDir := ClientDir + recConcurSetup."Error Folder";
-        if not FileMgt.ServerDirectoryExists(ClientErrorDir) then
-            FileMgt.ServerCreateDirectory(ClientErrorDir);
-        ClientUploadDir := ClientDir + recConcurSetup."Uploaded Folder";
-        if not FileMgt.ServerDirectoryExists(ClientUploadDir) then
-            FileMgt.ServerCreateDirectory(ClientUploadDir);
-        ClientFromConcDir := ClientDir + recConcurSetup."From Concur Folder";
-        if not FileMgt.ServerDirectoryExists(ClientFromConcDir) then
-            FileMgt.ServerCreateDirectory(ClientFromConcDir);
-        ClientArchiveDir := StrSubstNo('%1%2%3\%4-%5\', ClientDir, recConcurSetup."Archive Folder", Date2dmy(Today, 3), Date2dmy(Today, 2), ZGT.GetMonthText(Date2dmy(Today, 2), false, false, false));
-        if not FileMgt.ServerDirectoryExists(ClientArchiveDir) then
-            FileMgt.ServerCreateDirectory(ClientArchiveDir);
+        // recConcurSetup.Get;
+        // ClientErrorDir := ClientDir + recConcurSetup."Error Folder";
+        // if not FileMgt.ServerDirectoryExists(ClientErrorDir) then
+        //     FileMgt.ServerCreateDirectory(ClientErrorDir);
+        // ClientUploadDir := ClientDir + recConcurSetup."Uploaded Folder";
+        // if not FileMgt.ServerDirectoryExists(ClientUploadDir) then
+        //     FileMgt.ServerCreateDirectory(ClientUploadDir);
+        // ClientFromConcDir := ClientDir + recConcurSetup."From Concur Folder";
+        // if not FileMgt.ServerDirectoryExists(ClientFromConcDir) then
+        //     FileMgt.ServerCreateDirectory(ClientFromConcDir);
+        // ClientArchiveDir := StrSubstNo('%1%2%3\%4-%5\', ClientDir, recConcurSetup."Archive Folder", Date2dmy(Today, 3), Date2dmy(Today, 2), ZGT.GetMonthText(Date2dmy(Today, 2), false, false, false));
+        // if not FileMgt.ServerDirectoryExists(ClientArchiveDir) then
+        //     FileMgt.ServerCreateDirectory(ClientArchiveDir);
 
-        //>> Search for errors
-        recNameValueBuf.DeleteAll;
-        FileMgt.GetServerDirectoryFilesList(recNameValueBuf, ClientErrorDir);
-        if recNameValueBuf.FindFirst and (StrPos(UpperCase(recNameValueBuf.Name), 'THUMB') = 0) then begin
-            recConcurSetup.Get;
-            SI.SetMergefield(100, Format(Type));
-            SI.SetMergefield(101, ClientErrorDir);
-            EmailAddMgt.CreateSimpleEmail(recConcurSetup."Import Error E-mail Code", '', '');
-            EmailAddMgt.Send;
-        end;
+        // //>> Search for errors
+        // recNameValueBuf.DeleteAll;
+        // FileMgt.GetServerDirectoryFilesList(recNameValueBuf, ClientErrorDir);
+        // if recNameValueBuf.FindFirst and (StrPos(UpperCase(recNameValueBuf.Name), 'THUMB') = 0) then begin
+        //     recConcurSetup.Get;
+        //     SI.SetMergefield(100, Format(Type));
+        //     SI.SetMergefield(101, ClientErrorDir);
+        //     EmailAddMgt.CreateSimpleEmail(recConcurSetup."Import Error E-mail Code", '', '');
+        //     EmailAddMgt.Send;
+        // end;
 
-        FileMgt.GetServerDirectoryFilesList(recNameValueBuf, ClientDir);
-        if recNameValueBuf.FindSet then
-            repeat
-                // Updoad file to server
-                ClientFilename := ClientErrorDir + FileMgt.GetFileName(recNameValueBuf.Name);
-                ZyxelFileMgt.MoveServerFile(recNameValueBuf.Name, ClientFilename);
-                ServerFilename := FileMgt.ServerTempFileName(FileMgt.GetExtension(ClientFilename));
-                FileMgt.CopyServerFile(ClientFilename, ServerFilename, true);
+        // FileMgt.GetServerDirectoryFilesList(recNameValueBuf, ClientDir);
+        // if recNameValueBuf.FindSet then
+        //     repeat
+        //         // Updoad file to server
+        //         ClientFilename := ClientErrorDir + FileMgt.GetFileName(recNameValueBuf.Name);
+        //         ZyxelFileMgt.MoveServerFile(recNameValueBuf.Name, ClientFilename);
+        //         ServerFilename := FileMgt.ServerTempFileName(FileMgt.GetExtension(ClientFilename));
+        //         FileMgt.CopyServerFile(ClientFilename, ServerFilename, true);
 
-                // Import file
-                case Type of
-                    Type::"Travel Expense":
-                        begin
-                            Clear(repImpConcurTrExp);
-                            repImpConcurTrExp.InitReport(ServerFilename);
-                            repImpConcurTrExp.UseRequestPage(false);
-                            repImpConcurTrExp.RunModal;
-                        end;
-                end;
+        //         // Import file
+        //         case Type of
+        //             Type::"Travel Expense":
+        //                 begin
+        //                     Clear(repImpConcurTrExp);
+        //                     repImpConcurTrExp.InitReport(ServerFilename);
+        //                     repImpConcurTrExp.UseRequestPage(false);
+        //                     repImpConcurTrExp.RunModal;
+        //                 end;
+        //         end;
 
-                // Store file
-                FileMgt.DeleteServerFile(ServerFilename);
-                ZyxelFileMgt.MoveServerFile(ClientFilename, ClientUploadDir + FileMgt.GetFileName(recNameValueBuf.Name));
-            until recNameValueBuf.Next() = 0;
+        //         // Store file
+        //         FileMgt.DeleteServerFile(ServerFilename);
+        //         ZyxelFileMgt.MoveServerFile(ClientFilename, ClientUploadDir + FileMgt.GetFileName(recNameValueBuf.Name));
+        //     until recNameValueBuf.Next() = 0;
 
-        // Move Concur files into the archive
-        recNameValueBuf.DeleteAll;
-        FileMgt.GetServerDirectoryFilesList(recNameValueBuf, ClientFromConcDir);
-        if recNameValueBuf.FindSet then
-            repeat
-                ZyxelFileMgt.MoveServerFile(recNameValueBuf.Name, ClientArchiveDir + FileMgt.GetFileName(recNameValueBuf.Name));
-            until recNameValueBuf.Next() = 0;
+        // // Move Concur files into the archive
+        // recNameValueBuf.DeleteAll;
+        // FileMgt.GetServerDirectoryFilesList(recNameValueBuf, ClientFromConcDir);
+        // if recNameValueBuf.FindSet then
+        //     repeat
+        //         ZyxelFileMgt.MoveServerFile(recNameValueBuf.Name, ClientArchiveDir + FileMgt.GetFileName(recNameValueBuf.Name));
+        //     until recNameValueBuf.Next() = 0;
 
-        // Delete uploaded files older than 3 months
-        recNameValueBuf.DeleteAll;
-        FileMgt.GetServerDirectoryFilesList(recNameValueBuf, ClientUploadDir);
-        if recNameValueBuf.FindSet then
-            repeat
-                FileMgt.GetServerFileProperties(recNameValueBuf.Name, LastModifyDate, LastModifyTime, FileSize);
-                if CalcDate('3M', LastModifyDate) < Today then
-                    FileMgt.DeleteServerFile(recNameValueBuf.Name);
-            until recNameValueBuf.Next() = 0;
+        // // Delete uploaded files older than 3 months
+        // recNameValueBuf.DeleteAll;
+        // FileMgt.GetServerDirectoryFilesList(recNameValueBuf, ClientUploadDir);
+        // if recNameValueBuf.FindSet then
+        //     repeat
+        //         FileMgt.GetServerFileProperties(recNameValueBuf.Name, LastModifyDate, LastModifyTime, FileSize);
+        //         if CalcDate('3M', LastModifyDate) < Today then
+        //             FileMgt.DeleteServerFile(recNameValueBuf.Name);
+        //     until recNameValueBuf.Next() = 0;
 
-        Commit;
+        // Commit;
     end;
 
     local procedure TransferAndPostDocument(Type: Option "Invoice Capture","Travel Expense"; PostDocument: Boolean)

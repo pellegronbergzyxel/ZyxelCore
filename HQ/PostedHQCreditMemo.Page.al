@@ -66,7 +66,9 @@ Page 50325 "Posted HQ Credit Memo"
 
                 trigger OnAction()
                 begin
-                    Hyperlink(Rec.GetFilename);
+                    // CLOUD READY DELETE
+                 //   Hyperlink(Rec.GetFilename);
+                 rec.DownloadBlobToFile('')
                 end;
             }
         }

@@ -74,6 +74,11 @@ Table 50062 "Customer Contract"
             FieldClass = FlowFilter;
             TableRelation = "Contract Tag";
         }
+        field(100; filblob; blob)
+        {
+
+            Caption = 'File blob';
+        }
     }
 
     keys
@@ -128,34 +133,16 @@ Table 50062 "Customer Contract"
     begin
         if "Folder and Filename" = '' then begin
             lCustContractSetup.Get;
-            TempBlob.CreateInStream(NewStream);
-            TempBlob.CreateOutStream(NewoStream);
-            InputFilename := FileMgt.BLOBImportWithFilter(TempBlob, ImportTxt, Filename, StrSubstNo(FileDialogTxt, FilterTxt), FilterTxt);
-            if InputFilename <> '' then begin
-                BaseFolderName := GetBaseFolderName;  // 07-02-20 ZY-LD 002
-                ClientFolder := StrSubstNo('%1%2 - %3\', BaseFolderName, pCustomerNo, FileMgt.StripNotsupportChrInFileName(pCustomerName));
-                if not FileMgt.ServerDirectoryExists(ClientFolder) then
-                    FileMgt.ServerCreateDirectory(ClientFolder);
-                OutputFilename := ClientFolder + FileMgt.GetFileName(InputFilename);
-                Filename := FileMgt.GetFileName(OutputFilename);
-                //>> 06-01-20 ZY-LD 001
-                //"Folder and Filename" := OutputFilename;
-                "Folder and Filename" := CopyStr(OutputFilename, StrLen(BaseFolderName), StrLen(OutputFilename));
-                //<< 06-01-20 ZY-LD 001
-                if FileMgt.ServerFileExists(OutputFilename) then
-                    Error(lText001, OutputFilename);
-                if serverFile.Create(OutputFilename) then begin
-                    serverFile.CreateOutStream(NewoStream2);
-                    CopyStream(NewoStream2, NewStream);
-                    //     FileMgt.CopyServerFile(InputFilename, OutputFilename, false);
-                    //   FIleMgt.DeleteServerFile(InputFilename);
-                    serverFile.Close();
-                    Status := Status::Uploaded;
-                    Modify(true);
-                end;
+            UploadIntoStream(ImportTxt, '', 'All Files (*.*)|*.*', Filename, NewStream);
+            if filename <> '' then begin
+                rec.filblob.CreateOutStream(NewoStream);
+                CopyStream(NewoStream, NewStream);
+                Status := Status::Uploaded;
+                Modify(true);
             end;
         end;
     end;
+
 
 
     procedure GetFilename(): Text
@@ -199,7 +186,8 @@ Table 50062 "Customer Contract"
         // recCustCtctSetup.GET;
         // Filename := STRSUBSTNO('%1\%2',DELCHR(recCustCtctSetup."Folder Name",'>','\'),DELCHR("Folder and Filename",'<','\'));
         //<< 06-01-20 ZY-LD 001
-        Hyperlink(GetFilename);
+        //Hyperlink(GetFilename);
+        rec.DownloadBlobToFile('');
     end;
 
     procedure DownloadToClient()
@@ -207,7 +195,9 @@ Table 50062 "Customer Contract"
         FileMgt: Codeunit "File Management";
         lText001: label 'Download Battery Certificate';
     begin
-        FileMgt.DownloadHandler(GetFilename, lText001, '', 'PDF(*.pdf)|*.pdf|All files(*.*)|*.*', Filename);
+        // CLOUD READY DELETE
+        //FileMgt.DownloadHandler(GetFilename, lText001, '', 'PDF(*.pdf)|*.pdf|All files(*.*)|*.*', Filename);
+        rec.DownloadBlobToFile('');
     end;
 
 
@@ -241,18 +231,104 @@ Table 50062 "Customer Contract"
         NewoStream2: outsTream;
         serverFile: File;
     begin
-        if rec."Folder and Filename" <> '' then begin
-            lCustContractSetup.Get;
-            TempBlob.CreateInStream(NewStream);
-            TempBlob.CreateOutStream(NewoStream);
-            BaseFolderName := GetBaseFolderName + Copystr(rec."Folder and Filename", 2);
-            if FILE.Exists(BaseFolderName) then begin
-                serverFile.Open(BaseFolderName);
-                serverFile.CreateInStream(NewStream);
-                Filename := FileMgt.GetFileName(BaseFolderName);
-                if DownloadFromStream(NewStream, 'Export', '', 'All Files (*.*)|*.*', Filename) then
-                    message('fil downloaded')
-            end;
-        end;
+        rec.DownloadBlobToFile('');
+        // CLOUD READY DELETE
+        // if rec."Folder and Filename" <> '' then begin
+        //     lCustContractSetup.Get;
+        //     TempBlob.CreateInStream(NewStream);
+        //     TempBlob.CreateOutStream(NewoStream);
+        //     BaseFolderName := GetBaseFolderName + Copystr(rec."Folder and Filename", 2);
+        //     if FILE.Exists(BaseFolderName) then begin
+        //         serverFile.Open(BaseFolderName);
+        //         serverFile.CreateInStream(NewStream);
+        //         Filename := FileMgt.GetFileName(BaseFolderName);
+        //         if DownloadFromStream(NewStream, 'Export', '', 'All Files (*.*)|*.*', Filename) then
+        //             message('fil downloaded')
+        //     end;
+        // end;
     end;
+
+
+    procedure LoadFileToBlob(FilePath: Text): Boolean
+    var
+        FileIn: File;
+        FileStream: InStream;
+        outstream: OutStream;
+    begin
+        if not File.Exists(FilePath) then
+            exit(false);
+
+        FileIn.Open(FilePath);
+        FileIn.CreateInstream(FileStream);
+        filblob.CreateOutStream(outstream);
+        CopyStream(outstream, FileStream);
+        modify();
+        FileIn.Close;
+        exit(true);
+    end;
+
+    procedure DownloadBlobToFile(DownloadPath: Text): Boolean
+    var
+        FileOut: File;
+        FileStream: OutStream;
+        InStr: instream;
+    begin
+        Rec.CalcFields("Filblob");
+        if filblob.HasValue then begin
+            //    FileOut.Create(DownloadPath);
+            //  FileOut.CreateOutstream(FileStream);
+            Rec.filblob.CreateInStream(InStr, TextEncoding::Windows);
+            DownloadFromStream(InStr, 'Download', '', '', Filename);
+        end;
+        exit(false);
+    end;
+
+    procedure GetBlobInStream(var BlobStream: InStream): Boolean
+    begin
+        if filblob.HasValue then begin
+            filblob.CreateInStream(BlobStream);
+            exit(true);
+        end;
+        exit(false);
+    end;
+
+    procedure GetBlobOutStream(var BlobStream: OutStream): Boolean
+    begin
+        filblob.CreateOutStream(BlobStream);
+        exit(true);
+    end;
+   
+
+    procedure GetBlobAsBase64(var Base64Content: Text): Boolean
+    var
+        Base64: Codeunit "Base64 Convert";
+        BlobStream: InStream;
+    begin
+        if filblob.HasValue then begin
+            filblob.CreateInStream(BlobStream);
+            Base64Content := Base64.ToBase64(BlobStream);
+            exit(true);
+        end;
+        exit(false);
+    end;
+
+    procedure SetBlobFromBase64(Base64Content: Text): Boolean
+    var
+        Base64: Codeunit "Base64 Convert";
+        BlobStream: OutStream;
+    begin
+        filblob.CreateOutStream(BlobStream);
+        Base64.FromBase64(Base64Content, BlobStream);
+        exit(true);
+    end;
+
+
+
+
+
+
+
+
+
+
 }

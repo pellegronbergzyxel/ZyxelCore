@@ -79,8 +79,10 @@ Page 50324 "Posted HQ Invoice"
                 var
                     zyxektool: codeunit "ZyXEL General Tools";
                 begin
+                    // CLOUD READY
                     //Hyperlink(Rec.GetFilename);
-                    zyxektool.downloadserverfil(rec.GetFilename());
+                    //zyxektool.downloadserverfil(rec.GetFilename());
+                    rec.DownloadBlobToFile('');
 
 
                 end;

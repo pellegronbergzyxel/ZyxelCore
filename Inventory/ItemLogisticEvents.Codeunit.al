@@ -289,22 +289,7 @@ codeunit 50091 "Item / Logistic Events"
         //  IF Quantity = 0 THEN
         //    ERROR(Text001,Rec."Sales Order No.",Rec."Sales Order Line No.");  // 07-01-19 ZY-LD 006
     end;
-
-    /* Removed again...
-    [EventSubscriber(ObjectType::Table, Database::"Value Entry", 'OnBeforeInsertEvent', '', false, false)]
-    local procedure OnBeforeInsertValueEntry(var Rec: Record "Value Entry"; RunTrigger: Boolean)
-    var
-        recItemLedgerEntry: Record "Item Ledger Entry";
-        lText001: Label 'Difference on "%1" has occured between "%2" and "%3". Please raise a ticket.';
-    begin
-        //>> 23-08-18 ZY-LD 002
-        if recItemLedgerEntry.Get(Rec."Item Ledger Entry No.") then
-            if recItemLedgerEntry."Item No." <> Rec."Item No." then
-                Error(lText001, Rec.FieldCaption(Rec."Item No."), recItemLedgerEntry.TableCaption(), Rec.TableCaption());
-        //<< 23-08-18 ZY-LD 002
-    end;
-    */
-
+    
     local procedure ">> Sales Price"()
     begin
     end;
@@ -321,27 +306,6 @@ codeunit 50091 "Item / Logistic Events"
     begin
         UpdateSalesPriceEndDate(Rec);  // 19-11-18 ZY-LD 005
     end;
-
-    // [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnBeforeVerify', '', false, false)]
-    // local procedure PriceListLine_OnBeforeVerify(var PriceListLine: Record "Price List Line"; var IsHandled: Boolean)
-    // var
-    //     MarginApp: Record "Margin Approval";
-    //     SalesDocType: Enum "Sales Document Type";
-    // begin
-    //     // If the margin is not approved, then we can´t validate the price book. 
-    //     //30-10-2025 BK #MarginApproval
-    //     IsHandled :=
-    //         not MarginApp.MarginApproved(
-    //             MarginApp."Source Type"::"Price Book",
-    //             SalesDocType::Quote,  // Used for sales document.
-    //             PriceListLine."Price List Code",
-    //             PriceListLine."Line No.",
-    //             PriceListLine."Assign-to No.",
-    //             PriceListLine."Product No.",
-    //             PriceListLine."Currency Code",
-    //             PriceListLine."Unit Price",
-    //             0);
-    // end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Price UX Management", 'OnBeforeShowPriceListLines', '', false, false)]
     local procedure PriceUxMgt_OnBeforeShowPriceListLines(PriceSource: Record "Price Source"; PriceAsset: Record "Price Asset"; PriceType: Enum "Price Type"; AmountType: Enum "Price Amount Type"; var IsHandled: Boolean)

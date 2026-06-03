@@ -397,7 +397,7 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
                 until TempICCommentLine.Next() = 0;
         end;  // 12-04-24 ZY-LD 005
 
-        OnICInboxTransactionCreated(PartnerInboxTransaction, CurrentPartner."Inbox Details");
+        //OnICInboxTransactionCreated(PartnerInboxTransaction, CurrentPartner."Inbox Details");
 
         TempICInboxTransaction.DeleteAll();
         TempInboxPurchHeader.DeleteAll();
@@ -585,11 +585,11 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
     begin
     end;
 
-    [IntegrationEvent(true, false)]
-    [Scope('OnPrem')]
-    procedure OnICInboxTransactionCreated(var ICInboxTransaction: Record "IC Inbox Transaction"; PartnerCompanyName: Text)
-    begin
-    end;
+    // [IntegrationEvent(true, false)]
+    // [Scope('OnPrem')]
+    // procedure OnICInboxTransactionCreated(var ICInboxTransaction: Record "IC Inbox Transaction"; PartnerCompanyName: Text)
+    // begin
+    // end;
 
     [IntegrationEvent(false, false)]
     local procedure OnTransferToPartnerOnBeforePartnerInboxTransactionInsert(var PartnerInboxTransaction: Record "IC Inbox Transaction"; CurrentICPartner: Record "IC Partner")

@@ -34,11 +34,15 @@ Codeunit 62012 "HQ Sales Document Download"
                                 SI.SetMergefield(100, recHqInvHead."No.");
                                 Clear(EmailAdd);
                                 // CLOUD READY NEW 
-                                // MANGKLER FORDI HQ INVOICE IKKE ER KODET FÆRDIG
-                                // FIL SKAL I BLOB FELT
-                                TempBlob.CreateOutStream(varoutstream);
+                                recHqInvHead.CalcFields(filblob);
+                                if recHqInvHead.filblob.HasValue then begin 
+                                  recHqInvHead.filblob.CreateInStream(varinstream);
+                                  TempBlob.CreateOutStream(varoutstream);
+                                  CopyStream(varoutstream,varinstream);
                                 //EmailAdd.CreateEmailWithAttachment(copystr(AutoSetup."Received HQ Sales Invoice Mail", 1, 10), '', '', recHqInvHead."File Path" + recHqInvHead.Filename, recHqInvHead.Filename, false);
+                                end;
                                 EmailAdd.CreateEmailWithAttachment(copystr(AutoSetup."Received HQ Sales Invoice Mail", 1, 10), '', '', TempBlob, recHqInvHead.Filename);
+                                
                                 EmailAdd.Send();
                             end;
                 until (recHqInvHead.Next() = 0); //0601-2026 BK #480772

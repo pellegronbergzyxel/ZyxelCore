@@ -82,33 +82,34 @@ Table 50016 "Battery Certificate"
         ZGT: Codeunit "ZyXEL General Tools";
         FilePath: Text;
     begin
-        LockTable;
+        // CLOUD READY DELETE - Battery Certificate are no-longer used in BC
+        // LockTable;
 
-        if "File Path" = '' then begin
-            ZGT.OpenProgressWindow('', 1);
+        // if "File Path" = '' then begin
+        //     ZGT.OpenProgressWindow('', 1);
 
-            ZGT.UpdateProgressWindow(lText001, 0, true);
-            if recServEnviron.ProductionEnvironment then begin
-                TestField("Item No.");
+        //     ZGT.UpdateProgressWindow(lText001, 0, true);
+        //     if recServEnviron.ProductionEnvironment then begin
+        //         TestField("Item No.");
 
-                recServEnviron.Get;
-                recFtpFolder.Get('HQ-BATTERY', recServEnviron.Environment);
-                NewFolder := recFtpFolder."Archive Folder" + "Item No.";
-                if not FileMgt.ServerDirectoryExists(NewFolder) then
-                    FileMgt.ServerCreateDirectory(NewFolder);
+        //         recServEnviron.Get;
+        //         recFtpFolder.Get('HQ-BATTERY', recServEnviron.Environment);
+        //         NewFolder := recFtpFolder."Archive Folder" + "Item No.";
+        //         if not FileMgt.ServerDirectoryExists(NewFolder) then
+        //             FileMgt.ServerCreateDirectory(NewFolder);
 
-                VisionFTPMgt.SetSubFolder("Item No.");
-                FilePath := VisionFTPMgt.DownloadFile(recFtpFolder.Code, Filename, false);
-                "File Path" := FileMgt.GetDirectoryName(FilePath) + '\';
+        //         VisionFTPMgt.SetSubFolder("Item No.");
+        //         FilePath := VisionFTPMgt.DownloadFile(recFtpFolder.Code, Filename, false);
+        //         "File Path" := FileMgt.GetDirectoryName(FilePath) + '\';
 
-                if FileMgt.ServerFileExists(GetFilename) then begin
-                    Modify;
-                    Commit;
-                end;
-            end;
+        //         if FileMgt.ServerFileExists(GetFilename) then begin
+        //             Modify;
+        //             Commit;
+        //         end;
+        //     end;
 
-            ZGT.CloseProgressWindow;
-        end;
+        //     ZGT.CloseProgressWindow;
+        // end;
     end;
 
 
@@ -116,6 +117,7 @@ Table 50016 "Battery Certificate"
     var
         FileMgt: Codeunit "File Management";
     begin
-        FileMgt.DownloadHandler(GetFilename, Text001, '', 'PDF(*.pdf)|*.pdf|All files(*.*)|*.*', Filename);
+        // CLOUD READY DELETE - Battery Certificate are no-longer used in BC
+     //   FileMgt.DownloadHandler(GetFilename, Text001, '', 'PDF(*.pdf)|*.pdf|All files(*.*)|*.*', Filename);
     end;
 }

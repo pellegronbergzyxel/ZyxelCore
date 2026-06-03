@@ -14,10 +14,10 @@ codeunit 50021 "ZyXEL File Management"
             exit;
 
         ValidateServerPath(FileMgt.GetDirectoryName(TargetFileName) + '\');
-
-        FileMgt.DeleteServerFile(TargetFileName);
-        FileMgt.CopyServerFile(SourceFileName, TargetFileName, true);
-        FileMgt.DeleteServerFile(SourceFileName);
+// CLOUD READY DELETE
+        // FileMgt.DeleteServerFile(TargetFileName);
+        // FileMgt.CopyServerFile(SourceFileName, TargetFileName, true);
+        // FileMgt.DeleteServerFile(SourceFileName);
     end;
 
     local procedure ValidateServerPath(FilePath: Text);
@@ -29,13 +29,15 @@ codeunit 50021 "ZyXEL File Management"
             exit;
         //if FileMgt.ServerFileExists(FilePath) then
         //    exit;
-        IF FileMgt.ServerDirectoryExists(FilePath) then //02-03-2026 BK #Job 50048 fejler
-            exit;
 
-        if Confirm(CreatePathQst, true, FilePath) then
-            FileMgt.ServerCreateDirectory(FilePath)
-        else
-            Error('');
+        // CLOUD READY DELETE
+        // IF FileMgt.ServerDirectoryExists(FilePath) then //02-03-2026 BK #Job 50048 fejler
+        //     exit;
+
+        // if Confirm(CreatePathQst, true, FilePath) then
+        //     FileMgt.ServerCreateDirectory(FilePath)
+        // else
+        //     Error('');
     end;
 
     procedure GetClientDownloadFolder() rValue: Text

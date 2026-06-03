@@ -166,6 +166,12 @@ Table 76150 "HQ Invoice Header"
         {
             Caption = 'Creation Date';
         }
+
+          field(100; filblob; blob)
+        {
+
+            Caption = 'File blob';
+        }
     }
 
     keys
@@ -209,6 +215,7 @@ Table 76150 "HQ Invoice Header"
         FileMgt: Codeunit "File Management";
         lText001: label 'Downloading document';
         ZGT: Codeunit "ZyXEL General Tools";
+        varoutsteam: OutStream;
     begin
         LockTable;
 
@@ -217,8 +224,13 @@ Table 76150 "HQ Invoice Header"
 
             ZGT.UpdateProgressWindow(lText001, 0, true);
             if recServEnviron.ProductionEnvironment then begin
-                "File Path" := VisionFTPMgt.DownloadFile('HQ-SALES-DOC', Filename, pShowError);
-                "File Path" := FileMgt.GetDirectoryName("File Path") + '\';
+                // CLOUD READY NEW 
+                //"File Path" := VisionFTPMgt.DownloadFile('HQ-SALES-DOC', Filename, pShowError);
+                rec.filblob.CreateOutStream(varoutsteam);
+                "File Path" := VisionFTPMgt.DownloadFilestream('HQ-SALES-DOC', Filename,pShowError,varoutsteam);
+                // CLOUD READY DELETE >>
+                //VisionFTPMgt.DownloadFile('HQ-SALES-DOC', Filename, pShowError);
+                //"File Path" := FileMgt.GetDirectoryName("File Path") + '\';
             end;
             if FileMgt.ServerFileExists(GetFilename) or recServEnviron.TestEnvironment then begin
                 Status := Status::"Document is Downloaded";
@@ -338,7 +350,130 @@ Table 76150 "HQ Invoice Header"
         FileMgt: Codeunit "File Management";
         lText001: Label 'Download Document';
     begin
-        FileMgt.DownloadHandler(GetFilename, lText001, '', 'PDF(*.pdf)|*.pdf|All files(*.*)|*.*', Filename);
+        rec.DownloadBlobToFile('');
+        // FileMgt.DownloadHandler(GetFilename, lText001, '', 'PDF(*.pdf)|*.pdf|All files(*.*)|*.*', Filename);
     end;
+
+
+procedure LoadFileToBlob(FilePath: Text): Boolean
+    var
+        FileIn: File;
+        FileStream: InStream;
+        outstream: OutStream;
+    begin
+        if not File.Exists(FilePath) then
+            exit(false);
+
+        FileIn.Open(FilePath);
+        FileIn.CreateInstream(FileStream);
+        filblob.CreateOutStream(outstream);
+        CopyStream(outstream, FileStream);
+        modify();
+        FileIn.Close;
+        exit(true);
+    end;
+
+    procedure DownloadBlobToFile(DownloadPath: Text): Boolean
+    var
+        FileOut: File;
+        FileStream: OutStream;
+        InStr: instream;
+    begin
+        Rec.CalcFields("Filblob");
+        if filblob.HasValue then begin
+        //    FileOut.Create(DownloadPath);
+          //  FileOut.CreateOutstream(FileStream);
+          Rec.filblob.CreateInStream(InStr, TextEncoding::Windows);
+                    DownloadFromStream(InStr, 'Download', '', '', Filename);
+        end;
+        exit(false);
+    end;
+
+    procedure GetBlobInStream(var BlobStream: InStream): Boolean
+    begin
+        if filblob.HasValue then begin
+            filblob.CreateInStream(BlobStream);
+            exit(true);
+        end;
+        exit(false);
+    end;
+
+    procedure GetBlobOutStream(var BlobStream: OutStream): Boolean
+    begin
+        filblob.CreateOutStream(BlobStream);
+        exit(true);
+    end;
+
+    // procedure LoadFileToBase64(FilePath: Text): Boolean
+    // var
+    //     FileIn: File;
+    //     FileStream: InStream;
+    //     Base64: Codeunit "Base64 Convert";
+    //     BlobStream: OutStream;
+    //     Base64Content: Text;
+    // begin
+    //     if not File.Exists(FilePath) then
+    //         exit(false);
+
+    //     FileIn.Open(FilePath);
+    //     FileIn.CreateInstream(FileStream);
+    //     Base64Content := Base64.ToBase64(FileStream);
+    //     FileIn.Close;
+
+    //     filblob.CreateOutStream(BlobStream);
+    //     BlobStream.WriteText(Base64Content);
+    //     exit(true);
+    // end;
+
+    // procedure DownloadBlobFromBase64(DownloadPath: Text): Boolean
+    // var
+    //     FileOut: File;
+    //     FileStream: OutStream;
+    //     Base64: Codeunit "Base64 Convert";
+    //     BlobStream: InStream;
+    //     Base64Content: Text;
+    // begin
+    //     if not filblob.HasValue then
+    //         exit(false);
+
+    //     filblob.CreateInStream(BlobStream);
+    //     BlobStream.ReadText(Base64Content);
+
+    //     FileOut.Create(DownloadPath);
+    //     FileOut.CreateOutstream(FileStream);
+    //     Base64.FromBase64(Base64Content, FileStream);
+    //     FileOut.Close;
+    //     exit(true);
+    // end;
+
+    procedure GetBlobAsBase64(var Base64Content: Text): Boolean
+    var
+        Base64: Codeunit "Base64 Convert";
+        BlobStream: InStream;
+    begin
+        if filblob.HasValue then begin
+            filblob.CreateInStream(BlobStream);
+            Base64Content := Base64.ToBase64(BlobStream);
+            exit(true);
+        end;
+        exit(false);
+    end;
+
+    procedure SetBlobFromBase64(Base64Content: Text): Boolean
+    var
+        Base64: Codeunit "Base64 Convert";
+        BlobStream: OutStream;
+    begin
+        filblob.CreateOutStream(BlobStream);
+        Base64.FromBase64(Base64Content, BlobStream);
+        exit(true);
+    end;
+
+
+   
+
+
+
+
 
 }

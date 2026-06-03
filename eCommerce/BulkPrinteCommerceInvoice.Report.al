@@ -17,14 +17,14 @@ report 50082 "Bulk Print eCommerce Invoice"
                 recAmzOrdArch.Get("Sales Invoice Header"."External Document No.", "Sales Invoice Header"."External Invoice No.");
 
                 recSaleInvHead.SetRange("No.", "Sales Invoice Header"."No.");
-
-                if recAmzOrdArch."Sell-to Type" = recAmzOrdArch."sell-to type"::Business then begin
-                    ClientFilename := StrSubstNo(Text001, recAmzSetup."Posted Document Path", "Sales Invoice Header"."External Document No.", 'xlsx');
-                    Report.SaveAsExcel(Report::"Sales - Invoice eCommerce", ServerFilename, recSaleInvHead);
-                end else begin
-                    ClientFilename := StrSubstNo(Text001, recAmzSetup."Posted Document Path", "Sales Invoice Header"."External Document No.", 'pdf');
-                    Report.SaveAsPdf(Report::"Sales - Invoice eCommerce", ServerFilename, recSaleInvHead);
-                end;
+// CLOUD READY DELETE NOT DONE
+                // if recAmzOrdArch."Sell-to Type" = recAmzOrdArch."sell-to type"::Business then begin
+                //     ClientFilename := StrSubstNo(Text001, recAmzSetup."Posted Document Path", "Sales Invoice Header"."External Document No.", 'xlsx');
+                //     Report.SaveAsExcel(Report::"Sales - Invoice eCommerce", ServerFilename, recSaleInvHead);
+                // end else begin
+                //     ClientFilename := StrSubstNo(Text001, recAmzSetup."Posted Document Path", "Sales Invoice Header"."External Document No.", 'pdf');
+                //     Report.SaveAsPdf(Report::"Sales - Invoice eCommerce", ServerFilename, recSaleInvHead);
+                // end;
 
             end;
 
@@ -37,8 +37,9 @@ report 50082 "Bulk Print eCommerce Invoice"
             begin
                 recAmzSetup.Get();
                 recAmzSetup.TestField("Posted Document Path");
-                if FileMgt.ServerDirectoryExists(recAmzSetup."Posted Document Path") then
-                    FileMgt.ServerCreateDirectory(recAmzSetup."Posted Document Path");
+                // CLOUD READY DELETE
+                //if FileMgt.ServerDirectoryExists(recAmzSetup."Posted Document Path") then
+                //    FileMgt.ServerCreateDirectory(recAmzSetup."Posted Document Path");
                 ZGT.OpenProgressWindow('', "Sales Invoice Header".Count());
             end;
         }

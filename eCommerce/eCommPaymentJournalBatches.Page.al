@@ -141,7 +141,8 @@ page 50260 "eComm. Payment Journal Batches"
                     var
                         APIMgt: Codeunit "API Management";
                     begin
-                        APIMgt.ImportPayments;
+                        // APIMgt.ImportPayments;
+                        message('use [Import eCommerce Payments]')
                     end;
                 }
                 Action("Import eCommerce Payments")

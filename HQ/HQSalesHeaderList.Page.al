@@ -106,12 +106,15 @@ Page 50083 "HQ Sales Header List"
 
                 trigger OnAction()
                 begin
+                    // CLOUD READY NEW
+                    rec.DownloadBlobToFile('');
                     //>> 07-11-19 ZY-LD 001
-                    if Rec."File Path" = '' then
-                        if Confirm(Text001, true) then begin
-                            Rec.DownloadDocument(true);
-                            Hyperlink(Rec.GetFilename);
-                        end;
+                    // if Rec."File Path" = '' then
+
+                    //     if Confirm(Text001, true) then begin
+                    //         Rec.DownloadDocument(true);
+                    //         Hyperlink(Rec.GetFilename);
+                    //     end;
                     //<< 07-11-19 ZY-LD 001
                 end;
             }

@@ -5,19 +5,20 @@ Codeunit 50014 "HQ Account Receivable Details"
 
     trigger OnRun()
     begin
-        ServerFilename := FileMgt.ServerTempFileName('');
-        if ZGT.IsZComCompany then
-            TargetFilename := '\\ZYEU-NAVSQL02\NAV Archive\Zyxel\EMEA\HQ Account Receivable\HqAccountReceivable.xlsx';
-        if ZGT.IsZNetCompany then
-            TargetFilename := '\\ZYEU-NAVSQL02\NAV Archive\ZNet\EMEA\HQ Account Receivable\HqAccountReceivable.xlsx';
-        FileMgt.DeleteServerFile(TargetFilename);
+        // CLOUD READY NOT USED
+        // ServerFilename := FileMgt.ServerTempFileName('');
+        // if ZGT.IsZComCompany then
+        //     TargetFilename := '\\ZYEU-NAVSQL02\NAV Archive\Zyxel\EMEA\HQ Account Receivable\HqAccountReceivable.xlsx';
+        // if ZGT.IsZNetCompany then
+        //     TargetFilename := '\\ZYEU-NAVSQL02\NAV Archive\ZNet\EMEA\HQ Account Receivable\HqAccountReceivable.xlsx';
+        // FileMgt.DeleteServerFile(TargetFilename);
 
-        Clear(repHQAccountReceivableDetails);
-        repHQAccountReceivableDetails.InitReqest(Today, 0);
-        repHQAccountReceivableDetails.SaveAsExcel(ServerFilename);
+        // Clear(repHQAccountReceivableDetails);
+        // repHQAccountReceivableDetails.InitReqest(Today, 0);
+        // repHQAccountReceivableDetails.SaveAsExcel(ServerFilename);
 
-        ZyxelFileMgt.MoveServerFile(ServerFilename, TargetFilename);
-        FileMgt.DeleteServerFile(ServerFilename);
+        // ZyxelFileMgt.MoveServerFile(ServerFilename, TargetFilename);
+        // FileMgt.DeleteServerFile(ServerFilename);
     end;
 
     var
