@@ -2038,7 +2038,7 @@ codeunit 50055 AmazonHelper
     // ZYXEL MARGIN REST API >>
 
 
-    procedure ProcessMarginApproval(var MarginApproval: record "Margin Approval")
+    procedure ProcessMarginApproval(var MarginApproval: record "Margin Approval"; All: Boolean)
     var
         JsontextReply: text;
         Marginsetup: record "Amazon Setup";
@@ -2049,16 +2049,21 @@ codeunit 50055 AmazonHelper
         TokenValue: JsonToken;
         part_number: text[20];
         is_low_margin: text[10];
+        entry_no: Integer;
 
     begin
 
         if not Marginsetup.get('MARCHETST') then
             error('Please create MARCHETST in setup');
-        if SentMarginApproval(MarginApproval, Marginsetup, JsontextReply) then begin
+        if SentMarginApproval(MarginApproval, Marginsetup, JsontextReply, All) then begin
             IF jsonTokenMain.ReadFrom(JsontextReply) then
                 if jsonTokenMain.SelectToken('margincheckresult', jsonTokenorders) then begin
                     jsonarrayMain := jsonTokenorders.AsArray();
                     foreach TokenOrder in jsonarrayMain do begin
+                        if TokenOrder.SelectToken('entry_no', TokenValue) then
+                            entry_no := TokenValue.AsValue().AsInteger();
+                        if all then
+                            MarginApproval.get(entry_no);
                         if TokenOrder.SelectToken('part_number', TokenValue) then
                             EVALUATE(part_number, TokenValue.AsValue().AsText());
                         if TokenOrder.SelectToken('is_low_margin', TokenValue) then
@@ -2101,7 +2106,6 @@ codeunit 50055 AmazonHelper
 
         end;
     end;
-
 
 
     procedure ProcessPriceApproval(var MarginApproval: record "Margin Approval")
@@ -2182,7 +2186,7 @@ codeunit 50055 AmazonHelper
     end;
 
 
-    procedure SentMarginApproval(MarginApproval: record "Margin Approval"; Marginsetup: record "amazon Setup"; var replytext: text): Boolean
+    procedure SentMarginApproval(MarginApproval: record "Margin Approval"; Marginsetup: record "amazon Setup"; var replytext: text; All: Boolean): Boolean
     var
 
         Httpcontent: HttpContent;
@@ -2206,7 +2210,10 @@ codeunit 50055 AmazonHelper
         filename: text;
         temptext: text;
     begin
-        temptext := makeMarginApprovalXml(MarginApproval, Marginsetup);
+        if all then
+            temptext := makeAllMarginApprovalXml(Marginsetup)
+        else
+            temptext := makeMarginApprovalXml(MarginApproval, Marginsetup);
         if temptext <> '' then begin
             httpcontent.writefrom(temptext);
             httpcontent.GetHeaders(contentHeaders);
@@ -2246,6 +2253,71 @@ codeunit 50055 AmazonHelper
             // TEMP TEST >>
             exit(true);
         end;
+    end;
+
+    procedure makeAllMarginApprovalXml(Marginsetup: record "amazon Setup"): Text
+    var
+        totalDoc: JsonObject;
+        totextvar: Text;
+        margin_info: JsonObject;
+        margin_infoArray: JsonArray;
+        Salesline: record "Sales Line";
+        Priceline: record "Price List Line";
+        tempcurr: code[3];
+        glsetup: record "General Ledger Setup";
+        MarginApproval: record "Margin Approval";
+        TempBlob: Codeunit "Temp Blob";
+        outStr: OutStream;
+        inStr: InStream;
+        filename: text;
+    begin
+        glsetup.get();
+        totalDoc.add('token', Marginsetup.client_secret);
+        totalDoc.add('company', Marginsetup.ApiCompanyname);
+
+
+        // loop >>
+        marginapproval.setrange(requeststatus, marginapproval.requeststatus::new);
+        if marginapproval.findset() then
+            repeat
+                Clear(margin_info);
+                margin_info.add('entry_no', MarginApproval."Entry No.");
+                margin_info.add('part_number', MarginApproval."Item No.");
+                tempcurr := '';
+
+                case MarginApproval."Source Type" of
+                    MarginApproval."Source Type"::Sales:
+                        begin
+                            if Salesline.get(MarginApproval."Sales Document Type", MarginApproval."Source Line No.") then
+                                tempcurr := Salesline."Currency Code"
+                        end;
+                    MarginApproval."Source Type"::"Price Book":
+                        begin
+                            if Priceline.get(MarginApproval."Source No.", MarginApproval."Source Line No.") then
+                                tempcurr := Priceline."Currency Code";
+                        end;
+                end;
+                if tempcurr = '' then
+                    tempcurr := glsetup."LCY Code";
+                margin_info.add('currency', tempcurr);
+                margin_info.add('selling_price', MarginApproval."Unit Price");
+                margin_infoArray.add(margin_info);
+            // loop >>
+
+            until marginapproval.next = 0;
+
+        totalDoc.add('margincheck', margin_infoArray);
+        // totalDoc.add('fulfillment', fulfillment);
+        totalDoc.WriteTo(totextvar);
+        // Save the data of the InStream as a file.
+        if (Marginsetup.testmode) and GuiAllowed then begin
+            TempBlob.CreateOutStream(outStr, TextEncoding::UTF8);
+            outStr.WriteText(totextvar);
+            TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
+            fileName := 'Shopify_postfulfillment.txt';
+            File.DownloadFromStream(inStr, 'Export', '', '', fileName);
+        end;
+        exit(totextvar);
     end;
 
     procedure makeMarginApprovalXml(MarginApproval: record "Margin Approval"; Marginsetup: record "amazon Setup"): Text
@@ -2575,9 +2647,7 @@ codeunit 50055 AmazonHelper
         exit(totextvar);
     end;
 
-    // event >>
-    [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnBeforeVerify', '', false, false)]
-    local procedure OnBeforeVerify(var PriceListLine: Record "Price List Line"; var IsHandled: Boolean)
+Procedure checkandSetMarginApproval(var PriceListLine: Record "Price List Line"; var IsHandled: Boolean)
     var
         salessetup: Record "Sales & Receivables Setup";
         MarginApproval: record "Margin Approval";
@@ -2639,6 +2709,20 @@ codeunit 50055 AmazonHelper
                 end;
             end
         end;
+    end;
+
+
+
+
+    // event >>
+    [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnBeforeVerify', '', false, false)]
+    local procedure OnBeforeVerify(var PriceListLine: Record "Price List Line"; var IsHandled: Boolean)
+    var
+        salessetup: Record "Sales & Receivables Setup";
+        MarginApproval: record "Margin Approval";
+        x: integer;
+    begin
+        checkandSetMarginApproval(PriceListLine,IsHandled);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnAfterValidateEvent', 'Status', false, false)]
@@ -3128,10 +3212,10 @@ codeunit 50055 AmazonHelper
 
         marginapproval.setrange(requeststatus, marginapproval.requeststatus::new);
         if marginapproval.findset() then
-            repeat
-                marginapproval2.get(marginapproval."Entry No.");
-                ProcessMarginApproval(marginapproval2);
-            until marginapproval.next = 0;
+            ProcessMarginApproval(marginapproval, true);
+        //marginapproval2.get(marginapproval."Entry No.");
+        //ProcessMarginApproval(marginapproval);
+        //until marginapproval.next = 0;
 
 
 

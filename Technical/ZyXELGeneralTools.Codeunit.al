@@ -825,7 +825,8 @@ Codeunit 50000 "ZyXEL General Tools"
         filename: text;
         tempblob: Codeunit "Temp Blob";
     begin
-        filemgt.BLOBImportFromServerFile(tempblob, serverfiltext);
+        // CLOUD READY DELETE 
+        ///filemgt.BLOBImportFromServerFile(tempblob, serverfiltext);
         tempblob.CreateInStream(instr);
         filename := filemgt.GetFileName(serverfiltext);
         file.DownloadFromStream(instr, '', '', '', filename)

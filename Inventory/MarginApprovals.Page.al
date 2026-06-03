@@ -207,7 +207,21 @@ Editable = false;
                     Helper: codeunit AmazonHelper;
 
                 begin
-                    Helper.ProcessMarginApproval(rec);
+                    Helper.ProcessMarginApproval(rec,false);
+                end;
+            }
+            action(testAllmargincheck)
+            {
+                Caption = 'Run ALL margin check API';
+                Image = UpdateDescription;
+
+
+                trigger OnAction()
+                var
+                    Helper: codeunit AmazonHelper;
+
+                begin
+                    Helper.ProcessMarginApproval(rec,true);
                 end;
             }
                  action(testPricecheck)

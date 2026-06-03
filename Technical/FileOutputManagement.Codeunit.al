@@ -36,9 +36,10 @@ Codeunit 50046 "File Output Management"
     var
         FileMgt: Codeunit "File Management";
     begin
-        ServerFilename := FileMgt.ServerTempFileName('');
-        CsvFile.Create(ServerFilename);
-        CsvFile.CreateOutstream(StreamOut);
+        // CLOUD READY DELETE
+        //ServerFilename := FileMgt.ServerTempFileName('');
+        //CsvFile.Create(ServerFilename);
+        //CsvFile.CreateOutstream(StreamOut);
     end;
 
 

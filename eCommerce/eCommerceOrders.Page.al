@@ -350,7 +350,9 @@ page 50238 "eCommerce Orders"
                         var
                             APIMgt: Codeunit "API Management";
                         begin
-                            APIMgt.ImportTaxLibDocument();
+                            // Cloud READY DELETE TEMP
+                            //APIMgt.ImportTaxLibDocument();
+                            Message('Use [Import Tax Library Doc.]')
                         end;
                     }
                 }
