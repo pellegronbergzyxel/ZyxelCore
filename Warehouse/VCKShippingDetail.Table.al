@@ -103,15 +103,19 @@ Table 50046 "VCK Shipping Detail"
                         If Format(ShipmentMethodrec."Shipping Days") <> '' THEN
                             If ETD <> 0D THEN Begin
                                 //02-06-2026 BK #542554
-                                Validate("Calculated ETA Date", CALCDATE(ShipmentMethodrec."Shipping Days", ETD));
-                                if rec.Location <> '' then
-                                    if LocationRec.get(rec.Location) then
-                                        if format(locationRec."Adjust ETA Calucation") <> ''  then begin
-                                            betweenDate := "Calculated ETA Date";    
+                                BetweenDate := CALCDATE(ShipmentMethodrec."Shipping Days", ETD);
+                                //Validate("Calculated ETA Date", CALCDATE(ShipmentMethodrec."Shipping Days", ETD));
+                                if rec.Location <> '' then begin
+                                    if LocationRec.get(rec.Location) then begin
+                                        if format(locationRec."Adjust ETA Calucation") <> '' then begin
                                             Validate("Calculated ETA Date", CALCDATE(locationRec."Adjust ETA Calucation", betweenDate));
-                                        end;    
-                            end;    
-
+                                        end else
+                                            Validate("Calculated ETA Date", BetweenDate);
+                                    end else
+                                        validate("Calculated ETA Date", BetweenDate);
+                                end else
+                                    validate("Calculated ETA Date", BetweenDate);
+                            end;
             end;
         }
         field(10; "Shipping Method"; Code[30])
@@ -394,16 +398,8 @@ Table 50046 "VCK Shipping Detail"
                 if zgt.IsZComCompany() then
                     if warehouseSetup.get() then
                         If Format(warehouseSetup."Expected Receipt Calculation") <> '' THEN
-                            If "Calculated ETA Date" <> 0D THEN Begin
-                                //02-06-2026 BK #542554
+                            If "Calculated ETA Date" <> 0D THEN
                                 Validate("Expected Receipt Date", CALCDATE(warehouseSetup."Expected Receipt Calculation", "Calculated ETA Date"));
-                                if rec.Location <> '' then
-                                    if LocationRec.get(rec.Location) then
-                                        if format(locationRec."Adjust ETA Calucation") <> ''  then begin
-                                            betweenDate := "Calculated ETA Date";    
-                                            Validate("Calculated ETA Date", CALCDATE(locationRec."Adjust ETA Calucation", betweenDate));
-                                        end;    
-                            end;    
             end;
         }
     }
