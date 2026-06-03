@@ -309,6 +309,15 @@ pageextension 50119 ItemCardZX extends "Item Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the value of the Pallet Height (cm) field.';
                 }
+                field("Pallet Weight"; Rec."Pallet Weight")
+                { ///01-06-2026 BK #573586  
+                    Caption = 'Pallet Weight (kg)';
+                    DecimalPlaces = 2 : 2;
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the value of the Pallet Weight (kg) field.';
+                    Editable = PLMSUpdateEditable;
+                }
+
             }
             group(WEEE)
             {

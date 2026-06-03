@@ -1475,6 +1475,11 @@ Page 50205 "Item List API"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Width (ctn) field.';
                 }
+                field("Min. Carton Qty. Enabled"; Rec."Min. Carton Qty. Enabled") //29-05-2026 BK Ben Requested
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Min. Carton Qty. Enabled field.';
+                }
             }
         }
     }

@@ -179,11 +179,17 @@ pageextension 50144 UserSetupZX extends "User Setup"
                 ToolTip = 'Specifies Allow Froce Validation of eCommerse Orders';
                 Visible = false;
             }
-            field("Allow Force Margin Approval";Rec."Allow Force Margin Approval")
+            field("Allow Force Margin Approval"; Rec."Allow Force Margin Approval")
             {
-                ApplicationArea = Basic, Suite; 
-                
-                Visible = false;
+                ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies Allow Force Margin Approval';
+                Visible = true;
+            }
+            field("Allow Change Incoterms on DD"; Rec."Allow Change Incoterms on DD") //01-06-2026 BK #573882
+            {
+                ApplicationArea = Basic, Suite;
+                Visible = true;
+                ToolTip = 'Allow Change Incoterms on Document Delivery';
             }
         }
     }

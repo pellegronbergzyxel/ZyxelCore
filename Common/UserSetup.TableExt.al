@@ -147,5 +147,9 @@ tableextension 50125 UserSetupZX extends "User Setup"
         {
             Caption = 'Allow Force Margin Approval';
         }
+        Field(50073; "Allow Change Incoterms on DD"; Boolean) //01-06-2026 BK #573882
+        {
+            Caption = 'Allow Change Incoterms on DD';
+        }
     }
 }

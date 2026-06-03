@@ -1340,6 +1340,11 @@ tableextension 50114 ItemZX extends Item
             Caption = 'Empty Outer Carton Weight (kg)';
             DecimalPlaces = 2 : 2;
         }
+        field(62534; "Pallet Weight"; Decimal) //01-06-2026 BK #573586
+        {
+            Caption = 'Pallet Weight (kg)';
+            DecimalPlaces = 2 : 2;
+        }
     }
 
     keys

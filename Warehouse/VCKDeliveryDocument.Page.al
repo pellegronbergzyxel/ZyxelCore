@@ -1,24 +1,5 @@
 Page 50086 "VCK Delivery Document"
 {
-    // 001. 12-09-17 ZY-LD 000 - Validation before realiseing deliver document.
-    // 002. 04-10-17 ZY-LD 000 - TRUE is added to the delete.
-    // 003. 23-04-18 ZY-LD 2018042010000117 - Code has moved to a function.
-    // 004. 30-07-18 ZY-LD 2018073010000147 - Test on quantity before release.
-    // 005. 19-03-19 ZY-LD 2019031910000031 - Test on picking date before release.
-    // 006. 01-04-19 ZY-LD 000 - Release button can be blocked.
-    // 007. 30-04-19 ZY-LD P0225 "Re-Release" is set to Visible = FALSE.
-    // 13-07-19 .. 02-07-19 PAB 2019071710000072 - Changes made for Project Rock Go-live.  // 05-08-19 ZY-LD - The code has been made active again.
-    // 008. 05-08-19 ZY-LD 2019080510000084 - Reopen the document, if it hasn't been sent.
-    // 009. 15-08-19 ZY-LD 2019081510000074 - It has happend that the DD No. on the sales line was blank at the release time.
-    // 010. 21-08-19 ZY-LD 2019082110000115 - Unblock customer.
-    // 011. 26-08-19 ZY-LD 2019082610000062 - Check if additional items are confirmed.
-    // 012. 30-10-19 ZY-LD 2019103010000077 - Update only date if status is New.
-    // 013. 07-11-19 ZY-LD 000 - Confirm delete.
-    // 014. 18-11-19 ZY-LD 000 - Print Serial No.
-    // 015. 14-10-20 ZY-LD 2020101410000131 - Additional items can be editable on the sales line, and can also be deleted.
-    // 016. 29-03-22 ZY-LD 000 - Block release from automation.
-    // 017. 23-08-22 ZY-LD 000 - Post response.
-
     InsertAllowed = false;
     PageType = Card;
     RefreshOnActivate = true;
@@ -163,6 +144,7 @@ Page 50086 "VCK Delivery Document"
                 field("Delivery Terms Terms"; Rec."Delivery Terms Terms")
                 {
                     ApplicationArea = Basic, Suite;
+                    Editable = changeIncotermsEnabled; //01-06-2026 BK #573882
                 }
                 field("Delivery Terms City"; Rec."Delivery Terms City")
                 {
@@ -720,6 +702,19 @@ Page 50086 "VCK Delivery Document"
                         UpdateBacklogComment;
                     end;
                 }
+                action("Update Incoterms")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Update Incoterms';
+                    //01-06-2026 BK #573882
+                    Image = UpdateShipment;
+                    Enabled = changeIncotermsEnabled;
+
+                    trigger OnAction()
+                    begin
+                        ChangeIncoTerms();
+                    end;
+                }
             }
             group("Function")
             {
@@ -820,12 +815,12 @@ Page 50086 "VCK Delivery Document"
 
     trigger OnAfterGetRecord()
     begin
-        SetActions();  // 01-04-19 ZY-LD 006
+        SetActions();
     end;
 
     trigger OnOpenPage()
     begin
-        SetActions();  // 01-04-19 ZY-LD 006
+        SetActions();
     end;
 
     var
@@ -837,6 +832,7 @@ Page 50086 "VCK Delivery Document"
         ChangePickingDateEnabled: Boolean;
         PageEditable: Boolean;
         ReleaseDeliveryDocumentEnable: Boolean;
+        ChangeIncotermsEnabled: Boolean; //01-06-2026 BK #573882    
 
     local procedure SetActions()
     var
@@ -849,7 +845,7 @@ Page 50086 "VCK Delivery Document"
         if recAutoSetup.Get() then  // 29-03-22 ZY-LD 016
             ReleaseEnabled := (Rec."Document Status" <> Rec."document status"::Released) and
                               recAutoSetup."Release Deliver Document" and  // 29-03-22 ZY-LD 016
-                              ((CurrentDatetime < recCountryShip."Block DD Release from") or (recCountryShip."Block DD Release from" = 0DT));
+                              ((CurrentDatetime() < recCountryShip."Block DD Release from") or (recCountryShip."Block DD Release from" = 0DT));
         //<< 01-04-19 ZY-LD 006
 
         ChangePickingDateEnabled :=
@@ -857,8 +853,8 @@ Page 50086 "VCK Delivery Document"
           (Rec."Document Status" = Rec."document status"::Open) and
           (Rec."Warehouse Status" = Rec."warehouse status"::New);
 
-        //CurrPage.EDITABLE("Document Status" = "Document Status"::New);  // 30-10-19 ZY-LD 012
         PageEditable := Rec."Document Status" = Rec."document status"::Open;
+        changeIncotermsEnabled := allowChangeIncoTerms(UserId); //01-06-2026 BK #573882
     end;
 
     local procedure UpdatePickingDate()
@@ -872,10 +868,10 @@ Page 50086 "VCK Delivery Document"
         NewPickingDate: Date;
         lText003: label 'Do you want to update "%1" to %2\on %3 sales order line(s)?';
     begin
-        NewPickingDate := Today;
+        NewPickingDate := Today();
         recCtryShipDaySub.SetRange("Country Code", Rec."Ship-to Country/Region Code");
         recCtryShipDaySub.SetFilter("Week Day", '%1..', Date2dwy(NewPickingDate, 1));
-        if not recCtryShipDaySub.FindFirst then
+        if not recCtryShipDaySub.FindFirst() then
             recCtryShipDaySub.SetRange("Week Day");
         if recCtryShipDaySub.FindFirst then
             NewPickingDate := DelDocMgt.GetNextWeekday(recCtryShipDaySub."Week Day", NewPickingDate);
@@ -895,10 +891,10 @@ Page 50086 "VCK Delivery Document"
             recSalesLine.SetRange("Document Type", recSalesLine."document type"::Order);
             recSalesLine.SetRange("Delivery Document No.", Rec."No.");
             if recSalesLine.FindSet(true) then
-                if Confirm(lText003, false, recSalesLine.FieldCaption("Shipment Date"), NewPickingDate, recSalesLine.Count) then begin
+                if Confirm(lText003, false, recSalesLine.FieldCaption("Shipment Date"), NewPickingDate, recSalesLine.Count()) then begin
                     repeat
                         recSalesLine."Shipment Date" := NewPickingDate;
-                        recSalesLine.Modify;
+                        recSalesLine.Modify();
                     until recSalesLine.Next() = 0;
                 end;
         end;
@@ -922,10 +918,10 @@ Page 50086 "VCK Delivery Document"
             recSalesLine.SetRange("Document Type", recSalesLine."document type"::Order);
             recSalesLine.SetRange("Delivery Document No.", Rec."No.");
             if recSalesLine.FindSet(true) then
-                if Confirm(lText003, false, recSalesLine.FieldCaption("Backlog Comment"), Format(recSalesHead."Backlog Comment"), recSalesLine.Count) then begin
+                if Confirm(lText003, false, recSalesLine.FieldCaption("Backlog Comment"), Format(recSalesHead."Backlog Comment"), recSalesLine.Count()) then begin
                     repeat
                         recSalesLine."Backlog Comment" := recSalesHead."Backlog Comment";
-                        recSalesLine.Modify;
+                        recSalesLine.Modify();
                     until recSalesLine.Next() = 0;
                 end;
         end;
@@ -938,6 +934,43 @@ Page 50086 "VCK Delivery Document"
     begin
         recDelDocHead.SetRange("No.", Rec."No.");
         SendDeliveryDocument.SetTableview(recDelDocHead);
-        SendDeliveryDocument.Run;
+        SendDeliveryDocument.Run();
     end;
+
+    //01-06-2026 BK #573882
+    local procedure ChangeIncoTerms()
+    var
+        GenericInputPage: Page "Generic Input Page";
+        NewValue: Code[20];
+        lText001: label 'Update Shipment Method Code / Incoterms';
+        lText002: label 'New Shipment Method Code';
+
+    begin
+        if ChangeIncotermsEnabled then begin
+            GenericInputPage.SetPageCaption(lText001);
+            GenericInputPage.SetFieldCaption(StrSubstNo(lText002, Rec."Delivery Terms Terms"));
+            GenericInputPage.SetVisibleField(6);
+            genericInputPage.SetLookupType(2); //ShipmentMethod
+
+            if GenericInputPage.RunModal = Action::OK then begin
+                NewValue := GenericInputPage.GetCode20Lookup();
+                if NewValue <> '' then begin
+                    Rec.validate("Delivery Terms Terms", NewValue);
+                    Rec.Modify();
+                end;
+            end;
+        end;
+    end;
+
+    local procedure AllowChangeIncoTerms(UserID: Code[50]): boolean
+    var
+        userSetup: Record "User Setup";
+
+    begin
+        if userSetup.get(userid) then
+            if (userSetup."Allow Change Incoterms on DD") then
+                exit(true);
+        exit(false);
+    end;
+
 }
