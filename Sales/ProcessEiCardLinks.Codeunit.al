@@ -325,6 +325,24 @@ Codeunit 50039 "Process EiCard Links"
         //  rValue := TRUE;  // 11-09-20 ZY-LD 007  // 14-01-21 ZY-LD 008
     end;
 
+    procedure createEicardLinkHtml(recEiCardQueue: Record "EiCard Queue"): Text
+    var
+        tempblob: codeunit "Temp Blob";
+        EiCardQueue: Record "EiCard Queue";
+        EiCardQueueRecord: report "EiCard Queue Record";
+        varoutstream: OutStream;
+        Varinstream: instream;
+        BodyTextOut: text;
+        ReportParameters: text;
+    begin
+        tempblob.CreateOutStream(varoutstream, TextEncoding::UTF8);
+        EiCardQueue.setrange("Sales Order No.", recEiCardQueue."Sales Order No.");
+        EiCardQueueRecord.SetTableView(EiCardQueue);
+        EiCardQueueRecord.SaveAs(ReportParameters, ReportFormat::Html, varoutstream);
+        tempblob.CreateInStream(Varinstream, TextEncoding::UTF8);
+        Varinstream.ReadText(BodyTextOut);
+        exit(BodyTextOut);
+    end;
 
     local procedure SendEiCardLink(recEiCardQueue: Record "EiCard Queue"; TestEmailAdd: Text; ReSend: Boolean): Boolean
     var
@@ -338,25 +356,30 @@ Codeunit 50039 "Process EiCard Links"
         FileMgt: Codeunit "File Management";
     begin
         recEmailAdd.Get('EICARDLINK');
-        Body := GetEmailBody(Text10 + Text08, recEiCardQueue."No. of EiCard Link Lines" > 1, AttachementSize);
-        Table := GetTableHeader;
 
-        // Setup Body
-        Body := ReplaceString(Body, '%1', recEiCardQueue."External Document No.");
-        Body := ReplaceString(Body, Text16, recEiCardQueue."From E-Mail Address");
-        Body := ReplaceString(Body, Text17, recEiCardQueue."From E-Mail Signature");
+        // CLOUR READY DELETE
+        // Body := GetEmailBody(Text10 + Text08, recEiCardQueue."No. of EiCard Link Lines" > 1, AttachementSize);
+        // Table := GetTableHeader;
 
-        recEiCardLinkLine.SetRange("Purchase Order No.", recEiCardQueue."Purchase Order No.");
-        recEiCardLinkLine.SetFilter(Link, '<>%1', '');
-        recEiCardLinkLine.SetAutocalcFields("Item Description");
-        if recEiCardLinkLine.FindSet then begin
-            repeat
-                Table := Table + AddTableLine(recEiCardLinkLine."Item No.", recEiCardLinkLine."Item Description", recEiCardLinkLine.Link);
-            until recEiCardLinkLine.Next() = 0;
-        end;
-        Table := Table + Text19;
+        // // Setup Body
+        // Body := ReplaceString(Body, '%1', recEiCardQueue."External Document No.");
+        // Body := ReplaceString(Body, Text16, recEiCardQueue."From E-Mail Address");
+        // Body := ReplaceString(Body, Text17, recEiCardQueue."From E-Mail Signature");
 
-        Body := ReplaceString(Body, Text18, Table);
+        // recEiCardLinkLine.SetRange("Purchase Order No.", recEiCardQueue."Purchase Order No.");
+        // recEiCardLinkLine.SetFilter(Link, '<>%1', '');
+        // recEiCardLinkLine.SetAutocalcFields("Item Description");
+        // if recEiCardLinkLine.FindSet then begin
+        //     repeat
+        //         Table := Table + AddTableLine(recEiCardLinkLine."Item No.", recEiCardLinkLine."Item Description", recEiCardLinkLine.Link);
+        //     until recEiCardLinkLine.Next() = 0;
+        // end;
+        // Table := Table + Text19;
+        //
+        //Body := ReplaceString(Body, Text18, Table);
+
+        // CLOUD READY NEW >>
+        Body := createEicardLinkHtml(recEiCardQueue);
 
         // Create e-mail
         Clear(EmailAddMgt);
@@ -406,73 +429,74 @@ Codeunit 50039 "Process EiCard Links"
         // CLOUD READY GIF in email footer???
         //  EmailAddMgt.AddAttachment(Text10 + Text20, Text20, false);
         // EmailAddMgt.AddAttachment(Text10 + Text21, Text21, false);
-         //EmailAddMgt.AddAttachment(Text10 + Text22, Text22, false);
-         //EmailAddMgt.AddAttachment(Text10 + Text36, Text36, false);
-         //EmailAddMgt.AddAttachment(Text10 + Text39, Text39, false);
+        //EmailAddMgt.AddAttachment(Text10 + Text22, Text22, false);
+        //EmailAddMgt.AddAttachment(Text10 + Text36, Text36, false);
+        //EmailAddMgt.AddAttachment(Text10 + Text39, Text39, false);
 
         // Send e-mail
         EmailAddMgt.Send;
 
         exit(true);
     end;
+    
+    //CLOUR READY DELETE
+    // local procedure GetEmailBody(HTMLFileName: Text[250]; Plural: Boolean; AttachementSize: Decimal) HTMLStr: Text
+    // var
+    //     file: File;
+    //     Linestr: Text;
+    //     recCompanyInformation: Record "Company Information";
+    // begin
+    //     if Exists(HTMLFileName) then begin
+    //         file.TextMode(true);
+    //         file.WriteMode(false);
+    //         file.Open(HTMLFileName);
+    //         repeat
+    //             file.Read(Linestr);
+    //             HTMLStr := HTMLStr + Linestr;
+    //         until file.POS = file.LEN;
+    //         file.Close;
+    //         if recCompanyInformation.FindFirst then begin
+    //             HTMLStr := ReplaceString(HTMLStr, Text29, recCompanyInformation.Address);
+    //             HTMLStr := ReplaceString(HTMLStr, Text30, recCompanyInformation.City);
+    //             HTMLStr := ReplaceString(HTMLStr, Text31, recCompanyInformation."Post Code");
+    //             HTMLStr := ReplaceString(HTMLStr, Text32, recCompanyInformation."Phone No.");
+    //         end else begin
+    //             HTMLStr := ReplaceString(HTMLStr, Text29, '');
+    //             HTMLStr := ReplaceString(HTMLStr, Text30, '');
+    //             HTMLStr := ReplaceString(HTMLStr, Text31, '');
+    //             HTMLStr := ReplaceString(HTMLStr, Text32, '');
+    //         end;
+    //         HTMLStr := ReplaceString(HTMLStr, Text33, Text35);
+    //         HTMLStr := ReplaceString(HTMLStr, Text37, GetEmailDisclaimer(Text10 + Text38));
+    //         if AttachementSize < 50000000 then
+    //             if Plural then
+    //                 HTMLStr := ReplaceString(HTMLStr, Text34, Text09)
+    //             else
+    //                 HTMLStr := ReplaceString(HTMLStr, Text34, Text11);
+    //         if AttachementSize >= 50000000 then
+    //             if Plural then
+    //                 HTMLStr := ReplaceString(HTMLStr, Text34, Text42)
+    //             else
+    //                 HTMLStr := ReplaceString(HTMLStr, Text34, Text11);
+    //     end;
+    // end;
 
-    local procedure GetEmailBody(HTMLFileName: Text[250]; Plural: Boolean; AttachementSize: Decimal) HTMLStr: Text
-    var
-        file: File;
-        Linestr: Text;
-        recCompanyInformation: Record "Company Information";
-    begin
-        if Exists(HTMLFileName) then begin
-            file.TextMode(true);
-            file.WriteMode(false);
-            file.Open(HTMLFileName);
-            repeat
-                file.Read(Linestr);
-                HTMLStr := HTMLStr + Linestr;
-            until file.POS = file.LEN;
-            file.Close;
-            if recCompanyInformation.FindFirst then begin
-                HTMLStr := ReplaceString(HTMLStr, Text29, recCompanyInformation.Address);
-                HTMLStr := ReplaceString(HTMLStr, Text30, recCompanyInformation.City);
-                HTMLStr := ReplaceString(HTMLStr, Text31, recCompanyInformation."Post Code");
-                HTMLStr := ReplaceString(HTMLStr, Text32, recCompanyInformation."Phone No.");
-            end else begin
-                HTMLStr := ReplaceString(HTMLStr, Text29, '');
-                HTMLStr := ReplaceString(HTMLStr, Text30, '');
-                HTMLStr := ReplaceString(HTMLStr, Text31, '');
-                HTMLStr := ReplaceString(HTMLStr, Text32, '');
-            end;
-            HTMLStr := ReplaceString(HTMLStr, Text33, Text35);
-            HTMLStr := ReplaceString(HTMLStr, Text37, GetEmailDisclaimer(Text10 + Text38));
-            if AttachementSize < 50000000 then
-                if Plural then
-                    HTMLStr := ReplaceString(HTMLStr, Text34, Text09)
-                else
-                    HTMLStr := ReplaceString(HTMLStr, Text34, Text11);
-            if AttachementSize >= 50000000 then
-                if Plural then
-                    HTMLStr := ReplaceString(HTMLStr, Text34, Text42)
-                else
-                    HTMLStr := ReplaceString(HTMLStr, Text34, Text11);
-        end;
-    end;
-
-    local procedure GetEmailDisclaimer(HTMLFileName: Text) HTMLStr: Text
-    var
-        file: File;
-        Linestr: Text;
-    begin
-        if Exists(HTMLFileName) then begin
-            file.TextMode(true);
-            file.WriteMode(false);
-            file.Open(HTMLFileName);
-            repeat
-                file.Read(Linestr);
-                HTMLStr := HTMLStr + Linestr;
-            until file.POS = file.LEN;
-            file.Close;
-        end;
-    end;
+    // local procedure GetEmailDisclaimer(HTMLFileName: Text) HTMLStr: Text
+    // var
+    //     file: File;
+    //     Linestr: Text;
+    // begin
+    //     if Exists(HTMLFileName) then begin
+    //         file.TextMode(true);
+    //         file.WriteMode(false);
+    //         file.Open(HTMLFileName);
+    //         repeat
+    //             file.Read(Linestr);
+    //             HTMLStr := HTMLStr + Linestr;
+    //         until file.POS = file.LEN;
+    //         file.Close;
+    //     end;
+    // end;
 
     local procedure ReplaceString(String: Text; FindWhat: Text[250]; ReplaceWith: Text) NewString: Text
     begin
@@ -568,41 +592,41 @@ Codeunit 50039 "Process EiCard Links"
         //<< 07-01-20 ZY-LD 003
     end;
 
-    local procedure ExtractZipFile(ZipFilePath: Text; DestinationFolder: Text)
-    var
-        FileMgt: Codeunit "File Management";
-        DataCompression: Codeunit "Data Compression";
-        EntryList: List of [Text];
-        EntryKey: Text;
-        ZipFile: File;
-        ZipInStream: InStream;
-        OutFile: File;
-        EntryOutStream: OutStream;
-        EntryLength: Integer;
-        Text004: Label 'The file %1 does not exist.';
-    begin
-        // CLOUD READY NEW
-        if not FileMgt.ServerFileExists(ZipFilePath) then
-            Error(Text004, ZipFilePath);
+    // local procedure ExtractZipFile(ZipFilePath: Text; DestinationFolder: Text)
+    // var
+    //     FileMgt: Codeunit "File Management";
+    //     DataCompression: Codeunit "Data Compression";
+    //     EntryList: List of [Text];
+    //     EntryKey: Text;
+    //     ZipFile: File;
+    //     ZipInStream: InStream;
+    //     OutFile: File;
+    //     EntryOutStream: OutStream;
+    //     EntryLength: Integer;
+    //     Text004: Label 'The file %1 does not exist.';
+    // begin
+    //     // CLOUD READY NEW
+    //     if not FileMgt.ServerFileExists(ZipFilePath) then
+    //         Error(Text004, ZipFilePath);
 
-        FileMgt.ServerCreateDirectory(DestinationFolder);
+    //     FileMgt.ServerCreateDirectory(DestinationFolder);
 
-        ZipFile.Open(ZipFilePath);
-        ZipFile.CreateInStream(ZipInStream);
-        DataCompression.OpenZipArchive(ZipInStream, false);
-        DataCompression.GetEntryList(EntryList);
+    //     ZipFile.Open(ZipFilePath);
+    //     ZipFile.CreateInStream(ZipInStream);
+    //     DataCompression.OpenZipArchive(ZipInStream, false);
+    //     DataCompression.GetEntryList(EntryList);
 
-        foreach EntryKey in EntryList do begin
-            OutFile.WriteMode(true);
-            OutFile.Create(DestinationFolder + '\' + FileMgt.GetFileName(EntryKey));
-            OutFile.CreateOutStream(EntryOutStream);
-            DataCompression.ExtractEntry(EntryKey, EntryOutStream, EntryLength);
-            OutFile.Close();
-        end;
+    //     foreach EntryKey in EntryList do begin
+    //         OutFile.WriteMode(true);
+    //         OutFile.Create(DestinationFolder + '\' + FileMgt.GetFileName(EntryKey));
+    //         OutFile.CreateOutStream(EntryOutStream);
+    //         DataCompression.ExtractEntry(EntryKey, EntryOutStream, EntryLength);
+    //         OutFile.Close();
+    //     end;
 
-        DataCompression.CloseZipArchive();
-        ZipFile.Close();
-    end;
+    //     DataCompression.CloseZipArchive();
+    //     ZipFile.Close();
+    // end;
 
     /*
     local procedure ExtractZipFileOld(ZipFilePath: Text; DestinationFolder: Text)
