@@ -17,12 +17,13 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
             CreateWebServiceLog(lText001, '');
             recItem.LockTable();
             repeat
-                if recItem.Get(pItemTmp."No.") then
-                    if recItem."Country/Region of Origin Code" <> pItemTmp."Country/Region of Origin Code" then begin
-                        recItem."Country/Region of Origin Code" := pItemTmp."Country/Region of Origin Code";
-                        recItem.Modify(true);
-                        WebServiceLogEntry."Quantity Inserted" += 1;
-                    end;
+                if pItemTmp."Country/Region of Origin Code" <> '' then //29-05-2026 BK #Mail with Steven 
+                    if recItem.Get(pItemTmp."No.") then
+                        if recItem."Country/Region of Origin Code" <> pItemTmp."Country/Region of Origin Code" then begin
+                            recItem."Country/Region of Origin Code" := pItemTmp."Country/Region of Origin Code";
+                            recItem.Modify(true);
+                            WebServiceLogEntry."Quantity Inserted" += 1;
+                        end;
             until pItemTmp.Next() = 0;
 
             CloseWebServiceLog();
@@ -678,7 +679,9 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
         recPurchLine: Record "Purchase Line";
         recAutoSetup: Record "Automation Setup";
         recWhseSetup: Record "Warehouse Setup";
+        Location: Record Location;
         ZGT: Codeunit "Zyxel General Tools";
+
         lText001: Label 'Purchase Order No. must not be blank. "%1".';
         lText002: Label 'UNSHIPPEDQUANTITY';
         lText003: Label 'EMPTY';
@@ -722,6 +725,11 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
                                     recUnshipPurchder."Expected receipt date" := CALCDATE(recWhseSetup."Expected Shipment Period", recUnshipPurchder."ETD Date")
                                 ELSE
                                     recUnshipPurchder."Expected receipt date" := 0D;
+                            //03-06-2026 BK #542554
+                            IF recUnshipPurchder."Location Code" <> '' then
+                                IF Location.GET(recUnshipPurchder."Location Code") then
+                                    recUnshipPurchder."Expected receipt date" := CALCDATE(Location."Adjust ETA Calucation", recUnshipPurchder."Expected receipt date");
+
                             recUnshipPurchder.MODIFY(TRUE);
                         END;
                     end else begin //08-09-2025 BK #525482
@@ -736,6 +744,12 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
                                     recUnshipPurchder."Expected receipt date" := CALCDATe(recWhseSetup."Expected Receipt Calculation", recUnshipPurchder."ETA Date")
                                 ELSE
                                     recUnshipPurchder."Expected receipt date" := 0D;
+
+                            //03-06-2026 BK #542554
+                            IF recUnshipPurchder."Location Code" <> '' then
+                                IF Location.GET(recUnshipPurchder."Location Code") then
+                                    recUnshipPurchder."Expected receipt date" := CALCDATE(Location."Adjust ETA Calucation", recUnshipPurchder."Expected receipt date");
+
                             recUnshipPurchder.MODIFY(TRUE);
                         end;
                     end;

@@ -1,25 +1,5 @@
 Page 50217 "Item List (All fields)"
 {
-    // 001.  DT1.01  01-07-2010  SH
-    //  .Documention for tectura customasation
-    //  .IsEICard added to tablebox
-    // 
-    // 003. DT5.0 05-01-2012 TS
-    //   .New fielde
-    //   50080 Cost Amount (Actual)
-    //   50081 Cost Amount (Actual LCY)
-    //   50082 Cost Posted to G/L
-    //   50083 Coat Posted to G/L (LCY)
-    // ZY2.0 BS 15.06.2012 Added Qty. fields on form
-    //       BS 03.08.2012 Added Serial code,business unit,country code,sp/channel code
-    // 004. Steven Su
-    //      . Modify "Quantity per Pallet" wording to "Cartons per Pallet" according to Kim's demand
-    // 005. 25-09-17 ZY-LD Change Log is added.
-    // 006. 08-03-18 ZY-LD 2018022810000231 - Old category code has been removed.
-    // 007. 22-03-18 ZY-LD 2018032310000168 - "Category Code 4" is now back.
-    // 008. 05-07-19 ZY-LD P0213 - EU2Inventory is replaced by Inventory.
-    // 009. 09-08-19 ZY-LD 2019080810000097 - New field.
-
     AdditionalSearchTerms = 'product,finished good,component,raw material,assembly item';
     ApplicationArea = Basic, Suite, Assembly, Service;
     Caption = 'Item List  (All fields)';
@@ -1636,9 +1616,14 @@ Page 50217 "Item List (All fields)"
                 {
                     ToolTip = 'Specifies the value of the Width (ctn) field.';
                 }
-
-
-
+                field("Empty Outer Carton Weight"; Rec."Empty Outer Carton Weight") //01-06-2026 BK #573586
+                {
+                    ToolTip = 'Specifies the value of the Empty Outer Carton Weight field.';
+                }
+                field("Pallet Weight"; Rec."Pallet Weight") //01-06-2026 BK #573586
+                {
+                    ToolTip = 'Specifies the value of the Pallet Weight field.';
+                }
             }
         }
         area(factboxes)

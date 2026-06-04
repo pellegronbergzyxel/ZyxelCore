@@ -134,6 +134,11 @@ pageextension 50240 LocationCardZX extends "Location Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Location transalte(mapping) between zNet an zCom, when Item are move between the two entities';
                 }
+                field("Adjust ETA Calucation"; Rec."Adjust ETA Calucation")
+                { // 02-06-2026 BK #542554
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Used for adjusting ETA calculation based on the receiving date of the goods.';
+                }
             }
         }
         addafter("Bin Policies")

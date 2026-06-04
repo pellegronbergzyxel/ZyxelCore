@@ -101,7 +101,6 @@ Page 50358 "Travel Expense List"
         }
         area(processing)
         {
-            // CLOUD READY NOT USED
             // action("Import Directory")
             // {
             //     ApplicationArea = Basic, Suite;
@@ -271,16 +270,15 @@ Page 50358 "Travel Expense List"
         SetToTransferredVisible := ZGT.IsRhq and ZGT.IsZComCompany;
     end;
 
-// CLOUD READY NOT USED
-    // local procedure ImportDirectory()
-    // var
-    //     lTest001: label 'Do you want to import directory?';
-    //     recConcurSetup: Record "Concur Setup";
-    //     ProcessConcur: Codeunit "Process Concur";
-    // begin
-    //     if Confirm(lTest001, true) then begin
-    //         recConcurSetup.Get;
-    //         ProcessConcur.ImportFile(1, recConcurSetup."Import Folder - Travel Expense");
-    //     end;
-    // end;
+    local procedure ImportDirectory()
+    var
+        lTest001: label 'Do you want to import directory?';
+        recConcurSetup: Record "Concur Setup";
+        ProcessConcur: Codeunit "Process Concur";
+    begin
+        if Confirm(lTest001, true) then begin
+            recConcurSetup.Get;
+            ProcessConcur.ImportFile(1, recConcurSetup."Import Folder - Travel Expense");
+        end;
+    end;
 }

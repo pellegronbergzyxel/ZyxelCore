@@ -44,6 +44,8 @@ page 50218 "Generic Input Page"
                             InputCode20Lookup := LookupContact;
                         Lookuptype::Item:
                             InputCode20Lookup := LookupItem;
+                        LookupType::shipmentMethod:
+                            InputCode20Lookup := LookupShipmentMethod;
                     end;
                 end;
 
@@ -122,7 +124,7 @@ page 50218 "Generic Input Page"
         InputTimeVisible: Boolean;
         InputOptionCustBlockVisible: Boolean;
         InputOptionBacklogCommentVisible: Boolean;
-        LookupType: Option Contact,Item;
+        LookupType: Option Contact,Item,ShipmentMethod;  //01-06-2026 BK #573882
         InputOptionCustBlock: Option " ",Ship,Invoice,All;
         InputOptionBacklogComment: Option " ","Awaiting Prepayment","Credit Blocked","On Hold by Customer",Other;
 
@@ -275,7 +277,7 @@ page 50218 "Generic Input Page"
     end;
 
 
-    procedure SetLookupType(pLookupType: Option Contact,Item)
+    procedure SetLookupType(pLookupType: Option Contact,Item,ShipmentMethod)  //01-06-2026 BK #573882
     begin
         LookupType := pLookupType;
     end;
@@ -294,5 +296,14 @@ page 50218 "Generic Input Page"
     begin
         if Page.RunModal(Page::"Item List", lItem) = Action::LookupOK then
             exit(lItem."No.");
+    end;
+
+    //01-06-2026 BK #573882
+    local procedure LookupShipmentMethod(): Code[20]
+    var
+        ShipmentMethod: Record "Shipment Method";
+    begin
+        if Page.RunModal(Page::"Shipment Methods", ShipmentMethod) = Action::LookupOK then
+            exit(ShipmentMethod.Code);
     end;
 }

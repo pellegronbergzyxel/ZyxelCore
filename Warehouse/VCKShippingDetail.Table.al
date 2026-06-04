@@ -94,14 +94,28 @@ Table 50046 "VCK Shipping Detail"
                 ZGT: Codeunit "Zyxel General Tools";
                 WarehouseSetup: Record "Warehouse Setup";
                 ShipmentMethodrec: Record "Shipment Method";
+                LocationRec: Record Location;
+                BetweenDate: date;
 
             begin
                 if zgt.IsZComCompany() then
                     if ShipmentMethodrec.get(rec."Shipping Method") then
                         If Format(ShipmentMethodrec."Shipping Days") <> '' THEN
-                            If ETD <> 0D THEN
-                                Validate("Calculated ETA Date", CALCDATE(ShipmentMethodrec."Shipping Days", ETD))
-
+                            If ETD <> 0D THEN Begin
+                                //02-06-2026 BK #542554
+                                BetweenDate := CALCDATE(ShipmentMethodrec."Shipping Days", ETD);
+                                //Validate("Calculated ETA Date", CALCDATE(ShipmentMethodrec."Shipping Days", ETD));
+                                if rec.Location <> '' then begin
+                                    if LocationRec.get(rec.Location) then begin
+                                        if format(locationRec."Adjust ETA Calucation") <> '' then begin
+                                            Validate("Calculated ETA Date", CALCDATE(locationRec."Adjust ETA Calucation", betweenDate));
+                                        end else
+                                            Validate("Calculated ETA Date", BetweenDate);
+                                    end else
+                                        validate("Calculated ETA Date", BetweenDate);
+                                end else
+                                    validate("Calculated ETA Date", BetweenDate);
+                            end;
             end;
         }
         field(10; "Shipping Method"; Code[30])
@@ -378,12 +392,14 @@ Table 50046 "VCK Shipping Detail"
                 ZGT: Codeunit "Zyxel General Tools";
                 ShipmentMethodrec: Record "Shipment Method";
                 warehouseSetup: Record "Warehouse Setup";
+                LocationRec: Record Location;
+                BetweenDate: date;
             begin
                 if zgt.IsZComCompany() then
                     if warehouseSetup.get() then
                         If Format(warehouseSetup."Expected Receipt Calculation") <> '' THEN
                             If "Calculated ETA Date" <> 0D THEN
-                                Validate("Expected Receipt Date", CALCDATE(warehouseSetup."Expected Receipt Calculation", "Calculated ETA Date"))
+                                Validate("Expected Receipt Date", CALCDATE(warehouseSetup."Expected Receipt Calculation", "Calculated ETA Date"));
             end;
         }
     }

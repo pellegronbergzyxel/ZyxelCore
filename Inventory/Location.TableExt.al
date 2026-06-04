@@ -210,5 +210,10 @@ tableextension 50107 LocationZX extends Location
             Caption = 'zNet / zCom location translate';
             Description = 'translate between zNet and zCom location code between znet <> zCom';
         }
+        field(67007; "Adjust ETA Calucation"; DateFormula)
+        { // 02-06-2026 BK #542554
+            Caption = 'Adjust ETA Calculation';
+            Description = 'Used for adjusting ETA calculation based on the receiving date of the goods. The receiving date can be used to calculate the ETA when the shipment is in transit, and the receiving date is earlier than the ETA. This field can also be used to adjust the ETA calculation when there is a delay in the shipment and the receiving date is later than the original ETA.';
+        }
     }
 }
