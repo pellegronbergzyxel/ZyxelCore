@@ -89,7 +89,7 @@ page 50118 "Margin Approvals"
                 field("Currency Code"; Rec."Currency Code")
                 {
                     Visible = true;
-Editable = false;
+                    Editable = false;
                 }
                 field("Customer Name"; Rec."Customer Name")
                 {
@@ -115,12 +115,12 @@ Editable = false;
                     Editable = false;
                     ToolTip = 'Specifies the description of the item associated with the margin approval request.';
                 }
-                field("User Comment";Rec."User Comment")
+                field("User Comment"; Rec."User Comment")
                 {
                     Visible = true;
                     Editable = true;
                 }
-                field("Approver Comment";Rec."Approver Comment")
+                field("Approver Comment"; Rec."Approver Comment")
                 {
                     Visible = true;
                     Editable = false;
@@ -184,7 +184,7 @@ Editable = false;
 
         area(Processing)
         {
-           
+
             action(Update)
             {
                 Caption = 'Update Existing';
@@ -207,7 +207,7 @@ Editable = false;
                     Helper: codeunit AmazonHelper;
 
                 begin
-                    Helper.ProcessMarginApproval(rec,false);
+                    Helper.ProcessMarginApproval(rec, false);
                 end;
             }
             action(testAllmargincheck)
@@ -221,12 +221,12 @@ Editable = false;
                     Helper: codeunit AmazonHelper;
 
                 begin
-                    Helper.ProcessMarginApproval(rec,true);
+                    Helper.ProcessMarginApproval(rec, true);
                 end;
             }
-                 action(testPricecheck)
+            action(testPricecheck)
             {
-                Caption = 'Run margin  Price approval API';
+                Caption = 'Run Price approval API';
                 Image = UpdateDescription;
 
 
@@ -236,7 +236,22 @@ Editable = false;
 
                 begin
                     if rec."Source Type" = rec."Source Type"::"Price Book" then
-                    Helper.ProcessPriceApproval(rec);
+                        Helper.ProcessPriceApproval(rec, false);
+                end;
+            }
+            action(testAllPricecheck)
+            {
+                Caption = 'Run All Price approval API';
+                Image = UpdateDescription;
+
+
+                trigger OnAction()
+                var
+                    Helper: codeunit AmazonHelper;
+
+                begin
+                    if rec."Source Type" = rec."Source Type"::"Price Book" then
+                        Helper.ProcessPriceApproval(rec, true);
                 end;
             }
             action(testSalesordercheck)
@@ -251,32 +266,32 @@ Editable = false;
 
                 begin
                     if rec."Source Type" = rec."Source Type"::Sales then
-                    Helper.ProcessOrderApproval(rec);
+                        Helper.ProcessOrderApproval(rec);
                 end;
             }
-      action(ReturnpriceApprovaltoPricelist)
+            action(ReturnpriceApprovaltoPricelist)
             {
                 Caption = 'Confirm approval in price list';
                 Image = Apply;
-ApplicationArea = all;
+                ApplicationArea = all;
 
                 trigger OnAction()
                 var
-                    
+
 
                 begin
                     rec.Setapprovedpricebookline(rec);
                 end;
             }
             action(force)
-              {
+            {
                 Caption = 'Force approval';
                 Image = Approval;
-ApplicationArea = all;
+                ApplicationArea = all;
 
                 trigger OnAction()
                 var
-                    
+
 
                 begin
                     rec.Setapprovedpricebookline(rec);
