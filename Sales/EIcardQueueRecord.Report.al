@@ -58,11 +58,19 @@ Report 50125 "EiCard Queue Record"
             {
                 IncludeCaption = true;
             }
-            column(External_Document_No_; EiCardQueue."External Document No.")
+            column(ExternalDocumentNo; EiCardQueue."External Document No.")
             {
                 IncludeCaption = true;
             }
-            column(Distributor_Reference; EiCardQueue."Distributor Reference")
+            column(DistributorReference; EiCardQueue."Distributor Reference")
+            {
+                IncludeCaption = true;
+            }
+            column(EmailFromSignature; EiCardQueue."From E-Mail Signature")
+            {
+                IncludeCaption = true;
+            }
+            column(EmailAdressFrom; EiCardQueue."From E-Mail Address")
             {
                 IncludeCaption = true;
             }
@@ -115,7 +123,6 @@ Report 50125 "EiCard Queue Record"
                 {
                     IncludeCaption = true;
                 }
-
             }
         }
     }
