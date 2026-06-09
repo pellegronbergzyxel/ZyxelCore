@@ -2108,7 +2108,7 @@ codeunit 50055 AmazonHelper
     end;
 
 
-    procedure ProcessPriceApproval(var MarginApproval: record "Margin Approval")
+    procedure ProcessPriceApproval(var MarginApproval: record "Margin Approval"; All: Boolean)
     var
         JsontextReply: text;
         Marginsetup: record "Amazon Setup";
@@ -2119,6 +2119,7 @@ codeunit 50055 AmazonHelper
         TokenValue: JsonToken;
         part_number: text[20];
         is_low_margin: text[10];
+        entry_no: Integer;
 
     begin
         if MarginApproval.requeststatus <> MarginApproval.requeststatus::WaitingPrice then
@@ -2127,12 +2128,15 @@ codeunit 50055 AmazonHelper
         if not Marginsetup.get('PRICHETST') then
             error('Please create PriCHETST in setup');
 
-        if SentPriceApproval(MarginApproval, Marginsetup, JsontextReply) then begin
+        if SentPriceApproval(MarginApproval, Marginsetup, JsontextReply, all) then begin
             IF jsonTokenMain.ReadFrom(JsontextReply) then
                 if jsonTokenMain.SelectToken('margincheckresult', jsonTokenorders) then begin
                     jsonarrayMain := jsonTokenorders.AsArray();
                     foreach TokenOrder in jsonarrayMain do begin
-
+                        if TokenOrder.SelectToken('entry_no', TokenValue) then
+                            entry_no := TokenValue.AsValue().AsInteger();
+                        if all then
+                            MarginApproval.get(entry_no);
 
                         MarginApproval.requeststatusDT := CurrentDateTime;
                         MarginApproval.requeststatus := MarginApproval.requeststatus::SendPrice;
@@ -2377,7 +2381,7 @@ codeunit 50055 AmazonHelper
     end;
 
 
-    procedure SentPriceApproval(MarginApproval: record "Margin Approval"; Marginsetup: record "amazon Setup"; var replytext: text): Boolean
+    procedure SentPriceApproval(MarginApproval: record "Margin Approval"; Marginsetup: record "amazon Setup"; var replytext: text; All: Boolean): Boolean
     var
 
         Httpcontent: HttpContent;
@@ -2401,7 +2405,10 @@ codeunit 50055 AmazonHelper
         filename: text;
         temptext: text;
     begin
-        temptext := makePriceApprovalXml(MarginApproval, Marginsetup);
+        if all then
+            temptext := makePriceApprovalXmlAll(Marginsetup)
+        else
+            temptext := makePriceApprovalXml(MarginApproval, Marginsetup);
         if temptext <> '' then begin
             httpcontent.writefrom(temptext);
             httpcontent.GetHeaders(contentHeaders);
@@ -2574,6 +2581,80 @@ codeunit 50055 AmazonHelper
         exit(totextvar);
     end;
 
+    procedure makePriceApprovalXmlAll(Marginsetup: record "amazon Setup"): Text
+    var
+        totalDoc: JsonObject;
+        totextvar: Text;
+        margin_info: JsonObject;
+        margin_infoArray: JsonArray;
+        Salesline: record "Sales Line";
+        Priceline: record "Price List Line";
+        Customer: record Customer;
+        tempcurr: code[3];
+        glsetup: record "General Ledger Setup";
+        // Testfil
+        TempBlob: Codeunit "Temp Blob";
+        outStr: OutStream;
+        inStr: InStream;
+        filename: text;
+        MarginApproval: record "Margin Approval";
+    begin
+        glsetup.get();
+        totalDoc.add('token', Marginsetup.client_secret);
+        totalDoc.add('company', Marginsetup.ApiCompanyname);
+
+        marginapproval.setrange("Source Type", marginapproval."Source Type"::"Price Book");
+        marginapproval.setrange(requeststatus, marginapproval.requeststatus::WaitingPrice);
+        marginapproval.setfilter("User Comment", '<>%1', '');
+        if marginapproval.findset() then begin
+            if (MarginApproval."Customer No." <> '') and (MarginApproval."Customer Name" = '') then
+                if customer.get(MarginApproval."Customer No.") then
+                    MarginApproval."Customer Name" := Customer.Name;
+            if MarginApproval."Customer Name" = '' then
+                MarginApproval."Customer Name" := 'Zyxel pricelist';
+
+            totalDoc.add('customer_name', MarginApproval."Customer Name");
+            // loop >>
+            repeat
+                clear(margin_info);
+                margin_info.add('entry_no', MarginApproval."Entry No.");
+                margin_info.add('part_number', MarginApproval."Item No.");
+                tempcurr := '';
+                case MarginApproval."Source Type" of
+                    MarginApproval."Source Type"::Sales:
+                        begin
+                            if Salesline.get(MarginApproval."Sales Document Type", MarginApproval."Source Line No.") then
+                                tempcurr := Salesline."Currency Code"
+                        end;
+                    MarginApproval."Source Type"::"Price Book":
+                        begin
+                            if Priceline.get(MarginApproval."Source No.", MarginApproval."Source Line No.") then
+                                tempcurr := Priceline."Currency Code";
+                        end;
+                end;
+                if tempcurr = '' then
+                    tempcurr := glsetup."LCY Code";
+                margin_info.add('currency', tempcurr);
+                margin_info.add('selling_price', MarginApproval."Unit Price");
+                margin_info.Add('comment', MarginApproval."User Comment");
+                margin_infoArray.add(margin_info);
+            until marginapproval.next = 0;
+            // loop >>
+            totalDoc.add('priceapprovereq', margin_infoArray);
+            // totalDoc.add('fulfillment', fulfillment);
+            totalDoc.WriteTo(totextvar);
+            // Save the data of the InStream as a file.
+            if (Marginsetup.testmode) and GuiAllowed then begin
+                TempBlob.CreateOutStream(outStr, TextEncoding::UTF8);
+                outStr.WriteText(totextvar);
+                TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
+                fileName := 'Shopify_postfulfillment.txt';
+                File.DownloadFromStream(inStr, 'Export', '', '', fileName);
+            end;
+        end;
+        exit(totextvar);
+    end;
+
 
     procedure makeOrderApprovalXml(MarginApproval: record "Margin Approval"; Marginsetup: record "amazon Setup"): Text
     var
@@ -2647,7 +2728,7 @@ codeunit 50055 AmazonHelper
         exit(totextvar);
     end;
 
-Procedure checkandSetMarginApproval(var PriceListLine: Record "Price List Line"; var IsHandled: Boolean)
+    Procedure checkandSetMarginApproval(var PriceListLine: Record "Price List Line"; var IsHandled: Boolean)
     var
         salessetup: Record "Sales & Receivables Setup";
         MarginApproval: record "Margin Approval";
@@ -2722,7 +2803,7 @@ Procedure checkandSetMarginApproval(var PriceListLine: Record "Price List Line";
         MarginApproval: record "Margin Approval";
         x: integer;
     begin
-        checkandSetMarginApproval(PriceListLine,IsHandled);
+        checkandSetMarginApproval(PriceListLine, IsHandled);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnAfterValidateEvent', 'Status', false, false)]
@@ -3235,10 +3316,8 @@ Procedure checkandSetMarginApproval(var PriceListLine: Record "Price List Line";
         marginapproval.setrange(requeststatus, marginapproval.requeststatus::WaitingPrice);
         marginapproval.setfilter("User Comment", '<>%1', '');
         if marginapproval.findset() then
-            repeat
-                marginapproval2.get(marginapproval."Entry No.");
-                ProcessPriceApproval(marginapproval2);
-            until marginapproval.next = 0;
+            ProcessPriceApproval(marginapproval, true);
+
 
 
     end;
@@ -3259,7 +3338,7 @@ Procedure checkandSetMarginApproval(var PriceListLine: Record "Price List Line";
         if marginapproval.findset() then
             repeat
                 marginapproval2.get(marginapproval."Entry No.");
-                ProcessPriceApproval(marginapproval2);
+                ProcessOrderApproval(marginapproval2);
             until marginapproval.next = 0;
     end;
 
