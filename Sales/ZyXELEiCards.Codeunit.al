@@ -266,6 +266,8 @@ Codeunit 50001 "ZyXEL EiCards"
                 //ServerFilename := FileMgt.ServerTempFileName('');
                 RemoteFilename := StrSubstNo('%1.txt', recPurchHead."No.");
                 // CLOUD READY NEW
+                Cr := 13;
+                Lf := 10;
                 FileContent := 'Order Header,,' + Cr + Lf;
                 FileContent += recPurchSetup."EiCar Default Transport Method" + Cr + Lf;
                 FileContent += ', ' + Cr + Lf;
