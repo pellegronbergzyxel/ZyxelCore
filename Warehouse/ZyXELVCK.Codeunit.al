@@ -71,7 +71,8 @@ Codeunit 50004 "ZyXEL VCK"
                 recPurchHead.TestField("FTP Code");
                 //<< 04-11-19 ZY-LD 006
 
-
+                Cr := 13;
+                Lf := 10;
                 //   ServerFilename := FileMgt.ServerTempFileName('');
                 RemoteFilename := StrSubstNo('%1.txt', recPurchHead."No.");
                 // CLOUD READY DELETE
@@ -134,12 +135,12 @@ Codeunit 50004 "ZyXEL VCK"
                     recPurchLine.SuspendStatusCheck(false);  // 17-04-24 ZY-LD 008
                 end;
                 //CurrFile.Close;
-                
+
                 TempBlob.CreateOutStream(varOutputStream);
                 varOutputStream.WriteText(FileContent);
 
                 //IF FTPMgt.UploadFile(FTPFolder,ServerFilename,RemoteFilename) THEN BEGIN  // 04-11-19 ZY-LD 006
-                if FTPMgt.UploadFilestream(recPurchHead."FTP Code", TempBlob,RemoteFilename, RemoteFilename) then begin  // CLOUD READY NEW
+                if FTPMgt.UploadFilestream(recPurchHead."FTP Code", TempBlob, RemoteFilename, RemoteFilename) then begin  // CLOUD READY NEW
                     recPurchHead."Vendor Status" := recPurchHead."vendor status"::"Order Created";
                     recPurchHead."EShop Order Sent" := true;
                     recPurchHead.Modify;

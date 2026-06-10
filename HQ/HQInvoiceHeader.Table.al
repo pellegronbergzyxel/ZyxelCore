@@ -403,48 +403,7 @@ procedure LoadFileToBlob(FilePath: Text): Boolean
         filblob.CreateOutStream(BlobStream);
         exit(true);
     end;
-
-    // procedure LoadFileToBase64(FilePath: Text): Boolean
-    // var
-    //     FileIn: File;
-    //     FileStream: InStream;
-    //     Base64: Codeunit "Base64 Convert";
-    //     BlobStream: OutStream;
-    //     Base64Content: Text;
-    // begin
-    //     if not File.Exists(FilePath) then
-    //         exit(false);
-
-    //     FileIn.Open(FilePath);
-    //     FileIn.CreateInstream(FileStream);
-    //     Base64Content := Base64.ToBase64(FileStream);
-    //     FileIn.Close;
-
-    //     filblob.CreateOutStream(BlobStream);
-    //     BlobStream.WriteText(Base64Content);
-    //     exit(true);
-    // end;
-
-    // procedure DownloadBlobFromBase64(DownloadPath: Text): Boolean
-    // var
-    //     FileOut: File;
-    //     FileStream: OutStream;
-    //     Base64: Codeunit "Base64 Convert";
-    //     BlobStream: InStream;
-    //     Base64Content: Text;
-    // begin
-    //     if not filblob.HasValue then
-    //         exit(false);
-
-    //     filblob.CreateInStream(BlobStream);
-    //     BlobStream.ReadText(Base64Content);
-
-    //     FileOut.Create(DownloadPath);
-    //     FileOut.CreateOutstream(FileStream);
-    //     Base64.FromBase64(Base64Content, FileStream);
-    //     FileOut.Close;
-    //     exit(true);
-    // end;
+   
 
     procedure GetBlobAsBase64(var Base64Content: Text): Boolean
     var
