@@ -554,38 +554,33 @@ Codeunit 50000 "ZyXEL General Tools"
         //<< 11-04-19 ZY-LD 009
     end;
 
-    // procedure EMEAServer(): Boolean
-    // var
-    //     EnvironmentInfo: codeunit "Environment Information"; //27-05-2026 BK #Cloud Ready
-    //     EnviromentText: Text;
-    // begin
-    //     EnviromentText := EnvironmentInfo.GetApplicationFamily();
-    //     IF EnviromentText = 'EMEA' THEN
-    //         exit(true);
-    //     //ServerInstance.SetFilter(ServerInstance.Server, '%1|%2', ServerInstance.Server::" ", ServerInstance.Server::Main);
-    //     //if ServerInstance.FindFirst then
-    //     //    exit(true);
-    // end;
+    procedure EMEAServer(): Boolean
+    var
+        ServerInstance: Record "Server Environment"; //27-05-2026 BK #Cloud Ready
+    begin
+        ServerInstance.SetFilter(ServerInstance.Server, '%1|%2', ServerInstance.Server::" ", ServerInstance.Server::Main);
+        if ServerInstance.FindFirst then
+            exit(true);
+    end;
 
-    // procedure TurkishServer(): Boolean
-    // var
-    //     ServerInstance: Record "Server Instance";
-    // begin
-
-    //     ServerInstance.SetFilter("Service Name", '%1|%2', 'TR-WS', 'TESTTR-WS');
-    //     if ServerInstance.FindFirst then
-    //         exit(true);
-    // end;
+    procedure TurkishServer(): Boolean
+    var
+        ServerInstance: Record "Server Instance";
+    begin
+        ServerInstance.SetFilter("Service Name", '%1|%2', 'TR-WS', 'TESTTR-WS');
+        if ServerInstance.FindFirst then
+            exit(true);
+    end;
 
 
-    // procedure ItalianServer(): Boolean
-    // var
-    //     ServerInstance: Record "Server Instance";
-    // begin
-    //     ServerInstance.SetFilter("Service Name", '%1|%2', 'IT-WS', 'TESTIT-WS');
-    //     if ServerInstance.FindFirst then
-    //         exit(true);
-    // end;
+    procedure ItalianServer(): Boolean
+    var
+        ServerInstance: Record "Server Instance";
+    begin
+        ServerInstance.SetFilter("Service Name", '%1|%2', 'IT-WS', 'TESTIT-WS');
+        if ServerInstance.FindFirst then
+            exit(true);
+    end;
 
 
     procedure GetMonthText(pMonthNo: Integer; pLowercase: Boolean; pUppercase: Boolean; pShortText: Boolean) rValue: Text
@@ -825,8 +820,7 @@ Codeunit 50000 "ZyXEL General Tools"
         filename: text;
         tempblob: Codeunit "Temp Blob";
     begin
-        // CLOUD READY DELETE 
-        ///filemgt.BLOBImportFromServerFile(tempblob, serverfiltext);
+        filemgt.BLOBImportFromServerFile(tempblob, serverfiltext);
         tempblob.CreateInStream(instr);
         filename := filemgt.GetFileName(serverfiltext);
         file.DownloadFromStream(instr, '', '', '', filename)
