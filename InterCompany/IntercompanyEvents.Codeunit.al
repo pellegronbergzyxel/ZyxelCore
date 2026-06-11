@@ -856,6 +856,7 @@ codeunit 50048 "Intercompany Events"
             until ICOutboxTransaction.Next() = 0;
     end;
 
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"IC Outbox Export", 'OnBeforeSendToExternalPartner', '', false, false)]
     local procedure ICOutboxExport_OnBeforeSendToExternalPartner(var ICOutboxTransaction: Record "IC Outbox Transaction"; var IsHandled: Boolean)
     var
@@ -869,7 +870,7 @@ codeunit 50048 "Intercompany Events"
         DocumentMailing: Codeunit "Document-Mailing";
         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
         InStream: InStream;
-        OFile: File;
+       // OFile: File;
         FileName: Text;
         ICPartnerFilter: Text[1024];
         ToName: Text[100];
@@ -889,100 +890,101 @@ codeunit 50048 "Intercompany Events"
         if GenJnlPostPreview.IsActive() then
             exit;
 
-        ICPartner.SetFilter("Inbox Type", '<>%1&<>%2', ICPartner."Inbox Type"::Database, ICPartner."Inbox Type"::"Web Service");
+        // CLOUD READY DELETE
+        // USED on fil transfer and not database or web service
+        //     ICPartner.SetFilter("Inbox Type", '<>%1&<>%2', ICPartner."Inbox Type"::Database, ICPartner."Inbox Type"::"Web Service");
+        //     ICPartnerFilter := CopyStr(ICOutboxTransaction.GetFilter("IC Partner Code"), 1, 1024);
+        //     if ICPartnerFilter <> '' then
+        //         ICPartner.SetFilter(Code, ICPartnerFilter);
+        //     if ICPartner.Find('-') then
+        //         repeat
+        //             ICOutboxTransaction.SetRange("IC Partner Code", ICPartner.Code);
+        //             if ICOutboxTransaction.Find('-') then begin
+        //                 if (ICPartner."Inbox Type" = ICPartner."Inbox Type"::"File Location") and not IsWebClient() then begin
+        //                     ICPartner.TestField(Blocked, false);
+        //                     if ICPartner."Inbox Details" = '' then
+        //                         Error(FolderPathMissingErr, ICPartner.Code);
+        //                     i := 1;
+        //                     while i <> 0 do begin
+        //                         FileName :=
+        //                           StrSubstNo('%1\%2_%3_%4.xml', ICPartner."Inbox Details", ICPartner.Code, ICOutboxTransaction."Transaction No.", i);
+        //                         if Exists(FileName) then
+        //                             i := i + 1
+        //                         else
+        //                             i := 0;
+        //                     end;
+        //                 end else begin
+        //                     OFile.CreateTempFile();
+        //                     FileName := StrSubstNo('%1.%2.xml', OFile.Name, ICPartner.Code);
+        //                     OFile.Close();
+        //                 end;
 
-        ICPartnerFilter := CopyStr(ICOutboxTransaction.GetFilter("IC Partner Code"), 1, 1024);
-        if ICPartnerFilter <> '' then
-            ICPartner.SetFilter(Code, ICPartnerFilter);
-        if ICPartner.Find('-') then
-            repeat
-                ICOutboxTransaction.SetRange("IC Partner Code", ICPartner.Code);
-                if ICOutboxTransaction.Find('-') then begin
-                    if (ICPartner."Inbox Type" = ICPartner."Inbox Type"::"File Location") and not IsWebClient() then begin
-                        ICPartner.TestField(Blocked, false);
-                        if ICPartner."Inbox Details" = '' then
-                            Error(FolderPathMissingErr, ICPartner.Code);
-                        i := 1;
-                        while i <> 0 do begin
-                            FileName :=
-                              StrSubstNo('%1\%2_%3_%4.xml', ICPartner."Inbox Details", ICPartner.Code, ICOutboxTransaction."Transaction No.", i);
-                            if Exists(FileName) then
-                                i := i + 1
-                            else
-                                i := 0;
-                        end;
-                    end else begin
-                        OFile.CreateTempFile();
-                        FileName := StrSubstNo('%1.%2.xml', OFile.Name, ICPartner.Code);
-                        OFile.Close();
-                    end;
+        //                 ExportOutboxTransaction(ICOutboxTransaction, FileName);
 
-                    ExportOutboxTransaction(ICOutboxTransaction, FileName);
+        //                 if IsWebClient() then begin
+        //                     OutFileName := StrSubstNo('%1_%2.xml', ICPartner.Code, ICOutboxTransaction."Transaction No.");
+        //                     if not AddBatchProcessingArtifact(FileName, CopyStr(OutFileName, 1, 1024)) then
+        //                         Download(FileName, '', '', '', OutFileName)
+        //                 end else
+        //                     FileName := FileMgt.DownloadTempFile(FileName);
 
-                    if IsWebClient() then begin
-                        OutFileName := StrSubstNo('%1_%2.xml', ICPartner.Code, ICOutboxTransaction."Transaction No.");
-                        if not AddBatchProcessingArtifact(FileName, CopyStr(OutFileName, 1, 1024)) then
-                            Download(FileName, '', '', '', OutFileName)
-                    end else
-                        FileName := FileMgt.DownloadTempFile(FileName);
+        //                 if ICPartner."Inbox Type" = ICPartner."Inbox Type"::Email then begin
+        //                     ICPartner.TestField(Blocked, false);
+        //                     if ICPartner."Inbox Details" = '' then
+        //                         Error(EmailAddressMissingErr, ICPartner.Code);
+        //                     ToName := Copystr(ICPartner."Inbox Details", 1, 100);
+        //                     if StrPos(ToName, ';') > 0 then begin
+        //                         CcName := CopyStr(ToName, StrPos(ToName, ';') + 1);
+        //                         ToName := CopyStr(ToName, 1, StrPos(ToName, ';') - 1);
+        //                         if StrPos(CcName, ';') > 0 then
+        //                             CcName := CopyStr(CcName, 1, StrPos(CcName, ';') - 1);
+        //                     end;
 
-                    if ICPartner."Inbox Type" = ICPartner."Inbox Type"::Email then begin
-                        ICPartner.TestField(Blocked, false);
-                        if ICPartner."Inbox Details" = '' then
-                            Error(EmailAddressMissingErr, ICPartner.Code);
-                        ToName := Copystr(ICPartner."Inbox Details", 1, 100);
-                        if StrPos(ToName, ';') > 0 then begin
-                            CcName := CopyStr(ToName, StrPos(ToName, ';') + 1);
-                            ToName := CopyStr(ToName, 1, StrPos(ToName, ';') - 1);
-                            if StrPos(CcName, ';') > 0 then
-                                CcName := CopyStr(CcName, 1, StrPos(CcName, ';') - 1);
-                        end;
+        //                     if IsWebClient() then begin
+        //                         EmailItem."Send to" := ICPartner."Inbox Details";
+        //                         EmailItem.Subject := StrSubstNo('%1 %2', ICOutboxTransaction."Document Type", ICOutboxTransaction."Document No.");
+        //                         Commit();
 
-                        if IsWebClient() then begin
-                            EmailItem."Send to" := ICPartner."Inbox Details";
-                            EmailItem.Subject := StrSubstNo('%1 %2', ICOutboxTransaction."Document Type", ICOutboxTransaction."Document No.");
-                            Commit();
+        //                         OFile.Open(FileName);
+        //                         OFile.CreateInStream(InStream);
 
-                            OFile.Open(FileName);
-                            OFile.CreateInStream(InStream);
+        //                         SourceTableIDs.Add(Database::"IC Outbox Transaction");
+        //                         SourceIDs.Add(ICOutboxTransaction.SystemId);
+        //                         SourceRelationTypes.Add(Enum::"Email Relation Type"::"Primary Source".AsInteger());
 
-                            SourceTableIDs.Add(Database::"IC Outbox Transaction");
-                            SourceIDs.Add(ICOutboxTransaction.SystemId);
-                            SourceRelationTypes.Add(Enum::"Email Relation Type"::"Primary Source".AsInteger());
+        //                         SourceTableIDs.Add(Database::"IC Partner");
+        //                         SourceIDs.Add(ICPartner.SystemId);
+        //                         SourceRelationTypes.Add(Enum::"Email Relation Type"::"Related Entity".AsInteger());
 
-                            SourceTableIDs.Add(Database::"IC Partner");
-                            SourceIDs.Add(ICPartner.SystemId);
-                            SourceRelationTypes.Add(Enum::"Email Relation Type"::"Related Entity".AsInteger());
-
-                            DocumentMailing.EmailFile(
-                              InStream,
-                              StrSubstNo('%1.xml', ICPartner.Code),
-                              '',
-                              ICOutboxTransaction."Document No.",
-                              EmailItem."Send to",
-                              EmailItem.Subject,
-                              true,
-                              5, // S.Test
-                              SourceTableIDs,
-                              SourceIDs,
-                              SourceRelationTypes);
-                        end else begin
-                            ICSetup.Get();
-                            CompanyInfo.Get();
-                            MailHandler.NewMessage(
-                              ToName, CcName, '',
-                              StrSubstNo(Text001, CompanyInfo.Name),
-                              StrSubstNo(
-                                Text002, CompanyInfo.Name, ICSetup.FieldCaption("IC Partner Code"), ICSetup."IC Partner Code"),
-                              FileName, false);
-                        end;
-                    end;
-                    ICOutboxTransaction.Find('-');
-                    repeat
-                        ICInboxOutboxMgt.MoveOutboxTransToHandledOutbox(ICOutboxTransaction);
-                    until ICOutboxTransaction.Next() = 0;
-                end;
-            until ICPartner.Next() = 0;
+        //                         DocumentMailing.EmailFile(
+        //                           InStream,
+        //                           StrSubstNo('%1.xml', ICPartner.Code),
+        //                           '',
+        //                           ICOutboxTransaction."Document No.",
+        //                           EmailItem."Send to",
+        //                           EmailItem.Subject,
+        //                           true,
+        //                           5, // S.Test
+        //                           SourceTableIDs,
+        //                           SourceIDs,
+        //                           SourceRelationTypes);
+        //                     end else begin
+        //                         ICSetup.Get();
+        //                         CompanyInfo.Get();
+        //                         MailHandler.NewMessage(
+        //                           ToName, CcName, '',
+        //                           StrSubstNo(Text001, CompanyInfo.Name),
+        //                           StrSubstNo(
+        //                             Text002, CompanyInfo.Name, ICSetup.FieldCaption("IC Partner Code"), ICSetup."IC Partner Code"),
+        //                           FileName, false);
+        //                     end;
+        //                 end;
+        //                 ICOutboxTransaction.Find('-');
+        //                 repeat
+        //                     ICInboxOutboxMgt.MoveOutboxTransToHandledOutbox(ICOutboxTransaction);
+        //                 until ICOutboxTransaction.Next() = 0;
+        //             end;
+        //         until ICPartner.Next() = 0;
         ICOutboxTransaction.SetRange("IC Partner Code");
         if ICPartnerFilter <> '' then
             ICOutboxTransaction.SetFilter("IC Partner Code", ICPartnerFilter);
@@ -1035,41 +1037,43 @@ codeunit 50048 "Intercompany Events"
         exit(ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::Web, CLIENTTYPE::Phone, CLIENTTYPE::Tablet, CLIENTTYPE::Desktop]);
     end;
 
-    local procedure ExportOutboxTransaction(var ICOutboxTransaction: Record "IC Outbox Transaction"; var FileName: Text)
-    var
-        ICOutboxImpExpXML: XmlPort "IC Outbox Imp/Exp";
-        OFile: File;
-        OStr: OutStream;
+    // CLOUD READY DELETE
+    // local procedure ExportOutboxTransaction(var ICOutboxTransaction: Record "IC Outbox Transaction"; var FileName: Text)
+    // var
+    //     ICOutboxImpExpXML: XmlPort "IC Outbox Imp/Exp";
+    //     OFile: File;
+    //     OStr: OutStream;
 
-    begin
-        OFile.Create(FileName);
-        OFile.CreateOutStream(OStr);
+    // begin
+    //     OFile.Create(FileName);
+    //     OFile.CreateOutStream(OStr);
 
-        ICOutboxImpExpXML.SetICOutboxTrans(ICOutboxTransaction);
-        ICOutboxImpExpXML.SetDestination(OStr);
-        ICOutboxImpExpXML.Export();
+    //     ICOutboxImpExpXML.SetICOutboxTrans(ICOutboxTransaction);
+    //     ICOutboxImpExpXML.SetDestination(OStr);
+    //     ICOutboxImpExpXML.Export();
 
-        OFile.Close();
-        Clear(OStr);
-        Clear(ICOutboxImpExpXML);
-    end;
+    //     OFile.Close();
+    //     Clear(OStr);
+    //     Clear(ICOutboxImpExpXML);
+    // end;
 
-    local procedure AddBatchProcessingArtifact(FilePath: Text; ArtifactName: Text[1024]): Boolean
-    var
-        BatchProcessingMgt: Codeunit "Batch Processing Mgt.";
-        FileManagement: Codeunit "File Management";
-        TempBlob: Codeunit "Temp Blob";
-        BatchProcessingArtifactType: Enum "Batch Processing Artifact Type";
-    begin
-        if not BatchProcessingMgt.IsActive() then
-            exit(false);
+    // CLOUD READY DELETE
+    // local procedure AddBatchProcessingArtifact(FilePath: Text; ArtifactName: Text[1024]): Boolean
+    // var
+    //     BatchProcessingMgt: Codeunit "Batch Processing Mgt.";
+    //     FileManagement: Codeunit "File Management";
+    //     TempBlob: Codeunit "Temp Blob";
+    //     BatchProcessingArtifactType: Enum "Batch Processing Artifact Type";
+    // begin
+    //     if not BatchProcessingMgt.IsActive() then
+    //         exit(false);
 
-        FileManagement.BLOBImportFromServerFile(TempBlob, FilePath);
+    //     FileManagement.BLOBImportFromServerFile(TempBlob, FilePath);
 
-        BatchProcessingMgt.AddArtifact(BatchProcessingArtifactType::"IC Output File", ArtifactName, TempBlob);
+    //     BatchProcessingMgt.AddArtifact(BatchProcessingArtifactType::"IC Output File", ArtifactName, TempBlob);
 
-        exit(true);
-    end;
+    //     exit(true);
+    // end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"IC Outbox Export", 'OnBeforeRunOutboxTransactions', '', false, false)]
     local procedure ICOutboxExport_OnBeforeRunOutboxTransactions(var ICOutboxTransaction: Record "IC Outbox Transaction")

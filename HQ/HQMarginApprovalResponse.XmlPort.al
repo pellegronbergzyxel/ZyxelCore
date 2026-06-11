@@ -57,7 +57,7 @@ xmlport 50011 "HQ Margin Approval Response"
                 textelement(Comment)
                 {
                     XmlName = 'Comment';
-                    MinOccurs = Once;
+                    MinOccurs = Zero;
                     MaxOccurs = Once;
                 }
 
