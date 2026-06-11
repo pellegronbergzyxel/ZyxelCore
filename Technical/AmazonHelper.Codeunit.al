@@ -3477,10 +3477,11 @@ codeunit 50055 AmazonHelper
                 if not Loadtable.filblob.HasValue then begin
                     if File.Exists(loadsetup."Folder Name" + Loadtable."Folder and Filename") then
                         if Loadtable.LoadFileToBlob(loadsetup."Folder Name" + Loadtable."Folder and Filename") then begin
-                            Loadtable.modify(false);
+                            Loadtable.modify(true);
                             commit;
                         end;
-                end;
+                end else
+                    Loadtable.modify(true);
             until Loadtable.next = 0;
     end;
 
