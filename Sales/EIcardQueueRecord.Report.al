@@ -123,10 +123,17 @@ Report 50125 "EiCard Queue Record"
                 {
                     IncludeCaption = true;
                 }
+
+                column(LicenseDownload_Url; EiCardLinkLine.Link)
+                {
+                    IncludeCaption = true;
+                }
+                column(LicenseDownload_UrlText; LicenseDownloadLinkText)
+                {
+                }
             }
         }
     }
-
     requestpage
     {
         layout
@@ -139,4 +146,13 @@ Report 50125 "EiCard Queue Record"
         {
         }
     }
+
+    trigger OnPreReport()
+    begin
+        LicenseDownloadLinkText := 'Download License';
+    end;
+
+    var
+        LicenseDownloadLinkText: Text;
 }
+
