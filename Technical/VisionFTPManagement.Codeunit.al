@@ -205,60 +205,60 @@ Codeunit 50057 "VisionFTP Management"
                 Error(Text50005);
     end;
 
-    procedure DownloadFolder("Code": Code[20])
-    var
-        recZyFileMgt: Record "Zyxel File Management";
-        TempBlob: Codeunit "Temp Blob";
-        FileAPIMgt: Codeunit FileAPIMgtHLPVPE;
-        FileMgt: Codeunit "File Management";
-        B64: Codeunit "Base64 Convert";
-        FileHandle: File;
-        FileArray: JsonArray;
-        FileToken: JsonToken;
-        FileOutStream: OutStream;
-        FileInStream: InStream;
-        FTPConnectionString: Text;
-        FileName: Text;
-        ArchiveFileName: Text;
-        I: Integer;
-    begin
-        GetFtpFolder(Code);
+    // procedure DownloadFolder("Code": Code[20])
+    // var
+    //     recZyFileMgt: Record "Zyxel File Management";
+    //     TempBlob: Codeunit "Temp Blob";
+    //     FileAPIMgt: Codeunit FileAPIMgtHLPVPE;
+    //     FileMgt: Codeunit "File Management";
+    //     B64: Codeunit "Base64 Convert";
+    //     FileHandle: File;
+    //     FileArray: JsonArray;
+    //     FileToken: JsonToken;
+    //     FileOutStream: OutStream;
+    //     FileInStream: InStream;
+    //     FTPConnectionString: Text;
+    //     FileName: Text;
+    //     ArchiveFileName: Text;
+    //     I: Integer;
+    // begin
+    //     GetFtpFolder(Code);
 
-        if recFtpFolder.Direction = recFtpFolder.Direction::Send then
-            Error(Text001, Code, recFtpFolder.Direction);
+    //     if recFtpFolder.Direction = recFtpFolder.Direction::Send then
+    //         Error(Text001, Code, recFtpFolder.Direction);
 
-        if SubFolder <> '' then
-            recFtpFolder."Remote Folder" := FileMgt.CombinePath(recFtpFolder."Remote Folder", SubFolder);
+    //     if SubFolder <> '' then
+    //         recFtpFolder."Remote Folder" := FileMgt.CombinePath(recFtpFolder."Remote Folder", SubFolder);
 
-        FTPConnectionString := GetFTPConnectionString(true);
+    //     FTPConnectionString := GetFTPConnectionString(true);
 
-        FileArray := FileAPIMgt.FtpGetFileList(FTPConnectionString, recFtpFolder."Remote Folder");
-        for I := 0 to FileArray.Count() - 1 do begin
-            FileArray.Get(I, FileToken);
-            FileName := FileToken.AsValue().AsText();
-            ArchiveFileName := FileMgt.CombinePath(recFtpFolder."Archive Folder", FileName);
-            if not (FileName in ['.', '..']) and (filename.Contains('.')) then begin
-                recZyFileMgt.LockTable();
+    //     FileArray := FileAPIMgt.FtpGetFileList(FTPConnectionString, recFtpFolder."Remote Folder");
+    //     for I := 0 to FileArray.Count() - 1 do begin
+    //         FileArray.Get(I, FileToken);
+    //         FileName := FileToken.AsValue().AsText();
+    //         ArchiveFileName := FileMgt.CombinePath(recFtpFolder."Archive Folder", FileName);
+    //         if not (FileName in ['.', '..']) and (filename.Contains('.')) then begin
+    //             recZyFileMgt.LockTable();
 
-                FileHandle.Create(ArchiveFileName);
-                FileHandle.CreateOutStream(FileOutStream);
-                B64.FromBase64(FileApiMgt.FTPDownloadFile(FTPConnectionString, recFtpFolder."Remote Folder", FileName), FileOutStream);
-                //TempBlob.CreateInStream(FileInStream);
-                //FileHandle.Write(FileInStream);
-                FileHandle.Close();
+    //             FileHandle.Create(ArchiveFileName);
+    //             FileHandle.CreateOutStream(FileOutStream);
+    //             B64.FromBase64(FileApiMgt.FTPDownloadFile(FTPConnectionString, recFtpFolder."Remote Folder", FileName), FileOutStream);
+    //             //TempBlob.CreateInStream(FileInStream);
+    //             //FileHandle.Write(FileInStream);
+    //             FileHandle.Close();
 
-                recZyFileMgt.Init();
-                recZyFileMgt.Validate(Filename, ArchiveFileName);
+    //             recZyFileMgt.Init();
+    //             recZyFileMgt.Validate(Filename, ArchiveFileName);
 
-                recZyFileMgt.Insert(true);
+    //             recZyFileMgt.Insert(true);
 
-                if recFtpFolder."Delete Remote" then
-                    FileAPIMgt.FtpDeleteFile(FTPConnectionString, recFtpFolder."Remote Folder", FileName);
+    //             if recFtpFolder."Delete Remote" then
+    //                 FileAPIMgt.FtpDeleteFile(FTPConnectionString, recFtpFolder."Remote Folder", FileName);
 
-                Commit();
-            end;
-        end;
-    end;
+    //             Commit();
+    //         end;
+    //     end;
+    // end;
 
     procedure DownloadFolderStream("Code": Code[20])
     var
