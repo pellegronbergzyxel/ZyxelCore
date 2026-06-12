@@ -266,7 +266,23 @@ page 50118 "Margin Approvals"
 
                 begin
                     if rec."Source Type" = rec."Source Type"::Sales then
-                        Helper.ProcessOrderApproval(rec);
+                        Helper.ProcessOrderApproval(rec, false);
+                end;
+            }
+
+              action(testallSalesordercheck)
+            {
+                Caption = 'Run all Salesorder approval API';
+                Image = UpdateDescription;
+
+
+                trigger OnAction()
+                var
+                    Helper: codeunit AmazonHelper;
+
+                begin
+                    if rec."Source Type" = rec."Source Type"::Sales then
+                        Helper.ProcessOrderApproval(rec, true);
                 end;
             }
             action(ReturnpriceApprovaltoPricelist)

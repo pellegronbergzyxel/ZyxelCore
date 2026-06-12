@@ -2168,7 +2168,7 @@ codeunit 50055 AmazonHelper
 
 
 
-    procedure ProcessOrderApproval(var MarginApproval: record "Margin Approval")
+    procedure ProcessOrderApproval(var MarginApproval: record "Margin Approval"; All: Boolean)
     var
         JsontextReply: text;
         Marginsetup: record "Amazon Setup";
@@ -2180,6 +2180,7 @@ codeunit 50055 AmazonHelper
         jsonvalue: JsonValue;
         part_number: text[20];
         is_low_margin: text[10];
+        entry_no: integer;
 
     begin
         if MarginApproval.requeststatus <> MarginApproval.requeststatus::WaitingPrice then
@@ -2188,10 +2189,17 @@ codeunit 50055 AmazonHelper
         if not Marginsetup.get('ORDERTST') then
             error('Please create ORDERTST in setup');
 
-        if SentOrderApproval(MarginApproval, Marginsetup, JsontextReply) then begin
+        if SentOrderApproval(MarginApproval, Marginsetup, JsontextReply, All) then begin
             IF jsonTokenMain.ReadFrom(JsontextReply) then
                 if jsonTokenMain.SelectToken('status', jsonTokenorders) then begin
                     jsonvalue := jsonTokenorders.AsValue();
+
+                    if TokenOrder.SelectToken('entry_no', TokenValue) then
+                        entry_no := TokenValue.AsValue().AsInteger();
+
+
+                    if all then
+                        MarginApproval.get(entry_no);
 
                     if jsonvalue.AsText().Contains('received') then begin
                         MarginApproval.requeststatusDT := CurrentDateTime;
@@ -2420,7 +2428,7 @@ codeunit 50055 AmazonHelper
         temptext: text;
     begin
         if all then
-            temptext := makePriceApprovalXmlAll(Marginsetup)
+            temptext := makePriceApprovalXmlAll(MarginApproval, Marginsetup)
         else
             temptext := makePriceApprovalXml(MarginApproval, Marginsetup);
         if temptext <> '' then begin
@@ -2464,7 +2472,7 @@ codeunit 50055 AmazonHelper
         end;
     end;
 
-    procedure SentOrderApproval(MarginApproval: record "Margin Approval"; Marginsetup: record "amazon Setup"; var replytext: text): Boolean
+    procedure SentOrderApproval(MarginApproval: record "Margin Approval"; Marginsetup: record "amazon Setup"; var replytext: text; All: Boolean): Boolean
     var
 
         Httpcontent: HttpContent;
@@ -2488,7 +2496,10 @@ codeunit 50055 AmazonHelper
         filename: text;
         temptext: text;
     begin
-        temptext := makeOrderApprovalXml(MarginApproval, Marginsetup);
+        if all then
+            temptext := makeOrderApprovalXmlAll(MarginApproval, Marginsetup)
+        else
+            temptext := makeOrderApprovalXml(MarginApproval, Marginsetup);
         if temptext <> '' then begin
             httpcontent.writefrom(temptext);
             httpcontent.GetHeaders(contentHeaders);
@@ -2595,7 +2606,7 @@ codeunit 50055 AmazonHelper
         exit(totextvar);
     end;
 
-    procedure makePriceApprovalXmlAll(Marginsetup: record "amazon Setup"): Text
+    procedure makePriceApprovalXmlAll(MarginApprovalfilter: record "Margin Approval"; Marginsetup: record "amazon Setup"): Text
     var
         totalDoc: JsonObject;
         totextvar: Text;
@@ -2619,6 +2630,7 @@ codeunit 50055 AmazonHelper
 
         marginapproval.setrange("Source Type", marginapproval."Source Type"::"Price Book");
         marginapproval.setrange(requeststatus, marginapproval.requeststatus::WaitingPrice);
+        MarginApproval.setrange("Source No.", MarginApprovalfilter."Source No.");
         marginapproval.setfilter("User Comment", '<>%1', '');
         if marginapproval.findset() then begin
             if (MarginApproval."Customer No." <> '') and (MarginApproval."Customer Name" = '') then
@@ -2741,6 +2753,90 @@ codeunit 50055 AmazonHelper
         end;
         exit(totextvar);
     end;
+
+    procedure makeOrderApprovalXmlAll(MarginApprovalFilter: record "Margin Approval"; Marginsetup: record "amazon Setup"): Text
+    var
+        totalDoc: JsonObject;
+        totextvar: Text;
+        margin_info: JsonObject;
+        margin_infoArray: JsonArray;
+        Salesline: record "Sales Line";
+        Priceline: record "Price List Line";
+        Customer: record Customer;
+        tempcurr: code[3];
+        glsetup: record "General Ledger Setup";
+        // Testfil
+        TempBlob: Codeunit "Temp Blob";
+        outStr: OutStream;
+        inStr: InStream;
+        filename: text;
+        tempqty: integer;
+        MarginApproval: record "Margin Approval";
+    begin
+        glsetup.get();
+        totalDoc.add('token', Marginsetup.client_secret);
+        totalDoc.add('company', Marginsetup.ApiCompanyname);
+        marginapproval.setrange("Source Type", marginapproval."Source Type"::Sales);
+        marginapproval.setrange(requeststatus, marginapproval.requeststatus::WaitingPrice);
+        MarginApproval.setrange("Source No.", MarginApprovalfilter."Source No.");
+        marginapproval.setfilter("User Comment", '<>%1', '');
+        if marginapproval.findset() then begin
+
+            if (MarginApproval."Customer No." <> '') and (MarginApproval."Customer Name" = '') then
+                if customer.get(MarginApproval."Customer No.") then
+                    MarginApproval."Customer Name" := Customer.Name;
+            if MarginApproval."Customer Name" = '' then
+                MarginApproval."Customer Name" := 'Zyxel pricelist';
+
+            totalDoc.add('customer_name', MarginApproval."Customer Name");
+            totalDoc.add('sales_order_number', MarginApproval."Source No.");
+            // loop >>
+            repeat
+                clear(margin_info);
+                margin_info.add('entry_no', MarginApproval."Entry No.");
+                margin_info.add('line_number', MarginApproval."Source Line No.");
+                margin_info.add('part_number', MarginApproval."Item No.");
+                tempcurr := '';
+
+                case MarginApproval."Source Type" of
+                    MarginApproval."Source Type"::Sales:
+                        begin
+                            if Salesline.get(MarginApproval."Sales Document Type", MarginApproval."Source Line No.") then begin
+                                tempcurr := Salesline."Currency Code";
+                                tempqty := Salesline.Quantity;
+                            end;
+                        end;
+                    MarginApproval."Source Type"::"Price Book":
+                        begin
+                            if Priceline.get(MarginApproval."Source No.", MarginApproval."Source Line No.") then
+                                tempcurr := Priceline."Currency Code";
+                        end;
+                end;
+                if tempcurr = '' then
+                    tempcurr := glsetup."LCY Code";
+                margin_info.add('currency', tempcurr);
+                margin_info.add('selling_price', MarginApproval."Unit Price");
+                margin_info.add('qty', tempqty);
+
+                margin_info.Add('comment', MarginApproval."User Comment");
+                margin_infoArray.add(margin_info);
+            until MarginApproval.next = 0;
+            // loop >>
+            totalDoc.add('orderapprovereq', margin_infoArray);
+            // totalDoc.add('fulfillment', fulfillment);
+            totalDoc.WriteTo(totextvar);
+            // Save the data of the InStream as a file.
+            if (Marginsetup.testmode) and GuiAllowed then begin
+                TempBlob.CreateOutStream(outStr, TextEncoding::UTF8);
+                outStr.WriteText(totextvar);
+                TempBlob.CreateInStream(inStr, TextEncoding::UTF8);
+                fileName := 'Shopify_postfulfillment.txt';
+                File.DownloadFromStream(inStr, 'Export', '', '', fileName);
+            end;
+        end;
+        exit(totextvar);
+    end;
+
 
     Procedure checkandSetMarginApproval(var PriceListLine: Record "Price List Line"; var IsHandled: Boolean)
     var
@@ -3322,6 +3418,7 @@ codeunit 50055 AmazonHelper
         marginapproval: record "Margin Approval";
         marginapproval2: record "Margin Approval";
         salessetups: record "Sales & Receivables Setup";
+        lastSource: code[20];
     begin
         salessetups.get();
         if salessetups."Margin Approval" = salessetups."Margin Approval"::inActive then
@@ -3330,29 +3427,38 @@ codeunit 50055 AmazonHelper
         marginapproval.setrange(requeststatus, marginapproval.requeststatus::WaitingPrice);
         marginapproval.setfilter("User Comment", '<>%1', '');
         if marginapproval.findset() then
-            ProcessPriceApproval(marginapproval, true);
-
-
-
+            repeat
+                if lastSource <> marginapproval."Source No." then begin
+                    marginapproval2.get(marginapproval."Entry No.");
+                    lastSource := marginapproval."Source No.";
+                    ProcessPriceApproval(marginapproval2, true);
+                end;
+            until marginapproval.next = 0;
     end;
+
 
     procedure ORDERAPPROVAL()
     var
         marginapproval: record "Margin Approval";
         marginapproval2: record "Margin Approval";
         salessetups: record "Sales & Receivables Setup";
+        lastSource: code[20];
     begin
         salessetups.get();
         if salessetups."Margin Approval" = salessetups."Margin Approval"::inActive then
             exit;
-        marginapproval.setrange("Source Type", marginapproval."Source Type"::Sales);
 
+        marginapproval.SetCurrentKey("Source Type", "Sales Document Type", "Source No.");
+        marginapproval.setrange("Source Type", marginapproval."Source Type"::Sales);
         marginapproval.setrange(requeststatus, marginapproval.requeststatus::WaitingPrice);
         marginapproval.setfilter("User Comment", '<>%1', '');
         if marginapproval.findset() then
             repeat
-                marginapproval2.get(marginapproval."Entry No.");
-                ProcessOrderApproval(marginapproval2);
+                if lastSource <> marginapproval."Source No." then begin
+                    marginapproval2.get(marginapproval."Entry No.");
+                    lastSource := marginapproval."Source No.";
+                    ProcessOrderApproval(marginapproval2, true);
+                end;
             until marginapproval.next = 0;
     end;
 
