@@ -26,7 +26,7 @@ codeunit 50049 "Process RMA"
     local procedure DownloadLMR(pFolder: Code[20])
     FtpMgt: Codeunit "VisionFTP Management";
     begin
-        FtpMgt.DownloadFolder(pFolder);
+        //FtpMgt.DownloadFolder(pFolder);
     end;
 
     local procedure ImportLMR(pEntryNo: Integer)
@@ -132,7 +132,7 @@ codeunit 50049 "Process RMA"
                 ItemRegister.FindLast();
                 ItemRegister.SetRange("No.", ItemRegister."No.");
                 ItemRegQty.SetTableView(ItemRegister);
-                ItemRegQty.SaveAs(Dummy,ReportFormat::Excel,varoutstream);
+                ItemRegQty.SaveAs(Dummy, ReportFormat::Excel, varoutstream);
 
                 AutoSetup.get;
                 SI.SetMergefield(100, Format(ItemRegister."To Entry No." - ItemRegister."From Entry No." + 1));
