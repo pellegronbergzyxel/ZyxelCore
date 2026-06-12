@@ -55,5 +55,5 @@
     "NoImplicitWith"
   ],
   
-  "target": "OnPrem"
+  "target": "Cloud"
 }
