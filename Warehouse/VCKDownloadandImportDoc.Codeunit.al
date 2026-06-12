@@ -37,6 +37,7 @@ Codeunit 50099 "VCK Download and  Import Doc."
         recZyFileMgt: Record "Zyxel File Management";
         recAutoSetup: Record "Automation Setup";
         //ArchiveFile: File;
+        
         InStream: InStream;
         xmlStockInbound: XmlPort "Read Stock Level Response";
         xmlReadStockReq: XmlPort "Read Stock Level Request";

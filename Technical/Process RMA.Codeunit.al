@@ -26,7 +26,7 @@ codeunit 50049 "Process RMA"
     local procedure DownloadLMR(pFolder: Code[20])
     FtpMgt: Codeunit "VisionFTP Management";
     begin
-        FtpMgt.DownloadFolder(pFolder);
+        FtpMgt.DownloadFolderStream(pFolder);
     end;
 
     local procedure ImportLMR(pEntryNo: Integer)
@@ -41,6 +41,8 @@ codeunit 50049 "Process RMA"
         FilenameForDate: Text;
         lText001: Label 'Import LMR';
         InStream: InStream;
+        varOutstream: outstream;
+        tempblob: codeunit "Temp Blob";
     begin
         AutoSetup.get;
 
@@ -63,13 +65,12 @@ codeunit 50049 "Process RMA"
                         // CLOUD READY NEW <<
                         // MANGLER MANGLER:
                         // importlmrsheet skal tage en insteam i stedet
-
-
-
+                        tempblob.CreateOutStream(varOutstream);
+                        CopyStream(varOutstream, InStream);
                         Clear(ImportLMRSheet);
-
-
-                        ImportLMRSheet.InitReport(recZyFileMgt.Filename);
+                        // Cloud Ready delete
+                        //ImportLMRSheet.InitReport(recZyFileMgt.Filename);
+                        ImportLMRSheet.Initblob(tempblob);
                         ImportLMRSheet.useRequestPage(false);
                         ImportLMRSheet.RunModal();
 
@@ -132,7 +133,7 @@ codeunit 50049 "Process RMA"
                 ItemRegister.FindLast();
                 ItemRegister.SetRange("No.", ItemRegister."No.");
                 ItemRegQty.SetTableView(ItemRegister);
-                ItemRegQty.SaveAs(Dummy,ReportFormat::Excel,varoutstream);
+                ItemRegQty.SaveAs(Dummy, ReportFormat::Excel, varoutstream);
 
                 AutoSetup.get;
                 SI.SetMergefield(100, Format(ItemRegister."To Entry No." - ItemRegister."From Entry No." + 1));

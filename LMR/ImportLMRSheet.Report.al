@@ -274,4 +274,10 @@ Report 50122 "Import LMR Sheet"
     begin
         Filename := NewFilename;
     end;
+
+    procedure Initblob(var tempblob: codeunit "Temp blob")
+    begin
+        iStreamimport := true;
+        tempblob.CreateInStream(iStream);
+    end;
 }
