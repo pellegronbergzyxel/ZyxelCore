@@ -120,6 +120,19 @@ page 50224 "Company Contracts"
                     ApplicationArea = Basic, Suite;
                     Visible = false;
                 }
+                //01-06-2026 BK Cloud Ready
+                field("Folder and Filename"; Rec."Folder and Filename")
+                {
+                    ToolTip = 'Specify the Folder and Filename';
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
+                }
+                field(FileAttached; Rec.FileAttached)
+                {
+                    ToolTip = 'Specify if File is Attached';
+                    ApplicationArea = Basic, Suite;
+                    Visible = True;
+                }
             }
         }
         area(factboxes)

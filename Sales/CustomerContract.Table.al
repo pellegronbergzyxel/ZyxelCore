@@ -79,6 +79,10 @@ Table 50062 "Customer Contract"
 
             Caption = 'File blob';
         }
+        field(102; FileAttached; Boolean)
+        {
+            Caption = 'File Attached';
+        }
     }
 
     keys
@@ -103,6 +107,17 @@ Table 50062 "Customer Contract"
             CustContractSetup.TestField("Serial No.");
             NoSeriesMgt.GetNextNo(CustContractSetup."Serial No.", Today, true);
         end;
+        //11-06-2026 BK Cloud Ready - Move file to blob when insert and update
+        rec.CalcFields("filblob");
+        rec.CalcFields("filblob");
+        FileAttached := rec.filblob.HasValue;
+    end;
+
+    //11-06-2026 BK Cloud Ready - Move file to blob when insert and update
+    trigger onmodify()
+    begin
+        rec.CalcFields("filblob");
+        FileAttached := rec.filblob.HasValue;
     end;
 
     var
@@ -297,7 +312,7 @@ Table 50062 "Customer Contract"
         filblob.CreateOutStream(BlobStream);
         exit(true);
     end;
-   
+
 
     procedure GetBlobAsBase64(var Base64Content: Text): Boolean
     var

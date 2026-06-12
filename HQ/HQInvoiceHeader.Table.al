@@ -167,11 +167,16 @@ Table 76150 "HQ Invoice Header"
             Caption = 'Creation Date';
         }
 
-          field(100; filblob; blob)
+        field(100; filblob; blob)
         {
 
             Caption = 'File blob';
         }
+        field(102; FileAttached; Boolean)
+        {
+            Caption = 'File Attached';
+        }
+
     }
 
     keys
@@ -180,10 +185,6 @@ Table 76150 "HQ Invoice Header"
         {
             Clustered = true;
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnDelete()
@@ -195,7 +196,18 @@ Table 76150 "HQ Invoice Header"
 
     trigger OnInsert()
     begin
-        "Creation Date" := CurrentDatetime;  // 02-03-22 ZY-LD 001
+        "Creation Date" := CurrentDatetime;
+        //11-06-2026 BK Cloud Ready - Move file to blob when insert and update
+        rec.CalcFields("filblob");
+        rec.CalcFields("filblob");
+        FileAttached := rec.filblob.HasValue;
+    end;
+
+    //11-06-2026 BK Cloud Ready - Move file to blob when insert and update
+    trigger onmodify()
+    begin
+        rec.CalcFields("filblob");
+        FileAttached := rec.filblob.HasValue;
     end;
 
     var
@@ -227,7 +239,7 @@ Table 76150 "HQ Invoice Header"
                 // CLOUD READY NEW 
                 //"File Path" := VisionFTPMgt.DownloadFile('HQ-SALES-DOC', Filename, pShowError);
                 rec.filblob.CreateOutStream(varoutsteam);
-                "File Path" := VisionFTPMgt.DownloadFilestream('HQ-SALES-DOC', Filename,pShowError,varoutsteam);
+                "File Path" := VisionFTPMgt.DownloadFilestream('HQ-SALES-DOC', Filename, pShowError, varoutsteam);
                 // CLOUD READY DELETE >>
                 //VisionFTPMgt.DownloadFile('HQ-SALES-DOC', Filename, pShowError);
                 //"File Path" := FileMgt.GetDirectoryName("File Path") + '\';
@@ -355,7 +367,7 @@ Table 76150 "HQ Invoice Header"
     end;
 
 
-procedure LoadFileToBlob(FilePath: Text): Boolean
+    procedure LoadFileToBlob(FilePath: Text): Boolean
     var
         FileIn: File;
         FileStream: InStream;
@@ -381,10 +393,10 @@ procedure LoadFileToBlob(FilePath: Text): Boolean
     begin
         Rec.CalcFields("Filblob");
         if filblob.HasValue then begin
-        //    FileOut.Create(DownloadPath);
-          //  FileOut.CreateOutstream(FileStream);
-          Rec.filblob.CreateInStream(InStr, TextEncoding::Windows);
-                    DownloadFromStream(InStr, 'Download', '', '', Filename);
+            //    FileOut.Create(DownloadPath);
+            //  FileOut.CreateOutstream(FileStream);
+            Rec.filblob.CreateInStream(InStr, TextEncoding::Windows);
+            DownloadFromStream(InStr, 'Download', '', '', Filename);
         end;
         exit(false);
     end;
@@ -403,7 +415,7 @@ procedure LoadFileToBlob(FilePath: Text): Boolean
         filblob.CreateOutStream(BlobStream);
         exit(true);
     end;
-   
+
 
     procedure GetBlobAsBase64(var Base64Content: Text): Boolean
     var
@@ -429,7 +441,7 @@ procedure LoadFileToBlob(FilePath: Text): Boolean
     end;
 
 
-   
+
 
 
 

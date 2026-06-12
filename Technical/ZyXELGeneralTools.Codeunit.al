@@ -565,9 +565,10 @@ Codeunit 50000 "ZyXEL General Tools"
 
     procedure TurkishServer(): Boolean
     var
-        ServerInstance: Record "Server Instance";
+        ServerInstance: Record "Server Environment"; //12-06-2026 BK #Cloud Ready
     begin
-        ServerInstance.SetFilter("Service Name", '%1|%2', 'TR-WS', 'TESTTR-WS');
+        ServerInstance.Setfilter(serverinstance.Server, '%1', serverinstance.Server::Turkish);
+        //ServerInstance.SetFilter("Service Name", '%1|%2', 'TR-WS', 'TESTTR-WS');
         if ServerInstance.FindFirst then
             exit(true);
     end;
@@ -575,9 +576,10 @@ Codeunit 50000 "ZyXEL General Tools"
 
     procedure ItalianServer(): Boolean
     var
-        ServerInstance: Record "Server Instance";
+        ServerInstance: Record "Server Environment"; //12-06-2026 BK #Cloud Ready
     begin
-        ServerInstance.SetFilter("Service Name", '%1|%2', 'IT-WS', 'TESTIT-WS');
+        ServerInstance.Setfilter(ServerInstance.Server, '%1', serverinstance.Server::Italian);
+        //ServerInstance.SetFilter("Service Name", '%1|%2', 'IT-WS', 'TESTIT-WS');
         if ServerInstance.FindFirst then
             exit(true);
     end;

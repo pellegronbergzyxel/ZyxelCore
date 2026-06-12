@@ -47,6 +47,13 @@ Page 50083 "HQ Sales Header List"
                     ApplicationArea = Basic, Suite;
                     Visible = false;
                 }
+                //12-06-2026 BK Cloud Ready
+                field(FileAttached; Rec.FileAttached)
+                {
+                    ToolTip = 'Specify if File is Attached';
+                    ApplicationArea = Basic, Suite;
+                    Visible = True;
+                }
             }
         }
         area(factboxes)

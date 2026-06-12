@@ -106,10 +106,10 @@ Codeunit 50057 "VisionFTP Management"
             end;
     end;
 
-    procedure DownloadFile("Code": Code[20]; RemoteFileName: Text; ShowError: Boolean) ArchiveFilename: Text[250]
-    begin
-        ArchiveFilename := DownloadFile2(Code, RemoteFileName, RemoteFileName, ShowError);  // 21-04-21 ZY-LD 005
-    end;
+    // procedure DownloadFile("Code": Code[20]; RemoteFileName: Text; ShowError: Boolean) ArchiveFilename: Text[250]
+    // begin
+    //     ArchiveFilename := DownloadFile2(Code, RemoteFileName, RemoteFileName, ShowError);  // 21-04-21 ZY-LD 005
+    // end;
 
     procedure DownloadFilestream("Code": Code[20]; RemoteFileName: Text; ShowError: Boolean; var OutStr: OutStream): Text[250]
     begin
@@ -133,38 +133,38 @@ Codeunit 50057 "VisionFTP Management"
         //<< 21-04-21 ZY-LD 005
     end;
 
-    local procedure DownloadFile2("Code": Code[20]; RemoteFilename: Text; DestinationFilename: Text; ShowError: Boolean) ArchiveFilename: Text[250]
-    var
-        FileAPIMgt: Codeunit FileAPIMgtHLPVPE;
-        FileMgt: Codeunit "File Management";
-        B64: Codeunit "Base64 Convert";
-        FileHandle: File;
-        OutStr: OutStream;
-        FTPConnectionString: Text;
-        ResponseText: Text;
-    begin
-        GetFtpFolder(Code);
+    // local procedure DownloadFile2("Code": Code[20]; RemoteFilename: Text; DestinationFilename: Text; ShowError: Boolean) ArchiveFilename: Text[250]
+    // var
+    //     FileAPIMgt: Codeunit FileAPIMgtHLPVPE;
+    //     FileMgt: Codeunit "File Management";
+    //     B64: Codeunit "Base64 Convert";
+    //     FileHandle: File;
+    //     OutStr: OutStream;
+    //     FTPConnectionString: Text;
+    //     ResponseText: Text;
+    // begin
+    //     GetFtpFolder(Code);
 
-        if SubFolder <> '' then
-            ArchiveFilename := FileMgt.CombinePath(FileMgt.CombinePath(recFtpFolder."Archive Folder", SubFolder), DestinationFilename)
-        else
-            ArchiveFilename := FileMgt.CombinePath(recFtpFolder."Archive Folder", DestinationFilename);
+    //     if SubFolder <> '' then
+    //         ArchiveFilename := FileMgt.CombinePath(FileMgt.CombinePath(recFtpFolder."Archive Folder", SubFolder), DestinationFilename)
+    //     else
+    //         ArchiveFilename := FileMgt.CombinePath(recFtpFolder."Archive Folder", DestinationFilename);
 
-        FTPConnectionString := GetFTPConnectionString(FileMgt.GetExtension(RemoteFilename) <> '.txt');
+    //     FTPConnectionString := GetFTPConnectionString(FileMgt.GetExtension(RemoteFilename) <> '.txt');
 
-        ResponseText := FileAPIMgt.FtpDownloadFile(FTPConnectionString, FileMgt.GetDirectoryName(RemoteFilename), FileMgt.GetFileName(RemoteFilename));
-        if ResponseText <> '' then begin
-            FileHandle.Create(ArchiveFilename);
-            FileHandle.CreateOutStream(OutStr);
-            OutStr.Write(B64.FromBase64(ResponseText));
-            FileHandle.Close();
+    //     ResponseText := FileAPIMgt.FtpDownloadFile(FTPConnectionString, FileMgt.GetDirectoryName(RemoteFilename), FileMgt.GetFileName(RemoteFilename));
+    //     if ResponseText <> '' then begin
+    //         FileHandle.Create(ArchiveFilename);
+    //         FileHandle.CreateOutStream(OutStr);
+    //         OutStr.Write(B64.FromBase64(ResponseText));
+    //         FileHandle.Close();
 
-            if recFtpFolder."Delete Remote" then
-                FileAPIMgt.FtpDeleteFile(FTPConnectionString, FileMgt.GetDirectoryName(RemoteFilename), FileMgt.GetFileName(RemoteFilename));
-        end else
-            if ShowError then  // 27-02-20 ZY-LD 004
-                Error(Text50005);
-    end;
+    //         if recFtpFolder."Delete Remote" then
+    //             FileAPIMgt.FtpDeleteFile(FTPConnectionString, FileMgt.GetDirectoryName(RemoteFilename), FileMgt.GetFileName(RemoteFilename));
+    //     end else
+    //         if ShowError then  // 27-02-20 ZY-LD 004
+    //             Error(Text50005);
+    // end;
 
 
     local procedure DownloadFile2stream("Code": Code[20]; RemoteFilename: Text; DestinationFilename: Text; ShowError: Boolean; var OutStr: OutStream): text[250]
