@@ -235,7 +235,7 @@ Table 76150 "HQ Invoice Header"
             ZGT.OpenProgressWindow('', 1);
 
             ZGT.UpdateProgressWindow(lText001, 0, true);
-            if recServEnviron.ProductionEnvironment then begin
+            //f recServEnviron.ProductionEnvironment then begin
                 // CLOUD READY NEW 
                 //"File Path" := VisionFTPMgt.DownloadFile('HQ-SALES-DOC', Filename, pShowError);
                 rec.filblob.CreateOutStream(varoutsteam);
