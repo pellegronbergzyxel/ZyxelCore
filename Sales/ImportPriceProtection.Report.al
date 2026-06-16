@@ -1,14 +1,9 @@
 Report 50013 "Import Price Protection"
 {
-    // 001. 14-02-19 ZY-LD 2019021410000087 - It has happend that a customer has claimed items that has never been bought.
-    // 002. 20-05-19 ZY-LD 2019052010000079 - Allow import of negative quantities.
-    // 003. 27-03-20 ZY-LD P0388 - Update sales header.
-    // 004. 22-04-22 ZY-LD 2022042110000081 - If Reference was blank, it didn´t merge the lines.
-    // 005. 03-05-24 ZY-LD #6772668 - Moved the update of posting groups to Codeunit 50067. Sometimes the credit memos is created manually.
-
 
     Caption = 'Import Price Protection and Rebate';
     ProcessingOnly = true;
+    usagecategory = administration;
 
     dataset
     {
@@ -29,40 +24,19 @@ Report 50013 "Import Price Protection"
                     {
                         Caption = 'Import from';
                     }
-                    // field(FileName; FileName)
-                    // {
-                    //     ApplicationArea = Basic, Suite;
-                    //     AssistEdit = true;
-                    //     Caption = 'Workbook File Name';
-
-                    //     trigger OnAssistEdit()
-                    //     begin
-                    //         UploadFile;
-                    //     end;
-                    // }
-                    // field(SheetName; SheetName)
-                    // {
-                    //     ApplicationArea = Basic, Suite;
-                    //     Caption = 'Worksheet Name';
-
-                    //     trigger OnAssistEdit()
-                    //     var
-                    //         ExcelBuf: Record "Excel Buffer";
-                    //     begin
-                    //         SheetName := ExcelBuf.SelectSheetsName(UploadedFileName)
-                    //     end;
-                    // }
                     field(SheetContainesHeaderRow; SheetContainesHeaderRow)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Contains Headings';
                         Visible = false;
+                        tooltip = 'contains headings in the first two rows of the worksheet';
                     }
                     field(LocatCode; LocatCode)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Location Code';
                         TableRelation = Location;
+                        tooltip = 'Location Code is required if not specified on the sales line or purchase line.';
                     }
                 }
             }
@@ -72,17 +46,19 @@ Report 50013 "Import Price Protection"
         {
         }
 
-          trigger OnQueryClosePage(CloseAction: Action): Boolean
+        trigger OnQueryClosePage(CloseAction: Action): Boolean
         var
-            UploadExcelMsg: Label 'Please Choose the Excel file';
-            NofileMsg: Label 'Please select file';
+
             FileMgt: Codeunit "File Management";
             iStream: InStream;
             fromfile: text[250];
+            UploadExcelMsg: Label 'Please Choose the Excel file';
+            NofileMsg: Label 'Please select file';
+
         begin
             UploadIntoStream(UploadExcelMsg, '', '', fromfile, iStream);
             if fromfile <> '' then begin
-                FileName := FileMgt.GetFileName(fromfile);
+                FileName := copystr(FileMgt.GetFileName(fromfile), 1, 1024);
                 SheetName := ExcelBuf.SelectSheetsNameStream(iStream);
 
             end else
@@ -104,19 +80,13 @@ Report 50013 "Import Price Protection"
 
     trigger OnPreReport()
     begin
-        if UploadedFileName = '' then
-            Error(Text001);
-
-        if SheetName = '' then
-            Error(Text002);
-
         if LocatCode = '' then
             Error(Text009);
 
-       // ReadExcelSheet;
+        // ReadExcelSheet;
         ImportExcelSheet;
 
-        SI.UseOfReport(3, 50013, 3);  // 14-10-20 ZY-LD 000
+        SI.UseOfReport(3, 50013, 3);
     end;
 
     var
@@ -127,19 +97,27 @@ Report 50013 "Import Price Protection"
         recPurchLineTmp: Record "Purchase Line" temporary;
         recReturnReason: Record "Return Reason";
         recItemLedgEntry: Record "Item Ledger Entry";
+        ExcelBuf: Record "Excel Buffer" temporary;
+        SI: Codeunit "Single Instance";
+        EmailAddMgt: Codeunit "E-mail Address Management";
+        ZGT: Codeunit "ZyXEL General Tools";
         FileName: Text[1024];
         SheetName: Text[1024];
-        ExcelBuf: Record "Excel Buffer" temporary;
-        UploadedFileName: Text[1024];
-        Text006: label 'Import Excel File';
         RecNo: Integer;
-        Window: Dialog;
-        Text001: label 'You must specify an Excel file first.';
-        Text002: label 'You must specify the sheet name to import first.';
-        Text003: label 'Loading Credit Memo Lines...\\';
-        TotalRecNo: Integer;
         SheetContainesHeaderRow: Boolean;
-        Text004: label 'A Credit Memo Header does not exist for Credit Memo %1. This will be skipped.';
+        RowCount: Integer;
+        Row: Integer;
+        startrow: Integer;
+        DocNo: Code[20];
+        ExpectedTotalAmount: Decimal;
+        TotalLineAmount: Decimal;
+        DocType: Option " ","Sales Shipment","Sales Invoice","Sales Return Receipt","Sales Credit Memo","Purchase Receipt","Purchase Invoice","Purchase Return Shipment","Purchase Credit Memo","Transfer Shipment","Transfer Receipt","Service Shipment","Service Invoice","Service Credit Memo","Posted Assembly";
+        SalesDocType: Integer;
+        LocatCode: Code[10];
+        ImportNegativeQty: Boolean;
+        Text013: label 'STOCK RETURN';
+        ExternalDocumentNo: Text;
+        Text003: label 'Loading Credit Memo Lines...\\';
         Text005: label 'Amount to import: %1\Imported Amount: %2';
         Text007: label 'Item No. must not be blank at line %1.';
         Text008: label 'Amount is not correct.\"%1": %2\"Total from Excel": %3.';
@@ -147,47 +125,7 @@ Report 50013 "Import Price Protection"
         Text010: label 'You are now allowed to import lines with quantitys less than one.';
         Text011: label 'The customer %1 has not bought the product %2 with in the last year. Please check with the sales team.';
         Text012: label 'You have negative quantities in the file.\Are you sure you want to import them?';
-        Text19047774: label 'Worksheet Name';
-        Text19051956: label 'Contains Headings';
-        RowCount: Integer;
-        Row: Integer;
-        startrow: Integer;
-        ProdPostGroup: Code[20];
-        DocNo: Code[20];
-        ZGT: Codeunit "ZyXEL General Tools";
-        ExpectedTotalAmount: Decimal;
-        TotalLineAmount: Decimal;
-        DocType: Option " ","Sales Shipment","Sales Invoice","Sales Return Receipt","Sales Credit Memo","Purchase Receipt","Purchase Invoice","Purchase Return Shipment","Purchase Credit Memo","Transfer Shipment","Transfer Receipt","Service Shipment","Service Invoice","Service Credit Memo","Posted Assembly";
-        SalesDocType: Integer;
-        LocatCode: Code[10];
-        EmailAddMgt: Codeunit "E-mail Address Management";
-        ImportNegativeQty: Boolean;
-        Text013: label 'STOCK RETURN';
-        SI: Codeunit "Single Instance";
-        ExternalDocumentNo: Text;
 
-
-// CLOUD READY DELETE
-    // procedure UploadFile()
-    // var
-    //     FileMgt: Codeunit "File Management";
-    // begin
-    //     Upload('Upload', 'C:\', 'Excel file(*.xlsx)|*.xlsx', '', UploadedFileName);
-    //     FileName := UploadedFileName;
-
-    //     SheetName := ExcelBuf.SelectSheetsName(UploadedFileName)
-    // end;
-
-    // local procedure ReadExcelSheet()
-    // begin
-    //     if UploadedFileName = '' then
-    //         UploadFile
-    //     else
-    //         FileName := UploadedFileName;
-
-    //     ExcelBuf.OpenBook(FileName, SheetName);
-    //     ExcelBuf.ReadSheet;
-    // end;
 
     local procedure ImportExcelSheet()
     var
@@ -197,21 +135,17 @@ Report 50013 "Import Price Protection"
         ItemNo: Code[20];
         Qty: Integer;
         UnitValue: Decimal;
-        xrecSalesHeader: Record "Sales Header";
-        LastError: Code[20];
         HideLineCreated: Integer;
         Created: Integer;
         TotalValue: Decimal;
         Reference: Text[30];
     begin
         if ExcelBuf.FindLast then begin
-            //>> 27-03-20 ZY-LD 003
             if DocType = Doctype::"Sales Return Receipt" then begin
                 recSalesHead.Get(recSalesHead."document type"::"Return Order", DocNo);
                 recSalesHead."External Document No." := Text013;
                 recSalesHead.Modify;
             end;
-            //<< 27-03-20 ZY-LD 003
 
             RowCount := ExcelBuf."Row No.";
             ZGT.OpenProgressWindow('', RowCount);
@@ -238,11 +172,10 @@ Report 50013 "Import Price Protection"
                     Error(Text007, RecNo);
 
                 if Qty < 1 then
-                    //>> 20-05-19 ZY-LD 002
                     if not ImportNegativeQty then
                         if Confirm(Text012, false) then
                             ImportNegativeQty := true
-                        else  //<< 20-05-19 ZY-LD 002
+                        else
                             Error(Text010);
 
                 case DocType of
@@ -253,13 +186,10 @@ Report 50013 "Import Price Protection"
                             recSalesLine.SetRange("Document No.", DocNo);
                             recSalesLine.SetRange("No.", ItemNo);
                             recSalesLine.SetRange("Return Reason Code", recReturnReason.Code);
-                            //>> 22-04-22 ZY-LD 004
-                            //recSalesLine.SETRANGE("External Document No.",Reference)
                             if Reference <> '' then
                                 recSalesLine.SetRange("External Document No.", Reference)
                             else
                                 recSalesLine.SetRange("External Document No.", ExternalDocumentNo);
-                            //<< 22-04-22 ZY-LD 004
                             recSalesLine.SetRange("Unit Price", UnitValue);
                             if recSalesLine.FindFirst then begin
                                 recSalesLine.Validate(Quantity, recSalesLine.Quantity + Qty);
@@ -281,12 +211,6 @@ Report 50013 "Import Price Protection"
                                 recSalesLine.Validate(Type, recSalesLine.Type::Item);
                                 recSalesLine.Validate("Line No.", LineNo);
                                 recSalesLine.Validate("No.", ItemNo);
-                                //>> 03-05-24 ZY-LD 005
-                                // if recReturnReason."Gen. Bus. Posting Group" <> '' then
-                                //     recSalesLine.Validate("Gen. Bus. Posting Group", recReturnReason."Gen. Bus. Posting Group");
-                                // if recReturnReason."Gen. Prod. Posting Group" <> '' then
-                                //     recSalesLine.Validate("Gen. Prod. Posting Group", recReturnReason."Gen. Prod. Posting Group");
-                                //<< 03-05-24 ZY-LD 005
                                 recSalesLine.Validate("Return Reason Code", recReturnReason.Code);
                                 if recSalesLine."Location Code" = '' then
                                     recSalesLine.Validate("Location Code", LocatCode);
@@ -306,17 +230,14 @@ Report 50013 "Import Price Protection"
                                     recSalesLineTmp.Insert;
                             end;
 
-                            //>> 14-02-19 ZY-LD 001
                             recItemLedgEntry.SetCurrentkey("Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date");
                             recItemLedgEntry.SetRange("Item No.", ItemNo);
                             recItemLedgEntry.SetRange("Entry Type", recItemLedgEntry."entry type"::Sale);
-                            //recItemLedgEntry.SETRANGE("Location Code",LocatCode);  // Both items and EiCards are on the same cr. memo.
                             recItemLedgEntry.SetFilter("Posting Date", '%1..', CalcDate('<-1Y>', Today));
                             recItemLedgEntry.SetRange("Source Type", recItemLedgEntry."source type"::Customer);
                             recItemLedgEntry.SetRange("Source No.", recSalesLine."Sell-to Customer No.");
                             if not recItemLedgEntry.FindFirst then
                                 EmailAddMgt.CreateEmailWithBodytext('LD', StrSubstNo(Text011, recSalesLine."Sell-to Customer No.", recSalesLine."No."), '');
-                            //<< 14-02-19 ZY-LD 001
 
                             Created += 1;
                         end;
@@ -428,6 +349,6 @@ Report 50013 "Import Price Protection"
         DocNo := pDocumentNo;
         LocatCode := pLocation;
         SheetContainesHeaderRow := true;
-        ExternalDocumentNo := pExternalDocumentNo;  // 22-04-22 ZY-LD 004
+        ExternalDocumentNo := pExternalDocumentNo;
     end;
 }
