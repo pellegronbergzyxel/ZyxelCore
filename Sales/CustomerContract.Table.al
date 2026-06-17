@@ -264,23 +264,23 @@ Table 50062 "Customer Contract"
     end;
 
 
-    procedure LoadFileToBlob(FilePath: Text): Boolean
-    var
-        FileIn: File;
-        FileStream: InStream;
-        outstream: OutStream;
-    begin
-        if not File.Exists(FilePath) then
-            exit(false);
+    // procedure LoadFileToBlob(FilePath: Text): Boolean
+    // var
+    //     FileIn: File;
+    //     FileStream: InStream;
+    //     outstream: OutStream;
+    // begin
+    //     if not File.Exists(FilePath) then
+    //         exit(false);
 
-        FileIn.Open(FilePath);
-        FileIn.CreateInstream(FileStream);
-        filblob.CreateOutStream(outstream);
-        CopyStream(outstream, FileStream);
-        modify();
-        FileIn.Close;
-        exit(true);
-    end;
+    //     FileIn.Open(FilePath);
+    //     FileIn.CreateInstream(FileStream);
+    //     filblob.CreateOutStream(outstream);
+    //     CopyStream(outstream, FileStream);
+    //     modify();
+    //     FileIn.Close;
+    //     exit(true);
+    // end;
 
     procedure DownloadBlobToFile(DownloadPath: Text): Boolean
     var

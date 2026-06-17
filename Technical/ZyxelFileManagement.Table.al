@@ -125,15 +125,15 @@ Table 66002 "Zyxel File Management"
         // MyFile.Open(Filename);
         //MyFile.CreateInstream(StreamInTest);
         // CLOUD READY NEW >>
-        
+
         rec.filblob.CreateInStream(StreamInTest);
-        
+
         while not StreamInTest.eos do begin
             StreamInTest.ReadText(Buffer);
             break;
         end;
         //MyFile.Close; //
-        
+
 
         if StrPos(UpperCase(Buffer), UpperCase(lText001)) > 0 then
             Type := Type::"VCK Purch. Response"
@@ -154,23 +154,23 @@ Table 66002 "Zyxel File Management"
 
     end;
 
-    procedure LoadFileToBlob(FilePath: Text): Boolean
-    var
-        FileIn: File;
-        FileStream: InStream;
-        outstream: OutStream;
-    begin
-        if not File.Exists(FilePath) then
-            exit(false);
+    // procedure LoadFileToBlob(FilePath: Text): Boolean
+    // var
+    //     FileIn: File;
+    //     FileStream: InStream;
+    //     outstream: OutStream;
+    // begin
+    //     if not File.Exists(FilePath) then
+    //         exit(false);
 
-        FileIn.Open(FilePath);
-        FileIn.CreateInstream(FileStream);
-        filblob.CreateOutStream(outstream);
-        CopyStream(outstream, FileStream);
-        modify();
-        FileIn.Close;
-        exit(true);
-    end;
+    //     FileIn.Open(FilePath);
+    //     FileIn.CreateInstream(FileStream);
+    //     filblob.CreateOutStream(outstream);
+    //     CopyStream(outstream, FileStream);
+    //     modify();
+    //     FileIn.Close;
+    //     exit(true);
+    // end;
 
     procedure DownloadBlobToFile(DownloadPath: Text): Boolean
     var
@@ -180,10 +180,10 @@ Table 66002 "Zyxel File Management"
     begin
         Rec.CalcFields("Filblob");
         if filblob.HasValue then begin
-        //    FileOut.Create(DownloadPath);
-          //  FileOut.CreateOutstream(FileStream);
-          Rec.filblob.CreateInStream(InStr, TextEncoding::Windows);
-                    DownloadFromStream(InStr, 'Download', '', '', Filename);
+            //    FileOut.Create(DownloadPath);
+            //  FileOut.CreateOutstream(FileStream);
+            Rec.filblob.CreateInStream(InStr, TextEncoding::Windows);
+            DownloadFromStream(InStr, 'Download', '', '', Filename);
         end;
         exit(false);
     end;
@@ -203,47 +203,47 @@ Table 66002 "Zyxel File Management"
         exit(true);
     end;
 
-    procedure LoadFileToBase64(FilePath: Text): Boolean
-    var
-        FileIn: File;
-        FileStream: InStream;
-        Base64: Codeunit "Base64 Convert";
-        BlobStream: OutStream;
-        Base64Content: Text;
-    begin
-        if not File.Exists(FilePath) then
-            exit(false);
+    // procedure LoadFileToBase64(FilePath: Text): Boolean
+    // var
+    //     FileIn: File;
+    //     FileStream: InStream;
+    //     Base64: Codeunit "Base64 Convert";
+    //     BlobStream: OutStream;
+    //     Base64Content: Text;
+    // begin
+    //     if not File.Exists(FilePath) then
+    //         exit(false);
 
-        FileIn.Open(FilePath);
-        FileIn.CreateInstream(FileStream);
-        Base64Content := Base64.ToBase64(FileStream);
-        FileIn.Close;
+    //     FileIn.Open(FilePath);
+    //     FileIn.CreateInstream(FileStream);
+    //     Base64Content := Base64.ToBase64(FileStream);
+    //     FileIn.Close;
 
-        filblob.CreateOutStream(BlobStream);
-        BlobStream.WriteText(Base64Content);
-        exit(true);
-    end;
+    //     filblob.CreateOutStream(BlobStream);
+    //     BlobStream.WriteText(Base64Content);
+    //     exit(true);
+    // end;
 
-    procedure DownloadBlobFromBase64(DownloadPath: Text): Boolean
-    var
-        FileOut: File;
-        FileStream: OutStream;
-        Base64: Codeunit "Base64 Convert";
-        BlobStream: InStream;
-        Base64Content: Text;
-    begin
-        if not filblob.HasValue then
-            exit(false);
+    // procedure DownloadBlobFromBase64(DownloadPath: Text): Boolean
+    // var
+    //     FileOut: File;
+    //     FileStream: OutStream;
+    //     Base64: Codeunit "Base64 Convert";
+    //     BlobStream: InStream;
+    //     Base64Content: Text;
+    // begin
+    //     if not filblob.HasValue then
+    //         exit(false);
 
-        filblob.CreateInStream(BlobStream);
-        BlobStream.ReadText(Base64Content);
+    //     filblob.CreateInStream(BlobStream);
+    //     BlobStream.ReadText(Base64Content);
 
-        FileOut.Create(DownloadPath);
-        FileOut.CreateOutstream(FileStream);
-        Base64.FromBase64(Base64Content, FileStream);
-        FileOut.Close;
-        exit(true);
-    end;
+    //     FileOut.Create(DownloadPath);
+    //     FileOut.CreateOutstream(FileStream);
+    //     Base64.FromBase64(Base64Content, FileStream);
+    //     FileOut.Close;
+    //     exit(true);
+    // end;
 
     procedure GetBlobAsBase64(var Base64Content: Text): Boolean
     var
@@ -269,21 +269,21 @@ Table 66002 "Zyxel File Management"
     end;
 
 
-    procedure LoadAllFilesToBlob()
-    var
-        recZyFileMgt: Record "Zyxel File Management";
-        checkfile: file;
-    begin
-        if recZyFileMgt.FindSet() then
-            repeat
-                if recZyFileMgt.Filename <> '' then
-                if file.Exists(recZyFileMgt.Filename) then
-                    if recZyFileMgt.LoadFileToBlob(recZyFileMgt.Filename) then begin
-                        recZyFileMgt.Modify(true);
+    // procedure LoadAllFilesToBlob()
+    // var
+    //     recZyFileMgt: Record "Zyxel File Management";
+    //     checkfile: file;
+    // begin
+    //     if recZyFileMgt.FindSet() then
+    //         repeat
+    //             if recZyFileMgt.Filename <> '' then
+    //             if file.Exists(recZyFileMgt.Filename) then
+    //                 if recZyFileMgt.LoadFileToBlob(recZyFileMgt.Filename) then begin
+    //                     recZyFileMgt.Modify(true);
 
-                    end;
-            until recZyFileMgt.Next() = 0;
-    end;
+    //                 end;
+    //         until recZyFileMgt.Next() = 0;
+    // end;
 
 
 
