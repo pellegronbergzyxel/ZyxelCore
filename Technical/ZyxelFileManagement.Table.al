@@ -154,24 +154,7 @@ Table 66002 "Zyxel File Management"
 
     end;
 
-    procedure LoadFileToBlob(FilePath: Text): Boolean
-    var
-        FileIn: File;
-        FileStream: InStream;
-        outstream: OutStream;
-    begin
-        if not File.Exists(FilePath) then
-            exit(false);
-
-        FileIn.Open(FilePath);
-        FileIn.CreateInstream(FileStream);
-        filblob.CreateOutStream(outstream);
-        CopyStream(outstream, FileStream);
-        modify();
-        FileIn.Close;
-        exit(true);
-    end;
-
+ 
     procedure DownloadBlobToFile(DownloadPath: Text): Boolean
     var
         FileOut: File;
@@ -202,49 +185,6 @@ Table 66002 "Zyxel File Management"
         filblob.CreateOutStream(BlobStream);
         exit(true);
     end;
-
-    procedure LoadFileToBase64(FilePath: Text): Boolean
-    var
-        FileIn: File;
-        FileStream: InStream;
-        Base64: Codeunit "Base64 Convert";
-        BlobStream: OutStream;
-        Base64Content: Text;
-    begin
-        if not File.Exists(FilePath) then
-            exit(false);
-
-        FileIn.Open(FilePath);
-        FileIn.CreateInstream(FileStream);
-        Base64Content := Base64.ToBase64(FileStream);
-        FileIn.Close;
-
-        filblob.CreateOutStream(BlobStream);
-        BlobStream.WriteText(Base64Content);
-        exit(true);
-    end;
-
-    procedure DownloadBlobFromBase64(DownloadPath: Text): Boolean
-    var
-        FileOut: File;
-        FileStream: OutStream;
-        Base64: Codeunit "Base64 Convert";
-        BlobStream: InStream;
-        Base64Content: Text;
-    begin
-        if not filblob.HasValue then
-            exit(false);
-
-        filblob.CreateInStream(BlobStream);
-        BlobStream.ReadText(Base64Content);
-
-        FileOut.Create(DownloadPath);
-        FileOut.CreateOutstream(FileStream);
-        Base64.FromBase64(Base64Content, FileStream);
-        FileOut.Close;
-        exit(true);
-    end;
-
     procedure GetBlobAsBase64(var Base64Content: Text): Boolean
     var
         Base64: Codeunit "Base64 Convert";
@@ -267,24 +207,6 @@ Table 66002 "Zyxel File Management"
         Base64.FromBase64(Base64Content, BlobStream);
         exit(true);
     end;
-
-
-    procedure LoadAllFilesToBlob()
-    var
-        recZyFileMgt: Record "Zyxel File Management";
-        checkfile: file;
-    begin
-        if recZyFileMgt.FindSet() then
-            repeat
-                if recZyFileMgt.Filename <> '' then
-                if file.Exists(recZyFileMgt.Filename) then
-                    if recZyFileMgt.LoadFileToBlob(recZyFileMgt.Filename) then begin
-                        recZyFileMgt.Modify(true);
-
-                    end;
-            until recZyFileMgt.Next() = 0;
-    end;
-
 
 
 }

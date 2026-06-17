@@ -54,10 +54,11 @@ xmlport 50011 "HQ Margin Approval Response"
                     MaxOccurs = Once;
                     FieldValidate = No;
                 }
-                textelement(Comment)
+                fieldelement(Comment; MarginApproval."Approver Comment")
                 {
                     XmlName = 'Comment';
                     MinOccurs = Zero;
+                    FieldValidate = No;
                     MaxOccurs = Once;
                 }
 
@@ -85,9 +86,9 @@ xmlport 50011 "HQ Margin Approval Response"
                 MarginApp.get(MarginApproval."Entry No.");
                 MarginApp.Validate(Status, MarginApproval.Status);
                 MarginApp."Approved/Rejected by" := MarginApproval."Approved/Rejected by";
-                if Comment <> '' then 
-                        MarginApp."Approver Comment" := CopyStr(Comment,1,250);
-                
+                if MarginApproval."Approver Comment" <> '' then
+                    MarginApp."Approver Comment" := CopyStr(MarginApproval."Approver Comment", 1, 250);
+
                 MarginApp.requeststatusDT := CurrentDateTime;
                 MarginApp.Status := MarginApproval.Status;
                 MarginApp.requeststatus := MarginApproval.requeststatus;

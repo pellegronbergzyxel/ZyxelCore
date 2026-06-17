@@ -187,8 +187,8 @@ Codeunit 50057 "VisionFTP Management"
 
 
         FTPConnectionString := GetFTPConnectionString(FileMgt.GetExtension(RemoteFilename) <> '.txt');
-
-        ResponseText := FileAPIMgt.FtpDownloadFile(FTPConnectionString, FileMgt.GetDirectoryName(RemoteFilename), FileMgt.GetFileName(RemoteFilename));
+// ResponseText := FileAPIMgt.FtpDownloadFile(FTPConnectionString, FileMgt.GetDirectoryName(RemoteFilename), FileMgt.GetFileName(RemoteFilename));
+        ResponseText := FileAPIMgt.FtpDownloadFile(FTPConnectionString, recFtpFolder."Remote Folder", FileMgt.GetFileName(RemoteFilename));
         if ResponseText <> '' then begin
             //FileHandle.Create(ArchiveFilename);
             //FileHandle.CreateOutStream(OutStr);
@@ -196,7 +196,7 @@ Codeunit 50057 "VisionFTP Management"
             //FileHandle.Close();
 
             if recFtpFolder."Delete Remote" then
-                FileAPIMgt.FtpDeleteFile(FTPConnectionString, FileMgt.GetDirectoryName(RemoteFilename), FileMgt.GetFileName(RemoteFilename));
+                FileAPIMgt.FtpDeleteFile(FTPConnectionString,recFtpFolder."Remote Folder", FileMgt.GetFileName(RemoteFilename));
 
             exit(DestinationFilename);
 

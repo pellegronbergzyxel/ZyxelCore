@@ -36,23 +36,7 @@ codeunit 50055 AmazonHelper
                 begin
                     PRICEAPPROVAL();
                 END;
-            'FILLOADZYXEL':
-                begin
-                    zyxelfilmgt.LoadAllFilesToBlob();
-                end;
-            '76150':
-                begin
-                    LOADTable76150HQInvoiceHeader();
-                end;
-            '66002':
-                begin
-                    LOADTable66002ZyxelFileManagement
-                end;
 
-            '50062':
-                begin
-                    LOADTable50062CustomerContract();
-                end;
 
         end;
     end;
@@ -2144,7 +2128,7 @@ codeunit 50055 AmazonHelper
 
         if SentPriceApproval(MarginApproval, Marginsetup, JsontextReply, all) then begin
             IF jsonTokenMain.ReadFrom(JsontextReply) then
-                if jsonTokenMain.SelectToken('margincheckresult', jsonTokenorders) then begin
+                if jsonTokenMain.SelectToken('result', jsonTokenorders) then begin
                     jsonarrayMain := jsonTokenorders.AsArray();
                     foreach TokenOrder in jsonarrayMain do begin
                         if TokenOrder.SelectToken('entry_no', TokenValue) then
@@ -2191,21 +2175,22 @@ codeunit 50055 AmazonHelper
 
         if SentOrderApproval(MarginApproval, Marginsetup, JsontextReply, All) then begin
             IF jsonTokenMain.ReadFrom(JsontextReply) then
-                if jsonTokenMain.SelectToken('status', jsonTokenorders) then begin
-                    jsonvalue := jsonTokenorders.AsValue();
-
-                    if TokenOrder.SelectToken('entry_no', TokenValue) then
-                        entry_no := TokenValue.AsValue().AsInteger();
-
-
-                    if all then
-                        MarginApproval.get(entry_no);
-
-                    if jsonvalue.AsText().Contains('received') then begin
-                        MarginApproval.requeststatusDT := CurrentDateTime;
-                        MarginApproval.requeststatus := MarginApproval.requeststatus::SendPrice;
-                        MarginApproval.Status := MarginApproval.Status::"Waiting for Margin Approval";
-                        MarginApproval.Modify()
+                if jsonTokenMain.SelectToken('result', jsonTokenorders) then begin
+                    jsonarrayMain := jsonTokenorders.AsArray();
+                    foreach TokenOrder in jsonarrayMain do begin
+                        //  if jsonTokenMain.SelectToken('status', jsonTokenorders) then begin
+                        //    jsonvalue := jsonTokenorders.AsValue();
+                        if TokenOrder.SelectToken('entry_no', TokenValue) then
+                            entry_no := TokenValue.AsValue().AsInteger();
+                        if all then
+                            MarginApproval.get(entry_no);
+                        if TokenOrder.SelectToken('status', TokenValue) then
+                            if TokenValue.asValue.AsText().contains('received') then begin
+                                MarginApproval.requeststatusDT := CurrentDateTime;
+                                MarginApproval.requeststatus := MarginApproval.requeststatus::SendPrice;
+                                MarginApproval.Status := MarginApproval.Status::"Waiting for Margin Approval";
+                                MarginApproval.Modify()
+                            end;
                     end;
                 end;
         end;
@@ -2631,6 +2616,7 @@ codeunit 50055 AmazonHelper
         marginapproval.setrange("Source Type", marginapproval."Source Type"::"Price Book");
         marginapproval.setrange(requeststatus, marginapproval.requeststatus::WaitingPrice);
         MarginApproval.setrange("Source No.", MarginApprovalfilter."Source No.");
+        MarginApproval.setrange("Customer No.", MarginApprovalfilter."Customer No.");
         marginapproval.setfilter("User Comment", '<>%1', '');
         if marginapproval.findset() then begin
             if (MarginApproval."Customer No." <> '') and (MarginApproval."Customer Name" = '') then
@@ -3428,9 +3414,9 @@ codeunit 50055 AmazonHelper
         marginapproval.setfilter("User Comment", '<>%1', '');
         if marginapproval.findset() then
             repeat
-                if lastSource <> marginapproval."Source No." then begin
+                if lastSource <> marginapproval."Customer No." then begin
                     marginapproval2.get(marginapproval."Entry No.");
-                    lastSource := marginapproval."Source No.";
+                    lastSource := marginapproval."Customer No.";
                     ProcessPriceApproval(marginapproval2, true);
                 end;
             until marginapproval.next = 0;
@@ -3552,68 +3538,6 @@ codeunit 50055 AmazonHelper
     // MIGRATION 
 
 
-    Procedure LOADTable76150HQInvoiceHeader()
-    var
-        Loadtable: record "HQ Invoice Header";
-    begin
-        if Loadtable.findset then
-            repeat
-                Loadtable.CalcFields(filblob);
-                if not Loadtable.filblob.HasValue then begin
-                    if File.Exists(Loadtable."File Path" + Loadtable.Filename) then
-                        if Loadtable.LoadFileToBlob(Loadtable."File Path" + Loadtable.Filename) then begin
-                            Loadtable.modify(True);
-                            commit;
-                        end;
-                end else
-                    Loadtable.modify(True);
-            until Loadtable.next = 0;
-    end;
-
-    Procedure LOADTable50062CustomerContract()
-
-    var
-        Loadtable: record "Customer Contract";
-        loadsetup: record "Customer Contract Setup";
-    begin
-        loadsetup.get();
-        if Loadtable.findset then
-            repeat
-                Loadtable.CalcFields(filblob);
-
-                if not Loadtable.filblob.HasValue then begin
-                    if File.Exists(loadsetup."Folder Name" + Loadtable."Folder and Filename") then begin
-                        if Loadtable.LoadFileToBlob(loadsetup."Folder Name" + Loadtable."Folder and Filename") then begin
-                            Loadtable.modify(true);
-                            commit;
-                        end;
-                    end else
-                        if Loadtable.LoadFileToBlob(Loadtable."Folder and Filename") then begin
-                            Loadtable.modify(true);
-                            commit;
-                        end;
-                end else
-                    Loadtable.modify(true);
-            until Loadtable.next = 0;
-    end;
-
-    Procedure LOADTable66002ZyxelFileManagement()
-    var
-        Loadtable: record "Zyxel File Management";
-    begin
-        if Loadtable.findset then
-            repeat
-                Loadtable.CalcFields(filblob);
-
-                if not Loadtable.filblob.HasValue then begin
-                    if File.Exists(Loadtable.Filename) then
-                        if Loadtable.LoadFileToBlob(Loadtable.Filename) then begin
-                            Loadtable.modify(false);
-                            commit;
-                        end;
-                end;
-            until Loadtable.next = 0;
-    end;
 
 
     var
