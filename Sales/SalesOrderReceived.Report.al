@@ -38,7 +38,7 @@ report 50048 "Sales Order Received"
             SI.SetMergefield(100, StrSubstNo(Text001, Date2dwy(WorkDate, 2)));
             SI.SetMergefield(101, Format(CalcDate('<-CW>', WorkDate)));
             EmailAddMgt.CreateSimpleEmail('REP50102', '', '');
-            EmailAddMgt.AddAttachment(tempblob, FileMgt.GetFileName(FilenameTarget));
+            EmailAddMgt.AddAttachment(tempblob, 'SalesOrderReceived.xlsx');
             EmailAddMgt.Send;
             //            FileMgt.DeleteServerFile(FilenameTarget);
         end;
