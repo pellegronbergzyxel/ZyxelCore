@@ -244,7 +244,7 @@ Table 76150 "HQ Invoice Header"
                 //VisionFTPMgt.DownloadFile('HQ-SALES-DOC', Filename, pShowError);
                 //"File Path" := FileMgt.GetDirectoryName("File Path") + '\';
             end;
-            if FileMgt.ServerFileExists(GetFilename) or recServEnviron.TestEnvironment then begin
+            if (rec."File Path" <> '') or recServEnviron.TestEnvironment then begin
                 Status := Status::"Document is Downloaded";
                 Modify;
                 Commit;
@@ -365,7 +365,26 @@ Table 76150 "HQ Invoice Header"
         rec.DownloadBlobToFile('');
         // FileMgt.DownloadHandler(GetFilename, lText001, '', 'PDF(*.pdf)|*.pdf|All files(*.*)|*.*', Filename);
     end;
-    
+
+
+    // procedure LoadFileToBlob(FilePath: Text): Boolean
+    // var
+    //     FileIn: File;
+    //     FileStream: InStream;
+    //     outstream: OutStream;
+    // begin
+    //     if not File.Exists(FilePath) then
+    //         exit(false);
+
+    //     FileIn.Open(FilePath);
+    //     FileIn.CreateInstream(FileStream);
+    //     filblob.CreateOutStream(outstream);
+    //     CopyStream(outstream, FileStream);
+    //     modify();
+    //     FileIn.Close;
+    //     exit(true);
+    // end;
+
     procedure DownloadBlobToFile(DownloadPath: Text): Boolean
     var
         FileOut: File;

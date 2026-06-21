@@ -813,7 +813,20 @@ Codeunit 50000 "ZyXEL General Tools"
         if UserInfo.Get(userID) then
             rValue := UserInfo."Full Name";
     end;
- 
+
+    // procedure downloadserverfil(serverfiltext: text)
+    // var
+    //     instr: InStream;
+    //     outstr: OutStream;
+    //     filemgt: codeunit "File Management";
+    //     filename: text;
+    //     tempblob: Codeunit "Temp Blob";
+    // begin
+    //     filemgt.BLOBImportFromServerFile(tempblob, serverfiltext);
+    //     tempblob.CreateInStream(instr);
+    //     filename := filemgt.GetFileName(serverfiltext);
+    //     file.DownloadFromStream(instr, '', '', '', filename)
+    // end;
 
     procedure FindNextSalesLine(DocumentNo: Code[20]; LineNo: Integer): Integer
     var //10-03-2026 BK #560238
