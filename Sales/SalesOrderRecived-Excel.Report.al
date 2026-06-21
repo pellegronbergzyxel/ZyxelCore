@@ -178,6 +178,7 @@ Report 50102 "Sales Order Recived - Excel"
         GlSetup: Record "General Ledger Setup";
         CountryRegion: Record "Country/Region";
         recCust: Record Customer;
+        varOutstream: outstream;
         Col: Integer;
         ChangeColour: Boolean;
         AmountSum: Decimal;
@@ -262,10 +263,10 @@ Report 50102 "Sales Order Recived - Excel"
     end;
 
 
- 
-     procedure CreateExcelbook()
-     var 
-      varOutstream: outstream;
+
+    procedure CreateExcelbook()
+    var
+    //varOutstream: outstream;
     begin
         //ExcelBuf.CreateBook('', "Sales Header".GetFilter("Create Date")); CLOUD ready DELETE
         ExcelBuf.CreateNewBook("Sales Header".GetFilter("Create Date"));
@@ -274,9 +275,9 @@ Report 50102 "Sales Order Recived - Excel"
         if GuiAllowed then begin
             ExcelBuf.OpenExcel;
             //Error('');
-        end else begin 
+        end else begin
             globaltempblob.CreateOutStream(varOutstream);
-            excelbuf.SaveToStream(varOutstream,false);
+            excelbuf.SaveToStream(varOutstream, false);
             //FilenameServer := ExcelBuf.GetFileNameServer;
         end;
 
@@ -285,7 +286,9 @@ Report 50102 "Sales Order Recived - Excel"
 
     procedure GetFilename(var tempblob: codeunit "Temp Blob")
     begin
+        globaltempblob.CreateOutStream(varOutstream);
+        excelbuf.SaveToStream(varOutstream, false);
         tempblob := globaltempblob;
-        
+
     end;
 }

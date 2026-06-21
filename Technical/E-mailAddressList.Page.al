@@ -81,6 +81,21 @@ Page 50234 "E-mail Address List"
                     Hyperlink('http://helpcenter/NAV/Shelf/DynamicsNAV/DynamicsNAV.htm?b=Finance&r=E-mail%20address%20Setup');
                 end;
             }
+            action("Test Report")
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Test Report';
+                Image = Report;
+                Promoted = true;
+                PromotedCategory = Process;
+
+                trigger OnAction()
+                var
+                    Report50126: Report "Sales Order Received TEST";
+                begin
+                    Report50126.RunModal;
+                end;
+            }
         }
     }
 }
