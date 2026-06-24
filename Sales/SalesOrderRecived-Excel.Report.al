@@ -284,8 +284,13 @@ Report 50102 "Sales Order Recived - Excel"
 
 
     procedure GetFilename(var tempblob: codeunit "Temp Blob")
+    var
+       InStr: InStream;
+        OutStr: OutStream;
     begin
-        tempblob := globaltempblob;
-        
+        globaltempblob.CreateInStream(InStr);
+        tempblob.CreateOutStream(OutStr);
+        CopyStream(OutStr, InStr);
+          
     end;
 }

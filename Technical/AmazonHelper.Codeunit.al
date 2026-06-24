@@ -3538,6 +3538,68 @@ codeunit 50055 AmazonHelper
     // MIGRATION 
 
 
+    // Procedure LOADTable76150HQInvoiceHeader()
+    // var
+    //     Loadtable: record "HQ Invoice Header";
+    // begin
+    //     if Loadtable.findset then
+    //         repeat
+    //             Loadtable.CalcFields(filblob);
+    //             if not Loadtable.filblob.HasValue then begin
+    //                 if File.Exists(Loadtable."File Path" + Loadtable.Filename) then
+    //                     if Loadtable.LoadFileToBlob(Loadtable."File Path" + Loadtable.Filename) then begin
+    //                         Loadtable.modify(True);
+    //                         commit;
+    //                     end;
+    //             end else
+    //                 Loadtable.modify(True);
+    //         until Loadtable.next = 0;
+    // end;
+
+    // Procedure LOADTable50062CustomerContract()
+
+    // var
+    //     Loadtable: record "Customer Contract";
+    //     loadsetup: record "Customer Contract Setup";
+    // begin
+    //     loadsetup.get();
+    //     if Loadtable.findset then
+    //         repeat
+    //             Loadtable.CalcFields(filblob);
+
+    //             if not Loadtable.filblob.HasValue then begin
+    //                 if File.Exists(loadsetup."Folder Name" + Loadtable."Folder and Filename") then begin
+    //                     if Loadtable.LoadFileToBlob(loadsetup."Folder Name" + Loadtable."Folder and Filename") then begin
+    //                         Loadtable.modify(true);
+    //                         commit;
+    //                     end;
+    //                 end else
+    //                     if Loadtable.LoadFileToBlob(Loadtable."Folder and Filename") then begin
+    //                         Loadtable.modify(true);
+    //                         commit;
+    //                     end;
+    //             end else
+    //                 Loadtable.modify(true);
+    //         until Loadtable.next = 0;
+    // end;
+
+    // Procedure LOADTable66002ZyxelFileManagement()
+    // var
+    //     Loadtable: record "Zyxel File Management";
+    // begin
+    //     if Loadtable.findset then
+    //         repeat
+    //             Loadtable.CalcFields(filblob);
+
+    //             if not Loadtable.filblob.HasValue then begin
+    //                 if File.Exists(Loadtable.Filename) then
+    //                     if Loadtable.LoadFileToBlob(Loadtable.Filename) then begin
+    //                         Loadtable.modify(false);
+    //                         commit;
+    //                     end;
+    //             end;
+    //         until Loadtable.next = 0;
+    // end;
 
 
     var
