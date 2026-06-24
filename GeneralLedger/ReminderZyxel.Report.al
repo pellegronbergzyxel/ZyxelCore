@@ -625,13 +625,24 @@ report 50057 "Reminder Zyxel"
                 CustPostingGroup: Record "Customer Posting Group";
                 VATPostingSetup: Record "VAT Posting Setup";
                 FormatAdr: Codeunit "Format Address";
+                Zgt: Codeunit "ZyXEL General Tools";
             begin
                 CurrReport.Language := LanguageCU.GetLanguageIdOrDefault("Language Code");
 
 
                 DimSetEntry.SetRange("Dimension Set ID", "Issued Reminder Header"."Dimension Set ID");
 
-                FormatAdr.IssuedReminder(CustAddr, "Issued Reminder Header");
+                //FormatAdr.IssuedReminder(CustAddr, "Issued Reminder Header");
+                //24-06-2026 BK #578598
+                custaddr[1] := "Issued Reminder Header".Name;
+                custaddr[2] := "Issued Reminder Header"."Name 2";
+                custaddr[3] := "Issued Reminder Header"."Address";
+                custaddr[4] := "Issued Reminder Header"."Address 2";
+                custaddr[5] := "Issued Reminder Header"."City";
+                custaddr[6] := "Issued Reminder Header"."Post Code";
+                custaddr[7] := "Issued Reminder Header"."Country/Region Code";
+                Zgt.CompactAddressArray(CustAddr);
+
                 if "Issued Reminder Header"."Your Reference" = '' then
                     ReferenceText := ''
                 else

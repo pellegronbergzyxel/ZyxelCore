@@ -733,6 +733,32 @@ Codeunit 50000 "ZyXEL General Tools"
         exit(pLocationCode = 'EICARD');
     end;
 
+    procedure CompactAddressArray(var AddrArray: array[8] of Text): Integer
+    var
+        i: Integer;
+        WriteIndex: Integer;
+        tempArray: array[8] of Text;
+    begin
+        // Move non-empty address lines up, filling empty gaps
+        // Returns the last non-empty line number
+        WriteIndex := 1;
+
+        // First pass: collect all non-empty lines
+        for i := 1 to 8 do begin
+            if AddrArray[i] <> '' then begin
+                tempArray[WriteIndex] := AddrArray[i];
+                WriteIndex += 1;
+            end;
+        end;
+
+        // Clear the original array and copy back compacted data
+        Clear(AddrArray);
+        for i := 1 to WriteIndex - 1 do
+            AddrArray[i] := tempArray[i];
+
+        exit(WriteIndex - 1); // Return number of non-empty lines
+    end;
+
     local procedure DontDeleteTheseObjects()
     var
         ">> Role Center": Integer;
