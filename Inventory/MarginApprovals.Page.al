@@ -251,7 +251,7 @@ page 50118 "Margin Approvals"
 
                 begin
                     if rec."Source Type" = rec."Source Type"::"Price Book" then
-                        Helper.ProcessPriceApproval(rec, true);
+                        Helper.PRICEAPPROVAL();
                 end;
             }
             action(testSalesordercheck)
@@ -282,7 +282,7 @@ page 50118 "Margin Approvals"
 
                 begin
                     if rec."Source Type" = rec."Source Type"::Sales then
-                        Helper.ProcessOrderApproval(rec, true);
+                        Helper.ORDERAPPROVAL();                 //.ProcessOrderApproval(rec, true);
                 end;
             }
             action(ReturnpriceApprovaltoPricelist)
@@ -310,7 +310,8 @@ page 50118 "Margin Approvals"
 
 
                 begin
-                    rec.Setapprovedpricebookline(rec);
+                    rec.forceapproval(rec);
+                    //rec.Setapprovedpricebookline(rec);
                 end;
             }
 

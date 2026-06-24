@@ -285,6 +285,9 @@ Report 50102 "Sales Order Recived - Excel"
 
 
     procedure GetFilename(var tempblob: codeunit "Temp Blob")
+    var
+       InStr: InStream;
+        OutStr: OutStream;
     begin
         globaltempblob.CreateOutStream(varOutstream);
         excelbuf.SaveToStream(varOutstream, false);

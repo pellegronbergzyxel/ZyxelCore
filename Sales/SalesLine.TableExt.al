@@ -514,6 +514,7 @@ tableextension 50117 SalesLineZX extends "Sales Line"
         field(66013;MarginApprovalSOStatus; enum MarginApprovalSOStatus)
         {
             Caption = 'Margin Approval status';
+            InitValue = 0;
             
         }
         field(66014;MarginApprovalEntryNo; integer)

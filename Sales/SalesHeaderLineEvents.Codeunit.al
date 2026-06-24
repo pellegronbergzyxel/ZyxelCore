@@ -1713,8 +1713,7 @@ codeunit 50067 "Sales Header/Line Events"
 
         end;
     end;
-
-    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeValidateEvent', 'Unit Price', false, false)]
+  [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeValidateEvent', 'Unit Price', false, false)]
     local procedure OnBeforeValidateSLUnitPriceExclVAT(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
     var
         ZGT: Codeunit "ZyXEL General Tools";
@@ -1724,6 +1723,7 @@ codeunit 50067 "Sales Header/Line Events"
             if Amazonhelper.MarginapprovalRequiredSalesorder(rec) then
                 Amazonhelper.MarginapprovalSalesorder(rec);
 
+  
 
         UpdateUnitPrice(Rec, Xrec, CurrFieldNo, false);
 

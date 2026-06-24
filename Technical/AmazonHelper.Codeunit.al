@@ -36,6 +36,8 @@ codeunit 50055 AmazonHelper
                 begin
                     PRICEAPPROVAL();
                 END;
+
+
         end;
     end;
 
@@ -438,11 +440,11 @@ codeunit 50055 AmazonHelper
                                                         //orderedQuantity > amount
                                                         if TokenValue.SelectToken('orderedQuantity', TokenValue2) then
                                                             if TokenValue2.SelectToken('amount', TokenValue3) then begin
-                                                                EVALUATE(Salesline.Quantity, TokenValue3.AsValue().AsText());
+                                                                // EVALUATE(Salesline.Quantity, TokenValue3.AsValue().AsText());
                                                                 Salesline."Description 2" := 'Price:' + format(amt);
                                                                 salesline.AmazconUnitprice := amt;
                                                                 Salesline.Modify(true);
-                                                                Salesline."Description 2" := Salesline."Description 2" + ',qty:' + format(Salesline.Quantity);
+                                                                Salesline."Description 2" := Salesline."Description 2" + ',qty:' + TokenValue3.AsValue().AsText();
                                                                 Salesline.Modify(true);
                                                             end;
                                                     end;
@@ -2126,7 +2128,7 @@ codeunit 50055 AmazonHelper
 
         if SentPriceApproval(MarginApproval, Marginsetup, JsontextReply, all) then begin
             IF jsonTokenMain.ReadFrom(JsontextReply) then
-                if jsonTokenMain.SelectToken('margincheckresult', jsonTokenorders) then begin
+                if jsonTokenMain.SelectToken('result', jsonTokenorders) then begin
                     jsonarrayMain := jsonTokenorders.AsArray();
                     foreach TokenOrder in jsonarrayMain do begin
                         if TokenOrder.SelectToken('entry_no', TokenValue) then
@@ -2173,21 +2175,22 @@ codeunit 50055 AmazonHelper
 
         if SentOrderApproval(MarginApproval, Marginsetup, JsontextReply, All) then begin
             IF jsonTokenMain.ReadFrom(JsontextReply) then
-                if jsonTokenMain.SelectToken('status', jsonTokenorders) then begin
-                    jsonvalue := jsonTokenorders.AsValue();
-
-                    if TokenOrder.SelectToken('entry_no', TokenValue) then
-                        entry_no := TokenValue.AsValue().AsInteger();
-
-
-                    if all then
-                        MarginApproval.get(entry_no);
-
-                    if jsonvalue.AsText().Contains('received') then begin
-                        MarginApproval.requeststatusDT := CurrentDateTime;
-                        MarginApproval.requeststatus := MarginApproval.requeststatus::SendPrice;
-                        MarginApproval.Status := MarginApproval.Status::"Waiting for Margin Approval";
-                        MarginApproval.Modify()
+                if jsonTokenMain.SelectToken('result', jsonTokenorders) then begin
+                    jsonarrayMain := jsonTokenorders.AsArray();
+                    foreach TokenOrder in jsonarrayMain do begin
+                        //  if jsonTokenMain.SelectToken('status', jsonTokenorders) then begin
+                        //    jsonvalue := jsonTokenorders.AsValue();
+                        if TokenOrder.SelectToken('entry_no', TokenValue) then
+                            entry_no := TokenValue.AsValue().AsInteger();
+                        if all then
+                            MarginApproval.get(entry_no);
+                        if TokenOrder.SelectToken('status', TokenValue) then
+                            if TokenValue.asValue.AsText().contains('received') then begin
+                                MarginApproval.requeststatusDT := CurrentDateTime;
+                                MarginApproval.requeststatus := MarginApproval.requeststatus::SendPrice;
+                                MarginApproval.Status := MarginApproval.Status::"Waiting for Margin Approval";
+                                MarginApproval.Modify()
+                            end;
                     end;
                 end;
         end;
@@ -2613,6 +2616,7 @@ codeunit 50055 AmazonHelper
         marginapproval.setrange("Source Type", marginapproval."Source Type"::"Price Book");
         marginapproval.setrange(requeststatus, marginapproval.requeststatus::WaitingPrice);
         MarginApproval.setrange("Source No.", MarginApprovalfilter."Source No.");
+        MarginApproval.setrange("Customer No.", MarginApprovalfilter."Customer No.");
         marginapproval.setfilter("User Comment", '<>%1', '');
         if marginapproval.findset() then begin
             if (MarginApproval."Customer No." <> '') and (MarginApproval."Customer Name" = '') then
@@ -2827,7 +2831,7 @@ codeunit 50055 AmazonHelper
         x: integer;
     begin
         salessetup.get();
-        if salessetup."Margin Approval" <> salessetup."Margin Approval"::inActive then begin
+        if MarginApproval.MarginApprovalActive() and MarginItemShouldApproves(PriceListLine."Product No.") then begin
             MarginApproval.setrange("Source Type", MarginApproval."Source Type"::"Price Book");
             MarginApproval.setrange("Source No.", PriceListLine."Price List Code");
             MarginApproval.setrange("Source Line No.", PriceListLine."Line No.");
@@ -2858,7 +2862,7 @@ codeunit 50055 AmazonHelper
                     end;
                     IsHandled := true;
                 end;
-
+                PriceListLine.modify(false);//temp
             end ELSE begin
                 if MarginApproval.findset then begin
                     if (MarginApproval."Item No." <> PriceListLine."Product No.") OR
@@ -2874,9 +2878,11 @@ codeunit 50055 AmazonHelper
                         MarginApproval.Modify(false);
                         PriceListLine.Status := PriceListLine.Status::WaitingApproval;
                         IsHandled := true;
+                        PriceListLine.modify(false);//temp
                     end else begin
                         PriceListLine.Status := PriceListLine.Status::Active;
                         IsHandled := true;
+                        PriceListLine.modify(false);//temp
                     end;
 
                 end;
@@ -2884,7 +2890,57 @@ codeunit 50055 AmazonHelper
         end;
     end;
 
+    procedure MarginSOItemShouldApproves(SL: record "Sales Line"): Boolean
+    var
+        cust: record Customer;
+    begin
+        if SL.Type <> sl.type::Item then
+            exit(false);
 
+        // Sample
+        if cust.get(sl."Sell-to Customer No.") then
+            if cust."Sample Account" then
+                Exit(false);
+
+        // over shipment 
+
+
+        // rework (hide)
+        if sl."Hide Line" then
+            exit(false);
+
+        // Item
+        if not MarginItemShouldApproves(sl."No.") then
+            exit(false);
+
+        exit(true);
+    end;
+
+    procedure MarginItemShouldApproves(ItemNo: code[20]): Boolean;
+    var
+        item: record Item;
+        ppsetup: record "Purchases & Payables Setup";
+        Purchaseprice: record "Price List Line";
+    begin
+        if not item.get(ItemNo) then
+            exit(false);
+
+        // NON-inventory (service)
+        if item.Type IN [item.Type::"Non-Inventory", item.Type::Service] then
+            exit(false);
+
+        // HQ (Last) If not
+        Purchaseprice.setrange("Price Type", Purchaseprice."Price Type"::Purchase);
+        Purchaseprice.setrange("Source Type", Purchaseprice."Source Type"::Vendor);
+        Purchaseprice.setrange("Source No.", ppsetup.CostPriceVendorno);
+        Purchaseprice.setrange("Asset Type", Purchaseprice."Asset Type"::Item);
+        Purchaseprice.setrange("Asset No.", ItemNo);
+        if not Purchaseprice.FindSet() then
+            if not (format(item."SBU Company").Contains('HQ')) then
+                if not (format(item."Part Number Type").Contains('HQ')) then  // change to P&P setup
+                    EXIT(FALSE);
+        exit(true);
+    end;
 
 
     // event >>
@@ -3410,9 +3466,9 @@ codeunit 50055 AmazonHelper
         marginapproval.setfilter("User Comment", '<>%1', '');
         if marginapproval.findset() then
             repeat
-                if lastSource <> marginapproval."Source No." then begin
+                if lastSource <> marginapproval."Customer No." then begin
                     marginapproval2.get(marginapproval."Entry No.");
-                    lastSource := marginapproval."Source No.";
+                    lastSource := marginapproval."Customer No.";
                     ProcessPriceApproval(marginapproval2, true);
                 end;
             until marginapproval.next = 0;
@@ -3471,7 +3527,8 @@ codeunit 50055 AmazonHelper
             exit(false);
 
         // Customer 
-
+        if not MarginSOItemShouldApproves(SL) then
+            exit(false);
 
         exit(true);
     end;
