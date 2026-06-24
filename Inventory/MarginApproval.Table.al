@@ -167,8 +167,9 @@ table 50071 "Margin Approval"
         //PriceLine: Record "Price List Line";
         MarginApp: Record "Margin Approval";
         PriceChangeType: Option Less,Equal,Higher;
+        Amazonhelper: Codeunit AmazonHelper;
     begin
-        if MarginApprovalActive() then begin
+        if MarginApprovalSOActive() and Amazonhelper.MarginSOItemShouldApproves(SalesLine) then begin
             If (SalesLine."Document Type" IN [SalesLine."Document Type"::Order, SalesLine."Document Type"::Invoice]) and
                (SalesLine.Type = SalesLine.Type::Item) and
                (SalesLine."Line No." <> 0)
@@ -344,6 +345,14 @@ table 50071 "Margin Approval"
     begin
         SalesSetup.get();
         exit(SalesSetup."Margin Approval" <> SalesSetup."Margin Approval"::inActive);
+    end;
+
+      procedure MarginApprovalSOActive(): Boolean
+    var
+        SalesSetup: Record "Sales & Receivables Setup";
+    begin
+        SalesSetup.get();
+        exit(SalesSetup."Margin Approval" = SalesSetup."Margin Approval"::OrdersAndPricelist);
     end;
 
     procedure GetEntryNo(pSourceNo: Code[20]; pSourceLineNo: Integer): Integer

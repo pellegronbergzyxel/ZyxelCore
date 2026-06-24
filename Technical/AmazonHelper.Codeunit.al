@@ -440,11 +440,11 @@ codeunit 50055 AmazonHelper
                                                         //orderedQuantity > amount
                                                         if TokenValue.SelectToken('orderedQuantity', TokenValue2) then
                                                             if TokenValue2.SelectToken('amount', TokenValue3) then begin
-                                                                EVALUATE(Salesline.Quantity, TokenValue3.AsValue().AsText());
+                                                                // EVALUATE(Salesline.Quantity, TokenValue3.AsValue().AsText());
                                                                 Salesline."Description 2" := 'Price:' + format(amt);
                                                                 salesline.AmazconUnitprice := amt;
                                                                 Salesline.Modify(true);
-                                                                Salesline."Description 2" := Salesline."Description 2" + ',qty:' + format(Salesline.Quantity);
+                                                                Salesline."Description 2" := Salesline."Description 2" + ',qty:' + TokenValue3.AsValue().AsText();
                                                                 Salesline.Modify(true);
                                                             end;
                                                     end;
@@ -2831,7 +2831,7 @@ codeunit 50055 AmazonHelper
         x: integer;
     begin
         salessetup.get();
-        if salessetup."Margin Approval" <> salessetup."Margin Approval"::inActive then begin
+        if MarginApproval.MarginApprovalActive() and MarginItemShouldApproves(PriceListLine."Product No.") then begin
             MarginApproval.setrange("Source Type", MarginApproval."Source Type"::"Price Book");
             MarginApproval.setrange("Source No.", PriceListLine."Price List Code");
             MarginApproval.setrange("Source Line No.", PriceListLine."Line No.");
@@ -2862,7 +2862,7 @@ codeunit 50055 AmazonHelper
                     end;
                     IsHandled := true;
                 end;
-
+                PriceListLine.modify(false);//temp
             end ELSE begin
                 if MarginApproval.findset then begin
                     if (MarginApproval."Item No." <> PriceListLine."Product No.") OR
@@ -2878,9 +2878,11 @@ codeunit 50055 AmazonHelper
                         MarginApproval.Modify(false);
                         PriceListLine.Status := PriceListLine.Status::WaitingApproval;
                         IsHandled := true;
+                        PriceListLine.modify(false);//temp
                     end else begin
                         PriceListLine.Status := PriceListLine.Status::Active;
                         IsHandled := true;
+                        PriceListLine.modify(false);//temp
                     end;
 
                 end;
@@ -2888,7 +2890,57 @@ codeunit 50055 AmazonHelper
         end;
     end;
 
+    procedure MarginSOItemShouldApproves(SL: record "Sales Line"): Boolean
+    var
+        cust: record Customer;
+    begin
+        if SL.Type <> sl.type::Item then
+            exit(false);
 
+        // Sample
+        if cust.get(sl."Sell-to Customer No.") then
+            if cust."Sample Account" then
+                Exit(false);
+
+        // over shipment 
+
+
+        // rework (hide)
+        if sl."Hide Line" then
+            exit(false);
+
+        // Item
+        if not MarginItemShouldApproves(sl."No.") then
+            exit(false);
+
+        exit(true);
+    end;
+
+    procedure MarginItemShouldApproves(ItemNo: code[20]): Boolean;
+    var
+        item: record Item;
+        ppsetup: record "Purchases & Payables Setup";
+        Purchaseprice: record "Price List Line";
+    begin
+        if not item.get(ItemNo) then
+            exit(false);
+
+        // NON-inventory (service)
+        if item.Type IN [item.Type::"Non-Inventory", item.Type::Service] then
+            exit(false);
+
+        // HQ (Last) If not
+        Purchaseprice.setrange("Price Type", Purchaseprice."Price Type"::Purchase);
+        Purchaseprice.setrange("Source Type", Purchaseprice."Source Type"::Vendor);
+        Purchaseprice.setrange("Source No.", ppsetup.CostPriceVendorno);
+        Purchaseprice.setrange("Asset Type", Purchaseprice."Asset Type"::Item);
+        Purchaseprice.setrange("Asset No.", ItemNo);
+        if not Purchaseprice.FindSet() then
+            if not (format(item."SBU Company").Contains('HQ')) then
+                if not (format(item."Part Number Type").Contains('HQ')) then  // change to P&P setup
+                    EXIT(FALSE);
+        exit(true);
+    end;
 
 
     // event >>
