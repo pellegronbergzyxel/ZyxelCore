@@ -3527,7 +3527,8 @@ codeunit 50055 AmazonHelper
             exit(false);
 
         // Customer 
-
+        if not MarginSOItemShouldApproves(SL) then
+            exit(false);
 
         exit(true);
     end;

@@ -310,7 +310,8 @@ page 50118 "Margin Approvals"
 
 
                 begin
-                    rec.Setapprovedpricebookline(rec);
+                    rec.forceapproval(rec);
+                    //rec.Setapprovedpricebookline(rec);
                 end;
             }
 
