@@ -14,8 +14,8 @@ report 50048 "Sales Order Received"
     ProcessingOnly = true;
 
     trigger OnPreReport()
-    var 
-    tempblob: codeunit "Temp Blob";
+    var
+        tempblob: codeunit "Temp Blob";
     begin
         recInvSetup.Get;  // 07-08-19 ZY-LD 004
         SalesHeader.SetRange("Document Type", SalesHeader."document type"::Order);
@@ -38,9 +38,9 @@ report 50048 "Sales Order Received"
             SI.SetMergefield(100, StrSubstNo(Text001, Date2dwy(WorkDate, 2)));
             SI.SetMergefield(101, Format(CalcDate('<-CW>', WorkDate)));
             EmailAddMgt.CreateSimpleEmail('REP50102', '', '');
-            EmailAddMgt.AddAttachment(tempblob, FileMgt.GetFileName(FilenameTarget));
+            EmailAddMgt.AddAttachment(tempblob, 'SalesOrderReceived.xlsx');
             EmailAddMgt.Send;
-//            FileMgt.DeleteServerFile(FilenameTarget);
+            //            FileMgt.DeleteServerFile(FilenameTarget);
         end;
     end;
 
