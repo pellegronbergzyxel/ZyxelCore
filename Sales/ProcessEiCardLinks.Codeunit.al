@@ -1,16 +1,5 @@
 Codeunit 50039 "Process EiCard Links"
 {
-    // 001. 20-09-19 ZY-LD 2019092010000044 - Send reminder to eShop.
-    // 002. 15-10-19 ZY-LD 000 - EMS License doesn't have a file to download.
-    // 003. 07-01-20 ZY-LD P0368 - Send to eShop with delay.
-    // 004. 21-01-20 ZY-LD 2020012110000081 - Send invoice reminder.
-    // 005. 18-02-20 ZY-LD P0395 - Don't send Consignment and eCommerce to the customer.
-    // 006. 23-03-20 ZY-LD 2020032310000047 - Download only links if quantity is below 100, otherwise it might timeout.
-    // 007. 11-09-20 ZY-LD 000 - We have seen issues where the download has timed out on small downloads. This will make it possible to drop the download and only send the links.
-    // 008. 14-01-21 ZY-LD 2021011410000075 - The customer can force a download no matter what the automation says.
-    // 009. 21-01-21 ZY-LD 000 - SendEicardToEshop is made global.
-    // 010. 20-04-22 ZY-LD 000 - Setup secure protocol to handle "https:". EicardLinks.Quantity is set equal to SalesLine.Quantity so we can post the sales order.
-    // 011. 24-05-23 ZY-LD 000 - GLC License doesn´t not have a file to download.
 
     Permissions = TableData "EiCard Link Line" = rm;
 
@@ -26,10 +15,8 @@ Codeunit 50039 "Process EiCard Links"
         if recAutoSetup.AutomationAllowed and recAutoSetup.EndOfMonthAllowed then
             SendEshopReminder;
 
-        //>> 07-01-20 ZY-LD 003
         if recAutoSetup.SendEicardToEshopAllowed then
             SendEicardToEshop;
-        //<< 07-01-20 ZY-LD 003
     end;
 
     var
@@ -93,27 +80,21 @@ Codeunit 50039 "Process EiCard Links"
         if recEiCardQueue.FindSet(true) then
             repeat
                 recEiCardQueue."Error Description" := '';
-
-                //>> 23-05-23 ZY-LD 011
-                //IF (recEiCardQueue."No. of Sales Order Lines" = recEiCardQueue."No. of EiCard Link Lines") OR ReSend THEN BEGIN
                 if (recEiCardQueue."No. of Sales Order Lines" = recEiCardQueue."No. of EiCard Link Lines") or
                    (recEiCardQueue."Quantity Sales Order" = recEiCardQueue."No. of EiCard Link Lines") or
-                   ReSend  //<< 23-05-23 ZY-LD 011
+                   ReSend
                 then begin
                     if recEiCardQueue."External Document No." <> '' then begin
                         if DownloadEiCardLinkFiles(
                              recEiCardQueue."Purchase Order No.",
-                             recEiCardQueue."Sales Order No.",  // 23-03-20 ZY-LD 006
+                             recEiCardQueue."Sales Order No.",
                              FilesSavedInFolder,
-                             recEiCardQueue."Customer No.")  // 14-01-21 ZY-LD 008
+                             recEiCardQueue."Customer No.")
                         then begin
                             recEiCardQueue.CalcFields("Size (Mb)");
                             if SendEiCardLink(recEiCardQueue, TestEmailAdd, ReSend) then begin
                                 if TestEmailAdd = '' then begin
                                     recEiCardQueue.Validate("Sales Order Status", recEiCardQueue."sales order status"::"EiCard Sent to Customer");
-                                    //FileMgt.ServerRemoveDirectory(FilesSavedInFolder,TRUE);  // Delete files after e-mail.
-                                    //recEiCardLinkLine.SETRANGE("Purchase Order No.",recEiCardQueue."Purchase Order No.");
-                                    //recEiCardLinkLine.MODIFYALL(Filename,'');
                                 end;
                                 rValue := true;
                             end else
@@ -243,8 +224,6 @@ Codeunit 50039 "Process EiCard Links"
         lText002: label 'Download file';
     begin
         // // CLOUD READY NEW
-        // Download http-links to a file.
-        //IF recAutoSetup."Download and Attach Eicards" THEN BEGIN  // 11-09-20 ZY-LD 007  // 14-01-21 ZY-LD 008
         recEiCardLinkLine.SetRange("Purchase Order No.", PurchOrderNo);
         recEiCardLinkLine.SetFilter(Link, '<>%1', '');
         if recEiCardLinkLine.FindSet(true) then begin
@@ -255,20 +234,17 @@ Codeunit 50039 "Process EiCard Links"
             recFTPFolder.TestField(Active, true);
             recFTPFolder.TestField("Archive Folder");
             SaveFilesInFolder := StrSubstNo('%1%2\', recFTPFolder."Archive Folder", PurchOrderNo);
-            //if not FileMgt.ServerDirectoryExists(SaveFilesInFolder) then
-            //  FileMgt.ServerCreateDirectory(SaveFilesInFolder);
 
             repeat
                 ZGT.UpdateProgressWindow(lText002, 0, true);
-                recItem.Get(recEiCardLinkLine."Item No.");  // 15-10-19 ZY-LD 002
-                                                            //IF NOT recItem."EMS License" THEN BEGIN  // 15-10-19 ZY-LD 002  // 24-05-23 ZY-LD 011
-                if recItem."Enter Security for Eicard on" = recItem."enter security for eicard on"::" " then begin  // 24-05-23 ZY-LD 011
-                    if not recSalesLine.Get(recSalesLine."document type"::Order, SalesOrderNo, recEiCardLinkLine."Purchase Order Line No.") then;  // 23-03-20 ZY-LD 006
-                    if not recCust.Get(CustNo) then  // 14-01-21 ZY-LD 008
-                        Clear(recCust);  // 14-01-21 ZY-LD 008
+                recItem.Get(recEiCardLinkLine."Item No.");
+                if recItem."Enter Security for Eicard on" = recItem."enter security for eicard on"::" " then begin
+                    if not recSalesLine.Get(recSalesLine."document type"::Order, SalesOrderNo, recEiCardLinkLine."Purchase Order Line No.") then;
+                    if not recCust.Get(CustNo) then
+                        Clear(recCust);
                     if (recEiCardLinkLine.Filename = '') and
-                        (recSalesLine.Quantity < recAutoSetup."Download if Qty. is Less than") and  // 23-03-20 ZY-LD 006
-                        (recAutoSetup."Download and Attach Eicards" or recCust."Download and Attach Eicards")  // 14-01-21 ZY-LD 008
+                        (recSalesLine.Quantity < recAutoSetup."Download if Qty. is Less than") and
+                        (recAutoSetup."Download and Attach Eicards" or recCust."Download and Attach Eicards")
                     then begin
                         Filename := StrSubstNo('%1%2-%3-%4%5', SaveFilesInFolder, PurchOrderNo, recEiCardLinkLine."Purchase Order Line No.", recEiCardLinkLine."Line No.", Text23);
                         if HttpClient.Get(recEiCardLinkLine.Link, HttpResponse) and HttpResponse.IsSuccessStatusCode() then begin
@@ -278,6 +254,8 @@ Codeunit 50039 "Process EiCard Links"
                             if ContentInStream.Length <> 0 then
                                 recEiCardLinkLine."Size (MB)" := ContentInStream.Length / 1000000;
                             recEiCardLinkLine.modify;
+                            if (recEiCardLinkLine."Purchase Order No." <> '') and (recEiCardLinkLine."Purchase Order Line No." <> 0) then //30-06-2026 BK ##581893
+                                recEiCardLinkLine.Quantity := FindPurchaseOrder(recEiCardLinkLine."Purchase Order No.", recEiCardLinkLine."Purchase Order Line No.");
                             //    end;
                             //     if FileMgt.ServerFileExists(Filename) then begin
                             //       recEiCardLinkLine.Filename := Filename;
@@ -356,27 +334,7 @@ Codeunit 50039 "Process EiCard Links"
         FileMgt: Codeunit "File Management";
     begin
         recEmailAdd.Get('EICARDLINK');
-
         // CLOUR READY DELETE
-        // Body := GetEmailBody(Text10 + Text08, recEiCardQueue."No. of EiCard Link Lines" > 1, AttachementSize);
-        // Table := GetTableHeader;
-
-        // // Setup Body
-        // Body := ReplaceString(Body, '%1', recEiCardQueue."External Document No.");
-        // Body := ReplaceString(Body, Text16, recEiCardQueue."From E-Mail Address");
-        // Body := ReplaceString(Body, Text17, recEiCardQueue."From E-Mail Signature");
-
-        // recEiCardLinkLine.SetRange("Purchase Order No.", recEiCardQueue."Purchase Order No.");
-        // recEiCardLinkLine.SetFilter(Link, '<>%1', '');
-        // recEiCardLinkLine.SetAutocalcFields("Item Description");
-        // if recEiCardLinkLine.FindSet then begin
-        //     repeat
-        //         Table := Table + AddTableLine(recEiCardLinkLine."Item No.", recEiCardLinkLine."Item Description", recEiCardLinkLine.Link);
-        //     until recEiCardLinkLine.Next() = 0;
-        // end;
-        // Table := Table + Text19;
-        //
-        //Body := ReplaceString(Body, Text18, Table);
 
         // CLOUD READY NEW >>
         Body := createEicardLinkHtml(recEiCardQueue);
@@ -438,7 +396,7 @@ Codeunit 50039 "Process EiCard Links"
 
         exit(true);
     end;
-    
+
     //CLOUR READY DELETE
     // local procedure GetEmailBody(HTMLFileName: Text[250]; Plural: Boolean; AttachementSize: Decimal) HTMLStr: Text
     // var
@@ -578,7 +536,6 @@ Codeunit 50039 "Process EiCard Links"
         recEicardQueue: Record "EiCard Queue";
         EicardMgt: Codeunit "ZyXEL EiCards";
     begin
-        //>> 07-01-20 ZY-LD 003
         if recAutoSetup."Delay Between Create and eShop" = 0 then
             recAutoSetup."Delay Between Create and eShop" := 1;
 
@@ -589,7 +546,16 @@ Codeunit 50039 "Process EiCard Links"
             repeat
                 EicardMgt.SendToHQ(recEicardQueue, false);
             until recEicardQueue.Next() = 0;
-        //<< 07-01-20 ZY-LD 003
+    end;
+    //30-06-2026 BK #581893
+    procedure FindPurchaseOrder(PurchaseOrderNo: Code[20]; PurchaseOrderLineNo: Decimal): Decimal
+    var
+        PurchaseLine: Record "Purchase Line";
+    begin
+        if (PurchaseOrderNo <> '') and (PurchaseOrderLineNo <> 0) then
+            if PurchaseLine.get(PurchaseLine."Document Type"::Order, PurchaseOrderNo, PurchaseOrderLineNo) then
+                exit(PurchaseLine.Quantity);
+
     end;
 
     // local procedure ExtractZipFile(ZipFilePath: Text; DestinationFolder: Text)
@@ -650,4 +616,7 @@ Codeunit 50039 "Process EiCard Links"
         Zip.ExtractToDirectory(ZipArchive, DestinationFolder);
         ZipArchive.Dispose;
     end;*/
+
+
+
 }

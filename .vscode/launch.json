@@ -214,8 +214,8 @@
             "startupCompany": "ZNet DK"
             //"startupCompany": "ZNet UK"
         }, 
-        /*     
-        {
+        */    
+        /*{
             "name": "Zyxel IT",
             "type": "al",
             "request": "launch",

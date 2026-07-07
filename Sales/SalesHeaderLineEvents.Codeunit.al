@@ -215,9 +215,17 @@ codeunit 50067 "Sales Header/Line Events"
         SI: Codeunit "Single Instance";
         lText001: Label '"%1" %2 does not match "%3" %4.';
 
-    begin
-        if (rec."From CDC") then //05-03-2026 BK #549826
+    begin //26-06-2026 BK #549826
+        if (rec."From CDC") then begin
+            if rec."Location Code" <> '' then
+                if Reclocation.get(rec."Location Code") then
+                    if (recLocation."Sales Order Type" <> rec."Sales Order Type") then begin
+                        recLocation.SetRange(recLocation."Sales Order Type", rec."Sales Order Type");
+                        if recLocation.FindFirst() then
+                            rec."Location Code" := recLocation.Code;
+                    end;
             exit;
+        end; //05-03-2026 BK #549826
 
         if (Rec."Document Type" in [Rec."document type"::Quote, Rec."document type"::Order, Rec."document type"::Invoice]) and
            (Rec."Sales Order Type" <> Rec."sales order type"::" ")
@@ -1512,6 +1520,25 @@ codeunit 50067 "Sales Header/Line Events"
         end;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Reference Management", OnBeforeValidateSalesReferenceNo, '', false, false)]
+    local procedure "Item Reference Management_OnBeforeValidateSalesReferenceNo"(var SalesLine: Record "Sales Line"; ItemReference: Record "Item Reference"; SearchItem: Boolean; CurrentFieldNo: Integer; var IsHandled: Boolean)
+    begin //02-07-2026 BK #582579
+        if currentFieldNo = SalesLine.FieldNo("Item Reference No.") then
+            if salesline.Type = salesline.Type::Item then
+                if (salesline."No." <> '') then
+                    if (ItemReference."Item No." = '') then begin
+                        itemReference.SetRange(itemReference."Item No.", salesline."No.");
+                        itemreference.setrange(itemreference."Reference Type", itemreference."Reference Type"::Customer);
+                        itemreference.SetRange(itemreference."Reference Type No.", salesline."Sell-to Customer No.");
+                        if ItemReference.FindFirst() then
+                            if (itemReference."Unit of Measure" = salesline."Unit of Measure Code") or (itemReference."Unit of Measure" = '') then
+                                ishandled := true;
+                    end else begin
+                        if (itemreference."Item No." = salesline."No.") and (itemreference."Reference Type" = itemreference."Reference Type"::Customer) and (itemreference."Reference Type No." = salesline."Sell-to Customer No.") then
+                            if (itemReference."Unit of Measure" = salesline."Unit of Measure Code") or (itemReference."Unit of Measure" = '') then
+                                ishandled := true;
+                    end;
+    end;
 
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeValidateEvent', 'Shipment Date', false, false)]
@@ -1713,7 +1740,8 @@ codeunit 50067 "Sales Header/Line Events"
 
         end;
     end;
-  [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeValidateEvent', 'Unit Price', false, false)]
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeValidateEvent', 'Unit Price', false, false)]
     local procedure OnBeforeValidateSLUnitPriceExclVAT(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
     var
         ZGT: Codeunit "ZyXEL General Tools";
@@ -1723,7 +1751,7 @@ codeunit 50067 "Sales Header/Line Events"
             if Amazonhelper.MarginapprovalRequiredSalesorder(rec) then
                 Amazonhelper.MarginapprovalSalesorder(rec);
 
-  
+
 
         UpdateUnitPrice(Rec, Xrec, CurrFieldNo, false);
 

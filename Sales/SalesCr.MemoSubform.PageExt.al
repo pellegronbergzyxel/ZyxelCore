@@ -11,6 +11,13 @@ pageextension 50140 SalesCrMemoSubformZX extends "Sales Cr. Memo Subform"
             field("Hide Line"; Rec."Hide Line")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Hide Line';
+            }
+            field("Line No."; Rec."Line No.")
+            { //30-06-2026 BK #582270
+                ApplicationArea = Basic, Suite;
+                ToolTip = 'Line No.';
+                Visible = false;
             }
         }
         addafter("Qty. Assigned")

@@ -44,19 +44,10 @@ XmlPort 50028 "HQ EiCard Download Link"
                     begin
                         EntryNoLine += 1;
                         "EiCard Link Line".UID := EntryNoLine;
-                        //"EiCard Link Line"."Purchase Order No." := "EiCard Link Header"."Order No.";  // 09-06-23 ZY-LD 001
-                        "EiCard Link Line"."Purchase Order No." := "EiCard Queue"."Purchase Order No.";  // 09-06-23 ZY-LD 001
+                        "EiCard Link Line"."Purchase Order No." := "EiCard Queue"."Purchase Order No.";
                         "EiCard Link Line"."Line No." := EntryNoLine * 10000;
                     end;
                 }
-
-                trigger OnAfterInitRecord()
-                begin
-                    //>> 09-06-23 ZY-LD 001
-                    //EntryNo += 1;
-                    //"EiCard Link Header".UID := EntryNo;
-                    //<< 09-06-23 ZY-LD 001
-                end;
             }
         }
     }
@@ -80,24 +71,30 @@ XmlPort 50028 "HQ EiCard Download Link"
 
     procedure GetData(var pEicardQueue: Record "EiCard Queue" temporary; var pEiCardLinkLine: Record "EiCard Link Line" temporary)
     begin
-        //IF "EiCard Link Header" then  // 09-06-23 ZY-LD 001
-        if "EiCard Queue".FindSet then  // 09-06-23 ZY-LD 001
+        if "EiCard Queue".FindSet then
             repeat
-                //>> 09-06-23 ZY-LD 001
-                //pEiCardLinkHeader := "EiCard Link Header";
-                //pEiCardLinkHeader.INSERT;
                 pEicardQueue := "EiCard Queue";
                 pEicardQueue.Insert;
-                //<< 09-06-23 ZY-LD 001
 
-                //"EiCard Link Line".SETRANGE("Purchase Order No.","EiCard Link Header"."Order No.");  // 09-06-23 ZY-LD 001
-                "EiCard Link Line".SetRange("Purchase Order No.", "EiCard Queue"."Purchase Order No.");  // 09-06-23 ZY-LD 001
+                "EiCard Link Line".SetRange("Purchase Order No.", "EiCard Queue"."Purchase Order No.");
                 if "EiCard Link Line".FindSet then
                     repeat
                         pEiCardLinkLine := "EiCard Link Line";
+                        //30-06-2026 BK #581893
+                        pEiCardLinkLine.Quantity := FindPurchaseOrder("EiCard Link Line"."Purchase Order No.", "EiCard Link Line"."Purchase Order Line No.");
                         pEiCardLinkLine.Insert;
                     until "EiCard Link Line".Next() = 0;
-            until "EiCard Queue".Next() = 0;  // 09-06-23 ZY-LD 001
-                                              //UNTIL "EiCard Link Header".Next() = 0;  // 09-06-23 ZY-LD 001
+            until "EiCard Queue".Next() = 0;
+    end;
+
+    //30-06-2026 BK #581893
+    procedure FindPurchaseOrder(PurchaseOrderNo: Code[20]; PurchaseOrderLineNo: Decimal): Decimal
+    var
+        PurchaseLine: Record "Purchase Line";
+    begin
+        if (PurchaseOrderNo <> '') and (PurchaseOrderLineNo <> 0) then
+            if PurchaseLine.get(PurchaseLine."Document Type"::Order, PurchaseOrderNo, PurchaseOrderLineNo) then
+                exit(PurchaseLine.Quantity);
+
     end;
 }

@@ -1,7 +1,6 @@
 Table 76153 "EiCard Link Line"
 {
-    // 001. 10-09-19 ZY-LD P0290 - Delete file.
-    // 002. 20-04-22 ZY-LD 000 - To test download of secure link.
+    //30-06-2026 BK #581893
 
     Caption = 'EiCard Links';
     Description = 'EiCard Links';
@@ -40,16 +39,6 @@ Table 76153 "EiCard Link Line"
         field(6; Filename; Text[250])
         {
             Description = 'PAB 1.0';
-
-            trigger OnValidate()
-            begin
-                //>> 10-09-19 ZY-LD 001
-                // if Filename = '' then
-                //     if xRec.Filename <> '' then
-                //         if FileMgt.ServerFileExists(xRec.Filename) then
-                //             FileMgt.DeleteServerFile(xRec.Filename);
-                //<< 10-09-19 ZY-LD 001
-            end;
         }
         field(7; "Purchase Order Line No."; Integer)
         {
@@ -99,37 +88,9 @@ Table 76153 "EiCard Link Line"
     {
     }
 
-    trigger OnDelete()
-    begin
-        //>> 10-09-19 ZY-LD 001
-        // if Filename <> '' then
-        //     if FileMgt.ServerFileExists(Filename) then
-        //         FileMgt.DeleteServerFile(Filename);
-        //<< 10-09-19 ZY-LD 001
-    end;
-
     var
         FileMgt: Codeunit "File Management";
 
-
-    // procedure DownloadFileOLD() // CLOUD READY DELETE
-    // var
-    //     WebClient: dotnet WebClient;
-    //     ServicePointManager: dotnet ServicePointManager;
-    //     SecurityProtocolType: dotnet SecurityProtocolType;
-    //     FileMgt: Codeunit "File Management";
-    //     Filename: Text;
-    // begin
-    //     //>> 20-04-22 ZY-LD 002
-    //     Filename := FileMgt.ServerTempFileName('');
-    //     if StrPos(Link, 'https') <> 0 then
-    //         ServicePointManager.SecurityProtocol := SecurityProtocolType.Tls12;
-    //     WebClient := WebClient.WebClient;
-    //     WebClient.DownloadFile(Lowercase(Link), Filename);
-    //     Hyperlink(Filename);
-    //     FileMgt.DeleteServerFile(Filename);
-    //     //<< 20-04-22 ZY-LD 002
-    // end;
 
     procedure DownloadFile() // CLOUD READY NEW
     var
@@ -142,27 +103,12 @@ Table 76153 "EiCard Link Line"
         Filename: Text;
         newFilename: text;
     begin
-        //>> 20-04-22 ZY-LD 002
-      //  Filename := FileMgt.ServerTempFileName('');
         if HttpClient.Get(Link, HttpResponse) and HttpResponse.IsSuccessStatusCode() then begin
             HttpResponse.Content.ReadAs(ContentInStream);
-         //   OutFile.WriteMode(true);
-         //   OutFile.Create(Filename);
-          //  OutFile.CreateOutStream(OutStream);
-            //CopyStream(OutStream, ContentInStream);
             newFilename := rec."Item No." + '_EICARD.xlsx';
             if DownloadFromStream(ContentInStream, 'Export', '', 'All Files (*.*)|*.*', newFilename) then
                 message('fil downloaded');
-            //OutFile.Close();
         end;
-        //Hyperlink(Filename);
-        //FileMgt.DeleteServerFile(Filename);
-        // if FILE.Exists(BaseFolderName) then begin
-        //     serverFile.Open(BaseFolderName);
-        //     serverFile.CreateInStream(NewStream);
-        //     Filename := FileMgt.GetFileName(BaseFolderName);
 
-        // end;
-        //<< 20-04-22 ZY-LD 002
     end;
 }
