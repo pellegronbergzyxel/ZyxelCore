@@ -9,11 +9,14 @@ Codeunit 50047 "E-mail Backlog Report"
         if recEmailAdd.Get('BACKLOG') and (recEmailAdd.Recipients <> '') then begin
             tempBlob.CreateOutstream(varoutstream);
             BacklogReport.InitRequest(3, '');
-            BacklogReport.SaveAs(dummy,ReportFormat::Excel,varoutstream);
-            EmailAddMgt.CreateSimpleEmail(recEmailAdd.Code, '', '');
-            EmailAddMgt.AddAttachment(tempblob, StrSubstNo(Text001, Text002, CurrentDatetime));
-            EmailAddMgt.Send;
-
+            BacklogReport.SaveAs(dummy, ReportFormat::Excel, varoutstream);
+            //28-07-2026 BK #585893
+            TempOutBlob.CreateOutStream(varoutstream);
+            if TempOutBlob.hasValue() then Begin
+                EmailAddMgt.CreateSimpleEmail(recEmailAdd.Code, '', '');
+                EmailAddMgt.AddAttachment(tempblob, StrSubstNo(Text001, Text002, CurrentDatetime));
+                EmailAddMgt.Send;
+            end;
         end;
 
         // Sales Orders
@@ -24,11 +27,14 @@ Codeunit 50047 "E-mail Backlog Report"
             clear(varoutstream);
             tempBlob.CreateOutstream(varoutstream);
             BacklogReport.InitRequest(0, '');
-            BacklogReport.SaveAs(dummy,ReportFormat::Excel,varoutstream);
-            EmailAddMgt.CreateSimpleEmail(recEmailAdd.Code, '', '');
-            EmailAddMgt.AddAttachment(tempblob, StrSubstNo(Text001, Text003, CurrentDatetime));
-            EmailAddMgt.Send;
-            
+            BacklogReport.SaveAs(dummy, ReportFormat::Excel, varoutstream);
+            //28-07-2026 BK #585893
+            TempOutBlob.CreateOutStream(varoutstream);
+            if TempOutBlob.hasValue() then Begin
+                EmailAddMgt.CreateSimpleEmail(recEmailAdd.Code, '', '');
+                EmailAddMgt.AddAttachment(tempblob, StrSubstNo(Text001, Text003, CurrentDatetime));
+                EmailAddMgt.Send;
+            End;
         end;
 
         // Transfer Orders
@@ -39,11 +45,14 @@ Codeunit 50047 "E-mail Backlog Report"
             clear(varoutstream);
             tempBlob.CreateOutstream(varoutstream);
             BacklogReport.InitRequest(1, '200153');
-            BacklogReport.SaveAs(dummy,ReportFormat::Excel,varoutstream);
-            EmailAddMgt.CreateSimpleEmail(recEmailAdd.Code, '', '');
-            EmailAddMgt.AddAttachment(tempblob, StrSubstNo(Text001, Text004, CurrentDatetime));
-            EmailAddMgt.Send;
-            
+            BacklogReport.SaveAs(dummy, ReportFormat::Excel, varoutstream);
+            //28-07-2026 BK #585893
+            TempOutBlob.CreateOutStream(varoutstream);
+            if TempOutBlob.hasValue() then Begin
+                EmailAddMgt.CreateSimpleEmail(recEmailAdd.Code, '', '');
+                EmailAddMgt.AddAttachment(tempblob, StrSubstNo(Text001, Text004, CurrentDatetime));
+                EmailAddMgt.Send;
+            End;
         end;
 
         // Assembly Orders
@@ -54,11 +63,14 @@ Codeunit 50047 "E-mail Backlog Report"
             clear(varoutstream);
             tempBlob.CreateOutstream(varoutstream);
             BacklogReport.InitRequest(2, '');
-            BacklogReport.SaveAs(dummy,ReportFormat::Excel,varoutstream);
-            EmailAddMgt.CreateSimpleEmail(recEmailAdd.Code, '', '');
-            EmailAddMgt.AddAttachment(tempblob, StrSubstNo(Text001, Text005, CurrentDatetime));
-            EmailAddMgt.Send;
-            
+            BacklogReport.SaveAs(dummy, ReportFormat::Excel, varoutstream);
+            //28-07-2026 BK #585893
+            TempOutBlob.CreateOutStream(varoutstream);
+            if TempOutBlob.hasValue() then Begin
+                EmailAddMgt.CreateSimpleEmail(recEmailAdd.Code, '', '');
+                EmailAddMgt.AddAttachment(tempblob, StrSubstNo(Text001, Text005, CurrentDatetime));
+                EmailAddMgt.Send;
+            End;
         end;
     end;
 
@@ -73,9 +85,10 @@ Codeunit 50047 "E-mail Backlog Report"
         Text003: label 'Sales Order';
         Text004: label 'Transfer Order';
         Text005: label 'Assembly Order';
-          tempblob: Codeunit "Temp Blob";
-        
+        tempblob: Codeunit "Temp Blob";
+
         varoutstream: outstream;
-        
+        TempOutBlob: Codeunit "Temp Blob";
+
         dummy: text;
 }

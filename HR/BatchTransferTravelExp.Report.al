@@ -2,6 +2,8 @@ Report 50055 "Batch Transfer Travel Exp."
 {
     Caption = 'Batch Transfer Travel Exp.';
     ProcessingOnly = true;
+    usagecategory = Tasks;
+    applicationarea = Basic, Suite;
 
     dataset
     {
@@ -15,9 +17,10 @@ Report 50055 "Batch Transfer Travel Exp."
 
                 trigger OnAfterGetRecord()
                 var
-                    Dummy: text;
                     TempBlob: codeunit "Temp Blob";
                     varoutstream: outstream;
+                    Dummy: text;
+
                 begin
                     if ValidateDocument then begin
                         recTrExpHead.CopyFilters("Travel Expense Header");
@@ -27,8 +30,6 @@ Report 50055 "Batch Transfer Travel Exp."
                             TravelExpDoc.UseRequestPage(false);
                             TravelExpDoc.InitReport(true);
                             TravelExpDoc.RunModal;
-                            // CLOUD READY DELETE
-                            //ServerFilename := TravelExpDoc.GetFilename;
                             TravelExpDoc.Gettempblob(TempBlob);
                             if ServerFilename <> '' then begin
                                 Clear(EmailAddMgt);
@@ -54,7 +55,7 @@ Report 50055 "Batch Transfer Travel Exp."
 
             trigger OnPostDataItem()
             begin
-                ZGT.CloseProgressWindow;
+                ZGT.CloseProgressWindow();
             end;
 
             trigger OnPreDataItem()
@@ -74,10 +75,12 @@ Report 50055 "Batch Transfer Travel Exp."
                 group(Options)
                 {
                     Caption = 'Options';
+
                     field(PostDocument; PostDocument)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Post';
+                        tooltip = 'Specifies whether to post the travel expense document after sending it to Concur.';
                     }
                 }
             }
@@ -94,7 +97,7 @@ Report 50055 "Batch Transfer Travel Exp."
 
     trigger OnPreReport()
     begin
-        SI.UseOfReport(3, 50055, 2);  // 14-10-20 ZY-LD 000
+        SI.UseOfReport(3, 50055, 2);
     end;
 
     var
@@ -102,11 +105,10 @@ Report 50055 "Batch Transfer Travel Exp."
         TravelExpDoc: Report "Travel Expense Document";
         ZyWebServMgt: Codeunit "Zyxel Web Service Management";
         EmailAddMgt: Codeunit "E-mail Address Management";
-        FileMgt: Codeunit "File Management";
         ZGT: Codeunit "ZyXEL General Tools";
+        SI: Codeunit "Single Instance";
         ServerFilename: Text;
         Text001: label 'Travel Expense %1.xlsx';
-        SI: Codeunit "Single Instance";
         PostDocument: Boolean;
 
 
@@ -122,7 +124,7 @@ Report 50055 "Batch Transfer Travel Exp."
     begin
         recTrExpLine.SetRange("Document No.", "Travel Expense Header"."No.");
         recTrExpLine.SetRange("Show Expense", true);
-        if recTrExpLine.FindSet then
+        if recTrExpLine.FindSet() then
             repeat
                 if recTrExpLine."VAT Prod. Posting Group" <> '' then
                     if not recVatProdPostGrp.Get(recTrExpLine."VAT Prod. Posting Group") then
@@ -131,4 +133,5 @@ Report 50055 "Batch Transfer Travel Exp."
 
         rValue := true;
     end;
+
 }

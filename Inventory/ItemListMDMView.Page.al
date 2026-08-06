@@ -607,6 +607,12 @@ page 50165 "Item List MDM View"
                     ToolTip = 'Specifies the quantity of the item that is reserved for return merchandise authorizations (RMAs).';
                     Visible = false;
                 }
+                field("Min. Carton Qty. Enabled"; Rec."Min. Carton Qty. Enabled") //27-07-2026 BK #586468
+                {
+                    Caption = 'Min. Carton Qty. Enabled';
+                    ToolTip = 'Specifies the value of the Min. Carton Qty. Enabled field.';
+                    Visible = true;
+                }
 
             }
         }

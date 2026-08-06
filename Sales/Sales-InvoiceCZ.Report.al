@@ -705,20 +705,21 @@ report 50015 "Sales - Invoice CZ"
                             TarrifCode := '';
                             DescriptionWEEE := '';
                             if ("Sales Invoice Line".Type = "Sales Invoice Line".Type::Item) and recItem.Get("Sales Invoice Line"."No.") then begin
-                                TarrifCode := recItem."Tariff No.";
+                                If recitem.Type = recitem.type::Inventory then begin //03-08-2026 BK and VT #587687
+                                    TarrifCode := recItem."Tariff No.";
 
-                                if "Sales Invoice Header"."Posting Date" >= 20210101D then begin
-                                    recCountry.Get("Sales Invoice Header"."Ship-to Country/Region Code");
-                                    if recCountry."Recycling Fee per. Unit" <> 0 then begin
-                                        recCountry.TestField("Recycling Fee Currency Code");
-                                        DescriptionWEEE :=
-                                          StrSubstNo(zText001,
-                                            Format(Round("Sales Invoice Line".Quantity * recCountry."Recycling Fee per. Unit"), 0, '<Precision,2:2><Standard Format,3>'),
-                                            Format(recCountry."Recycling Fee per. Unit", 0, '<Precision,2:2><Standard Format,3>'),
-                                            recCountry."Recycling Fee Currency Code");
+                                    if "Sales Invoice Header"."Posting Date" >= 20210101D then begin
+                                        recCountry.Get("Sales Invoice Header"."Ship-to Country/Region Code");
+                                        if recCountry."Recycling Fee per. Unit" <> 0 then begin
+                                            recCountry.TestField("Recycling Fee Currency Code");
+                                            DescriptionWEEE :=
+                                            StrSubstNo(zText001,
+                                                Format(Round("Sales Invoice Line".Quantity * recCountry."Recycling Fee per. Unit"), 0, '<Precision,2:2><Standard Format,3>'),
+                                                Format(recCountry."Recycling Fee per. Unit", 0, '<Precision,2:2><Standard Format,3>'),
+                                                recCountry."Recycling Fee Currency Code");
+                                        end;
                                     end;
-                                end;
-
+                                ENd;
                             end;
 
                             if "Sales Invoice Line".Type in ["Sales Invoice Line".Type::"G/L Account", "Sales Invoice Line".Type::Item] then

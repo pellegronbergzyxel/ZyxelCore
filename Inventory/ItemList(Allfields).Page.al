@@ -1624,6 +1624,10 @@ Page 50217 "Item List (All fields)"
                 {
                     ToolTip = 'Specifies the value of the Pallet Weight field.';
                 }
+                field("Min. Carton Qty. Enabled"; Rec."Min. Carton Qty. Enabled") //27-07-2026 BK #586468
+                {
+                    ToolTip = 'Specifies the value of the Min. Carton Qty. Enabled field.';
+                }
             }
         }
         area(factboxes)
@@ -1756,6 +1760,7 @@ Page 50217 "Item List (All fields)"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Whse. Ledger Entries';
+                        toolTip = 'View the history of warehouse transactions that have been posted for the selected record.';
                         Image = Warehouse;
                         RunObject = Page "Whse. Item Ledger Entry";
                         RunPageLink = "Item No." = field("No.");
@@ -1765,6 +1770,7 @@ Page 50217 "Item List (All fields)"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Change Log';
+                        toolTip = 'View the history of changes that have been made to the selected record.';
                         Image = ChangeLog;
                         RunObject = Page "Change Log Entries";
                         RunPageLink = "Primary Key Field 1 Value" = field("No.");
@@ -3626,12 +3632,12 @@ Page 50217 "Item List (All fields)"
         ItemListFilter: text;
 
     protected var
+        SI: Codeunit "Single Instance";
         IsFoundationEnabled: Boolean;
         CRMIntegrationEnabled: Boolean;
         CRMIsCoupledToRecord: Boolean;
         BlockedFilterApplied: Boolean;
         ExtendedPriceEnabled: Boolean;
-        NewFromPictureVisible: Boolean;
         OpenApprovalEntriesExist: Boolean;
         EnabledApprovalWorkflowsExist: Boolean;
         CanCancelApprovalForRecord: Boolean;
@@ -3646,17 +3652,7 @@ Page 50217 "Item List (All fields)"
         [InDataSet]
         IsInventoriable: Boolean;
 
-        SI: Codeunit "Single Instance";
-        ZyWsMgt: Codeunit "Zyxel Web Service Management";
-        Text001: Label 'Do you want to replicate %1 to subs?';
-        VckXmlMgt: Codeunit "VCK Download and  Import Doc.";
-        Text002: Label 'Do you want to resend %1 to VCK?';
-        Text003: Label 'Do you want to send all active items to VCK?';
-        Text004: Label 'Are you sure?';
-        Text005: Label 'Item %1 was sent.';
-        Text006: Label 'Item %1 was not sent.';
-        AvailabilityprLocation: Page "Availability pr Location";
-        SendAllItemsToVCKVisible: Boolean;
+
 
     procedure SelectActiveItems(): Text
     var

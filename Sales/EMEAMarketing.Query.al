@@ -34,9 +34,10 @@ Query 50006 "EMEA Marketing"
             column(Amount; Amount)
             {
             }
-            column(Country; Country)
+            column(Country; "Shortcut Dimension 3 Code") //06-08-2026 BK performance issue.
             {
             }
+
             dataitem(Vendor; Vendor)
             {
                 DataItemLink = "No." = G_L_Entry."Source No.";

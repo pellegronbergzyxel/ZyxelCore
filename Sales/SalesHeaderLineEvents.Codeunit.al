@@ -1602,7 +1602,8 @@ codeunit 50067 "Sales Header/Line Events"
                 end;
             end;
 
-        if MarginApp.MarginApprovalActive() then begin
+        //if MarginApp.MarginApprovalActive() then begin
+        if MarginApp.MarginApprovalSOActive() then begin
             Cust.get(Rec."Sell-to Customer No.");
             if not Cust."Sample Account" then begin
                 Rec.Calcfields("Margin Approved");

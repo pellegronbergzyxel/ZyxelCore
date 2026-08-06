@@ -1,12 +1,5 @@
 Report 50017 "Move IC Trans. to Pa. Comp ZX"
 {
-    //Copy of Report 513
-    // 001. 24-10-17 ZY-LD Change of "Buy-from Vendor No.";
-    // 002. 21-02-18 ZY-LD We need to separate on Sell-to Customer No.
-    // 003. 19-06-18 ZY-LD 000 - Inter company by Web Service
-    // 004. 08-02-21 ZY-LD P0557 - Sample setup. We user "IC Partner Code", so we can find the correct vendor in the corresponding company.
-    // 005. 12-04-24 ZY-LD #4895983 - Italy and Turkey is sent by web service, so we can´t update by changecompany.
-
     Caption = 'Move IC Trans. to Partner Comp';
     ProcessingOnly = true;
 
@@ -236,14 +229,11 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
         ZyWsReq: Codeunit "Zyxel Web Service Request";
         WSICInboxPurchHead: XmlPort "WS Intercompany";
     begin
-        if CurrentPartner."Inbox Type" = CurrentPartner."inbox type"::Database then begin  // 19-06-18 ZY-LD 003
+        if CurrentPartner."Inbox Type" = CurrentPartner."inbox type"::Database then begin  
             PartnerICPartner.ChangeCompany(CurrentPartner."Inbox Details");
 
-            /*if not PartnerICPartner.Get(ICSetup."IC Partner Code") then
-                Error(Text001, ICSetup."IC Partner Code", CurrentPartner.Code);*/
             if not PartnerICPartner.Get(CurrentPartner.Code) then
                 Error(Text001, CurrentPartner.Code, CurrentPartner.Code);
-            //<< 09-02-21 ZY-LD 004
 
             PartnerInboxTransaction.ChangeCompany(CurrentPartner."Inbox Details");
             PartnerInboxTransaction.LockTable();
@@ -595,45 +585,6 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
     local procedure OnTransferToPartnerOnBeforePartnerInboxTransactionInsert(var PartnerInboxTransaction: Record "IC Inbox Transaction"; CurrentICPartner: Record "IC Partner")
     begin
     end;
-
-    /*local procedure ReplicateICInboxPurchDocold(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
-    var
-        recItem: Record Item;
-        StreamOut: OutStream;
-        StreamIn: InStream;
-        TempBlob: Codeunit "Temp Blob";
-        Item: Record Item;
-        WsXmlPort: XmlPort "WS Replicate Tariff Number";
-        XDoc: dotnet XmlDocument;
-        NS: dotnet XmlNamespaceManager;
-        ZyWsRequest: Codeunit "Zyxel Web Service Request";
-        rValue: Text;
-        file: file;
-        OutStr: OutStream;
-        InStr: InStream;
-        amazonhelper: Codeunit AmazonHelper;
-    begin
-        // 2026.03.03: CLOUD READY DELETE 
-        //>> 19-06-18 ZY-LD 003
-        // Create Inner XML
-        TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
-
-        WSICInboxPurchHead.SetDestination(StreamOut);
-        WSICInboxPurchHead.Export;  // Change XMLPortNo.
-
-        TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
-
-        XDoc := XDoc.XmlDocument();
-        XDoc.Load(StreamIn);
-        NS := NS.XmlNamespaceManager(XDoc.NameTable);
-        NS.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');  // Change "Rep*" here
-        rValue := XDoc.SelectSingleNode('//d:root', NS).InnerXml;
-        amazonhelper.downloadtext2fil(rValue, 'rvalueold.txt');
-
-        ZyWsRequest.ReplicateICInboxPurchHead(pCompanyname, rValue);
-
-        //<< 19-06-18 ZY-LD 003
-    end; */
 
 
     local procedure ReplicateICInboxPurchDoc(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
