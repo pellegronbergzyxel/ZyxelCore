@@ -918,6 +918,8 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
                             repeat
                                 if not recPurchLineTmp.Get(recPurchLine."Document Type", recPurchLine."Document No.", recPurchLine."Line No.") then begin
                                     recEiCardLinkLine."Purchase Order Line No." := recPurchLine."Line No.";
+                                    //07-08-2025 BK #588562
+                                    recEiCardLinkLine.Quantity := recPurchLine.Quantity;
                                     recPurchLineTmp := recPurchLine;
                                     if not recPurchLineTmp.Insert() then;
                                     LineNoInserted := true;
@@ -931,6 +933,7 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
                             recEiCardLinkLine."Line No." := recEiCardLinkLine2."Line No." + 1
                         else
                             recEiCardLinkLine."Line No." := 1;
+
                         recEiCardLinkLine.Insert(true);
 
                         WebServiceLogEntry."Quantity Inserted" += 1;
@@ -986,8 +989,11 @@ codeunit 50077 "Zyxel HQ Web Service Mgt."
                         recPurchLine.SetRange("Document Type", recPurchLine."document type"::Order);
                         recPurchLine.SetRange("Document No.", recEiCardLinkLine."Purchase Order No.");
                         recPurchLine.SetRange("No.", recEiCardLinkLine."Item No.");
-                        if recPurchLine.FindFirst() then
+                        if recPurchLine.FindFirst() then begin
                             recEiCardLinkLine."Purchase Order Line No." := recPurchLine."Line No.";
+                            //07-08-2025 BK #588562
+                            recEiCardLinkLine.Quantity := recPurchLine.Quantity;
+                        end;
 
                         recEiCardLinkLine2.SetRange("Purchase Order No.", recEiCardLinkLine."Purchase Order No.");
                         recEiCardLinkLine2.SetRange("Purchase Order Line No.", recEiCardLinkLine."Purchase Order Line No.");

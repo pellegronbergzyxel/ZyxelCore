@@ -292,9 +292,11 @@ Codeunit 50039 "Process EiCard Links"
 
                             rValue := true;
                         end;
-                    end else
+                    end else begin
                         rValue := true;
-                end;
+                    end;
+                end else
+                    rValue := true; //08-07-2026 BK #585893
             until recEiCardLinkLine.Next() = 0;
 
             ZGT.CloseProgressWindow;
