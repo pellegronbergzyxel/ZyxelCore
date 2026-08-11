@@ -1,8 +1,5 @@
 Table 50070 "Forecast Territory Country"
 {
-    // 001. 20-08-18 ZY-LD 2018081610000289 - New field.
-    // 002. 23-03-20 ZY-LD 2020032310000065 - Update forecast territory on the customer.
-
     Caption = 'Forecast Territory Country';
     Description = 'Territory Countries';
     DrillDownPageID = "Forecast Territory Countries";
@@ -19,17 +16,19 @@ Table 50070 "Forecast Territory Country"
 
             trigger OnValidate()
             begin
-                //>> 23-03-20 ZY-LD 002
-                recCust.SetRange("Territory Code", "Territory Code");
-                GlobalFilter := "Division Code" + '*';
-                recCust.SetFilter("Global Dimension 1 Code", GlobalFilter);
-                if recCust.FindSet then
-                    if Confirm(Text001, true, recCust.Count) then
-                        repeat
-                            recCust."Forecast Territory" := "Forecast Territory Code";
-                            recCust.Modify(true);
-                        until recCust.Next() = 0;
-                //<< 23-03-20 ZY-LD 002
+                if (rec."Territory Code" <> '') and (rec."Forecast Territory Code" <> '') and (rec."Division Code" <> '') then begin
+                    recCust.Reset();
+                    recCust.SetCurrentKey("Territory Code", "Global Dimension 1 Code");
+                    recCust.SetRange("Territory Code", "Territory Code");
+                    GlobalFilter := "Division Code" + '*';
+                    recCust.SetFilter("Global Dimension 1 Code", GlobalFilter);
+                    if recCust.FindSet then
+                        if Confirm(Text001, true, recCust.Count) then
+                            repeat
+                                recCust."Forecast Territory" := "Forecast Territory Code";
+                                recCust.Modify(true);
+                            until recCust.Next() = 0;
+                end;
             end;
         }
         field(2; "Territory Code"; Code[20])
@@ -54,7 +53,6 @@ Table 50070 "Forecast Territory Country"
             TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
     }
-
     keys
     {
         key(Key1; "Territory Code", "Division Code")
@@ -63,9 +61,15 @@ Table 50070 "Forecast Territory Country"
         }
     }
 
-    fieldgroups
-    {
-    }
+    //11-08-2026 BK #588815
+    Trigger OnInsert()
+    begin
+        if (rec."Territory Code" <> '') and (rec."Division Code" <> '') then Begin
+            if "Forecast Territory Code" = '' then
+                if GetFilter("Forecast Territory Code") <> '' then
+                    Validate("Forecast Territory Code", GetRangeMin("Forecast Territory Code"));
+        end;
+    end;
 
     var
         recCust: Record Customer;

@@ -7,9 +7,10 @@ Page 50282 "Forecast Territory Countries"
     PageType = List;
     SourceTable = "Forecast Territory Country";
     ApplicationArea = all;
-    UsageCategory = none;
+    UsageCategory = None;
     Permissions = tabledata "Forecast Territory Country" = RIMD;
 
+    //10-08-2026 BK #588815
     layout
     {
         area(content)
@@ -19,20 +20,25 @@ Page 50282 "Forecast Territory Countries"
                 field("Territory Code"; Rec."Territory Code")
                 {
                     ApplicationArea = Basic, Suite;
-                    Visible = false;
+                    tooltip = 'Specifies the code of the territory.';
+                    //Visible = false;
                 }
                 field("Territory Name"; Rec."Territory Name")
                 {
                     ApplicationArea = Basic, Suite;
-                    Visible = false;
+                    tooltip = 'Specifies the name of the territory.';
+                    //Visible = false;
                 }
                 field("Division Code"; Rec."Division Code")
                 {
                     ApplicationArea = Basic, Suite;
+                    tooltip = 'Specifies the code of the division.';
                 }
                 field("Forecast Territory Code"; Rec."Forecast Territory Code")
                 {
                     ApplicationArea = Basic, Suite;
+                    tooltip = 'Specifies the code of the forecast territory.';
+                    visible = false;
                 }
             }
         }
