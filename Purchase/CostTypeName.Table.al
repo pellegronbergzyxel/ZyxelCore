@@ -1,12 +1,5 @@
 Table 62018 "Cost Type Name"
 {
-    // 001. 22-05-18 ZY-LD 2018050910000191 - New field.
-    // 002. 05-06-18 ZY-LD 2018060410000242 - New fields.
-    // 003. 07-08-20 ZY-LD 2020073110000042 - Create dimension.
-    // 004. 03-09-20 ZY-LD P0464 - New field.
-    // 005. 10-11-20 ZY-LD 2020110610000108 - Update travel expence when vendor no. is changed.
-    // 006. 12-09-23 ZY-LD 000 - Minor Updates.
-
     Caption = 'Cost Type Name';
 
     fields
@@ -42,11 +35,9 @@ Table 62018 "Cost Type Name"
 
             trigger OnValidate()
             begin
-                //>> 08-06-18 ZY-LD 002
-                recGlSetup.Get;
+                recGlSetup.Get();
                 if recDimValue.Get(recGlSetup."Global Dimension 2 Code", Department) then
                     "HQ Expense Category" := recDimValue."HQ Expense Category";
-                //<< 08-06-18 ZY-LD 002
             end;
         }
         field(6; Country; Code[20])
@@ -74,59 +65,53 @@ Table 62018 "Cost Type Name"
 
             trigger OnValidate()
             begin
-                //>> 07-08-20 ZY-LD 003
-                recGlSetup.Get;
+                recGlSetup.Get();
                 if recDimValue.Get(recGlSetup."Shortcut Dimension 4 Code", Code) then begin
                     recDimValue.Blocked := Blocked;
                     recDimValue.Modify(true);
                 end;
-                //<< 07-08-20 ZY-LD 003
             end;
         }
         field(10; "Used on Customer"; Boolean)
         {
             CalcFormula = exist("ZyXEL Employee" where("Cost Type" = field(Code)));
             Caption = 'Used on Customer';
-            Description = '22-05-18 ZY-LD 001';
             Editable = false;
             FieldClass = FlowField;
         }
         field(11; "Manager No."; Code[20])
         {
             Caption = 'Manager Cost Type';
-            Description = '05-06-18 ZY-LD 002';
             TableRelation = "Cost Type Name";
 
             trigger OnValidate()
             begin
-                IF "Manager No." <> '' THEN BEGIN  // 12-09-23 ZY-LD 006
+                IF "Manager No." <> '' THEN BEGIN
                     recZyEmp.SetRange("Code", "Manager No.");
-                    if recZyEmp.FindFirst then
+                    if recZyEmp.FindFirst() then
                         Manager := recZyEmp.Name;
-                END ELSE  // 12-09-23 ZY-LD 006
-                    Manager := '';  // 12-09-23 ZY-LD 006
+                END ELSE
+                    Manager := '';
             end;
         }
         field(12; "Vice President No."; Code[20])
         {
             Caption = 'Vice President Cost Type';
-            Description = '05-06-18 ZY-LD 002';
             TableRelation = "Cost Type Name";
 
             trigger OnValidate()
             begin
-                IF "Vice President No." <> '' THEN BEGIN  // 12-09-23 ZY-LD 006
+                IF "Vice President No." <> '' THEN BEGIN
                     recZyEmp.SetRange("Code", "Vice President No.");
-                    if recZyEmp.FindFirst then
+                    if recZyEmp.FindFirst() then
                         VP := recZyEmp.Name;
-                END ELSE  // 12-09-23 ZY-LD 006
-                    VP := '';  // 12-09-23 ZY-LD 006
+                END ELSE
+                    VP := '';
             end;
         }
         field(13; "HQ Expense Category"; Code[10])
         {
             Caption = 'HQ Expense Category';
-            Description = '05-06-18 ZY-LD 002';
             TableRelation = "HQ Expense Category";
         }
         field(14; "Employee No."; Code[20])
@@ -146,27 +131,23 @@ Table 62018 "Cost Type Name"
         field(16; "Concur Credit Card Vendor No."; Code[20])
         {
             Caption = 'Concur Credit Card Account No.';
-            TableRelation = /*if ("Bal. Account Type" = const(Vendor)) Vendor  // 18-04-24 ZY-LD 000 - It´s confusing that there is a lookup on the vendor
-            else*/
-            if ("Bal. Account Type" = const("G/L Account")) "G/L Account";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"; //UpgradeReady
             ValidateTableRelation = false;
 
             trigger OnValidate()
             begin
-                UpdateConcurVendorNo;  // 10-11-20 ZY-LD 005
+                UpdateConcurVendorNo();
             end;
         }
         field(17; "Concur Personal Vendor No."; Code[20])
         {
             Caption = 'Concur Personal Account No.';
-            TableRelation = /*if ("Bal. Account Type" = const(Vendor)) Vendor  // 18-04-24 ZY-LD 000 - It´s confusing that there is a lookup on the vendor
-            else*/
-            if ("Bal. Account Type" = const("G/L Account")) "G/L Account";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"; //UpgradeReady
             ValidateTableRelation = false;
 
             trigger OnValidate()
             begin
-                UpdateConcurVendorNo;  // 10-11-20 ZY-LD 005
+                UpdateConcurVendorNo();
             end;
         }
         field(18; "Concur Approval Limit"; Decimal)
@@ -219,9 +200,9 @@ Table 62018 "Cost Type Name"
 
     trigger OnInsert()
     begin
-        InsertDimension;  // 07-08-20 ZY-LD 003
-        if ZGT.IsRhq and ZGT.IsZComCompany then  // 23-09-20 ZY-LD 004
-            "Concur Id" := GetConcurId;  // 23-09-20 ZY-LD 00
+        InsertDimension();
+        if ZGT.IsRhq() and ZGT.IsZComCompany() then
+            "Concur Id" := GetConcurId();
     end;
 
     var
@@ -234,78 +215,74 @@ Table 62018 "Cost Type Name"
     procedure UpdateManagerAndVP()
     var
         recCostType: Record "Cost Type Name";
-        lText001: label 'Do you want to update manager and vice precident?';
         recCostType2: Record "Cost Type Name";
         recZyEmp: Record "ZyXEL Employee";
         recZyEmp2: Record "ZyXEL Employee";
         recRoleHist: Record "HR Role History";
         lText002: label 'Manager name and Vice Precident Name is updated.';
+        lText001: label 'Do you want to update manager and vice precident?';
     begin
-        //>> 07-06-18 ZY-LD 002
         if Confirm(lText001) then begin
             recCostType.SetRange(Blocked, false);
-            if recCostType.FindSet then
+            if recCostType.FindSet() then
                 repeat
                     recZyEmp.SetRange("Cost Type", recCostType.Code);
-                    if recZyEmp.FindFirst then begin
+                    if recZyEmp.FindFirst() then begin
                         recRoleHist.SetCurrentkey("Employee No.", "Start Date");
                         recRoleHist.SetRange("Employee No.", recZyEmp."No.");
-                        recRoleHist.SetFilter("Start Date", '..%1', CalcDate('<CM>', Today));
-                        if recRoleHist.FindLast then begin
+                        recRoleHist.SetFilter("Start Date", '..%1', CalcDate('<CM>', Today()));
+                        if recRoleHist.FindLast() then begin
                             // Line Manager
                             if recRoleHist."Line Manager" <> '' then begin
                                 if recZyEmp2.Get(recRoleHist."Line Manager") and (recZyEmp2."Cost Type" <> '') then
                                     if recCostType2.Get(recZyEmp2."Cost Type") then
                                         recCostType.Validate("Manager No.", recZyEmp2."Cost Type");
-                            END ELSE  // 12-09-23 ZY-LD 006
-                                recCostType.VALIDATE("Manager No.", '');  // 12-09-23 ZY-LD 006
+                            END ELSE
+                                recCostType.VALIDATE("Manager No.", '');
                             // Vice President
                             if recRoleHist."Vice President No." <> '' then begin
                                 if recZyEmp2.Get(recRoleHist."Vice President No.") and (recZyEmp2."Cost Type" <> '') then
                                     if recCostType2.Get(recZyEmp2."Cost Type") then
                                         recCostType.Validate("Vice President No.", recZyEmp2."Cost Type");
-                            END ELSE  // 12-09-23 ZY-LD 006
-                                recCostType.VALIDATE("Vice President No.", '');  // 12-09-23 ZY-LD 006
+                            END ELSE
+                                recCostType.VALIDATE("Vice President No.", '');
 
-                            recCostType.Modify;
+                            recCostType.Modify();
                         end;
                     end;
                 until recCostType.Next() = 0;
 
             Message(lText002);
         end;
-        //<< 07-06-18 ZY-LD 002
     end;
 
 
     procedure UpdateDivisionAndDepart()
     var
         recCostType: Record "Cost Type Name";
-        lText001: label 'Do you want to update Division and Department on the employee?';
         recZyEmp: Record "ZyXEL Employee";
         recRoleHist: Record "HR Role History";
+        lText001: label 'Do you want to update Division and Department on the employee?';
         lText002: label 'Division and Department has been updated.';
     begin
-        //>> 07-06-18 ZY-LD 002
         if Confirm(lText001) then begin
             recCostType.SetRange(Blocked, false);
-            if recCostType.FindSet then
+            if recCostType.FindSet() then
                 repeat
                     recZyEmp.SetRange("Cost Type", recCostType.Code);
-                    if recZyEmp.FindFirst then begin
+                    if recZyEmp.FindFirst() then begin
                         recRoleHist.SetCurrentkey("Employee No.", "Start Date");
                         recRoleHist.SetRange("Employee No.", recZyEmp."No.");
-                        if recRoleHist.FindLast then begin
+                        if recRoleHist.FindLast() then begin
                             recRoleHist.Division := recCostType.Division;
                             recRoleHist.Department := recCostType.Department;
-                            recRoleHist.Modify;
+                            recRoleHist.Modify();
                         end;
                     end;
                 until recCostType.Next() = 0;
 
             Message(lText002);
         end;
-        //<< 07-06-18 ZY-LD 002
     end;
 
     local procedure UpdateConcurVendorNo()
@@ -317,7 +294,7 @@ Table 62018 "Cost Type Name"
         //>> 10-11-20 ZY-LD 005
         recTrExpHead.SetRange("Cost Type Name", Code);
         recTrExpHead.SetFilter("Document Status", '<%1', recTrExpHead."document status"::Posted);
-        if recTrExpHead.FindSet then
+        if recTrExpHead.FindSet() then
             repeat
                 recTrExpLine.SetRange("Document No.", recTrExpHead."No.");
                 if recTrExpLine.FindSet(true) then
@@ -356,21 +333,19 @@ Table 62018 "Cost Type Name"
                         end;
                     until recTrExpLine.Next() = 0;
             until recTrExpHead.Next() = 0;
-        //<< 10-11-20 ZY-LD 005
     end;
 
     local procedure InsertDimension()
     var
         recDimValue: Record "Dimension Value";
         recGenLedgSetup: Record "General Ledger Setup";
-        lText001: label 'Employee';
         GenLedgEvent: Codeunit "General Ledger Event";
+        lText001: label 'Employee';
     begin
-        //>> 07-08-20 ZY-LD 003
-        recGenLedgSetup.Get;
+        recGenLedgSetup.Get();
 
         if not recDimValue.Get(recGenLedgSetup."Shortcut Dimension 4 Code", Code) then begin
-            recDimValue.Init;
+            recDimValue.Init();
             recDimValue.Validate("Dimension Code", recGenLedgSetup."Shortcut Dimension 4 Code");
             recDimValue.Validate(Code, Code);
             recDimValue.Validate(Name, lText001);
@@ -379,19 +354,18 @@ Table 62018 "Cost Type Name"
             recDimValue.Validate("Global Dimension No.", GenLedgEvent.GetGlobalDimensionNo(recDimValue));
             recDimValue.Modify(true);
         end;
-        //<< 07-08-20 ZY-LD 003
     end;
 
 
     procedure GetConcurId() rValue: Code[20]
     var
         recConcurSetup: Record "Concur Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series"; //UpgradeReady
         lText001: label 'Concur Id was not created.';
     begin
-        recConcurSetup.Get;
+        recConcurSetup.Get();
         recConcurSetup.TestField("Travel Exp. Concur Id Nos");
-        rValue := NoSeriesMgt.GetNextNo(recConcurSetup."Travel Exp. Concur Id Nos", Today, true);
+        rValue := NoSeriesMgt.GetNextNo(recConcurSetup."Travel Exp. Concur Id Nos", Today(), true);
         if rValue = '' then
             Error(lText001);
     end;

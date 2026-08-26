@@ -146,31 +146,42 @@ Table 50118 "Travel Expense Header"
 
     trigger OnInsert()
     var
-        GeneralLedgerSetup: Record "General Ledger Setup";
         recConcurSetup: Record "Concur Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series"; //UpgradeReady
+        NoSeriesCode: Code[20]; //UpgradeReady
+        Ishandled: Boolean; //UpgradeReady
+
     begin
+        //UpgradeReady
         if "No." = '' then begin
-            recConcurSetup.Get;
-            recConcurSetup.TestField("Travel Expense Nos.");
-            NoSeriesMgt.InitSeries(recConcurSetup."Travel Expense Nos.", xRec."No. Series", 0D, "No.", "No. Series");
+            recConcurSetup.Get();
+            Ishandled := false;
+            if not Ishandled then
+                if "No." = '' then begin
+                    recConcurSetup.TestField("Travel Expense Nos.");
+                    NoSeriesCode := recConcurSetup."Travel Expense Nos.";
+                    rec."No. Series" := copystr(NoSeriesCode, 1, 10);
+
+                    if NoSeriesMgt.AreRelated("No. Series", xRec."No. Series") then
+                        "No. Series" := xrec."No. Series";
+
+                    "No." := NoSeriesMgt.GetNextNo("No. Series", 0D);
+                end;
         end;
     end;
 
     var
-        ZGT: Codeunit "ZyXEL General Tools";
-
 
     procedure AssistEdit(): Boolean
     var
-        GeneralLedgerSetup: Record "General Ledger Setup";
         recConcurSetup: Record "Concur Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series"; //UpgradeReady
     begin
-        recConcurSetup.Get;
+        recConcurSetup.Get();
         recConcurSetup.TestField("Travel Expense Nos.");
-        if NoSeriesMgt.SelectSeries(recConcurSetup."Travel Expense Nos.", xRec."No. Series", "No. Series") then begin
-            NoSeriesMgt.SetSeries("No.");
+        //UpgradeReady
+        if NoSeriesMgt.LookupRelatedNoSeries(recConcurSetup."Travel Expense Nos.", xRec."No. Series", "No. Series") then begin
+            NoSeriesMgt.GetNextNo("No.", 0D, true);
             exit(true);
         end;
     end;

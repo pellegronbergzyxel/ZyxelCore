@@ -211,8 +211,8 @@
             "schemaUpdateMode": "Synchronize",
             //"schemaUpdateMode": "ForceSync",
             "dependencyPublishingOption": "Ignore",
-            //"startupCompany": "ZNet DK"
-            "startupCompany": "ZNet FI"
+            "startupCompany": "ZNet DK"
+            //"startupCompany": "ZNet FI"
             //"startupCompany": "ZNet UK"
         }, 
          */

@@ -53,7 +53,7 @@ Page 50217 "Item List (All fields)"
                 }
                 field(InventoryField; Rec.Inventory)
                 {
-                    ApplicationArea = Invoicing, Basic, Suite;
+                    ApplicationArea = Basic, Suite;
                     HideValue = IsNonInventoriable;
                     ToolTip = 'Specifies how many units, such as pieces, boxes, or cans, of the item are in inventory.';
                 }
@@ -92,7 +92,7 @@ Page 50217 "Item List (All fields)"
                 }
                 field("Base Unit of Measure"; Rec."Base Unit of Measure")
                 {
-                    ApplicationArea = Invoicing, Basic, Suite;
+                    ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the base unit used to measure the item, such as piece, box, or pallet. The base unit of measure also serves as the conversion basis for alternate units of measure.';
                 }
                 field("Shelf No."; Rec."Shelf No.")
@@ -143,7 +143,7 @@ Page 50217 "Item List (All fields)"
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-                    ApplicationArea = Invoicing, Basic, Suite;
+                    ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the price for one unit of the item, in LCY.';
                 }
                 field("Inventory Posting Group"; Rec."Inventory Posting Group")
@@ -1695,7 +1695,7 @@ Page 50217 "Item List (All fields)"
                               "Serial No. Filter" = FIELD("Serial No. Filter");
                 Visible = false;
             }
-            part("Attached Documents"; "Document Attachment Factbox")
+            part("Attached Documents"; "Doc. Attachment List Factbox") // UpgradeReady
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
@@ -3571,7 +3571,7 @@ Page 50217 "Item List (All fields)"
 
     trigger OnInit()
     begin
-        CurrPage.PowerBIEmbeddedReportPart.PAGE.InitPageRatio(PowerBIServiceMgt.GetFactboxRatio());
+        //CurrPage.PowerBIEmbeddedReportPart.PAGE.InitPageRatio(PowerBIServiceMgt.GetFactboxRatio()); //UpgradeReady
         CurrPage.PowerBIEmbeddedReportPart.PAGE.SetPageContext(CurrPage.ObjectId(false));
     end;
 
@@ -3608,13 +3608,13 @@ Page 50217 "Item List (All fields)"
             CurrPage.CAPTION := 'Item List [Filtered]';
         END;
         //15-51643 +
-        Rec.SetLocationFilterOnMainWarehouse();  // 05-07-19 ZY-LD 008
+        Rec.SetLocationFilterOnMainWarehouse();
 
     end;
 
     trigger OnClosePage()
     begin
-        SI.SetRejectChangeLog(FALSE);  // 25-04-18 ZY-LD 007
+        SI.SetRejectChangeLog(FALSE);
     end;
 
     var
@@ -3622,7 +3622,6 @@ Page 50217 "Item List (All fields)"
         TempItemFilteredFromAttributes: Record Item temporary;
         TempItemFilteredFromPickItem: Record Item temporary;
         ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
-        PowerBIServiceMgt: Codeunit "Power BI Service Mgt.";
         CalculateStdCost: Codeunit "Calculate Standard Cost";
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";

@@ -23,12 +23,18 @@ report 50044 SalesClaimRebateReportZX
                     CurrReport.Skip();
 
                 SalesLineTmp := "Sales Cr.Memo Line";
+                //21-08-2026 BK #567340
+                // if zgt.IsZNetCompany() then
+                //     if SalesLineTmp."External Document No." <> '' THEN
+                //         if SalesCreditMemoHeader.get("Sales Cr.Memo Line"."Document No.") then
+                //             if SalesCreditMemoHeader."External Document No." <> '' then
+                //                 SalesLineTmp."External Document No." := SalesCreditMemoHeader."External Document No.";
                 SalesLineTmp.Insert();
             end;
 
             trigger OnPostDataItem()
             begin
-                ZGT.CloseProgressWindow;
+                ZGT.CloseProgressWindow();
             end;
 
             trigger OnPreDataItem()
@@ -49,12 +55,18 @@ report 50044 SalesClaimRebateReportZX
 
                 SalesLineTmp.TransferFields("Sales Invoice Line");
                 SalesLineTmp.Amount := -SalesLineTmp.Amount;
-                SalesLineTmp.Insert();
+                //21-08-2026 BK #567340
+                // if zgt.IsZNetCompany() then
+                //     if SalesLineTmp."External Document No." <> '' then
+                //         if SalesInvoiceHeader.get("Sales Invoice Line"."Document No.") then
+                //             if SalesInvoiceHeader."External Document No." <> '' then
+                //                 SalesLineTmp."External Document No." := SalesInvoiceHeader."External Document No.";
+                // SalesLineTmp.Insert();
             end;
 
             trigger OnPostDataItem()
             begin
-                ZGT.CloseProgressWindow;
+                ZGT.CloseProgressWindow();
             end;
 
             trigger OnPreDataItem()
@@ -149,6 +161,7 @@ report 50044 SalesClaimRebateReportZX
                     recCust.Get(SalesLineTmp."Sell-to Customer No.")
                 else
                     Clear(recCust);
+
             end;
         }
     }
@@ -172,18 +185,19 @@ report 50044 SalesClaimRebateReportZX
     trigger OnPreReport()
     begin
         recReturnReason.SetRange("Gen. Prod. Posting Group", 'REBATE');
-        if recReturnReason.FindSet() then begin
+        if recReturnReason.FindSet() then
             repeat
                 recReturnReasonTmp := recReturnReason;
                 recReturnReasonTmp.Insert();
-            until recReturnReason.Next = 0;
-        end;
+            until recReturnReason.Next() = 0;
     end;
 
     var
         recCust: Record Customer;
         recReturnReason: Record "Return Reason";
         recReturnReasonTmp: Record "Return Reason" temporary;
+        SalesInvoiceHeader: Record "Sales Invoice Header"; //21-08-2026 BK #567340
+        SalesCreditMemoHeader: Record "Sales Cr.Memo Header"; //21-08-2026 BK #567340
         ZGT: Codeunit "ZyXEL General Tools";
         Text001: Label 'Return Reason Code';
         Text002: Label 'Return Reason Description';

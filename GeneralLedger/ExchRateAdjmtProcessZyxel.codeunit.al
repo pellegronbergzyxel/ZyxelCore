@@ -641,12 +641,11 @@ codeunit 50035 "Exch. Rate Adjmt. Proc. Zyxel"
         GenJnlLine."Account Type" := GenJnlLine."Account Type"::"G/L Account";
         GenJnlLine.Validate("Account No.", GLAccNo);
 
-        // 495872 : defualt dim 
         GLsetup.get();
         defaultdim.setrange("Table ID", database::"G/L Account");
         defaultdim.setrange("No.", GLAccNo);
         defaultdim.Setfilter("Dimension Value Code", '<>%1', '');
-        if defaultdim.findset then
+        if defaultdim.findset() then
             repeat
                 case defaultdim."Dimension Code" OF
                     GLsetup."Shortcut Dimension 1 Code":
@@ -674,7 +673,7 @@ codeunit 50035 "Exch. Rate Adjmt. Proc. Zyxel"
         GenJnlLine."VAT Bus. Posting Group" := '';
         GenJnlLine."VAT Prod. Posting Group" := '';
         GenJnlLine.Description :=
-PadStr(StrSubstNo(ExchRateAdjmtParameters."Posting Description", CurrencyCode2, AdjBase2), MaxStrLen(GenJnlLine.Description));
+            PadStr(StrSubstNo(ExchRateAdjmtParameters."Posting Description", CurrencyCode2, AdjBase2), MaxStrLen(GenJnlLine.Description));
         GenJnlLine.Validate(Amount, PostingAmount);
         GenJnlLine."Source Currency Code" := CurrencyCode2;
         GenJnlLine."IC Partner Code" := ICCode;
@@ -938,9 +937,9 @@ PadStr(StrSubstNo(ExchRateAdjmtParameters."Posting Description", CurrencyCode2, 
     var
         TempDtldCVLedgEntryBuf: Record "Detailed CV Ledg. Entry Buffer" temporary;
     begin
-        TempExchRateAdjmtBuffer.Reset;  // 01-03-24 ZY-LD 001
+        TempExchRateAdjmtBuffer.Reset;
         SummarizeExchRateAdjmtBuffer(TempExchRateAdjmtBuffer, TempExchRateAdjmtBuffer2);
-        TempExchRateAdjmtBuffer2.Reset;  // 01-03-24 ZY-LD 001
+        TempExchRateAdjmtBuffer2.Reset;
 
 
         // Post per posting group and per currency
@@ -2143,12 +2142,11 @@ PadStr(StrSubstNo(ExchRateAdjmtParameters."Posting Description", CurrencyCode2, 
 
     local procedure SetUnrealizedGainLossFilterVend(var DtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry"; EntryNo: Integer)
     begin
-        with DtldVendLedgEntry do begin
-            Reset();
-            SetCurrentKey("Vendor Ledger Entry No.", "Entry Type");
-            SetRange("Vendor Ledger Entry No.", EntryNo);
-            SetRange("Entry Type", "Entry Type"::"Unrealized Loss", "Entry Type"::"Unrealized Gain");
-        end;
+        //UpgradeReady
+        DtldVendLedgEntry.Reset();
+        DtldVendLedgEntry.SetCurrentKey("Vendor Ledger Entry No.", "Entry Type");
+        DtldVendLedgEntry.SetRange("Vendor Ledger Entry No.", EntryNo);
+        DtldVendLedgEntry.SetRange("Entry Type", DtldVendLedgEntry."Entry Type"::"Unrealized Loss", DtldVendLedgEntry."Entry Type"::"Unrealized Gain");
     end;
 
     local procedure InsertTempDtldCustomerLedgerEntry(CustLedgerEntry: Record "Cust. Ledger Entry")

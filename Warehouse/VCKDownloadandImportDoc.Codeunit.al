@@ -1,9 +1,5 @@
 Codeunit 50099 "VCK Download and  Import Doc."
 {
-    // 001. 10-01-20 ZY-LD 000 - Send e-mail when error.
-    // 002. 30-01-20 ZY-LD 000 - Import stocklevel the old way.
-    // 003. 21-12-21 ZY-LD 000 - On the old way, it send an e-mail every 5 min, and that was a problem in the weekend.
-
 
     trigger OnRun()
     begin
@@ -12,12 +8,8 @@ Codeunit 50099 "VCK Download and  Import Doc."
     end;
 
     var
-        VisionFTPMgt: Codeunit "VisionFTP Management";
-        FileMgt: Codeunit "File Management";
-        SI: Codeunit "Single Instance";
         ZGT: Codeunit "ZyXEL General Tools";
         EmailAddMgt: Codeunit "E-mail Address Management";
-        Servername: Text;
 
 
     procedure DownloadAndPostInventory()
@@ -36,11 +28,9 @@ Codeunit 50099 "VCK Download and  Import Doc."
     var
         recZyFileMgt: Record "Zyxel File Management";
         recAutoSetup: Record "Automation Setup";
-        //ArchiveFile: File;
-        
-        InStream: InStream;
         xmlStockInbound: XmlPort "Read Stock Level Response";
         xmlReadStockReq: XmlPort "Read Stock Level Request";
+        InStream: InStream;
         ImportErrorOccured: Boolean;
         FilenameXml: Text;
         LastErrorText: Text;
@@ -52,21 +42,13 @@ Codeunit 50099 "VCK Download and  Import Doc."
         recZyFileMgt.SetRange(Open, true);
         if pEntryNo <> 0 then
             recZyFileMgt.SetRange("Entry No.", pEntryNo);
-        if recZyFileMgt.FindSet(true) then begin
+        if recZyFileMgt.FindSet(true) then
             repeat
-
-                // CLOUD READY DELETE
-                //                if ArchiveFile.Open(recZyFileMgt.Filename) then begin   
-                //                  ArchiveFile.CreateInstream(InStream);
-                // CLOUD READY NEW
                 recZyFileMgt.calcfields(filblob);
 
-                if recZyFileMgt.filblob.HasValue then begin
+                if recZyFileMgt.filblob.HasValue() then begin
                     recZyFileMgt.filblob.CreateInstream(InStream);
-                    // CLOUD READY NEW <<
 
-
-                    //>> 05-04-22 ZY-LD 004
                     FilenameXml := recZyFileMgt.Filename;
                     FilenameXml := DelChr(FilenameXml, '=', 'NULL');
                     FilenameXml := CopyStr(FilenameXml, StrPos(FilenameXml, '_'), StrLen(FilenameXml));
@@ -77,11 +59,9 @@ Codeunit 50099 "VCK Download and  Import Doc."
 
                     Clear(xmlStockInbound);
                     xmlStockInbound.Init(Dmy2date(DD, MM, YYYY) - 1);  // The warehouse inventory date is the day before the file is created.
-                    //<< 05-04-22 ZY-LD 004
                     xmlStockInbound.SetSource(InStream);
 
-                    //if xmlStockInbound.Import then begin
-                    Commit;
+                    Commit();
                     LastErrorText := '';
                     ClearLastError();
                     if not xmlStockInbound.Import() then
@@ -89,49 +69,31 @@ Codeunit 50099 "VCK Download and  Import Doc."
 
                     if LastErrorText = '' then begin
                         recZyFileMgt.Open := false;
-                        if not GuiAllowed then begin
+                        if not GuiAllowed() then begin
                             EmailAddMgt.CreateSimpleEmail('VCKINVREQ', '', '');
                             EmailAddMgt.Send;
                         end;
 
-                        //>> 05-04-22 ZY-LD 004
                         Clear(xmlReadStockReq);
                         xmlReadStockReq.Init(Dmy2date(DD, MM, YYYY) - 1);
-                        //<< 05-04-22 ZY-LD 004
-                        //>> 30-01-20 ZY-LD 002
                         xmlReadStockReq.SetSource(InStream);
-                        xmlReadStockReq.Import;
-                        //<< 30-01-20 ZY-LD 002
+                        xmlReadStockReq.Import();
                     end else
                         recZyFileMgt."Error Text" := CopyStr(GetLastErrorText, 1, MaxStrLen(recZyFileMgt."Error Text"));
                     recZyFileMgt.Modify;
-                 //   ArchiveFile.Close;  /CLOUD READY DELTE
                 end;
 
-                //>> 21-12-21 ZY-LD 003
-                //ImportErrorOccured := recZyFileMgt."Error Text" <> '';  // 10-01-20 ZY-LD 001
                 if recZyFileMgt."Error Text" <> '' then begin
                     recAutoSetup.Get;
-                    if (recAutoSetup."Warehouse Import Error Date" = 0D) or (recAutoSetup."Warehouse Import Error Date" < Today) then begin
+                    if (recAutoSetup."Warehouse Import Error Date" = 0D) or (recAutoSetup."Warehouse Import Error Date" < Today()) then begin
                         EmailAddMgt.CreateSimpleEmail('VCKIMPDOC', '', '');
                         EmailAddMgt.Send;
 
                         recAutoSetup."Warehouse Import Error Date" := Today;
-                        recAutoSetup.Modify;
+                        recAutoSetup.Modify();
                     end;
                 end;
-            //<< 21-12-21 ZY-LD 003
             until recZyFileMgt.Next() = 0;
-
-            //>> 21-12-21 ZY-LD 003
-            /*//>> 10-01-20 ZY-LD 001
-            IF ImportErrorOccured THEN BEGIN
-              EmailAddMgt.CreateSimpleEmail('VCKIMPDOC','','');
-              EmailAddMgt.Send;
-            END;
-            //<< 10-01-20 ZY-LD 001*/
-            //<< 21-12-21 ZY-LD 003
-        end;
 
     end;
 
@@ -143,24 +105,22 @@ Codeunit 50099 "VCK Download and  Import Doc."
         FtpMgt: Codeunit "VisionFTP Management";
         lText001: label 'Downloading from VCK';
     begin
-        recWhseSetup.Get;
-        if GuiAllowed or recWhseSetup.WhsePostingAllowed then begin
+        recWhseSetup.Get();
+        if GuiAllowed() or recWhseSetup.WhsePostingAllowed() then begin
             ZGT.OpenProgressWindow(lText001, 1);
             ZGT.UpdateProgressWindow(lText001, 0, true);
             recWarehouse.SetRange(Warehouse, recWarehouse.Warehouse::VCK);
             recWarehouse.FindFirst;
             recWarehouse.TestField("Warehouse Outbound FTP Code");
-            //FtpMgt.DownloadFolder(recWarehouse."Warehouse Outbound FTP Code");  // CLOUD READY DELETE
-            FtpMgt.DownloadFolderStream(recWarehouse."Warehouse Outbound FTP Code");  // CLOUD READY New
-            ZGT.CloseProgressWindow;
+            FtpMgt.DownloadFolderStream(recWarehouse."Warehouse Outbound FTP Code");
+            ZGT.CloseProgressWindow();
 
             if Import then
                 case Type of
                     Type::"VCK Inventory":
+                        InventoryImport(0)
+                    else
                         InventoryImport(0);
-                    else begin
-                        InventoryImport(0);
-                    end;
                 end;
         end;
     end;

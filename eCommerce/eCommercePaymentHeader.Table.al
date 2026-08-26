@@ -338,7 +338,7 @@ table 50112 "eCommerce Payment Header"
         //>> 08-01-19 ZY-LD 002
         recAmzPayJnl.SETRANGE("Journal Batch No.", "No.");
         CalcFields(Open);
-        if recServEnviron.ProductionEnvironment and (recAmzPayJnl.COUNT > 0) then
+        if recServEnviron.ProductionEnvironment() and (recAmzPayJnl.COUNT > 0) then
             Error(Text001);
         recAmzPayJnl.SetRange("Journal Batch No.", "No.");
         recAmzPayJnl.DeleteAll();
@@ -473,13 +473,22 @@ table 50112 "eCommerce Payment Header"
     procedure AssistEdit(): Boolean
     var
         eCommerceSetup: Record "eCommerce Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series"; //UpgradeReady
+        NoSeriesCode: Code[20]; //UpgradeReady
+        Ishandled: Boolean; //UpgradeReady
+
     begin
         eCommerceSetup.Get();
         eCommerceSetup.TestField("Payment Batch Nos.");
-        if NoSeriesMgt.SelectSeries(eCommerceSetup."Payment Batch Nos.", xRec."No. Series", "No. Series") then begin
-            NoSeriesMgt.SetSeries("No.");
-            exit(true);
-        end;
+        NoSeriesCode := eCommerceSetup."Payment Batch Nos.";
+        rec."No. Series" := NoSeriesCode;
+        if NoSeriesMgt.AreRelated("No. Series", xRec."No. Series") then
+            "No. Series" := xRec."No. Series";
+
+        "No." := NoSeriesMgt.GetNextNo("No. Series", 0D);
+
+        //if NoSeriesMgt.SelectSeries(eCommerceSetup."Payment Batch Nos.", xRec."No. Series", "No. Series") then begin
+        //    NoSeriesMgt.SetSeries("No.");
+        exit(true);
     end;
 }

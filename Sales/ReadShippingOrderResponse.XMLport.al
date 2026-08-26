@@ -1,19 +1,11 @@
 xmlport 50060 "Read Shipping Order Response"
 {
-    // 001. 19-02-19 PAB - Updated for new NAV XML
-    // 002. 18-06-19 ZY-LD 2019061810000027 - It has happend once that serial no. is registered more that once.
-    // 003. 25-10-19 ZY-LD 000 - MinOccurs is set to Zero on the tag Items and Item.
-    // 004. 10-01-20 ZY-LD 000 - MinOccurs is set to Zero on Item.
-    // 005. 01-04-22 ZY-LD 000 - Adjustments meade for VCK upgrade.
-    // 006. 07-04-22 ZY-LD 000 - ShipmentNo and ReceiverReference has been changed from field to text. We don´t need this information on the response.
-    // 007. 07-02-23 ZY-LD 000 - We have seen that "SN:" is entered as a part of the seria no.
-
     Caption = 'Read Shipping Order Response';
     DefaultNamespace = 'http://Allin.BizTalk.Schemas.ZyXELSP_BTS_Response_SO';
     Direction = Import;
     Encoding = UTF8;
     Format = Xml;
-    FormatEvaluate = Xml;  // 28-08-24 ZY-LD Changed from Legacy to Xml, because of wrong digits at import.
+    FormatEvaluate = Xml;
     PreserveWhiteSpace = false;
     UseDefaultNamespace = false;
     UseLax = false;
@@ -313,6 +305,7 @@ xmlport 50060 "Read Shipping Order Response"
                     textelement(SerialNumbers)
                     {
                         MinOccurs = Zero;
+
                         textelement(serialnumber1)
                         {
                             XmlName = 'SerialNumber';
@@ -321,28 +314,69 @@ xmlport 50060 "Read Shipping Order Response"
                             trigger OnAfterAssignVariable()
                             begin
                                 if SerialNumber1 <> '' then begin
-                                    //>> 07-02-23 ZY-LD 007
                                     if StrPos(SerialNumber1, 'SN:') <> 0 then
                                         SerialNumber1 := DelStr(SerialNumber1, StrPos(SerialNumber1, 'SN:'), StrLen('SN:'));
-                                    //<< 07-02-23 ZY-LD 007
                                     Clear(recVCKShipResponceSerialNos);
                                     recVCKShipResponceSerialNos.Init();
                                     recVCKShipResponceSerialNos."Response No." := "Ship Response Header"."No.";
                                     recVCKShipResponceSerialNos."Response Line No." := "Ship Response Line"."Response Line No.";
                                     recVCKShipResponceSerialNos."Serial No." := SerialNumber1;
-                                    //recVCKShipResponceSerialNos."Item No." := "Ship Response Line"."Item No.";
+
                                     recVCKShipResponceSerialNos."Item No." := "Ship Response Line"."Product No.";
-                                    recVCKShipResponceSerialNos."Sales Order No." := "Ship Response Line"."Sales Order No.";
+                                    recVCKShipResponceSerialNos."Sales Order No." := copystr("Ship Response Line"."Sales Order No.", 1, 20);
                                     recVCKShipResponceSerialNos."Sales Order Line No." := "Ship Response Line"."Sales Order Line No.";
-                                    //  recVCKShipResponceSerialNos."Order No." := "Ship Response Header"."Order No.";
-                                    //  recVCKShipResponceSerialNos."Entry No." := "Ship Response Header"."Entry No.";
-                                    //  recVCKShipResponceSerialNos."Index No." := "VCK Ship Response Line"."Index No.";
-                                    if not recVCKShipResponceSerialNos.Insert() then begin
-                                        ErrorOnSerialNo += StrSubstNo('Response No.:%1 Line No.: %2 Serial No.: %3<br>', "Ship Response Header"."No.", "Ship Response Line"."Response Line No.", SerialNumber1);
-                                    end;
+
+                                    if not recVCKShipResponceSerialNos.Insert() then
+                                        ErrorOnSerialNo += StrSubstNo(Text005, "Ship Response Header"."No.", "Ship Response Line"."Response Line No.", SerialNumber1);
+
                                 end;
                             end;
                         }
+                        // 19-08-2026 BK #542568
+                        // textelement(SerialNumberNode)
+                        // {
+                        //     XmlName = 'SerialNumber';
+                        //     MinOccurs = Zero;
+                        //     MaxOccurs = Unbounded;
+
+                        //     textelement(Number)
+                        //     {
+                        //         MinOccurs = Zero;
+
+                        //         trigger OnAfterAssignVariable()
+                        //         begin
+                        //             if Number <> '' then begin
+                        //                 Clear(recVCKShipResponceSerialNos);
+                        //                 recVCKShipResponceSerialNos.Init();
+                        //                 recVCKShipResponceSerialNos."Response No." := "Ship Response Header"."No.";
+                        //                 recVCKShipResponceSerialNos."Response Line No." := "Ship Response Line"."Response Line No.";
+                        //                 recVCKShipResponceSerialNos."Serial No." := Number;
+                        //                 recVCKShipResponceSerialNos."Item No." := "Ship Response Line"."Product No.";
+                        //                 recVCKShipResponceSerialNos."Sales Order No." := CopyStr("Ship Response Line"."Sales Order No.", 1, 20);
+                        //                 recVCKShipResponceSerialNos."Sales Order Line No." := "Ship Response Line"."Sales Order Line No.";
+
+                        //                 if not recVCKShipResponceSerialNos.Insert() then
+                        //                     ErrorOnSerialNo += StrSubstNo(Text005, "Ship Response Header"."No.", "Ship Response Line"."Response Line No.", Number);
+                        //             end;
+                        //         end;
+                        //     }
+
+                        //     textelement(CarrierID)
+                        //     {
+                        //         XmlName = 'Carrier';
+                        //         MinOccurs = Zero;
+
+                        //         trigger OnAfterAssignVariable()
+                        //         begin
+                        //             if (CarrierID <> '') and
+                        //             (recVCKShipResponceSerialNos."Serial No." <> '')
+                        //             then begin
+                        //                 recVCKShipResponceSerialNos."Carrier ID" := CarrierID;
+                        //                 recVCKShipResponceSerialNos.Modify();
+                        //             end;
+                        //         end;
+                        //     }
+                        // } // 19-08-2026 BK #542568 slut
                     }
                     textelement(BatchNumbers)
                     {
@@ -357,8 +391,6 @@ xmlport 50060 "Read Shipping Order Response"
                         "Ship Response Line"."Response No." := "Ship Response Header"."No.";
                         "Ship Response Line"."Response Line No." := LineNo;
                         LineNo += 10000;
-                        // "VCK Ship Response Line"."Order No." := "Ship Response Header"."Order No.";
-                        // "VCK Ship Response Line"."Entry No." := "Ship Response Header"."Entry No.";
                     end;
 
                     trigger OnBeforeInsertRecord()
@@ -374,9 +406,8 @@ xmlport 50060 "Read Shipping Order Response"
                                 "Ship Response Line"."Customer Order No." := recDelDocLine."Transfer Order No.";
                                 "Ship Response Line"."Customer Order Line No." := recDelDocLine."Transfer Order Line No.";
                             end;
-                        end else begin
-                            "Ship Response Line"."Error Text" := StrSubstNo(Text004, recDelDocLine.TableCaption(), "Ship Response Line"."Sales Order No.", "Ship Response Line"."Sales Order Line No.");  // 18-06-19 ZY-LD 002
-                        end;
+                        end else
+                            "Ship Response Line"."Error Text" := StrSubstNo(Text004, recDelDocLine.TableCaption(), "Ship Response Line"."Sales Order No.", "Ship Response Line"."Sales Order Line No.");
                     end;
                 }
             }
@@ -436,6 +467,7 @@ xmlport 50060 "Read Shipping Order Response"
                     }
                     fieldelement(CustomerReference; "Ship Response Header"."Container Customer Reference")
                     {
+                        MinOccurs = Zero;
                     }
                 }
             }
@@ -467,13 +499,6 @@ xmlport 50060 "Read Shipping Order Response"
 
             trigger OnBeforeInsertRecord()
             begin
-                //recRespHead."No." := NoSeriesMgt.GetNextNo(recWhseSetup."Whse. Ship Response Nos.",TODAY,TRUE);
-
-                // recRespHead.SETRANGE("Order No.","Ship Response Header"."Order No.");
-                // IF recRespHead.FINDLAST THEN
-                //  "Ship Response Header"."Entry No." := recRespHead."Entry No." + 1
-                // ELSE
-                //  "Ship Response Header"."Entry No." := 1;
 
                 case "Ship Response Header".Status of
                     '00', '10':
@@ -516,19 +541,16 @@ xmlport 50060 "Read Shipping Order Response"
     end;
 
     var
-        Text001a: Label 'The location code of the VCK warehouse has not been set in the Sales & Receivables Setup.';
-        Text002a: Label 'VCK Integration has not been setup correctly in Inventory Setup.';
         recVCKShipResponceSerialNos: Record "Ship Responce Serial Nos.";
         recDelDocLine: Record "VCK Delivery Document Line";
         recWhseSetup: Record "Warehouse Setup";
         VCKXML: Codeunit "VCK Communication Management";
-        recRespHead: Record "Ship Response Header";
-        Text003: Label 'Status not found.';
-        gFileMgtEntryNo: Integer;
-        Text004: Label '"%1" was not found %2 %3.';
-        LineNo: Integer;
         EmailAddMgt: Codeunit "E-mail Address Management";
+        gFileMgtEntryNo: Integer;
+        LineNo: Integer;
         ErrorOnSerialNo: Text;
+        Text004: Label '"%1" was not found %2 %3.';
+        Text005: Label 'Response No.:%1 Line No.: %2 Serial No.: %3<br>';
 
     procedure Init(FileMgtEntryNo: Integer)
     begin

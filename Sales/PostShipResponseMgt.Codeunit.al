@@ -88,7 +88,7 @@ codeunit 50089 "Post Ship Response Mgt."
                             //ServerFilename := FileMgt.ServerTempFileName('');
                             Clear(repIdentifyIdenticalSerialNo);
                             repIdentifyIdenticalSerialNo.SetTableView(recRespHead2);
-                            repIdentifyIdenticalSerialNo.SaveAs(Dummy,ReportFormat::Excel,varoutstream);
+                            repIdentifyIdenticalSerialNo.SaveAs(Dummy, ReportFormat::Excel, varoutstream);
                             //repIdentifyIdenticalSerialNo.SaveAsExcel(ServerFilename);
                             if (recRespHead2."On Hold" = '') and repIdentifyIdenticalSerialNo.DifferenceLocated() then begin
                                 SI.SetMergefield(100, recRespHead2."Order No.");
@@ -99,7 +99,7 @@ codeunit 50089 "Post Ship Response Mgt."
                                 EmailAddMgt.CreateEmailWithAttachment('VCKSENOMIS', '', '', TempBlob, StrSubstNo(lText004, recRespHead2."Order No.", recRespHead2."Customer Reference"));
                                 EmailAddMgt.Send();
                                 // DELETE CLOUD READY
-                               // FileMgt.DeleteServerFile(ServerFilename);
+                                // FileMgt.DeleteServerFile(ServerFilename);
 
                                 recRespHead2."On Hold" := 'ERR';
                                 recRespHead2."After Post Description" := lText003;
@@ -976,7 +976,9 @@ codeunit 50089 "Post Ship Response Mgt."
                                         recDelDocSerialNo."Serial No." := recShipRespSerialNo."Serial No.";
                                         recDelDocSerialNo."Delivery Document No." := recShipRespSerialNo."Sales Order No.";
                                         recDelDocSerialNo."Delivery Document Line No." := recShipRespSerialNo."Sales Order Line No.";
-                                        recDelDocSerialNo."Posting Date" := Today;
+                                        //20-08-2026 BK #542568
+                                        recDelDocSerialNo."Pallet No." := recShipRespSerialNo."Carrier ID";
+                                        recDelDocSerialNo."Posting Date" := Today();
                                         recDelDocSerialNo."Item No." := recDelDocLine."Item No.";
                                         recDelDocSerialNo."Sales Order No." := recDelDocLine."Sales Order No.";
                                         recDelDocSerialNo."Sales Order Line No." := recDelDocLine."Sales Order Line No.";

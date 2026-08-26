@@ -356,7 +356,8 @@ tableextension 50118 PurchaseHeaderZX extends "Purchase Header"
                         EntryNo := WhseInbLine."Entry No.";
                         First := false;
                     end else begin
-                        WhseInbLine."Entry No." := EntryNo + 1;
+                        EntryNo := EntryNo + 1; //26-08-2026 BK #291330
+                        WhseInbLine."Entry No." := EntryNo;
                         WhseInbLine.insert(true);
                     end;
                     WhseInbLine.Location := PurchaseHeader."Location Code";

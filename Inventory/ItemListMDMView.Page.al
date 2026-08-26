@@ -681,7 +681,7 @@ page 50165 "Item List MDM View"
                               "Serial No. Filter" = field("Serial No. Filter");
                 Visible = false;
             }
-            part("Attached Documents"; "Document Attachment Factbox")
+            part("Attached Documents"; "Doc. Attachment List Factbox")
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
@@ -2579,7 +2579,7 @@ page 50165 "Item List MDM View"
 
     trigger OnInit()
     begin
-        CurrPage.PowerBIEmbeddedReportPart.Page.InitPageRatio(PowerBIServiceMgt.GetFactboxRatio());
+        //CurrPage.PowerBIEmbeddedReportPart.Page.InitPageRatio(PowerBIServiceMgt.GetFactboxRatio()); //UpgradeReady
         CurrPage.PowerBIEmbeddedReportPart.Page.SetPageContext(CurrPage.ObjectId(false));
     end;
 

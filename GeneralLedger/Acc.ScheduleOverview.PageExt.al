@@ -2,7 +2,7 @@ pageextension 50193 AccScheduleOverviewZX extends "Acc. Schedule Overview"
 {
     actions
     {
-        addafter("Update Existing Document")
+        addafter(ExportToExcel) //UpgradeReady
         {
             action("G/L Entries")
             {
