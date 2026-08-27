@@ -93,46 +93,46 @@ report 50012 "VAT- VIES Decl. Tax Auth ZX"
                 TotalValueofItemSupplies := 0;
                 EU3PartyItemTradeAmt := 0;
                 EU3PartyServiceTradeAmt := 0;
-                with VATEntriesBaseAmtSum do begin
-                    if not Read() then
-                        CurrReport.Break();
+                //UpgradeReady
+                if not VATEntriesBaseAmtSum.Read() then
+                    CurrReport.Break();
 
-                    if EU_Service then begin
-                        if UseAmtsInAddCurr then
-                            TotalValueofServiceSupplies := Sum_Additional_Currency_Base
-                        else
-                            TotalValueofServiceSupplies := Sum_Base
-                    end else
-                        if UseAmtsInAddCurr then
-                            TotalValueofItemSupplies := Sum_Additional_Currency_Base
-                        else
-                            TotalValueofItemSupplies := Sum_Base;
+                if VATEntriesBaseAmtSum.EU_Service then begin
+                    if UseAmtsInAddCurr then
+                        TotalValueofServiceSupplies := VATEntriesBaseAmtSum.Sum_Additional_Currency_Base
+                    else
+                        TotalValueofServiceSupplies := VATEntriesBaseAmtSum.Sum_Base
+                end else
+                    if UseAmtsInAddCurr then
+                        TotalValueofItemSupplies := VATEntriesBaseAmtSum.Sum_Additional_Currency_Base
+                    else
+                        TotalValueofItemSupplies := VATEntriesBaseAmtSum.Sum_Base;
 
-                    if EU_3_Party_Trade then begin
-                        EU3PartyItemTradeAmt := TotalValueofItemSupplies;
-                        EU3PartyServiceTradeAmt := TotalValueofServiceSupplies;
-                    end;
-
-                    CountryBlank := true;
-                    if not ((Sum_Base <> 0) or (Sum_Additional_Currency_Base <> 0)) and
-                       (Bill_to_Pay_to_No <> '') and (EU_Country_Region_Code <> '')
-                    then
-                        CountryBlank := false;
-
-                    //>> 17-01-23 ZY-LD 001
-                    //if Country_Region_Code = CompanyInfo."Country/Region Code" then
-                    //                        CurrReport.Skip();
-                    if Country_Region_Code = ShipFrom_Country_Region_Code then
-                        CurrReport.Skip();
-                    //<< 17-01-23 ZY-LD 001
-
-                    ShowError := false;
-                    ErrorText := '';
-                    if VAT_Registration_No = '' then begin
-                        ShowError := true;
-                        ErrorText := StrSubstNo(Text001, Bill_to_Pay_to_No);
-                    end;
+                if VATEntriesBaseAmtSum.EU_3_Party_Trade then begin
+                    EU3PartyItemTradeAmt := TotalValueofItemSupplies;
+                    EU3PartyServiceTradeAmt := TotalValueofServiceSupplies;
                 end;
+
+                CountryBlank := true;
+                if not ((VATEntriesBaseAmtSum.Sum_Base <> 0) or (VATEntriesBaseAmtSum.Sum_Additional_Currency_Base <> 0)) and
+                    (VATEntriesBaseAmtSum.Bill_to_Pay_to_No <> '') and (VATEntriesBaseAmtSum.EU_Country_Region_Code <> '')
+                then
+                    CountryBlank := false;
+
+                //>> 17-01-23 ZY-LD 001
+                //if Country_Region_Code = CompanyInfo."Country/Region Code" then
+                //                        CurrReport.Skip();
+                if VATEntriesBaseAmtSum.Country_Region_Code = VATEntriesBaseAmtSum.ShipFrom_Country_Region_Code then
+                    CurrReport.Skip();
+                //<< 17-01-23 ZY-LD 001
+
+                ShowError := false;
+                ErrorText := '';
+                if VATEntriesBaseAmtSum.VAT_Registration_No = '' then begin
+                    ShowError := true;
+                    ErrorText := StrSubstNo(Text001, VATEntriesBaseAmtSum.Bill_to_Pay_to_No);
+                end;
+                //end;
             end;
 
             trigger OnPreDataItem()

@@ -28,15 +28,10 @@ report 50127 "Goods in Transit to Excel"
                     "Item Category 1 Code",
                     "Item Category 2 Code",
                     "Item Category 3 Code",
-                    "Division Code");
+                    "Division Code", "SBU Company");
 
-                CalculatedQuantity :=
-                    ShippingDetail.Quantity -
-                    ShippingDetail."Quantity Received";
-
-                CalculatedAmount :=
-                    CalculatedQuantity *
-                    ShippingDetail."Direct Unit Cost";
+                CalculatedQuantity := ShippingDetail.Quantity - ShippingDetail."Quantity Received";
+                CalculatedAmount := CalculatedQuantity * ShippingDetail."Direct Unit Cost";
 
                 AddExcelLine();
             end;
@@ -53,6 +48,7 @@ report 50127 "Goods in Transit to Excel"
         TempExcelBuffer.NewRow();
 
         AddTextColumn('Invoice No.', true);
+        AddTextColumn('Zyxel Company', true);
         AddTextColumn('Bill of Lading No.', true);
         AddTextColumn('Purchase Order No.', true);
         AddTextColumn('Purchase Order Line No.', true);
@@ -76,6 +72,7 @@ report 50127 "Goods in Transit to Excel"
         TempExcelBuffer.NewRow();
 
         AddTextColumn(ShippingDetail."Invoice No.", false);
+        AddTextColumn(ShippingDetail."SBU Company", false);
         AddTextColumn(ShippingDetail."Bill of Lading No.", false);
         AddTextColumn(ShippingDetail."Purchase Order No.", false);
 

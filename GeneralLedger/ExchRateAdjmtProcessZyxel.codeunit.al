@@ -937,9 +937,9 @@ codeunit 50035 "Exch. Rate Adjmt. Proc. Zyxel"
     var
         TempDtldCVLedgEntryBuf: Record "Detailed CV Ledg. Entry Buffer" temporary;
     begin
-        TempExchRateAdjmtBuffer.Reset;
+        TempExchRateAdjmtBuffer.Reset();
         SummarizeExchRateAdjmtBuffer(TempExchRateAdjmtBuffer, TempExchRateAdjmtBuffer2);
-        TempExchRateAdjmtBuffer2.Reset;
+        TempExchRateAdjmtBuffer2.Reset();
 
 
         // Post per posting group and per currency
@@ -2132,12 +2132,11 @@ codeunit 50035 "Exch. Rate Adjmt. Proc. Zyxel"
 
     local procedure SetUnrealizedGainLossFilterCust(var DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry"; EntryNo: Integer)
     begin
-        with DtldCustLedgEntry do begin
-            Reset();
-            SetCurrentKey("Cust. Ledger Entry No.", "Entry Type");
-            SetRange("Cust. Ledger Entry No.", EntryNo);
-            SetRange("Entry Type", "Entry Type"::"Unrealized Loss", "Entry Type"::"Unrealized Gain");
-        end;
+        //UpgradeReady
+        DtldCustLedgEntry.Reset();
+        DtldCustLedgEntry.SetCurrentKey("Cust. Ledger Entry No.", "Entry Type");
+        DtldCustLedgEntry.SetRange("Cust. Ledger Entry No.", EntryNo);
+        DtldCustLedgEntry.SetRange("Entry Type", DtldCustLedgEntry."Entry Type"::"Unrealized Loss", DtldCustLedgEntry."Entry Type"::"Unrealized Gain");
     end;
 
     local procedure SetUnrealizedGainLossFilterVend(var DtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry"; EntryNo: Integer)

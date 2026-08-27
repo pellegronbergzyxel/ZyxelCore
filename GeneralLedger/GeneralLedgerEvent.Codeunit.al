@@ -315,108 +315,107 @@ codeunit 50085 "General Ledger Event"
         Cust: Record Customer;
         Vend: Record Vendor;
     begin
-        with Rec do begin
-            "Company Country/Region Code" := "Country/Region Code";
-            "VAT Registration No. ZX" := "VAT Registration No.";
-            "VAT Registration No. VIES" := "VAT Registration No.";
+        //UpgradeReady
+        Rec."Company Country/Region Code" := Rec."Country/Region Code";
+        Rec."VAT Registration No. ZX" := Rec."VAT Registration No.";
+        Rec."VAT Registration No. VIES" := Rec."VAT Registration No.";
 
-            case Type of
-                Type::Purchase:
-                    begin
-                        if Vend.Get("Bill-to/Pay-to No.") then begin
-                            "Bill-to/Pay-to Name" := vend.Name;
-                            "Bill-to/Pay-to Post Code" := vend."Post Code";
-                        end;
-
-                        case "Document Type" of
-                            "document type"::Invoice:
-                                if recPurchInvHead.Get("Document No.") then begin
-                                    "Ship-to Name" := recPurchInvHead."Ship-to Name";
-                                    "Vendor Document No." := recPurchInvHead."Vendor Invoice No.";
-                                    "Location Code" := recPurchInvHead."Location Code";
-                                end;
-                            "document type"::"Credit Memo":
-                                if recPurchCrMemoHdr.Get("Document No.") then begin
-                                    "Ship-to Name" := recPurchCrMemoHdr."Ship-to Name";
-                                    "Vendor Document No." := recPurchCrMemoHdr."Vendor Cr. Memo No.";
-                                    "Location Code" := recPurchcrmemohdr."Location Code";
-                                end;
-                        end;
+        case Rec.Type of
+            Rec.Type::Purchase:
+                begin
+                    if Vend.Get(Rec."Bill-to/Pay-to No.") then begin
+                        Rec."Bill-to/Pay-to Name" := vend.Name;
+                        Rec."Bill-to/Pay-to Post Code" := vend."Post Code";
                     end;
-                Type::Sale:
-                    begin
-                        if Cust.Get("Bill-to/Pay-to No.") then begin
-                            "Bill-to/Pay-to Name" := cust.Name;
-                            "Bill-to/Pay-to Post Code" := cust."Post Code";
-                        end;
 
-                        case "Document Type" of
-                            "document type"::Invoice:
-                                if recSalesInvHead.Get(Rec."Document No.") then begin
-                                    "Company Country/Region Code" := recSalesInvHead."Ship-to Country/Region Code";
-                                    "Company VAT Registration No." := recSalesInvHead."Company VAT Registration Code";
-                                    "Ship-to Name" := recSalesInvHead."Ship-to Name";
-                                    "Location Code" := recsalesInvHead."Location Code";
-                                    if recSalesInvHead."Ship-to VAT" <> '' then
-                                        "VAT Registration No. ZX" := copystr(recSalesInvHead."Ship-to VAT", 1, 20)
-                                    else
-                                        "VAT Registration No. ZX" := recSalesInvHead."VAT Registration No.";
-
-                                    If (recSalesInvHead."Bill-to Country/Region Code" <> recSalesInvHead."Ship-to Country/Region Code") and
-                                       (recSalesInvHead."Ship-to VAT" <> '')
-                                     then
-                                        "VAT Registration No. VIES" := copystr(recSalesInvHead."Ship-to VAT", 1, 20)
-                                    else
-                                        "VAT Registration No. VIES" := recSalesInvHead."VAT Registration No.";
-
-                                    if recEcomHead.get(recEcomHead."Transaction Type"::Order, recSalesInvHead."External Document No.", recSalesInvHead."External Invoice No.") then begin
-                                        "Ship-from Country/Region Code" := recEcomHead."Ship From Country";
-                                        "eCommerce Customer Type" := recEcomHead."Sell-to Type" + 1;
-                                    end else
-                                        if recEcomarch.get(recEcomHead."Transaction Type"::Order, recSalesInvHead."External Document No.", recSalesInvHead."External Invoice No.") then begin
-                                            "Ship-from Country/Region Code" := recEcomArch."Ship-From Country";
-                                            "eCommerce Customer Type" := recEcomArch."Sell-to Type" + 1;
-                                        end else
-                                            if recLocation.get(recSalesinvHead."Location Code") then begin
-                                                recLocation.TestField("Country/Region Code");
-                                                "Ship-from Country/Region Code" := recLocation."Country/Region Code";
-                                            end;
-                                end;
-                            "document type"::"Credit Memo":
-                                if recSalesCrMemoHead.Get(Rec."Document No.") then begin
-                                    "Company Country/Region Code" := recsalescrmemohead."sell-to Country/Region Code";
-                                    "Company VAT Registration No." := recSalesCrMemoHead."Company VAT Registration Code";
-                                    "Ship-to Name" := recSalesCrMemoHead."Ship-to Name";
-                                    "Location Code" := recSalesCrMemoHead."Location Code";
-                                    if recSalesCrMemoHead."Ship-to VAT" <> '' then
-                                        "VAT Registration No. ZX" := copystr(recSalesCrMemoHead."Ship-to VAT", 1, 20)
-                                    else
-                                        "VAT Registration No. ZX" := recSalesCrMemoHead."VAT Registration No.";
-
-                                    If (recSalesCrMemoHead."Bill-to Country/Region Code" <> recSalesCrMemoHead."Rcvd.-from Count./Region Code") and
-                                       (recSalesCrMemoHead."Rcvd.-from Count./Region Code" <> '') and
-                                       (recSalesCrMemoHead."Ship-to VAT" <> '')
-                                     then
-                                        "VAT Registration No. VIES" := copystr(recSalesCrMemoHead."Ship-to VAT", 1, 20)
-                                    else
-                                        "VAT Registration No. VIES" := recSalesCrMemoHead."VAT Registration No.";
-
-                                    if recEcomHead.get(recEcomHead."Transaction Type"::Refund, recSalescrmemoHead."External Document No.", recSalescrmemoHead."External Invoice No.") then begin
-                                        "Ship-from Country/Region Code" := recEcomHead."Ship From Country";
-                                        "eCommerce Customer Type" := recEcomHead."Sell-to Type" + 1;
-                                    end else
-                                        if recEcomarch.get(recEcomHead."Transaction Type"::Refund, recSalescrmemoHead."External Document No.", recSalescrmemoHead."External Invoice No.") then begin
-                                            "Ship-from Country/Region Code" := recEcomArch."Ship-From Country";
-                                            "eCommerce Customer Type" := recEcomArch."Sell-to Type" + 1;
-                                        end else
-                                            if recLocation.get(recSalesCrMemoHead."Location Code") then begin
-                                                recLocation.TestField("Country/Region Code");
-                                                "Ship-from Country/Region Code" := recLocation."Country/Region Code";
-                                            end;
-                                end
-                        end;
+                    case Rec."Document Type" of
+                        Rec."document type"::Invoice:
+                            if recPurchInvHead.Get(Rec."Document No.") then begin
+                                Rec."Ship-to Name" := recPurchInvHead."Ship-to Name";
+                                Rec."Vendor Document No." := recPurchInvHead."Vendor Invoice No.";
+                                Rec."Location Code" := recPurchInvHead."Location Code";
+                            end;
+                        Rec."document type"::"Credit Memo":
+                            if recPurchCrMemoHdr.Get(Rec."Document No.") then begin
+                                Rec."Ship-to Name" := recPurchCrMemoHdr."Ship-to Name";
+                                Rec."Vendor Document No." := recPurchCrMemoHdr."Vendor Cr. Memo No.";
+                                Rec."Location Code" := recPurchcrmemohdr."Location Code";
+                            end;
                     end;
-            end;
+                end;
+            Rec.Type::Sale:
+                begin
+                    if Cust.Get(Rec."Bill-to/Pay-to No.") then begin
+                        Rec."Bill-to/Pay-to Name" := cust.Name;
+                        Rec."Bill-to/Pay-to Post Code" := cust."Post Code";
+                    end;
+
+                    case Rec."Document Type" of
+                        Rec."document type"::Invoice:
+                            if recSalesInvHead.Get(Rec."Document No.") then begin
+                                Rec."Company Country/Region Code" := recSalesInvHead."Ship-to Country/Region Code";
+                                Rec."Company VAT Registration No." := recSalesInvHead."Company VAT Registration Code";
+                                Rec."Ship-to Name" := recSalesInvHead."Ship-to Name";
+                                Rec."Location Code" := recsalesInvHead."Location Code";
+                                if recSalesInvHead."Ship-to VAT" <> '' then
+                                    Rec."VAT Registration No. ZX" := copystr(recSalesInvHead."Ship-to VAT", 1, 20)
+                                else
+                                    Rec."VAT Registration No. ZX" := recSalesInvHead."VAT Registration No.";
+
+                                If (recSalesInvHead."Bill-to Country/Region Code" <> recSalesInvHead."Ship-to Country/Region Code") and
+                                    (recSalesInvHead."Ship-to VAT" <> '')
+                                    then
+                                    Rec."VAT Registration No. VIES" := copystr(recSalesInvHead."Ship-to VAT", 1, 20)
+                                else
+                                    Rec."VAT Registration No. VIES" := recSalesInvHead."VAT Registration No.";
+
+                                if recEcomHead.get(recEcomHead."Transaction Type"::Order, recSalesInvHead."External Document No.", recSalesInvHead."External Invoice No.") then begin
+                                    Rec."Ship-from Country/Region Code" := recEcomHead."Ship From Country";
+                                    Rec."eCommerce Customer Type" := recEcomHead."Sell-to Type" + 1;
+                                end else
+                                    if recEcomarch.get(recEcomHead."Transaction Type"::Order, recSalesInvHead."External Document No.", recSalesInvHead."External Invoice No.") then begin
+                                        Rec."Ship-from Country/Region Code" := recEcomArch."Ship-From Country";
+                                        Rec."eCommerce Customer Type" := recEcomArch."Sell-to Type" + 1;
+                                    end else
+                                        if recLocation.get(recSalesinvHead."Location Code") then begin
+                                            recLocation.TestField("Country/Region Code");
+                                            Rec."Ship-from Country/Region Code" := recLocation."Country/Region Code";
+                                        end;
+                            end;
+                        Rec."document type"::"Credit Memo":
+                            if recSalesCrMemoHead.Get(Rec."Document No.") then begin
+                                Rec."Company Country/Region Code" := recsalescrmemohead."sell-to Country/Region Code";
+                                Rec."Company VAT Registration No." := recSalesCrMemoHead."Company VAT Registration Code";
+                                Rec."Ship-to Name" := recSalesCrMemoHead."Ship-to Name";
+                                Rec."Location Code" := recSalesCrMemoHead."Location Code";
+                                if recSalesCrMemoHead."Ship-to VAT" <> '' then
+                                    Rec."VAT Registration No. ZX" := copystr(recSalesCrMemoHead."Ship-to VAT", 1, 20)
+                                else
+                                    Rec."VAT Registration No. ZX" := recSalesCrMemoHead."VAT Registration No.";
+
+                                If (recSalesCrMemoHead."Bill-to Country/Region Code" <> recSalesCrMemoHead."Rcvd.-from Count./Region Code") and
+                                    (recSalesCrMemoHead."Rcvd.-from Count./Region Code" <> '') and
+                                    (recSalesCrMemoHead."Ship-to VAT" <> '')
+                                    then
+                                    Rec."VAT Registration No. VIES" := copystr(recSalesCrMemoHead."Ship-to VAT", 1, 20)
+                                else
+                                    Rec."VAT Registration No. VIES" := recSalesCrMemoHead."VAT Registration No.";
+
+                                if recEcomHead.get(recEcomHead."Transaction Type"::Refund, recSalescrmemoHead."External Document No.", recSalescrmemoHead."External Invoice No.") then begin
+                                    Rec."Ship-from Country/Region Code" := recEcomHead."Ship From Country";
+                                    Rec."eCommerce Customer Type" := recEcomHead."Sell-to Type" + 1;
+                                end else
+                                    if recEcomarch.get(recEcomHead."Transaction Type"::Refund, recSalescrmemoHead."External Document No.", recSalescrmemoHead."External Invoice No.") then begin
+                                        Rec."Ship-from Country/Region Code" := recEcomArch."Ship-From Country";
+                                        Rec."eCommerce Customer Type" := recEcomArch."Sell-to Type" + 1;
+                                    end else
+                                        if recLocation.get(recSalesCrMemoHead."Location Code") then begin
+                                            recLocation.TestField("Country/Region Code");
+                                            Rec."Ship-from Country/Region Code" := recLocation."Country/Region Code";
+                                        end;
+                            end
+                    end;
+                end;
         end;
     end;
 
@@ -538,10 +537,12 @@ codeunit 50085 "General Ledger Event"
             AllowPostingFrom := GLSetup."Allow VAT Posting From";
             AllowPostingTo := GLSetup."Allow VAT Posting To";
         end;
+
         if (AllowPostingFrom = 0D) and (AllowPostingTo = 0D) then begin
             AllowPostingFrom := GLSetup."Allow Posting From";
             AllowPostingTo := GLSetup."Allow Posting To";
         end;
+
         if AllowPostingTo = 0D then
             AllowPostingTo := DMY2Date(31, 12, 9999);
         exit(PostingDate in [AllowPostingFrom .. AllowPostingTo]);
