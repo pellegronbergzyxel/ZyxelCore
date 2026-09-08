@@ -59,7 +59,7 @@ report 50295 "Combine Shipments ZX"
                                     SalesLine."Document Type" := SalesHeader."Document Type";
                                     SalesLine."Document No." := SalesHeader."No.";
                                 end else
-                                    ModifySalesInvHeader;  // 01-11-19 ZY-LD 001
+                                    ModifySalesInvHeader();
 
                                 SalesShptLine := "Sales Shipment Line";
                                 HasAmount := HasAmount or ("Qty. Shipped Not Invoiced" <> 0);
@@ -95,7 +95,7 @@ report 50295 "Combine Shipments ZX"
                     PmtDiscDate: Date;
                     PmtDiscPct: Decimal;
                 begin
-                    IF NOT HideDialog THEN  // 01-11-19 ZY-LD 001
+                    IF NOT HideDialog THEN
                         Window.Update(3, "No.");
 
                     if IsCompletlyInvoiced() then
@@ -134,21 +134,18 @@ report 50295 "Combine Shipments ZX"
 
                 CurrReport.Language := LanguageCU.GetLanguageIdOrDefault("Language Code");
 
-                //>> 09-07-20 ZY-LD 003
-                PickingListNo := SalesOrderHeader.GetFilter("Picking List No. Filter");  // 09-07-20 ZY-LD 003
+                PickingListNo := Copystr(SalesOrderHeader.GetFilter("Picking List No. Filter"), 1, 20);
                 IF recWhseOutbHead.GET(PickingListNo) AND (recWhseOutbHead."Delivery Terms Terms" <> '') THEN
-                    ShipmentMethodCode := recWhseOutbHead."Delivery Terms Terms"
+                    ShipmentMethodCode := Copystr(recWhseOutbHead."Delivery Terms Terms", 1, 10)
                 ELSE
                     ShipmentMethodCode := "Shipment Method Code";
-                //<< 09-07-20 ZY-LD 003
 
-                //>> 26-01-22 ZY-LD
                 recCustSell.GET("Sell-to Customer No.");
                 IF (recCustSell."Currency Code" = '') OR (recCustSell."Currency Code" = "Currency Code Sales Doc SUB") THEN
                     "Currency Code Sales Doc SUB" := '';
 
 
-                IF NOT HideDialog THEN BEGIN  // 01-11-19 ZY-LD 001
+                IF NOT HideDialog THEN BEGIN
                     Window.Update(1, "Bill-to Customer No.");
                     Window.Update(2, "No.");
                 end;
@@ -157,7 +154,7 @@ report 50295 "Combine Shipments ZX"
             trigger OnPostDataItem()
             begin
                 CurrReport.Language := ReportLanguage;
-                IF NOT HideDialog THEN  // 01-11-19 ZY-LD 001
+                IF NOT HideDialog THEN
                     Window.Close();
                 ShowResult();
             end;
@@ -173,7 +170,7 @@ report 50295 "Combine Shipments ZX"
                 if VATDateReq = 0D then
                     Error(VATDateEmptyErr);
 
-                IF NOT HideDialog THEN  // 01-11-19 ZY-LD 001
+                IF NOT HideDialog THEN
                     Window.Open(
                       Text002 +
                       Text003 +
@@ -287,12 +284,12 @@ report 50295 "Combine Shipments ZX"
 
     trigger OnPostReport()
     begin
-        SI.SetHideSalesDialog(FALSE);  // 18-11-20 ZY-LD 005
+        SI.SetHideSalesDialog(FALSE);
     end;
 
     trigger OnPreReport()
     begin
-        SI.SetHideSalesDialog(TRUE);  // 18-11-20 ZY-LD 005
+        SI.SetHideSalesDialog(TRUE);
     end;
 
 
@@ -301,9 +298,13 @@ report 50295 "Combine Shipments ZX"
         Cust: Record Customer;
         GLSetup: Record "General Ledger Setup";
         PmtTerms: Record "Payment Terms";
+        recWhseOutbHead: Record "VCK Delivery Document Header";
+        recCustSell: Record Customer;
         LanguageCU: Codeunit Language;
         SalesCalcDisc: Codeunit "Sales-Calc. Discount";
         SalesPost: Codeunit "Sales-Post";
+        SI: Codeunit "Single Instance";
+        ZGT: Codeunit "ZyXEL General Tools";
         Window: Dialog;
         HasAmount: Boolean;
         HideDialog: Boolean;
@@ -311,7 +312,8 @@ report 50295 "Combine Shipments ZX"
         NoOfSalesInv: Integer;
         NoOfskippedShiment: Integer;
         ReportLanguage: Integer;
-
+        PickingListNo: Code[20];
+        ShipmentMethodCode: Code[10];
         Text000: Label 'Enter the posting date.';
         Text001: Label 'Enter the document date.';
         Text002: Label 'Combining shipments...\\';
@@ -324,12 +326,6 @@ report 50295 "Combine Shipments ZX"
         Text011: Label 'The shipments are now combined, and the number of invoices created is %1.\%2 Shipments with nonstandard payment terms have not been combined.', Comment = '%1-Number of invoices,%2-Number Of shipments';
         VATDateEmptyErr: Label 'Enter the VAT date.';
         NotAllInvoicesCreatedMsg: Label 'Not all the invoices were created. A total of %1 invoices were not created.';
-        SI: Codeunit "Single Instance";
-        ZGT: Codeunit "ZyXEL General Tools";
-        recWhseOutbHead: Record "VCK Delivery Document Header";
-        PickingListNo: Code[20];
-        ShipmentMethodCode: Code[10];
-        recCustSell: Record Customer;
 
     protected var
         SalesHeader: Record "Sales Header";
@@ -354,28 +350,27 @@ report 50295 "Combine Shipments ZX"
         if HasError then
             NoOfSalesInvErrors += 1;
 
-        with SalesHeader do begin
-            if (not HasAmount) or HasError then begin
-                OnFinalizeSalesInvHeaderOnBeforeDelete(SalesHeader);
-                Delete(true);
-                OnFinalizeSalesInvHeaderOnAfterDelete(SalesHeader);
-                exit;
-            end;
-            OnFinalizeSalesInvHeader(SalesHeader);
-            if CalcInvDisc then
-                SalesCalcDisc.Run(SalesLine);
-            Find();
-            Commit();
-            Clear(SalesCalcDisc);
+        //UpgradeReady
+        if (not HasAmount) or HasError then begin
+            OnFinalizeSalesInvHeaderOnBeforeDelete(SalesHeader);
+            SalesHeader.Delete(true);
+            OnFinalizeSalesInvHeaderOnAfterDelete(SalesHeader);
+            exit;
+        end;
+        OnFinalizeSalesInvHeader(SalesHeader);
+        if CalcInvDisc then
+            SalesCalcDisc.Run(SalesLine);
+        SalesHeader.Find();
+        Commit();
+        Clear(SalesCalcDisc);
+        Clear(SalesPost);
+        NoOfSalesInv := NoOfSalesInv + 1;
+        ShouldPostInv := PostInv;
+        OnFinalizeSalesInvHeaderOnAfterCalcShouldPostInv(SalesHeader, NoOfSalesInv, ShouldPostInv);
+        if ShouldPostInv then begin
             Clear(SalesPost);
-            NoOfSalesInv := NoOfSalesInv + 1;
-            ShouldPostInv := PostInv;
-            OnFinalizeSalesInvHeaderOnAfterCalcShouldPostInv(SalesHeader, NoOfSalesInv, ShouldPostInv);
-            if ShouldPostInv then begin
-                Clear(SalesPost);
-                if not SalesPost.Run(SalesHeader) then
-                    NoOfSalesInvErrors := NoOfSalesInvErrors + 1;
-            end;
+            if not SalesPost.Run(SalesHeader) then
+                NoOfSalesInvErrors := NoOfSalesInvErrors + 1;
         end;
     end;
 
@@ -388,30 +383,29 @@ report 50295 "Combine Shipments ZX"
         if not IsHandled then begin
             GLSetup.Get();
             Clear(SalesHeader);
-            with SalesHeader do begin
-                SetHideValidationDialog(TRUE);  // 01-11-19 ZY-LD 001
-                Init();
-                "Document Type" := "Document Type"::Invoice;
-                "No." := '';
-                OnBeforeSalesInvHeaderInsert(SalesHeader, SalesOrderHeader);
-                Insert(true);
-                ValidateCustomerNo(SalesHeader, SalesOrderHeader);
-                Validate("Posting Date", PostingDateReq);
-                Validate("Document Date", DocDateReq);
-                Validate("VAT Reporting Date", VATDateReq);
-                Validate("Currency Code", SalesOrderHeader."Currency Code");
-                Validate("EU 3-Party Trade", SalesOrderHeader."EU 3-Party Trade");
-                if GLSetup."Journal Templ. Name Mandatory" then
-                    Validate("Journal Templ. Name", SalesOrderHeader."Journal Templ. Name");
-                "Salesperson Code" := SalesOrderHeader."Salesperson Code";
-                "Shortcut Dimension 1 Code" := SalesOrderHeader."Shortcut Dimension 1 Code";
-                "Shortcut Dimension 2 Code" := SalesOrderHeader."Shortcut Dimension 2 Code";
-                "Dimension Set ID" := SalesOrderHeader."Dimension Set ID";
-                OnBeforeSalesInvHeaderModify(SalesHeader, SalesOrderHeader);
-                Modify();
-                Commit();
-                HasAmount := false;
-            end;
+            //UpgradeReady
+            SalesHeader.SetHideValidationDialog(TRUE);
+            SalesHeader.Init();
+            SalesHeader."Document Type" := SalesHeader."Document Type"::Invoice;
+            SalesHeader."No." := '';
+            OnBeforeSalesInvHeaderInsert(SalesHeader, SalesOrderHeader);
+            SalesHeader.Insert(true);
+            ValidateCustomerNo(SalesHeader, SalesOrderHeader);
+            SalesHeader.Validate("Posting Date", PostingDateReq);
+            SalesHeader.Validate("Document Date", DocDateReq);
+            SalesHeader.Validate("VAT Reporting Date", VATDateReq);
+            SalesHeader.Validate("Currency Code", SalesOrderHeader."Currency Code");
+            SalesHeader.Validate("EU 3-Party Trade", SalesOrderHeader."EU 3-Party Trade");
+            if GLSetup."Journal Templ. Name Mandatory" then
+                SalesHeader.Validate("Journal Templ. Name", SalesOrderHeader."Journal Templ. Name");
+            SalesHeader."Salesperson Code" := SalesOrderHeader."Salesperson Code";
+            SalesHeader."Shortcut Dimension 1 Code" := SalesOrderHeader."Shortcut Dimension 1 Code";
+            SalesHeader."Shortcut Dimension 2 Code" := SalesOrderHeader."Shortcut Dimension 2 Code";
+            SalesHeader."Dimension Set ID" := SalesOrderHeader."Dimension Set ID";
+            OnBeforeSalesInvHeaderModify(SalesHeader, SalesOrderHeader);
+            SalesHeader.Modify();
+            Commit();
+            HasAmount := false;
         end;
         OnAfterInsertSalesInvHeader(SalesHeader, "Sales Shipment Header");
     end;
@@ -483,11 +477,10 @@ report 50295 "Combine Shipments ZX"
           (SalesOrderHeader."EU 3-Party Trade" <> SalesHeader."EU 3-Party Trade") or
           (SalesOrderHeader."Dimension Set ID" <> SalesHeader."Dimension Set ID") or
           (SalesOrderHeader."Journal Templ. Name" <> SalesHeader."Journal Templ. Name") or
-          (SalesOrderHeader."Sales Order Type" <> SalesHeader."Sales Order Type") OR  // 01-11-19 ZY-LD 001
-                                                                                      //((SalesOrderHeader."No." <> SalesHeader."Your Reference") AND (SalesHeader."Your Reference" <> '')) OR  // 16-06-20 ZY-LD 002  // 15-09-21 ZY-LD 008
-          ((SalesOrderHeader."No." <> SalesHeader."Create Invoice pr. Order No.") AND (SalesHeader."Create Invoice pr. Order No." <> '')) OR  // 15-09-21 ZY-LD 008
-          ((SalesOrderHeader."Currency Code Sales Doc SUB" <> SalesHeader."Currency Code Sales Doc SUB") AND (ZGT.IsZComCompany)) OR  // 06-07-21 ZY-LD 006
-          ((SalesOrderHeader."Ship-to VAT" <> SalesHeader."Ship-to VAT") AND (SalesHeader."Sell-to Customer No." <> SalesHeader."Bill-to Customer No."));  // 17-08-21 ZY-LD 007
+          (SalesOrderHeader."Sales Order Type" <> SalesHeader."Sales Order Type") OR
+          ((SalesOrderHeader."No." <> SalesHeader."Create Invoice pr. Order No.") AND (SalesHeader."Create Invoice pr. Order No." <> '')) OR
+          ((SalesOrderHeader."Currency Code Sales Doc SUB" <> SalesHeader."Currency Code Sales Doc SUB") AND (ZGT.IsZComCompany())) OR
+          ((SalesOrderHeader."Ship-to VAT" <> SalesHeader."Ship-to VAT") AND (SalesHeader."Sell-to Customer No." <> SalesHeader."Bill-to Customer No."));
 
         OnAfterShouldFinalizeSalesInvHeader(SalesOrderHeader, SalesHeader, Finalize, SalesShipmentLine, "Sales Shipment Header");
         exit(Finalize);
@@ -595,16 +588,14 @@ report 50295 "Combine Shipments ZX"
 
     LOCAL PROCEDURE ModifySalesInvHeader();
     BEGIN
-        WITH SalesHeader DO BEGIN
-            //>> 01-11-19 ZY-LD 001
-            IF SalesOrderHeader."External Document No." <> '' THEN
-                IF StrPos("External Document No.", SalesOrderHeader."External Document No.") = 0 THEN
-                    IF "External Document No." <> '' THEN
-                        "External Document No." := COPYSTR(STRSUBSTNO('%1,%2', "External Document No.", SalesOrderHeader."External Document No."), 1, MAXSTRLEN("External Document No."))
-                    ELSE
-                        "External Document No." := SalesOrderHeader."External Document No.";
-            //<< 01-11-19 ZY-LD 001
-        END;
+        //UpgradeReady
+        IF SalesOrderHeader."External Document No." <> '' THEN
+            IF StrPos(SalesHeader."External Document No.", SalesOrderHeader."External Document No.") = 0 THEN
+                IF SalesHeader."External Document No." <> '' THEN
+                    SalesHeader."External Document No." := COPYSTR(STRSUBSTNO('%1,%2', SalesHeader."External Document No.", SalesOrderHeader."External Document No."), 1, MAXSTRLEN(SalesHeader."External Document No."))
+                ELSE
+                    SalesHeader."External Document No." := SalesOrderHeader."External Document No.";
+        //END;
     END;
 
 }

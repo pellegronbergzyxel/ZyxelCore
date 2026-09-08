@@ -78,4 +78,6 @@ tableextension 50139 ShipToAddressZX extends "Ship-to Address"
             Error(Text001, FieldCaption(Code));
         //<< 21-09-17 ZY-LD 001
     end;
+
+
 }

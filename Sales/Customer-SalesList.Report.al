@@ -164,31 +164,30 @@ report 50119 "Customer - Sales List ZX"
     local procedure CalculateAmtOfSaleLCY(): Decimal
     var
         CustLedgEntry: Record "Cust. Ledger Entry";
+        ZGT: Codeunit "ZyXEL General Tools";
         Amt: Decimal;
         i: Integer;
-        ZGT: Codeunit "ZyXEL General Tools";
-    begin
-        with CustLedgEntry do begin
-            SetCurrentKey("Document Type", "Customer No.", "Posting Date");
-            //>> 10-12-18 ZY-LD 001
-            if ZGT.IsRhq and (Customer."Bill-to Customer No." <> Customer."No.") then
-                SetRange("Sell-to Customer No.", Customer."No.")
-            else  //<< 10-12-18 ZY-LD 001
 
-            SetRange("Customer No.", Customer."No.");
-            SetFilter("Posting Date", Customer.GetFilter("Date Filter"));
-            for i := 1 to 2 do begin
-                case i of
-                    1:
-                        SetRange("Document Type", "Document Type"::Invoice);
-                    2:
-                        SetRange("Document Type", "Document Type"::"Credit Memo");
-                end;
-                CalcSums("Sales (LCY)");
-                Amt := Amt + "Sales (LCY)";
+    begin
+        //UpgradeReady
+        CustLedgEntry.SetCurrentKey("Document Type", "Customer No.", "Posting Date");
+        if ZGT.IsRhq and (Customer."Bill-to Customer No." <> Customer."No.") then
+            CustLedgEntry.SetRange(CustLedgEntry."Sell-to Customer No.", Customer."No.")
+        else
+            CustLedgEntry.SetRange("Customer No.", Customer."No.");
+        CustLedgEntry.SetFilter("Posting Date", Customer.GetFilter("Date Filter"));
+        for i := 1 to 2 do begin
+            case i of
+                1:
+                    CustLedgEntry.SetRange("Document Type", CustLedgEntry."Document Type"::Invoice);
+                2:
+                    CustLedgEntry.SetRange("Document Type", CustLedgEntry."Document Type"::"Credit Memo");
             end;
-            exit(Amt);
+            CustLedgEntry.CalcSums("Sales (LCY)");
+            Amt := Amt + CustLedgEntry."Sales (LCY)";
         end;
+        exit(Amt);
+        //end;
     end;
 
     procedure InitializeRequest(MinimumAmtLCY: Decimal; HideAddressDetails: Boolean)

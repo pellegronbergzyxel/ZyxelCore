@@ -94,6 +94,10 @@ Table 50015 "Whse. Stock Corr. Led. Entry"
             Caption = 'Quantity';
             DecimalPlaces = 0 : 0;
         }
+        field(25; Serialno; code[100]) //RMA automation
+        {
+
+        }
         field(101; "Reason Description"; Text[50])
         {
             CalcFormula = lookup("Warehouse Reason Code ZY".Description where(Code = field("Reason Code")));

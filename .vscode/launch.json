@@ -215,7 +215,7 @@
             //"startupCompany": "ZNet FI"
             //"startupCompany": "ZNet UK"
         }, 
-         */
+            */
         /*{
             "name": "Zyxel IT",
             "type": "al",
@@ -238,7 +238,7 @@
             "startupCompany": "ZyND IT"
             //"startupCompany": "ZNET IT"
         }, */
-        {
+        /*{
             "name": "Zyxel@VisionPeople (W1)",
             "type": "al",
             "request": "launch",
@@ -275,7 +275,7 @@
             "tenant": "default",
             "primaryTenantDomain": "e5a0c6ee-5a8a-4cb6-a7f8-df7eb242af01",
             "schemaUpdateMode": "ForceSync"
-        },
+        }, */
          
     ]
 }
