@@ -577,12 +577,10 @@ tableextension 50116 SalesHeaderZX extends "Sales Header"
         field(67003; "Ship-to E-Mail"; Text[40])
         {
             Caption = 'Ship-to E-Mail';
-            Description = 'PAB 1.0';
         }
         field(67004; "Action Code"; Code[6])
         {
             Caption = 'Action Code';
-            Description = 'PAB 1.0';
             TableRelation = "Action Codes";
         }
         field(67005; "Delivery Document Created"; Boolean)
@@ -596,6 +594,10 @@ tableextension 50116 SalesHeaderZX extends "Sales Header"
             Description = 'Unused';
             OptionCaption = 'Zone 1,Zone 2,Zone 3,Zone 4,Zone 5,Zone 6,Zone 7,Zone 8,Zone 9,Zone 10';
             OptionMembers = "Zone 1","Zone 2","Zone 3","Zone 4","Zone 5","Zone 6","Zone 7","Zone 8","Zone 9","Zone 10";
+        }
+        field(67017; "Combine Eicard Shipments"; Boolean)
+        {
+            Caption = 'Combine Eicard Shipments'; //17-09-2026 BK #576888
         }
     }
 

@@ -80,402 +80,400 @@ codeunit 50080 "Sales Post Events"
         showwarningLabel: Label 'The customer do not allow invoice before delivered status, do want to check Del. document before invoocing';
         showwarningerror: Label 'Invoicing stopped';
     begin
-        with SalesHeader do begin
-            if GuiAllowed() then
-                if not "eCommerce Order" then
-                    if "Posting Date" <> Today then
-                        if not Confirm(lText028, false, FieldCaption("Posting Date"), "Posting Date") then
-                            Error('');
+        //UpgradeReady: 
+        if GuiAllowed() then
+            if not SalesHeader."eCommerce Order" then
+                if SalesHeader."Posting Date" <> Today then
+                    if not Confirm(lText028, false, SalesHeader.FieldCaption("Posting Date"), SalesHeader."Posting Date") then
+                        Error('');
 
-            ValidateAddPostGrpPrLocation(SalesHeader);
-            SI.SetAllowToDeleteAddItem(true);
+        ValidateAddPostGrpPrLocation(SalesHeader);
+        SI.SetAllowToDeleteAddItem(true);
 
-            if "Skip Verify on Inventory" then
-                SI.SetSkipVerifyOnInventory(true);
-
-
-            if "Document Type" in ["document type"::Order, "document type"::Invoice] then
-                if ("Location Code" = '') and ("Sales Order Type" <> "sales order type"::"G/L Account") then
-                    Error(lText019, FieldCaption("Location Code"), FieldCaption("Sales Order Type"), "Sales Order Type");
+        if SalesHeader."Skip Verify on Inventory" then
+            SI.SetSkipVerifyOnInventory(true);
 
 
+        if SalesHeader."Document Type" in [SalesHeader."document type"::Order, SalesHeader."document type"::Invoice] then
+            if (SalesHeader."Location Code" = '') and (SalesHeader."Sales Order Type" <> SalesHeader."sales order type"::"G/L Account") then
+                Error(lText019, SalesHeader.FieldCaption("Location Code"), SalesHeader.FieldCaption("Sales Order Type"), SalesHeader."Sales Order Type");
 
-            if not "eCommerce Order" then begin
-                TestField("VAT Registration No. Zyxel");  // Consumers in eCommerce doesn´t have a VAT Reg. No.
-                recVATRegNoMatrix.SetAutoCalcFields("VAT Registration No.");
-                recVATRegNoMatrix.SetRange("Location Code", "Location Code");
-                if ("Ship-to Country/Region Code" = '') or ("Document Type" IN ["Document type"::"Return Order", "Document type"::"Credit Memo"]) then
-                    recVATRegNoMatrix.SetFilter("Ship-to Customer Country Code", '%1|%2', "Sell-to Country/Region Code", '')
-                else
-                    recVATRegNoMatrix.SetFilter("Ship-to Customer Country Code", '%1|%2', "Ship-to Country/Region Code", '');
 
-                recVATRegNoMatrix.SetFilter("Sell-to Customer No.", '%1|%2', "Sell-to Customer No.", '');
-                if not recVATRegNoMatrix.FindLast() then
-                    Error(lText023, recVATRegNoMatrix.TableCaption(), recVATRegNoMatrix.GetFilters())
-                else
-                    if "VAT Registration No. Zyxel" <> recVATRegNoMatrix."VAT Registration No." then
-                        if "Document Type" = "document type"::"Credit Memo" then begin
-                            if not "Skip Posting Group Validation" then
-                                Error(lText026 + lText027, FieldCaption("VAT Registration No. Zyxel"), "VAT Registration No. Zyxel", recVATRegNoMatrix."VAT Registration No.")
-                        end else
-                            Error(lText026, FieldCaption("VAT Registration No. Zyxel"), "VAT Registration No. Zyxel", recVATRegNoMatrix."VAT Registration No.");
-            end else
-                if ZGT.IsRhq() and (not Correction) then begin
-                    CalcFields("Amount Including VAT");
-                    recAmzOrderHead.SetCurrentkey("Sales Document Type", "eCommerce Order Id", "Invoice No.");
-                    recAmzOrderHead.SetAutoCalcFields("Amount Including VAT");
-                    recAmzOrderHead.SetRange("Sales Document Type", "Document Type");
-                    recAmzOrderHead.SetRange("eCommerce Order Id", "External Document No.");
-                    recAmzOrderHead.SetRange("Invoice No.", "External Invoice No.");
-                    recAmzOrderHead.FindFirst();
-                    // It happens that the shipping has been credited on a "Transaction Type" = Order. Document Type and Tranaction Type will then not match.
-                    if ("Document Type" = "document type"::"Credit Memo") and (recAmzOrderHead."Transaction Type" = recAmzOrderHead."transaction type"::Order) then
-                        recAmzOrderHead."Amount Including VAT" := -recAmzOrderHead."Amount Including VAT";
 
-                    if Abs(recAmzOrderHead."Amount Including VAT" - "Amount Including VAT") >= 1 then
-                        Error(lText029, "No.", "Amount Including VAT", recAmzOrderHead."Amount Including VAT", "External Document No.");
-                end;
+        if not SalesHeader."eCommerce Order" then begin
+            SalesHeader.TestField("VAT Registration No. Zyxel");  // Consumers in eCommerce doesn´t have a VAT Reg. No.
+            recVATRegNoMatrix.SetAutoCalcFields("VAT Registration No.");
+            recVATRegNoMatrix.SetRange("Location Code", SalesHeader."Location Code");
+            if (SalesHeader."Ship-to Country/Region Code" = '') or (SalesHeader."Document Type" IN [SalesHeader."document type"::"Return Order", SalesHeader."document type"::"Credit Memo"]) then
+                recVATRegNoMatrix.SetFilter("Ship-to Customer Country Code", '%1|%2', SalesHeader."Sell-to Country/Region Code", '')
+            else
+                recVATRegNoMatrix.SetFilter("Ship-to Customer Country Code", '%1|%2', SalesHeader."Ship-to Country/Region Code", '');
 
-            if ("Ship-to VAT" = '') and (not "eCommerce Order") then begin
-                recCust.Get("Sell-to Customer No.");
-                "Ship-to VAT" := recCust."VAT Registration No.";
-            end;
-
-            if SalesHeader."Document Type" IN [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice] then begin
-                recBillToCust.get(SalesHeader."Bill-to Customer No.");
-                if recBillToCust."Payment Terms Code" <> SalesHeader."Payment Terms Code" then
-                    if GuiAllowed() then begin
-                        if not confirm(lText032 + ltext013, false,
-                               SalesHeader.FieldCaption("Payment Terms Code"),
-                               recBillToCust."Payment Terms Code",
-                               recbilltocust.TableCaption(),
-                               SalesHeader."Payment Terms Code",
-                               salesheader."Document Type")
-                        then
-                            error('');
+            recVATRegNoMatrix.SetFilter("Sell-to Customer No.", '%1|%2', SalesHeader."Sell-to Customer No.", '');
+            if not recVATRegNoMatrix.FindLast() then
+                Error(lText023, recVATRegNoMatrix.TableCaption(), recVATRegNoMatrix.GetFilters())
+            else
+                if SalesHeader."VAT Registration No. Zyxel" <> recVATRegNoMatrix."VAT Registration No." then
+                    if SalesHeader."Document Type" = SalesHeader."document type"::"Credit Memo" then begin
+                        if not SalesHeader."Skip Posting Group Validation" then
+                            Error(lText026 + lText027, SalesHeader.FieldCaption("VAT Registration No. Zyxel"), SalesHeader."VAT Registration No. Zyxel", recVATRegNoMatrix."VAT Registration No.")
                     end else
-                        error(lText032,
-                            SalesHeader.FieldCaption("Payment Terms Code"),
-                            recBillToCust."Payment Terms Code",
-                            recbilltocust.TableCaption(),
-                            SalesHeader."Payment Terms Code",
-                            salesheader."Document Type");
+                        Error(lText026, SalesHeader.FieldCaption("VAT Registration No. Zyxel"), SalesHeader."VAT Registration No. Zyxel", recVATRegNoMatrix."VAT Registration No.");
+        end else
+            if ZGT.IsRhq() and (not SalesHeader.Correction) then begin
+                SalesHeader.CalcFields("Amount Including VAT");
+                recAmzOrderHead.SetCurrentkey("Sales Document Type", "eCommerce Order Id", "Invoice No.");
+                recAmzOrderHead.SetAutoCalcFields("Amount Including VAT");
+                recAmzOrderHead.SetRange("Sales Document Type", SalesHeader."Document Type");
+                recAmzOrderHead.SetRange("eCommerce Order Id", SalesHeader."External Document No.");
+                recAmzOrderHead.SetRange("Invoice No.", SalesHeader."External Invoice No.");
+                recAmzOrderHead.FindFirst();
+                // It happens that the shipping has been credited on a "Transaction Type" = Order. Document Type and Tranaction Type will then not match.
+                if (SalesHeader."Document Type" = SalesHeader."document type"::"Credit Memo") and (recAmzOrderHead."Transaction Type" = recAmzOrderHead."transaction type"::Order) then
+                    recAmzOrderHead."Amount Including VAT" := -recAmzOrderHead."Amount Including VAT";
 
-                // 453154 >>
-                if GuiAllowed and SalesHeader.Invoice and recBillToCust."Warning on Not-delivery" then begin
-                    SaleslinecheckDD.setrange("Document Type", salesheader."Document Type");
-                    SaleslinecheckDD.setrange("Document No.", SalesHeader."No.");
-                    SaleslinecheckDD.setfilter("Qty. to Invoice", '<>%1', 0);
-                    if SaleslinecheckDD.findset() then
-                        repeat
-                            if SaleslinecheckDD."Warehouse Status" <> SaleslinecheckDD."Warehouse Status"::Delivered then
-                                showwarning := true;
-                        until (SaleslinecheckDD.next() = 0) or showwarning;
-                    IF showwarning then
-                        if not confirm(showwarninglabel, true) then
-                            error(showwarningerror);
-
-                end;
-                // 453154 <<
+                if Abs(recAmzOrderHead."Amount Including VAT" - SalesHeader."Amount Including VAT") >= 1 then
+                    Error(lText029, SalesHeader."No.", SalesHeader."Amount Including VAT", recAmzOrderHead."Amount Including VAT", SalesHeader."External Document No.");
             end;
 
-            //>> Sales Line
-            if not recPostGrpCtryLoc.Get("Sell-to Country/Region Code", "Location Code") then;
-            recSaleLine.Reset();
-            recSaleLine.SetRange("Document Type", "Document Type");
-            recSaleLine.SetRange("Document No.", "No.");
-            recSaleLine.SetFilter(Type, '<>%1', recSaleLine.Type::" ");
-            if recSaleLine.FindSet() then begin
-                repeat
-                    case recSaleLine.Type of
-                        recSaleLine.Type::"G/L Account":
-                            begin
-                                if recSaleLine."Hide Line" and
-                                   (recSaleLine."Unit Price" <> 0) and
-                                   ((recSaleLine."Qty. to Ship" <> 0) or (recSaleLine."Qty. to Invoice" <> 0)) and
-                                   (not GlAccIsReverseLineToChargeItem(recSaleLine))
-                                then
-                                    Error(lText025, recSaleLine.FieldCaption("Hide Line"), recSaleLine.FieldCaption("Unit Price"), TableCaption(), recSaleLine."Document No.", recSaleLine."Line No.");
+        if (SalesHeader."Ship-to VAT" = '') and (not SalesHeader."eCommerce Order") then begin
+            recCust.Get(SalesHeader."Sell-to Customer No.");
+            SalesHeader."Ship-to VAT" := recCust."VAT Registration No.";
+        end;
+
+        if SalesHeader."Document Type" IN [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice] then begin
+            recBillToCust.get(SalesHeader."Bill-to Customer No.");
+            if recBillToCust."Payment Terms Code" <> SalesHeader."Payment Terms Code" then
+                if GuiAllowed() then begin
+                    if not confirm(lText032 + ltext013, false,
+                           SalesHeader.FieldCaption("Payment Terms Code"),
+                           recBillToCust."Payment Terms Code",
+                           recbilltocust.TableCaption(),
+                           SalesHeader."Payment Terms Code",
+                           salesheader."Document Type")
+                    then
+                        error('');
+                end else
+                    error(lText032,
+                        SalesHeader.FieldCaption("Payment Terms Code"),
+                        recBillToCust."Payment Terms Code",
+                        recbilltocust.TableCaption(),
+                        SalesHeader."Payment Terms Code",
+                        salesheader."Document Type");
+
+            if GuiAllowed and SalesHeader.Invoice and recBillToCust."Warning on Not-delivery" then begin
+                SaleslinecheckDD.setrange("Document Type", salesheader."Document Type");
+                SaleslinecheckDD.setrange("Document No.", SalesHeader."No.");
+                SaleslinecheckDD.setfilter("Qty. to Invoice", '<>%1', 0);
+                if SaleslinecheckDD.findset() then
+                    repeat
+                        if SaleslinecheckDD."Warehouse Status" <> SaleslinecheckDD."Warehouse Status"::Delivered then
+                            showwarning := true;
+                    until (SaleslinecheckDD.next() = 0) or showwarning;
+                IF showwarning then
+                    if not confirm(showwarninglabel, true) then
+                        error(showwarningerror);
+
+            end;
+        end;
+
+        //>> Sales Line
+        if not recPostGrpCtryLoc.Get(SalesHeader."Sell-to Country/Region Code", SalesHeader."Location Code") then;
+        recSaleLine.Reset();
+        recSaleLine.SetRange("Document Type", SalesHeader."Document Type");
+        recSaleLine.SetRange("Document No.", SalesHeader."No.");
+        recSaleLine.SetFilter(Type, '<>%1', recSaleLine.Type::" ");
+        if recSaleLine.FindSet() then begin
+            repeat
+                case recSaleLine.Type of
+                    recSaleLine.Type::"G/L Account":
+                        begin
+                            if recSaleLine."Hide Line" and
+                               (recSaleLine."Unit Price" <> 0) and
+                               ((recSaleLine."Qty. to Ship" <> 0) or (recSaleLine."Qty. to Invoice" <> 0)) and
+                               (not GlAccIsReverseLineToChargeItem(recSaleLine))
+                            then
+                                Error(lText025, recSaleLine.FieldCaption("Hide Line"), recSaleLine.FieldCaption("Unit Price"), SalesHeader.TableCaption(), recSaleLine."Document No.", recSaleLine."Line No.");
 
 
-                                recSaleLine2.SetRange("Document Type", "Document Type");
-                                recSaleLine2.SetRange("Document No.", "No.");
-                                recSaleLine2.SetRange(Type, recSaleLine.Type::Item);
-                                if recSaleLine2.IsEmpty() and ("Sales Order Type" = "sales order type"::"G/L Account") and (recSaleLine."Location Code" <> '') then
-                                    Error(lText017);
+                            recSaleLine2.SetRange("Document Type", SalesHeader."Document Type");
+                            recSaleLine2.SetRange("Document No.", SalesHeader."No.");
+                            recSaleLine2.SetRange(Type, recSaleLine.Type::Item);
+                            if recSaleLine2.IsEmpty() and (SalesHeader."Sales Order Type" = SalesHeader."Sales Order Type"::"G/L Account") and (recSaleLine."Location Code" <> '') then
+                                Error(lText017);
 
-                                recSaleLine.TestField("Gen. Bus. Posting Group");
-                                recSaleLine.TestField("Gen. Prod. Posting Group");
-                                recSaleLine.TestField("VAT Bus. Posting Group");
-                                recSaleLine.TestField("VAT Prod. Posting Group");
+                            recSaleLine.TestField("Gen. Bus. Posting Group");
+                            recSaleLine.TestField("Gen. Prod. Posting Group");
+                            recSaleLine.TestField("VAT Bus. Posting Group");
+                            recSaleLine.TestField("VAT Prod. Posting Group");
 
-                            end;
-                        recSaleLine.Type::Item:
-                            begin
-                                if recSaleLine."No." <> '' then begin
-                                    if not recSaleLine."Completely Invoiced" then
-                                        if recSaleLine."Hide Line" and
-                                           (recSaleLine."Unit Price" <> 0) and
-                                            ((recSaleLine."Qty. to Ship" <> 0) or (recSaleLine."Qty. to Invoice" <> 0))
+                        end;
+                    recSaleLine.Type::Item:
+                        begin
+                            if recSaleLine."No." <> '' then begin
+                                if not recSaleLine."Completely Invoiced" then
+                                    if recSaleLine."Hide Line" and
+                                       (recSaleLine."Unit Price" <> 0) and
+                                        ((recSaleLine."Qty. to Ship" <> 0) or (recSaleLine."Qty. to Invoice" <> 0))
+                                    then
+                                        Error(lText025, recSaleLine.FieldCaption("Hide Line"), recSaleLine.FieldCaption("Unit Price"), SalesHeader.TableCaption(), recSaleLine."Document No.", recSaleLine."Line No.");
+
+                                if recPostGrpCtryLoc."VAT Prod. Post. Group - Sales" <> '' then
+                                    if recSaleLine."VAT Prod. Posting Group" <> recPostGrpCtryLoc."VAT Prod. Post. Group - Sales" then
+                                        Error(lText005, recSaleLine.FieldCaption("VAT Prod. Posting Group"), recPostGrpCtryLoc."VAT Prod. Post. Group - Sales");
+                                if recPostGrpCtryLoc."Line Discount %" <> 0 then
+                                    if recSaleLine."Line Discount %" <> recPostGrpCtryLoc."Line Discount %" then
+                                        Error(lText005, recSaleLine.FieldCaption("Line Discount %"), recPostGrpCtryLoc."Line Discount %");
+
+                                recGPPGrpRetReason.SetRange("Gen. Prod. Posting Group", recSaleLine."Gen. Prod. Posting Group");
+                                recGPPGrpRetReason.SetRange(Mandatory, true);
+                                if recGPPGrpRetReason.FindFirst() and (recSaleLine."Return Reason Code" <> recGPPGrpRetReason."Return Reason Code") then
+                                    Error(lText018, recSaleLine.FieldCaption("Return Reason Code"), recSaleLine."Return Reason Code", recSaleLine.FieldCaption("Gen. Prod. Posting Group"), recSaleLine."Gen. Prod. Posting Group");
+
+                                recGPPGrpRetReason.Reset();
+                                if recGPPGrpRetReason.Get(recSaleLine."Gen. Prod. Posting Group", recSaleLine."Return Reason Code") then begin
+                                    if recGPPGrpRetReason."Sales Unit Price Must be Zero" then
+                                        if recSaleLine."Unit Price" <> 0 then
+                                            Error(lText020, recSaleLine.FieldCaption("Unit Price"), recSaleLine."Line No.");
+
+                                    if recGPPGrpRetReason."Max. Sales Unit Price" <> 0 then
+                                        if ((recSaleLine."Qty. to Ship" <> 0) or (recSaleLine."Qty. to Invoice" <> 0)) and
+                                           (recSaleLine."Unit Price" > recGPPGrpRetReason."Max. Sales Unit Price")
                                         then
-                                            Error(lText025, recSaleLine.FieldCaption("Hide Line"), recSaleLine.FieldCaption("Unit Price"), TableCaption(), recSaleLine."Document No.", recSaleLine."Line No.");
+                                            Error(lText024, recSaleLine.FieldCaption("Unit Price"), recGPPGrpRetReason."Max. Sales Unit Price", recSaleLine."Line No.");
 
-                                    if recPostGrpCtryLoc."VAT Prod. Post. Group - Sales" <> '' then
-                                        if recSaleLine."VAT Prod. Posting Group" <> recPostGrpCtryLoc."VAT Prod. Post. Group - Sales" then
-                                            Error(lText005, recSaleLine.FieldCaption("VAT Prod. Posting Group"), recPostGrpCtryLoc."VAT Prod. Post. Group - Sales");
-                                    if recPostGrpCtryLoc."Line Discount %" <> 0 then
-                                        if recSaleLine."Line Discount %" <> recPostGrpCtryLoc."Line Discount %" then
-                                            Error(lText005, recSaleLine.FieldCaption("Line Discount %"), recPostGrpCtryLoc."Line Discount %");
+                                end;
 
-                                    recGPPGrpRetReason.SetRange("Gen. Prod. Posting Group", recSaleLine."Gen. Prod. Posting Group");
-                                    recGPPGrpRetReason.SetRange(Mandatory, true);
-                                    if recGPPGrpRetReason.FindFirst() and (recSaleLine."Return Reason Code" <> recGPPGrpRetReason."Return Reason Code") then
-                                        Error(lText018, recSaleLine.FieldCaption("Return Reason Code"), recSaleLine."Return Reason Code", recSaleLine.FieldCaption("Gen. Prod. Posting Group"), recSaleLine."Gen. Prod. Posting Group");
+                                if not recSaleLine."Hide Line" then begin
+                                    recGenBusPostGrp.Get(recSaleLine."Gen. Bus. Posting Group");
+                                    if recGenBusPostGrp."Sample / Test Equipment" > recGenBusPostGrp."sample / test equipment"::" " then begin
+                                        if (recSaleLine."Qty. to Ship" <> 0) or (recSaleLine."Qty. to Invoice" <> 0) then begin
+                                            if recSaleLine."Unit Cost" = 0 then
+                                                Error(lText006, recSaleLine.FieldCaption("Unit Cost"), SalesHeader."No.", recSaleLine."Line No.");
 
-                                    recGPPGrpRetReason.Reset();
-                                    if recGPPGrpRetReason.Get(recSaleLine."Gen. Prod. Posting Group", recSaleLine."Return Reason Code") then begin
-                                        if recGPPGrpRetReason."Sales Unit Price Must be Zero" then
-                                            if recSaleLine."Unit Price" <> 0 then
-                                                Error(lText020, recSaleLine.FieldCaption("Unit Price"), recSaleLine."Line No.");
+                                            if recGenBusPostGrp."Sample / Test Equipment" = recGenBusPostGrp."sample / test equipment"::"Sample (Unit Price = Zero)" then begin
+                                                if recSaleLine."Unit Price" <> 0 then
+                                                    Error(lText022, recSaleLine.FieldCaption("Unit Price"), SalesHeader."No.", recSaleLine."Line No.", LowerCase(recSaleLine."Gen. Bus. Posting Group"));
+                                            end else
+                                                if recSaleLine."Unit Price" <> recSaleLine."Unit Cost" then
+                                                    Error(lText021, recSaleLine.FieldCaption("Unit Price"), SalesHeader."No.", recSaleLine."Line No.", recSaleLine.FieldCaption("Unit Cost"));
 
-                                        if recGPPGrpRetReason."Max. Sales Unit Price" <> 0 then
-                                            if ((recSaleLine."Qty. to Ship" <> 0) or (recSaleLine."Qty. to Invoice" <> 0)) and
-                                               (recSaleLine."Unit Price" > recGPPGrpRetReason."Max. Sales Unit Price")
-                                            then
-                                                Error(lText024, recSaleLine.FieldCaption("Unit Price"), recGPPGrpRetReason."Max. Sales Unit Price", recSaleLine."Line No.");
+                                        end;
+                                    end else
 
-                                    end;
+                                        if ZGT.IsZNetCompany() and
+                                           (recSaleLine."Unit Price" = 0) and
+                                           ((recSaleLine."Qty. to Ship" <> 0) or (recSaleLine."Qty. to Invoice" <> 0)) and
+                                           (not recSaleLine."Zero Unit Price Accepted")
+                                        then
+                                            ItemWithZeroPriceFound := true;
 
-                                    if not recSaleLine."Hide Line" then begin
-                                        recGenBusPostGrp.Get(recSaleLine."Gen. Bus. Posting Group");
-                                        if recGenBusPostGrp."Sample / Test Equipment" > recGenBusPostGrp."sample / test equipment"::" " then begin
-                                            if (recSaleLine."Qty. to Ship" <> 0) or (recSaleLine."Qty. to Invoice" <> 0) then begin
-                                                if recSaleLine."Unit Cost" = 0 then
-                                                    Error(lText006, recSaleLine.FieldCaption("Unit Cost"), "No.", recSaleLine."Line No.");
+                                    if SalesHeader."Location Code" <> recSaleLine."Location Code" then
+                                        Error(lText014);
 
-                                                if recGenBusPostGrp."Sample / Test Equipment" = recGenBusPostGrp."sample / test equipment"::"Sample (Unit Price = Zero)" then begin
-                                                    if recSaleLine."Unit Price" <> 0 then
-                                                        Error(lText022, recSaleLine.FieldCaption("Unit Price"), "No.", recSaleLine."Line No.", LowerCase(recSaleLine."Gen. Bus. Posting Group"));
-                                                end else
-                                                    if recSaleLine."Unit Price" <> recSaleLine."Unit Cost" then
-                                                        Error(lText021, recSaleLine.FieldCaption("Unit Price"), "No.", recSaleLine."Line No.", recSaleLine.FieldCaption("Unit Cost"));
+                                    if (SalesHeader."Sales Order Type" <> SalesHeader."Sales Order Type"::"G/L Account") and (recSaleLine."Location Code" = '') then
+                                        Error(lText016);
 
-                                            end;
-                                        end else
+                                end;
 
-                                            if ZGT.IsZNetCompany() and
-                                               (recSaleLine."Unit Price" = 0) and
-                                               ((recSaleLine."Qty. to Ship" <> 0) or (recSaleLine."Qty. to Invoice" <> 0)) and
-                                               (not recSaleLine."Zero Unit Price Accepted")
-                                            then
-                                                ItemWithZeroPriceFound := true;
-
-                                        if "Location Code" <> recSaleLine."Location Code" then
-                                            Error(lText014);
-
-                                        if ("Sales Order Type" <> "sales order type"::"G/L Account") and (recSaleLine."Location Code" = '') then
-                                            Error(lText016);
-
-                                    end;
-
-                                    if (recSaleLine."Document Type" <> recSaleLine."Document Type"::"Credit Memo") and (recSaleLine."Document Type" <> recSaleLine."Document Type"::"Return Order") then
-                                        IF (recSaleLine."Qty. to Ship" <> 0) OR (recSaleLine."Qty. to Invoice" <> 0) then begin
-                                            recLocation.get(recSaleLine."Location Code");
-                                            if not recLocation."Allow Unit Cost is Zero" then begin
-                                                recItem.get(recSaleLine."No.");
-                                                ItemLedgEntry.SetCurrentKey("Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date");
-                                                ItemLedgEntry.SetRange("Item No.", recItem."No.");
-                                                ItemLedgEntry.SetRange("Entry Type", ItemLedgEntry."Entry Type"::Purchase);
-                                                ItemLedgEntry.SetRange("Location Code", recSaleLine."Location Code");
-                                                ItemLedgEntry.SetFilter("Cost Posted to G/L", '<>0');
-                                                if (recItem.Type = recItem.type::Inventory) and ((not recItem."Allow Unit Cost is Zero") or (ItemLedgEntry.FindLast())) then begin
-                                                    //10-03-2026 BK #560757
-                                                    if recSaleLine."Unit Cost" = 0 then begin
-                                                        if PostedPurchLine.get(recSaleLine."Special Order Purchase No.", recSaleLine."Special Order Purch. Line No.") then begin
-                                                            if PostedPurchLine."Unit Price (LCY)" <> 0 then
-                                                                recSaleLine.TESTFIELD("Unit Cost (LCY)");
-                                                        end else
+                                if (recSaleLine."Document Type" <> recSaleLine."Document Type"::"Credit Memo") and (recSaleLine."Document Type" <> recSaleLine."Document Type"::"Return Order") then
+                                    IF (recSaleLine."Qty. to Ship" <> 0) OR (recSaleLine."Qty. to Invoice" <> 0) then begin
+                                        recLocation.get(recSaleLine."Location Code");
+                                        if not recLocation."Allow Unit Cost is Zero" then begin
+                                            recItem.get(recSaleLine."No.");
+                                            ItemLedgEntry.SetCurrentKey("Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date");
+                                            ItemLedgEntry.SetRange("Item No.", recItem."No.");
+                                            ItemLedgEntry.SetRange("Entry Type", ItemLedgEntry."Entry Type"::Purchase);
+                                            ItemLedgEntry.SetRange("Location Code", recSaleLine."Location Code");
+                                            ItemLedgEntry.SetFilter("Cost Posted to G/L", '<>0');
+                                            if (recItem.Type = recItem.type::Inventory) and ((not recItem."Allow Unit Cost is Zero") or (ItemLedgEntry.FindLast())) then begin
+                                                //10-03-2026 BK #560757
+                                                if recSaleLine."Unit Cost" = 0 then begin
+                                                    if PostedPurchLine.get(recSaleLine."Special Order Purchase No.", recSaleLine."Special Order Purch. Line No.") then begin
+                                                        if PostedPurchLine."Unit Price (LCY)" <> 0 then
                                                             recSaleLine.TESTFIELD("Unit Cost (LCY)");
-
                                                     end else
                                                         recSaleLine.TESTFIELD("Unit Cost (LCY)");
-                                                end;
+
+                                                end else
+                                                    recSaleLine.TESTFIELD("Unit Cost (LCY)");
                                             end;
                                         end;
+                                    end;
 
-                                    if SalesHeader.Invoice and (recSaleLine."Unit Price" = 0) and (recSaleLine."Line Discount %" <> 0) then
-                                        Error(lText031, recSaleLine.FieldCaption("Line Discount %"), recSaleLine.FieldCaption("Unit Price"), recSaleLine."Line No.");
+                                if SalesHeader.Invoice and (recSaleLine."Unit Price" = 0) and (recSaleLine."Line Discount %" <> 0) then
+                                    Error(lText031, recSaleLine.FieldCaption("Line Discount %"), recSaleLine.FieldCaption("Unit Price"), recSaleLine."Line No.");
 
-                                    if SI.GetPostDamage() and SI.GetWarehouseManagement() then
-                                        if recSaleLine."Unit Price" <> 0 then
-                                            error(lText033, recSaleLine.FieldCaption("Unit Price"));
-                                end;
-
-
-                                recSaleLine.TestField("Gen. Bus. Posting Group");
-                                recSaleLine.TestField("Gen. Prod. Posting Group");
-                                recSaleLine.TestField("VAT Bus. Posting Group");
-                                recSaleLine.TestField("VAT Prod. Posting Group");
+                                if SI.GetPostDamage() and SI.GetWarehouseManagement() then
+                                    if recSaleLine."Unit Price" <> 0 then
+                                        error(lText033, recSaleLine.FieldCaption("Unit Price"));
                             end;
-                        recSaleLine.Type::"Charge (Item)":
-                            begin
-                                if not recSaleLine."Hide Line" then
-                                    Error(lText002, recSaleLine.Type, recSaleLine.FieldCaption("Hide Line"), recSaleLine."Line No.");
 
-                                recSaleLine.TestField("Gen. Bus. Posting Group");
-                                recSaleLine.TestField("Gen. Prod. Posting Group");
-                                recSaleLine.TestField("VAT Bus. Posting Group");
-                                recSaleLine.TestField("VAT Prod. Posting Group");
+
+                            recSaleLine.TestField("Gen. Bus. Posting Group");
+                            recSaleLine.TestField("Gen. Prod. Posting Group");
+                            recSaleLine.TestField("VAT Bus. Posting Group");
+                            recSaleLine.TestField("VAT Prod. Posting Group");
+                        end;
+                    recSaleLine.Type::"Charge (Item)":
+                        begin
+                            if not recSaleLine."Hide Line" then
+                                Error(lText002, recSaleLine.Type, recSaleLine.FieldCaption("Hide Line"), recSaleLine."Line No.");
+
+                            recSaleLine.TestField("Gen. Bus. Posting Group");
+                            recSaleLine.TestField("Gen. Prod. Posting Group");
+                            recSaleLine.TestField("VAT Bus. Posting Group");
+                            recSaleLine.TestField("VAT Prod. Posting Group");
+                        end;
+                end;
+            until recSaleLine.Next() = 0;
+
+            if ItemWithZeroPriceFound then
+                if SalesHeader.Ship then begin
+                    if not GuiAllowed() then begin
+                        EmailMgt.CreateEmailWithBodytext2('LOGORDERS', '', StrSubstNo(lText012, recSaleLine.FieldCaption("Unit Price"), Lowercase(Format(SalesHeader."Document Type")), SalesHeader."No."), '');
+                        EmailMgt.Send();
+                    end else
+                        if not Confirm(lText012 + lText013, false, recSaleLine.FieldCaption("Unit Price"), LowerCase(Format(SalesHeader."Document Type")), SalesHeader."No.") then
+                            Error('');
+                end else
+                    if not GuiAllowed() then
+                        Error(lText012, recSaleLine.FieldCaption("Unit Price"), LowerCase(Format(SalesHeader."Document Type")), SalesHeader."No.")
+                    else
+                        if not Confirm(lText012 + lText013, false, recSaleLine.FieldCaption("Unit Price"), LowerCase(Format(SalesHeader."Document Type")), SalesHeader."No.") then
+                            Error('');
+        end;
+
+        if SalesHeader."Document Type" in [SalesHeader."document type"::Invoice, SalesHeader."document type"::"Credit Memo"] then begin
+            // Additional item lines can't have an amount
+            recSaleLine.Reset();
+            recSaleLine.SetRange("Document Type", SalesHeader."Document Type");
+            recSaleLine.SetRange("Document No.", SalesHeader."No.");
+            recSaleLine.SetFilter("Additional Item Line No.", '<>%1', 0);
+            recSaleLine.SetFilter("Line Amount", '<>%1', 0);
+            if recSaleLine.FindFirst() then
+                Error(lText001, recSaleLine.FieldCaption("Line Amount"));
+        end;
+
+        if ZGT.IsZComCompany() then
+            if SalesHeader."Document Type" in [SalesHeader."document type"::"Credit Memo"] then
+                if (SalesHeader."Location Code" = 'PP') and (SalesHeader."Bill-to Country/Region Code" = 'IT') then begin
+                    SalesHeader.TestField("Ship-to Code", SalesHeader."Location Code");
+                    SalesHeader.TestField("Ship-to Address");
+                    SalesHeader.TestField("Ship-to Post Code");
+                    SalesHeader.TestField("Ship-to City");
+                end;
+
+        if ((SalesHeader."Document Type" = SalesHeader."document type"::Order) and SalesHeader.Invoice) or
+           (SalesHeader."Document Type" = SalesHeader."document type"::Invoice)
+        then begin
+            //recInvSetup.GET;  // The read has been moved up.
+            recGenBusPostGrp.Get(SalesHeader."Gen. Bus. Posting Group");
+            if ZGT.IsRhq() and not ZGT.IsZNetCompany() then
+                if recGenBusPostGrp."Sample / Test Equipment" = recGenBusPostGrp."sample / test equipment"::" " then
+                    if (SalesHeader."Bill-to Country/Region Code" = 'IT') and (SalesHeader."Location Code" = recInvSetup."AIT Location Code") and (SalesHeader."E-Invoice Comment" = '') then
+                        Error(lText004, SalesHeader.FieldCaption("E-Invoice Comment"));
+
+            if ZGT.CompanyNameIs(11) then begin  // DE
+                recSaleLine.Reset();
+                recSaleLine.SetRange("Document Type", SalesHeader."Document Type");
+                recSaleLine.SetRange("Document No.", SalesHeader."No.");
+                recSaleLine.SetRange(Type, recSaleLine.Type::Item);
+
+                if (SalesHeader."Ship-to Country/Region Code" <> 'DK') and
+                   (SalesHeader."Shipment Date" = 0D) and
+                   (recSaleLine.FindFirst())
+                then
+                    SalesHeader.FieldError(SalesHeader."Shipment Date");
+            end;
+
+            if recCustPriceGrp.Get(SalesHeader."Customer Price Group") and recCustPriceGrp.Blocked then
+                Error(lText015, SalesHeader.FieldCaption("Customer Price Group"), SalesHeader."Customer Price Group");
+
+        end;
+
+        if ZGT.IsRhq() then
+            case SalesHeader."Document Type" of
+                SalesHeader."document type"::Invoice:
+                    begin
+                        recCust.Get(SalesHeader."Sell-to Customer No.");
+
+                        if SalesHeader."Sales Order Type" = SalesHeader."sales order type"::Normal then begin
+                            SalesHeader.CalcFields("No of Lines", "Total Quantity", "Picking List No.", Amount, "Line Discount Amount");
+                            recDelDocHead.SetAutoCalcFields("No of Lines", "Total Quantity", Amount);
+                            if (recCust."Create Invoice pr. Order") and (SalesHeader."Create Invoice pr. Order No." <> '') then
+                                recDelDocHead.SetRange("Sales Order No. Filter", SalesHeader."Create Invoice pr. Order No.");
+
+
+                            if recDelDocHead.Get(SalesHeader."Picking List No.") then begin
+                                if recDelDocHead."No of Lines" <> SalesHeader."No of Lines" then
+                                    if not Confirm(lText009, false, SalesHeader.FieldCaption("No of Lines"), recDelDocHead."No of Lines") then
+                                        Error('');
+                                if recDelDocHead."Total Quantity" <> SalesHeader."Total Quantity" then
+                                    if not Confirm(lText010, false, SalesHeader.FieldCaption("Total Quantity"), recDelDocHead."Total Quantity") then
+                                        Error('');
+                                if SalesHeader.Amount + SalesHeader."Line Discount Amount" <> Round(recDelDocHead.Amount) then
+                                    if not Confirm(lText011, false, SalesHeader.FieldCaption("Amount"), recDelDocHead.Amount) then
+                                        Error('');
                             end;
+                        end;
+
+                        if ZGT.IsZComCompany() then begin
+                            recSaleLine.Reset();
+                            recSaleLine.SetRange("Document Type", SalesHeader."Document Type");
+                            recSaleLine.SetRange("Document No.", SalesHeader."No.");
+                            recSaleLine.SetRange(Type, recSaleLine.Type::Item);
+                            recSaleLine.SetFilter("Shipment No.", '<>%1', '');
+
+                            if recCust."Create Invoice pr. Order" and (recSaleLine.FindFirst()) then
+                                SalesHeader.TestField("Your Reference");
+                        end;
+
+
+                    end;
+
+                SalesHeader."document type"::"Credit Memo":
+                    if SalesHeader."Ship-to Country/Region Code" = '' then begin
+                        recSaleLine.Reset();
+                        recSaleLine.SetRange("Document Type", SalesHeader."Document Type");
+                        recSaleLine.SetRange("Document No.", SalesHeader."No.");
+                        recSaleLine.SetRange("Return Reason Code", '1');
+                        if recSaleLine.FindFirst() then
+                            Error(lText003, recSaleLine.FieldCaption("Return Reason Code"));
+                    end;
+            end;
+
+        // Eicards must have an machine code if it's marked on the item.
+        if (SalesHeader."Document Type" = SalesHeader."document type"::Order) and (SalesHeader."Sales Order Type" = SalesHeader."sales order type"::EICard) then begin
+            recBillToCust.Get(SalesHeader."Bill-to Customer No.");
+            if recBillToCust."Post EiCard Invoice Automatic" > recBillToCust."post eicard invoice automatic"::" " then begin
+                if recBillToCust."Post EiCard Invoice Automatic" = recBillToCust."post eicard invoice automatic"::"Yes (when purchase invoice is posted)" then
+                    SalesHeader.SetRange(SalesHeader."EiCard iPurch Order St. Filter", SalesHeader."eicard ipurch order st. filter"::Posted);
+                SalesHeader.CalcFields("EiCard Ready to Post");
+                if not SalesHeader."EiCard Ready to Post" then
+                    Error(lText008, SalesHeader."No.");
+            end;
+
+            recSaleLine.Reset();
+            recSaleLine.SetRange("Document Type", SalesHeader."Document Type");
+            recSaleLine.SetRange("Document No.", SalesHeader."No.");
+            recSaleLine.SetRange(Type, recSaleLine.Type::Item);
+            if recSaleLine.FindSet() then
+                repeat
+                    recItem.Get(recSaleLine."No.");
+                    if recItem."Enter Security for Eicard on" = recItem."enter security for eicard on"::"GLC License" then begin //25-08-25 BK #505159
+                        recAddEicardOrderInfo.SetRange("Document Type", recSaleLine."Document Type");
+                        recAddEicardOrderInfo.SetRange("Document No.", recSaleLine."Document No.");
+                        recAddEicardOrderInfo.SetRange("Sales Line Line No.", recSaleLine."Line No.");
+                        recAddEicardOrderInfo.SetRange(Validated, true);
+                        if recSaleLine.Quantity <> recAddEicardOrderInfo.Count() then
+                            Error(lText030, recSaleLine.Quantity, Format(recItem."Enter Security for Eicard on"), recAddEicardOrderInfo.Count());
                     end;
                 until recSaleLine.Next() = 0;
-
-                if ItemWithZeroPriceFound then
-                    if Ship then begin
-                        if not GuiAllowed() then begin
-                            EmailMgt.CreateEmailWithBodytext2('LOGORDERS', '', StrSubstNo(lText012, recSaleLine.FieldCaption("Unit Price"), Lowercase(Format("Document Type")), "No."), '');
-                            EmailMgt.Send();
-                        end else
-                            if not Confirm(lText012 + lText013, false, recSaleLine.FieldCaption("Unit Price"), LowerCase(Format("Document Type")), "No.") then
-                                Error('');
-                    end else
-                        if not GuiAllowed() then
-                            Error(lText012, recSaleLine.FieldCaption("Unit Price"), LowerCase(Format("Document Type")), "No.")
-                        else
-                            if not Confirm(lText012 + lText013, false, recSaleLine.FieldCaption("Unit Price"), LowerCase(Format("Document Type")), "No.") then
-                                Error('');
-            end;
-
-            if "Document Type" in ["document type"::Invoice, "document type"::"Credit Memo"] then begin
-                // Additional item lines can't have an amount
-                recSaleLine.Reset();
-                recSaleLine.SetRange("Document Type", "Document Type");
-                recSaleLine.SetRange("Document No.", "No.");
-                recSaleLine.SetFilter("Additional Item Line No.", '<>%1', 0);
-                recSaleLine.SetFilter("Line Amount", '<>%1', 0);
-                if recSaleLine.FindFirst() then
-                    Error(lText001, recSaleLine.FieldCaption("Line Amount"));
-            end;
-
-            if ZGT.IsZComCompany() then
-                if "Document Type" in ["document type"::"Credit Memo"] then
-                    if ("Location Code" = 'PP') and ("Bill-to Country/Region Code" = 'IT') then begin
-                        TestField("Ship-to Code", "Location Code");
-                        TestField("Ship-to Address");
-                        TestField("Ship-to Post Code");
-                        TestField("Ship-to City");
-                    end;
-
-            if (("Document Type" = "document type"::Order) and Invoice) or
-               ("Document Type" = "document type"::Invoice)
-            then begin
-                //recInvSetup.GET;  // The read has been moved up.
-                recGenBusPostGrp.Get("Gen. Bus. Posting Group");
-                if ZGT.IsRhq() and not ZGT.IsZNetCompany() then
-                    if recGenBusPostGrp."Sample / Test Equipment" = recGenBusPostGrp."sample / test equipment"::" " then
-                        if ("Bill-to Country/Region Code" = 'IT') and ("Location Code" = recInvSetup."AIT Location Code") and ("E-Invoice Comment" = '') then
-                            Error(lText004, FieldCaption("E-Invoice Comment"));
-
-                if ZGT.CompanyNameIs(11) then begin  // DE
-                    recSaleLine.Reset();
-                    recSaleLine.SetRange("Document Type", "Document Type");
-                    recSaleLine.SetRange("Document No.", "No.");
-                    recSaleLine.SetRange(Type, recSaleLine.Type::Item);
-
-                    if ("Ship-to Country/Region Code" <> 'DK') and
-                       ("Shipment Date" = 0D) and
-                       (recSaleLine.FindFirst())
-                    then
-                        FieldError("Shipment Date");
-                end;
-
-                if recCustPriceGrp.Get("Customer Price Group") and recCustPriceGrp.Blocked then
-                    Error(lText015, FieldCaption("Customer Price Group"), "Customer Price Group");
-
-            end;
-
-            if ZGT.IsRhq() then
-                case "Document Type" of
-                    "document type"::Invoice:
-                        begin
-                            recCust.Get("Sell-to Customer No.");
-
-                            if "Sales Order Type" = "sales order type"::Normal then begin
-                                CalcFields("No of Lines", "Total Quantity", "Picking List No.", Amount, "Line Discount Amount");
-                                recDelDocHead.SetAutoCalcFields("No of Lines", "Total Quantity", Amount);
-                                if (recCust."Create Invoice pr. Order") and ("Create Invoice pr. Order No." <> '') then
-                                    recDelDocHead.SetRange("Sales Order No. Filter", "Create Invoice pr. Order No.");
-
-
-                                if recDelDocHead.Get("Picking List No.") then begin
-                                    if recDelDocHead."No of Lines" <> "No of Lines" then
-                                        if not Confirm(lText009, false, "No of Lines", recDelDocHead."No of Lines") then
-                                            Error('');
-                                    if recDelDocHead."Total Quantity" <> "Total Quantity" then
-                                        if not Confirm(lText010, false, "Total Quantity", recDelDocHead."Total Quantity") then
-                                            Error('');
-                                    if Amount + "Line Discount Amount" <> Round(recDelDocHead.Amount) then
-                                        if not Confirm(lText011, false, Amount, recDelDocHead.Amount) then
-                                            Error('');
-                                end;
-                            end;
-
-                            if ZGT.IsZComCompany() then begin
-                                recSaleLine.Reset();
-                                recSaleLine.SetRange("Document Type", "Document Type");
-                                recSaleLine.SetRange("Document No.", "No.");
-                                recSaleLine.SetRange(Type, recSaleLine.Type::Item);
-                                recSaleLine.SetFilter("Shipment No.", '<>%1', '');
-
-                                if recCust."Create Invoice pr. Order" and (recSaleLine.FindFirst()) then
-                                    TestField("Your Reference");
-                            end;
-
-
-                        end;
-
-                    "document type"::"Credit Memo":
-                        if "Ship-to Country/Region Code" = '' then begin
-                            recSaleLine.Reset();
-                            recSaleLine.SetRange("Document Type", "Document Type");
-                            recSaleLine.SetRange("Document No.", "No.");
-                            recSaleLine.SetRange("Return Reason Code", '1');
-                            if recSaleLine.FindFirst() then
-                                Error(lText003, recSaleLine.FieldCaption("Return Reason Code"));
-                        end;
-                end;
-
-            // Eicards must have an machine code if it's marked on the item.
-            if ("Document Type" = "document type"::Order) and ("Sales Order Type" = "sales order type"::EICard) then begin
-                recBillToCust.Get("Bill-to Customer No.");
-                if recBillToCust."Post EiCard Invoice Automatic" > recBillToCust."post eicard invoice automatic"::" " then begin
-                    if recBillToCust."Post EiCard Invoice Automatic" = recBillToCust."post eicard invoice automatic"::"Yes (when purchase invoice is posted)" then
-                        SetRange("EiCard iPurch Order St. Filter", "eicard ipurch order st. filter"::Posted);
-                    CalcFields("EiCard Ready to Post");
-                    if not "EiCard Ready to Post" then
-                        Error(lText008, "No.");
-                end;
-
-                recSaleLine.Reset();
-                recSaleLine.SetRange("Document Type", "Document Type");
-                recSaleLine.SetRange("Document No.", "No.");
-                recSaleLine.SetRange(Type, recSaleLine.Type::Item);
-                if recSaleLine.FindSet() then
-                    repeat
-                        recItem.Get(recSaleLine."No.");
-                        if recItem."Enter Security for Eicard on" = recItem."enter security for eicard on"::"GLC License" then begin //25-08-25 BK #505159
-                            recAddEicardOrderInfo.SetRange("Document Type", recSaleLine."Document Type");
-                            recAddEicardOrderInfo.SetRange("Document No.", recSaleLine."Document No.");
-                            recAddEicardOrderInfo.SetRange("Sales Line Line No.", recSaleLine."Line No.");
-                            recAddEicardOrderInfo.SetRange(Validated, true);
-                            if recSaleLine.Quantity <> recAddEicardOrderInfo.Count() then
-                                Error(lText030, recSaleLine.Quantity, Format(recItem."Enter Security for Eicard on"), recAddEicardOrderInfo.Count());
-                        end;
-                    until recSaleLine.Next() = 0;
-            end;
-
-            //SI.SetRejectChangeLog(true);
         end;
+
+        //SI.SetRejectChangeLog(true);
+        //end;
 
     end;
 
@@ -505,87 +503,145 @@ codeunit 50080 "Sales Post Events"
         lText004: Label 'It was not possible to e-mail the invoice to the warehouse!!!';
         MessageText: Text;
     begin
-        with SalesHeader do begin
-            if (("Document Type" = "document type"::Order) and Invoice) or
-                ("Document Type" = "document type"::Invoice)
-            then
-                if ZGT.IsRhq() then begin
-                    recSaleInvHead.SetAutoCalcFields("Picking List No.");
-                    recSaleInvHead.Get(SalesInvHdrNo);
-                    if recSaleInvHead."Picking List No." <> '' then begin
-                        recDelDocHead.Get(recSaleInvHead."Picking List No.");
-                        recDelDocHead."Document Status" := recDelDocHead."document status"::Posted;
-                        recDelDocHead.Modify();
+        //UpgradeReady
+        if ((SalesHeader."Document Type" = SalesHeader."document type"::Order) and SalesHeader.Invoice) or
+            (SalesHeader."Document Type" = SalesHeader."document type"::Invoice)
+        then
+            if ZGT.IsRhq() then begin
+                recSaleInvHead.SetAutoCalcFields("Picking List No.");
+                recSaleInvHead.Get(SalesInvHdrNo);
+                if recSaleInvHead."Picking List No." <> '' then begin
+                    recDelDocHead.Get(recSaleInvHead."Picking List No.");
+                    recDelDocHead."Document Status" := recDelDocHead."document status"::Posted;
+                    recDelDocHead.Modify();
+                end;
+
+                if recSaleInvHead."Send Mail" then begin
+                    recSaleDocEmail."Document Type" := recSaleDocEmail."document type"::"Posted Sales Invoice";
+                    recSaleDocEmail."Document No." := recSaleInvHead."No.";
+                    recCust.Get(recSaleInvHead."Bill-to Customer No.");
+                    if recCust."Delay Btw. Post and Send Email" <> 0 then
+                        recSaleDocEmail."Send E-mail at" := CurrentDatetime + (1000 * 60 * recCust."Delay Btw. Post and Send Email");
+
+                    recDelDocHead.SetAutoCalcFields("Send Invoice to Warehouse");
+                    if recDelDocHead.Get(recSaleInvHead."Picking List No.") and (recDelDocHead."Warehouse Status" = recDelDocHead."warehouse status"::"Waiting for invoice") then begin
+                        if recDelDocHead."Send Invoice to Warehouse" then begin
+                            recEmailAdd.Get('VCKWAITINV');
+                            if recEmailAdd."Delay on Automated E-mail" <> 0 then
+                                recSaleDocEmail."Send E-mail at" := CurrentDatetime + (1000 * 60 * recEmailAdd."Delay on Automated E-mail");
+                            recSaleDocEmail."E-mail Address Code" := recEmailAdd.Code;
+                            MessageText := StrSubstNo(lText001, recEmailAdd.Recipients, StrSubstNo(lText002, recSaleInvHead."No."));
+                        end else
+                            MessageText := StrSubstNo(lText004);
+                    end else
+                        MessageText := StrSubstNo(lText002, recSaleInvHead."No.");
+
+                    recSaleDocEmail.Insert(true);
+                    if MessageText <> '' then
+                        Message(MessageText);
+                end else
+                    if not recSaleInvHead."eCommerce Order" then
+                        Message(lText003, recSaleInvHead."No.");
+            end;
+        Commit();
+
+        if SalesHeader."eCommerce Order" and (not SalesHeader.Correction) then begin
+            recAmzonOrderHead.SetCurrentkey("Sales Document Type", "eCommerce Order Id", "Invoice No.");
+            recAmzonOrderHead.SetRange("Sales Document Type", SalesHeader."Document Type");
+            recAmzonOrderHead.SetRange("eCommerce Order Id", SalesHeader."External Document No.");
+            recAmzonOrderHead.SetRange("Invoice No.", SalesHeader."External Invoice No.");
+            if recAmzonOrderHead.FindFirst() then begin
+                recAmzOrderArc.TransferFields(recAmzonOrderHead);
+                recAmzOrderArc."Date Archived" := Today();
+                recAmzOrderArc."Posting Date" := SalesHeader."Posting Date";
+                recAmzOrderArc.Insert(true);
+
+                recAmzOrderLine.SetRange("eCommerce Order Id", recAmzonOrderHead."eCommerce Order Id");
+                recAmzOrderLine.SetRange("Invoice No.", recAmzonOrderHead."Invoice No.");
+                if recAmzOrderLine.FindSet() then
+                    repeat
+                        recAmzOrderLineArc.TransferFields(recAmzOrderLine);
+                        recAmzOrderLineArc.Insert(true);
+                    until recAmzOrderLine.Next() = 0;
+
+                recAmzonOrderHead.Delete(true);
+
+                SalesOrder.SetRange("Document Type", SalesOrder."Document Type"::Order);
+                SalesOrder.SetRange("Sales Order Type", SalesOrder."Sales Order Type"::eCommerce);
+                SalesOrder.SetRange("External Document No.", SalesHeader."External Document No.");
+                if SalesOrder.FindFirst() then
+                    SalesOrder.Delete(true);
+                COMMIT();
+            end;
+        end;
+
+        case SalesHeader."Document Type" of
+            SalesHeader."document type"::Order:
+                if (SalesHeader."Sales Order Type" = SalesHeader."sales order type"::EICard) and (SalesInvHdrNo <> '') then
+                    if recEiCardQueue.Get(SalesHeader."No.") then begin
+                        recEiCardQueue.Validate("Sales Order Status", recEiCardQueue."sales order status"::Posted);
+                        recEiCardQueue.Modify(true);
                     end;
 
-                    if recSaleInvHead."Send Mail" then begin
-                        recSaleDocEmail."Document Type" := recSaleDocEmail."document type"::"Posted Sales Invoice";
-                        recSaleDocEmail."Document No." := recSaleInvHead."No.";
-                        recCust.Get(recSaleInvHead."Bill-to Customer No.");
-                        if recCust."Delay Btw. Post and Send Email" <> 0 then
-                            recSaleDocEmail."Send E-mail at" := CurrentDatetime + (1000 * 60 * recCust."Delay Btw. Post and Send Email");
-
-                        recDelDocHead.SetAutoCalcFields("Send Invoice to Warehouse");
-                        if recDelDocHead.Get(recSaleInvHead."Picking List No.") and (recDelDocHead."Warehouse Status" = recDelDocHead."warehouse status"::"Waiting for invoice") then begin
-                            if recDelDocHead."Send Invoice to Warehouse" then begin
-                                recEmailAdd.Get('VCKWAITINV');
-                                if recEmailAdd."Delay on Automated E-mail" <> 0 then
-                                    recSaleDocEmail."Send E-mail at" := CurrentDatetime + (1000 * 60 * recEmailAdd."Delay on Automated E-mail");
-                                recSaleDocEmail."E-mail Address Code" := recEmailAdd.Code;
-                                MessageText := StrSubstNo(lText001, recEmailAdd.Recipients, StrSubstNo(lText002, recSaleInvHead."No."));
-                            end else
-                                MessageText := StrSubstNo(lText004);
-                        end else
-                            MessageText := StrSubstNo(lText002, recSaleInvHead."No.");
-
-                        recSaleDocEmail.Insert(true);
-                        if MessageText <> '' then
-                            Message(MessageText);
-                    end else
-                        if not recSaleInvHead."eCommerce Order" then
-                            Message(lText003, recSaleInvHead."No.");
+            SalesHeader."document type"::"Return Order":
+                if SalesCrMemoHdrNo <> '' then begin
+                    recSaleCrHead.SetAutoCalcFields("Warehouse Inbound No.");
+                    recSaleCrHead.Get(SalesCrMemoHdrNo);
+                    if recWhseInbHead.Get(recSaleCrHead."Warehouse Inbound No.") then begin
+                        recWhseInbHead.Validate("Document Status", recWhseInbHead."document status"::Posted);
+                        recWhseInbHead.Modify(true);
+                    end;
                 end;
-            Commit();
 
-            if "eCommerce Order" and (not Correction) then begin
-                recAmzonOrderHead.SetCurrentkey("Sales Document Type", "eCommerce Order Id", "Invoice No.");
-                recAmzonOrderHead.SetRange("Sales Document Type", "Document Type");
-                recAmzonOrderHead.SetRange("eCommerce Order Id", "External Document No.");
-                recAmzonOrderHead.SetRange("Invoice No.", "External Invoice No.");
-                if recAmzonOrderHead.FindFirst() then begin
-                    recAmzOrderArc.TransferFields(recAmzonOrderHead);
-                    recAmzOrderArc."Date Archived" := Today();
-                    recAmzOrderArc."Posting Date" := "Posting Date";
-                    recAmzOrderArc.Insert(true);
+            SalesHeader."document type"::Invoice:
+                begin
+                    UpdateOutboxSalesHeader(SalesHeader);
 
-                    recAmzOrderLine.SetRange("eCommerce Order Id", recAmzonOrderHead."eCommerce Order Id");
-                    recAmzOrderLine.SetRange("Invoice No.", recAmzonOrderHead."Invoice No.");
-                    if recAmzOrderLine.FindSet() then
-                        repeat
-                            recAmzOrderLineArc.TransferFields(recAmzOrderLine);
-                            recAmzOrderLineArc.Insert(true);
-                        until recAmzOrderLine.Next() = 0;
+                    recSaleInvHead.SetAutoCalcFields("Picking List No.");
+                    recSaleInvHead.Get(SalesInvHdrNo);
+                    if ZGT.IsRhq() and SerialNoAttached(SalesInvHdrNo) then
+                        recSaleInvHead."Serial Numbers Status" := recSaleInvHead."serial numbers status"::Attached;
 
-                    recAmzonOrderHead.Delete(true);
+                    recSaleInvHead.Modify();
 
-                    SalesOrder.SetRange("Document Type", SalesOrder."Document Type"::Order);
-                    SalesOrder.SetRange("Sales Order Type", SalesOrder."Sales Order Type"::eCommerce);
-                    SalesOrder.SetRange("External Document No.", "External Document No.");
-                    if SalesOrder.FindFirst() then
-                        SalesOrder.Delete(true);
-                    COMMIT();
-                end;
-            end;
-
-            case "Document Type" of
-                "document type"::Order:
-                    if ("Sales Order Type" = "sales order type"::EICard) and (SalesInvHdrNo <> '') then
-                        if recEiCardQueue.Get(SalesHeader."No.") then begin
-                            recEiCardQueue.Validate("Sales Order Status", recEiCardQueue."sales order status"::Posted);
-                            recEiCardQueue.Modify(true);
+                    if ZGT.IsRhq() and
+                       (SalesHeader."Sales Order Type" <> SalesHeader."sales order type"::EICard)
+                    then begin
+                        recSalesSetup.Get();
+                        recSalesSetup.TestField("Customer No. on Sister Company");
+                        if (ZGT.IsZNetCompany() and (SalesHeader."Sell-to Customer No." = recSalesSetup."Customer No. on Sister Company")) or  // ZNet
+                           (not ZGT.IsZNetCompany() and (SalesHeader."Sell-to Customer No." = recSalesSetup."Customer No. on Sister Company"))  // Zyxel
+                        then begin
+                            SalesHeadEvent.UpdateUnshippedQuantity(SalesHeader."Sell-to Customer No.");
+                            SalesHeadEvent.SendContainerDetails(SalesInvHdrNo, SalesHeader."Sell-to Customer No.");
                         end;
+                    end;
 
-                "document type"::"Return Order":
+                    if SalesHeader."eCommerce Order" then begin
+                        recAmzOrderArc.SetCurrentkey("Sales Document Type", "eCommerce Order Id", "Invoice No.");
+                        recAmzOrderArc.SetRange("Sales Document Type", SalesHeader."Document Type");
+                        recAmzOrderArc.SetRange("eCommerce Order Id", SalesHeader."External Document No.");
+                        recAmzOrderArc.SetRange("Invoice No.", SalesHeader."External Invoice No.");
+                        if recAmzOrderArc.FindFirst() then begin
+                            recValueEntry.SetCurrentkey("Document Type", "Document No.");
+                            recValueEntry.SetRange("Document Type", recValueEntry."document type"::"Sales Invoice");
+                            recValueEntry.SetRange("Document No.", SalesHeader."No.");
+                            if recValueEntry.FindFirst() then begin  //  There can be refund of shipment fee without the product.
+                                recItemLedgEntry.Get(recValueEntry."Item Ledger Entry No.");
+
+                                recAmzOrderArc."Sales Shipment No." := recItemLedgEntry."Document No.";
+                                recAmzOrderArc.Modify(true);
+                            end;
+                        end;
+                    end;
+
+                    if SalesHeader."NL to DK Reverse Chg. Doc No." <> '' then
+                        NLtoDKPosting.NLtoDKRevChargePosted(SalesHeader."NL to DK Reverse Chg. Doc No.", SalesHeader."Document Type");
+                end;
+            SalesHeader."document type"::"Credit Memo":
+                begin
+                    UpdateOutboxSalesHeader(SalesHeader);
+
                     if SalesCrMemoHdrNo <> '' then begin
                         recSaleCrHead.SetAutoCalcFields("Warehouse Inbound No.");
                         recSaleCrHead.Get(SalesCrMemoHdrNo);
@@ -595,90 +651,26 @@ codeunit 50080 "Sales Post Events"
                         end;
                     end;
 
-                "document type"::Invoice:
-                    begin
-                        UpdateOutboxSalesHeader(SalesHeader);
+                    if SalesHeader."eCommerce Order" then begin
+                        recAmzOrderArc.SetCurrentkey("Sales Document Type", "eCommerce Order Id", "Invoice No.");
+                        recAmzOrderArc.SetRange("Sales Document Type", SalesHeader."Document Type");
+                        recAmzOrderArc.SetRange("eCommerce Order Id", SalesHeader."External Document No.");
+                        recAmzOrderArc.SetRange("Invoice No.", SalesHeader."External Invoice No.");
+                        if recAmzOrderArc.FindFirst() then begin
+                            recValueEntry.SetCurrentkey("Document Type", "Document No.");
+                            recValueEntry.SetRange("Document Type", recValueEntry."document type"::"Sales Credit Memo");
+                            recValueEntry.SetRange("Document No.", SalesHeader."No.");
+                            if recValueEntry.FindFirst() then begin
+                                recItemLedgEntry.Get(recValueEntry."Item Ledger Entry No.");
 
-                        recSaleInvHead.SetAutoCalcFields("Picking List No.");
-                        recSaleInvHead.Get(SalesInvHdrNo);
-                        if ZGT.IsRhq() and SerialNoAttached(SalesInvHdrNo) then
-                            recSaleInvHead."Serial Numbers Status" := recSaleInvHead."serial numbers status"::Attached;
-
-                        recSaleInvHead.Modify();
-
-                        if ZGT.IsRhq() and
-                           ("Sales Order Type" <> "sales order type"::EICard)
-                        then begin
-                            recSalesSetup.Get();
-                            recSalesSetup.TestField("Customer No. on Sister Company");
-                            if (ZGT.IsZNetCompany() and ("Sell-to Customer No." = recSalesSetup."Customer No. on Sister Company")) or  // ZNet
-                               (not ZGT.IsZNetCompany() and ("Sell-to Customer No." = recSalesSetup."Customer No. on Sister Company"))  // Zyxel
-                            then begin
-                                SalesHeadEvent.UpdateUnshippedQuantity("Sell-to Customer No.");
-                                SalesHeadEvent.SendContainerDetails(SalesInvHdrNo, "Sell-to Customer No.");
+                                recAmzOrderArc."Sales Shipment No." := recItemLedgEntry."Document No.";
+                                recAmzOrderArc.Modify(true);
                             end;
                         end;
-
-                        if "eCommerce Order" then begin
-                            recAmzOrderArc.SetCurrentkey("Sales Document Type", "eCommerce Order Id", "Invoice No.");
-                            recAmzOrderArc.SetRange("Sales Document Type", "Document Type");
-                            recAmzOrderArc.SetRange("eCommerce Order Id", "External Document No.");
-                            recAmzOrderArc.SetRange("Invoice No.", "External Invoice No.");
-                            if recAmzOrderArc.FindFirst() then begin  //<< 05-01-23 ZY-LD 064
-                                recValueEntry.SetCurrentkey("Document Type", "Document No.");
-                                recValueEntry.SetRange("Document Type", recValueEntry."document type"::"Sales Invoice");
-                                recValueEntry.SetRange("Document No.", "No.");
-                                if recValueEntry.FindFirst() then begin  // 09-12-22 ZY-LD 059 - There can be refund of shipment fee without the product.
-                                    recItemLedgEntry.Get(recValueEntry."Item Ledger Entry No.");
-
-                                    recAmzOrderArc."Sales Shipment No." := recItemLedgEntry."Document No.";
-                                    recAmzOrderArc.Modify(true);
-                                end;
-                            end;
-                        end;
-
-                        if SalesHeader."NL to DK Reverse Chg. Doc No." <> '' then
-                            NLtoDKPosting.NLtoDKRevChargePosted(SalesHeader."NL to DK Reverse Chg. Doc No.", SalesHeader."Document Type");
                     end;
-                "document type"::"Credit Memo":
-                    begin
-                        UpdateOutboxSalesHeader(SalesHeader);
 
-                        if SalesCrMemoHdrNo <> '' then begin
-                            recSaleCrHead.SetAutoCalcFields("Warehouse Inbound No.");
-                            recSaleCrHead.Get(SalesCrMemoHdrNo);
-                            if recWhseInbHead.Get(recSaleCrHead."Warehouse Inbound No.") then begin
-                                recWhseInbHead.Validate("Document Status", recWhseInbHead."document status"::Posted);
-                                recWhseInbHead.Modify(true);
-                            end;
-                        end;
-
-                        if "eCommerce Order" then begin
-                            recAmzOrderArc.SetCurrentkey("Sales Document Type", "eCommerce Order Id", "Invoice No.");
-                            recAmzOrderArc.SetRange("Sales Document Type", "Document Type");
-                            recAmzOrderArc.SetRange("eCommerce Order Id", "External Document No.");
-                            recAmzOrderArc.SetRange("Invoice No.", "External Invoice No.");
-                            if recAmzOrderArc.FindFirst() then begin  //<< 05-01-23 ZY-LD 064
-                                recValueEntry.SetCurrentkey("Document Type", "Document No.");
-                                recValueEntry.SetRange("Document Type", recValueEntry."document type"::"Sales Credit Memo");
-                                recValueEntry.SetRange("Document No.", "No.");
-                                if recValueEntry.FindFirst() then begin
-                                    recItemLedgEntry.Get(recValueEntry."Item Ledger Entry No.");
-
-                                    recAmzOrderArc."Sales Shipment No." := recItemLedgEntry."Document No.";
-                                    recAmzOrderArc.Modify(true);
-                                end;
-                            end;
-                        end;
-
-                        NLtoDKPosting.NLtoDKRevChargePosted(SalesHeader."NL to DK Reverse Chg. Doc No.", SalesHeader."Document Type");
-                    end;
-            end;
-            // V26 >>
-            // SI.SetAllowToDeleteAddItem(false);
-            // SI.SetRejectChangeLog(false);
-            // SI.SetSkipVerifyOnInventory(false);
-            // V26 <<
+                    NLtoDKPosting.NLtoDKRevChargePosted(SalesHeader."NL to DK Reverse Chg. Doc No.", SalesHeader."Document Type");
+                end;
         end;
 
     end;
@@ -689,19 +681,19 @@ codeunit 50080 "Sales Post Events"
         ItemChargeAss: Record "Item Charge Assignment (Sales)";
         PostItemChargeInv: Record "Posted Item Charge (Sales-Inv)";
     begin
-        with SalesLine do
+        //with SalesLine do
 
-            if Type = Type::"Charge (Item)" then begin
-                ItemChargeAss.SetRange("Document Type", "Document Type");
-                ItemChargeAss.SetRange("Document No.", "Document No.");
-                ItemChargeAss.SetRange("Document Line No.", "Line No.");
-                if ItemChargeAss.FindSet() then
-                    repeat
-                        PostItemChargeInv.TransferFields(ItemChargeAss);
-                        PostItemChargeInv."Document No." := SalesInvLine."Document No.";
-                        PostItemChargeInv.Insert();
-                    until ItemChargeAss.Next() = 0;
-            end;
+        if SalesLine.Type = SalesLine.Type::"Charge (Item)" then begin
+            ItemChargeAss.SetRange("Document Type", SalesLine."Document Type");
+            ItemChargeAss.SetRange("Document No.", SalesLine."Document No.");
+            ItemChargeAss.SetRange("Document Line No.", SalesLine."Line No.");
+            if ItemChargeAss.FindSet() then
+                repeat
+                    PostItemChargeInv.TransferFields(ItemChargeAss);
+                    PostItemChargeInv."Document No." := SalesInvLine."Document No.";
+                    PostItemChargeInv.Insert();
+                until ItemChargeAss.Next() = 0;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforeSalesCrMemoLineInsert', '', false, false)]
@@ -710,18 +702,18 @@ codeunit 50080 "Sales Post Events"
         ItemChargeAss: Record "Item Charge Assignment (Sales)";
         PostItemChargeCrM: Record "Posted Item Charge (Sales-CrM)";
     begin
-        with SalesLine do
-            if Type = Type::"Charge (Item)" then begin
-                ItemChargeAss.SetRange("Document Type", "Document Type");
-                ItemChargeAss.SetRange("Document No.", "Document No.");
-                ItemChargeAss.SetRange("Document Line No.", "Line No.");
-                if ItemChargeAss.FindSet() then
-                    repeat
-                        PostItemChargeCrM.TransferFields(ItemChargeAss);
-                        PostItemChargeCrM."Document No." := SalesCrMemoLine."Document No.";
-                        PostItemChargeCrM.Insert();
-                    until ItemChargeAss.Next() = 0;
-            end;
+        //UpgradeReady
+        if SalesLine.Type = SalesLine.Type::"Charge (Item)" then begin
+            ItemChargeAss.SetRange("Document Type", SalesLine."Document Type");
+            ItemChargeAss.SetRange("Document No.", SalesLine."Document No.");
+            ItemChargeAss.SetRange("Document Line No.", SalesLine."Line No.");
+            if ItemChargeAss.FindSet() then
+                repeat
+                    PostItemChargeCrM.TransferFields(ItemChargeAss);
+                    PostItemChargeCrM."Document No." := SalesCrMemoLine."Document No.";
+                    PostItemChargeCrM.Insert();
+                until ItemChargeAss.Next() = 0;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Check Dimensions", 'OnCheckDimValuePostingOnAfterCreateDimTableIDs', '', false, false)]
@@ -742,15 +734,14 @@ codeunit 50080 "Sales Post Events"
     local procedure OnBeforeInsertSalesInvoice(var Rec: Record "Sales Invoice Header"; RunTrigger: Boolean)
     var
     begin
-        with Rec do begin
-            if "Bill-to Customer No." <> '' then
-                if "Bill-to Country/Region Code" = '' then
-                    Error(Text001, FieldCaption("Bill-to Country/Region Code"));
+        //UpgradeReady
+        if Rec."Bill-to Customer No." <> '' then
+            if Rec."Bill-to Country/Region Code" = '' then
+                Error(Text001, Rec.FieldCaption("Bill-to Country/Region Code"));
 
-            if ZGT.IsRhq() then
-                if "Sell-to Customer No." = "Bill-to Customer No." then
-                    "Invoice No. for End Customer" := "No.";
-        end;
+        if ZGT.IsRhq() then
+            if Rec."Sell-to Customer No." = Rec."Bill-to Customer No." then
+                Rec."Invoice No. for End Customer" := Rec."No.";
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Invoice Header", 'OnAfterInsertEvent', '', false, false)]
@@ -759,32 +750,31 @@ codeunit 50080 "Sales Post Events"
         recLocation: Record Location;
         ZyWebServMgt: Codeunit "Zyxel Web Service Management";
     begin
-        with Rec do
-            if not ZGT.IsRhq() then
-                // Updates RHQ with end customer no.
-                if not "eCommerce Order" then
-                    //27-05-2026 BK #Cloud Ready
-                    //if ZGT.TurkishServer() then
-                    if zgt.IsITDatabaseServer() then
-                        ZyWebServMgt.SendSalesInvoiceNo(CopyStr(ZGT.GetRHQCompanyName(), 1, 30), "Your Reference", "No.")
-                    else
-                        if "Location Code" <> '' then begin
-                            recLocation.Get("Location Code");
-                            if recLocation."Comp Name for Return SInvNo" <> '' then
-                                ZyWebServMgt.SendSalesInvoiceNo(recLocation."Comp Name for Return SInvNo", "External Document No.", "No.")
-                            else
-                                ZyWebServMgt.SendSalesInvoiceNo(CopyStr(ZGT.GetRHQCompanyName(), 1, 30), "External Document No.", "No.")
-                        end;
+        //UpgradeReady
+        if not ZGT.IsRhq() then
+            // Updates RHQ with end customer no.
+            if not Rec."eCommerce Order" then
+                //27-05-2026 BK #Cloud Ready
+                if zgt.IsITDatabaseServer() then
+                    ZyWebServMgt.SendSalesInvoiceNo(CopyStr(ZGT.GetRHQCompanyName(), 1, 30), Rec."Your Reference", Rec."No.")
+                else
+                    if Rec."Location Code" <> '' then begin
+                        recLocation.Get(Rec."Location Code");
+                        if recLocation."Comp Name for Return SInvNo" <> '' then
+                            ZyWebServMgt.SendSalesInvoiceNo(recLocation."Comp Name for Return SInvNo", Rec."External Document No.", Rec."No.")
+                        else
+                            ZyWebServMgt.SendSalesInvoiceNo(CopyStr(ZGT.GetRHQCompanyName(), 1, 30), Rec."External Document No.", Rec."No.")
+                    end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Cr.Memo Header", 'OnBeforeInsertEvent', '', false, false)]
     local procedure OnBeforeInsertSalesCrMemo(var Rec: Record "Sales Cr.Memo Header"; RunTrigger: Boolean)
     var
     begin
-        with Rec do
-            if "Bill-to Customer No." <> '' then
-                if "Bill-to Country/Region Code" = '' then
-                    Error(Text001, FieldCaption("Bill-to Country/Region Code"));
+        //UpgradeReady
+        if Rec."Bill-to Customer No." <> '' then
+            if Rec."Bill-to Country/Region Code" = '' then
+                Error(Text001, Rec.FieldCaption("Bill-to Country/Region Code"));
     end;
 
 
@@ -793,11 +783,11 @@ codeunit 50080 "Sales Post Events"
     var
         recSalesCrMemoHead: Record "Sales Cr.Memo Header";
     begin
-        with Rec do
-            if not IsTemporary() then begin
-                recSalesCrMemoHead.Get("Document No.");
-                "Document Date" := recSalesCrMemoHead."Document Date";
-            end;
+        //UpgradeReady
+        if not Rec.IsTemporary() then begin
+            recSalesCrMemoHead.Get(Rec."Document No.");
+            Rec."Document Date" := recSalesCrMemoHead."Document Date";
+        end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Shipment Line", 'OnBeforeInsertEvent', '', false, false)]
@@ -806,16 +796,16 @@ codeunit 50080 "Sales Post Events"
         recSalesHead: Record "Sales Header";
         lText001: Label '"%1" "%2" must be equal to the "%1" on the "%3" "%4".';
     begin
-        with Rec do
-            if not IsTemporary then
-                if "Order No." <> '' then begin
-                    recSalesHead.Get(recSalesHead."document type"::Order, "Order No.");
-                    if (Type = Type::Item) and
-                       ("No." <> '') and
-                       ("Bill-to Customer No." <> recSalesHead."Bill-to Customer No.")
-                    then
-                        Error(lText001, FieldCaption("Bill-to Customer No."), "Bill-to Customer No.", recSalesHead.TableCaption(), recSalesHead."Bill-to Customer No.");
-                end;
+        //UpgradeReady
+        if not Rec.IsTemporary then
+            if Rec."Order No." <> '' then begin
+                recSalesHead.Get(recSalesHead."document type"::Order, Rec."Order No.");
+                if (Rec.Type = Rec.Type::Item) and
+                    (Rec."No." <> '') and
+                    (Rec."Bill-to Customer No." <> recSalesHead."Bill-to Customer No.")
+                then
+                    Error(lText001, Rec.FieldCaption("Bill-to Customer No."), Rec."Bill-to Customer No.", recSalesHead.TableCaption(), recSalesHead."Bill-to Customer No.");
+            end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Shipment Line", 'OnAfterInsertEvent', '', false, false)]
@@ -826,39 +816,39 @@ codeunit 50080 "Sales Post Events"
         lText001: Label 'Quantity on "%1" and quantity on "%2" (%8) is not equal on SO "%3" SO line "%4" and dev doc (%5). DD-line %6 against %7';
 
     begin
-        with Rec do
-            if not IsTemporary then
-                if not Correction then begin
-                    recDelDocLine.SetRange("Document No.", "Picking List No.");
-                    recDelDocLine.SetRange("Sales Order No.", "Order No.");
-                    recDelDocLine.SetRange("Sales Order Line No.", Rec."Order Line No.");
-                    recDelDocLine.SetRange(Posted, false);
-                    if recDelDocLine.FindFirst() then begin
-                        if recDelDocLine.Quantity <> Quantity then
-                            Error(lText001, recDelDocLine.TableCaption(), TableCaption(), "Order No.", "Order Line No.", "Picking List No.", recDelDocLine.Quantity, Quantity, Rec."No.");
-                        recDelDocLine.Validate(Posted, true);
-                        recDelDocLine.Modify();
-                    end;
-                end else begin
-                    recDelDocLine.SetRange("Document No.", "Picking List No.");
-                    recDelDocLine.SetRange("Sales Order No.", "Order No.");
-                    recDelDocLine.SetRange("Sales Order Line No.", "Order Line No.");
-                    if recDelDocLine.FindFirst() then
-                        if recDelDocLine.Quantity = -Quantity then begin
-                            recDelDocLine.Quantity := 0;
-                            recDelDocLine.Modify(true);
-
-                            if recSalesLine.Get(recSalesLine."document type"::Order, "Order No.", "Order Line No.") then
-                                if recSalesLine."Delivery Document No." = "Picking List No." then begin
-                                    recSalesLine.SetHideValidationDialog(true);
-                                    recSalesLine."Delivery Document No." := '';
-                                    recSalesLine."Warehouse Status" := recSalesLine."warehouse status"::New;
-                                    recSalesLine."Shipment Date Confirmed" := false;
-                                    recSalesLine.Modify(true);
-                                    recSalesLine.SetHideValidationDialog(false);
-                                end;
-                        end;
+        //UpgradeReady
+        if not Rec.IsTemporary then
+            if not Rec.Correction then begin
+                recDelDocLine.SetRange("Document No.", Rec."Picking List No.");
+                recDelDocLine.SetRange("Sales Order No.", Rec."Order No.");
+                recDelDocLine.SetRange("Sales Order Line No.", Rec."Order Line No.");
+                recDelDocLine.SetRange(Posted, false);
+                if recDelDocLine.FindFirst() then begin
+                    if recDelDocLine.Quantity <> Rec.Quantity then
+                        Error(lText001, recDelDocLine.TableCaption(), Rec.TableCaption(), Rec."Order No.", Rec."Order Line No.", Rec."Picking List No.", recDelDocLine.Quantity, Rec.Quantity, Rec."No.");
+                    recDelDocLine.Validate(Posted, true);
+                    recDelDocLine.Modify();
                 end;
+            end else begin
+                recDelDocLine.SetRange("Document No.", Rec."Picking List No.");
+                recDelDocLine.SetRange("Sales Order No.", Rec."Order No.");
+                recDelDocLine.SetRange("Sales Order Line No.", Rec."Order Line No.");
+                if recDelDocLine.FindFirst() then
+                    if recDelDocLine.Quantity = -Rec.Quantity then begin
+                        recDelDocLine.Quantity := 0;
+                        recDelDocLine.Modify(true);
+
+                        if recSalesLine.Get(recSalesLine."document type"::Order, Rec."Order No.", Rec."Order Line No.") then
+                            if recSalesLine."Delivery Document No." = Rec."Picking List No." then begin
+                                recSalesLine.SetHideValidationDialog(true);
+                                recSalesLine."Delivery Document No." := '';
+                                recSalesLine."Warehouse Status" := recSalesLine."warehouse status"::New;
+                                recSalesLine."Shipment Date Confirmed" := false;
+                                recSalesLine.Modify(true);
+                                recSalesLine.SetHideValidationDialog(false);
+                            end;
+                    end;
+            end;
     end;
 
 
@@ -897,37 +887,37 @@ codeunit 50080 "Sales Post Events"
         lText001: Label 'DEL: %1';
         lText002: Label '"%1" %2 is opened.';
     begin
-        with SalesHeader do
-            if "eCommerce Order" then begin
-                if SalesInvoiceHeader."No." <> '' then begin
-                    SalesInvoiceHeader."External Document No." := CopyStr(StrSubstNo(lText001, SalesInvoiceHeader."External Document No."), 1, MaxStrLen(SalesInvoiceHeader."External Document No."));
-                    SalesInvoiceHeader.Modify();
+        //UpgradeReady
+        if SalesHeader."eCommerce Order" then begin
+            if SalesInvoiceHeader."No." <> '' then begin
+                SalesInvoiceHeader."External Document No." := CopyStr(StrSubstNo(lText001, SalesInvoiceHeader."External Document No."), 1, MaxStrLen(SalesInvoiceHeader."External Document No."));
+                SalesInvoiceHeader.Modify();
 
-                    recAmzOrderHead.SetRange("Transaction Type", recAmzOrderHead."transaction type"::Order)
-                end;
+                recAmzOrderHead.SetRange("Transaction Type", recAmzOrderHead."transaction type"::Order)
+            end;
 
-                if SalesCrMemoHeader."No." <> '' then begin
-                    SalesCrMemoHeader."External Document No." := CopyStr(StrSubstNo(lText001, SalesInvoiceHeader."External Document No."), 1, MaxStrLen(SalesInvoiceHeader."External Document No."));
-                    SalesCrMemoHeader.Modify();
+            if SalesCrMemoHeader."No." <> '' then begin
+                SalesCrMemoHeader."External Document No." := CopyStr(StrSubstNo(lText001, SalesInvoiceHeader."External Document No."), 1, MaxStrLen(SalesInvoiceHeader."External Document No."));
+                SalesCrMemoHeader.Modify();
 
-                    recAmzOrderHead.SetRange("Transaction Type", recAmzOrderHead."transaction type"::Refund);
-                end;
+                recAmzOrderHead.SetRange("Transaction Type", recAmzOrderHead."transaction type"::Refund);
+            end;
 
-                if "External Document No." <> '' then begin
+            if SalesHeader."External Document No." <> '' then begin
 
-                    recAmzOrderHead.SetCurrentkey("Sales Document Type", "eCommerce Order Id", "Invoice No.");
-                    recAmzOrderHead.SetRange("Sales Document Type", "Document Type");
+                recAmzOrderHead.SetCurrentkey("Sales Document Type", "eCommerce Order Id", "Invoice No.");
+                recAmzOrderHead.SetRange("Sales Document Type", SalesHeader."Document Type");
 
-                    recAmzOrderHead.SetRange("eCommerce Order Id", "External Document No.");
-                    recAmzOrderHead.SetRange("Invoice No.", "External Invoice No.");
-                    recAmzOrderHead.SetRange(Open, false);
-                    if recAmzOrderHead.FindFirst() then begin
-                        recAmzOrderHead.Open := true;
-                        recAmzOrderHead.Modify();
-                        Message(lText002, recAmzOrderHead.TableCaption(), "External Document No.");
-                    end;
+                recAmzOrderHead.SetRange("eCommerce Order Id", SalesHeader."External Document No.");
+                recAmzOrderHead.SetRange("Invoice No.", SalesHeader."External Invoice No.");
+                recAmzOrderHead.SetRange(Open, false);
+                if recAmzOrderHead.FindFirst() then begin
+                    recAmzOrderHead.Open := true;
+                    recAmzOrderHead.Modify();
+                    Message(lText002, recAmzOrderHead.TableCaption(), SalesHeader."External Document No.");
                 end;
             end;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnBeforeShowPostedDocsToPrintCreatedMsg', '', false, false)]
@@ -944,22 +934,22 @@ codeunit 50080 "Sales Post Events"
         ICPartner: Record "IC Partner";
         lIcOutbSaleHead: Record "IC Outbox Sales Header";
     begin
-        with SalesHeader do
-            if "IC Direction" = "ic direction"::Outgoing then begin
-                lBillToCust.Get("Bill-to Customer No.");
-                if ICPartner.Get(lBillToCust."IC Partner Code") and (not ICPartner.Blocked) then
-                    if ICPartner."Set Posting Date to Today" or ICPartner."Set Document Date to Today" then begin
-                        lIcOutbSaleHead.SetRange("Document Type", "Document Type");
-                        lIcOutbSaleHead.SetRange("No.", "No.");
-                        if lIcOutbSaleHead.FindFirst() then begin
-                            if ICPartner."Set Posting Date to Today" then
-                                lIcOutbSaleHead."Posting Date" := Today();
-                            if ICPartner."Set Document Date to Today" then
-                                lIcOutbSaleHead."Document Date" := Today();
-                            lIcOutbSaleHead.Modify();
-                        end;
+        //UpgradeReady
+        if SalesHeader."IC Direction" = SalesHeader."ic direction"::Outgoing then begin
+            lBillToCust.Get(SalesHeader."Bill-to Customer No.");
+            if ICPartner.Get(lBillToCust."IC Partner Code") and (not ICPartner.Blocked) then
+                if ICPartner."Set Posting Date to Today" or ICPartner."Set Document Date to Today" then begin
+                    lIcOutbSaleHead.SetRange("Document Type", SalesHeader."Document Type");
+                    lIcOutbSaleHead.SetRange("No.", SalesHeader."No.");
+                    if lIcOutbSaleHead.FindFirst() then begin
+                        if ICPartner."Set Posting Date to Today" then
+                            lIcOutbSaleHead."Posting Date" := Today();
+                        if ICPartner."Set Document Date to Today" then
+                            lIcOutbSaleHead."Document Date" := Today();
+                        lIcOutbSaleHead.Modify();
                     end;
-            end;
+                end;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales Whse. Post Shipment", OnHandleSalesLineOnAfterCalcShouldModifyShipmentDate, '', false, false)]
@@ -973,13 +963,13 @@ codeunit 50080 "Sales Post Events"
     var
         recSalesLine: Record "Sales Line";
     begin
-        with SalesLine do
-            if Type = Type::"G/L Account" then begin
-                recSalesLine := SalesLine;
-                if recSalesLine.Next(-1) <> 0 then  // Charge (Item) line.
-                    if (recSalesLine.Type = recSalesLine.Type::"Charge (Item)") and (recSalesLine.Quantity = Quantity) and (-recSalesLine."Unit Price" = "Unit Price") then
-                        rValue := true;
-            end;
+        //with SalesLine do
+        if SalesLine.Type = SalesLine.Type::"G/L Account" then begin
+            recSalesLine := SalesLine;
+            if recSalesLine.Next(-1) <> 0 then  // Charge (Item) line.
+                if (recSalesLine.Type = recSalesLine.Type::"Charge (Item)") and (recSalesLine.Quantity = SalesLine.Quantity) and (-recSalesLine."Unit Price" = SalesLine."Unit Price") then
+                    rValue := true;
+        end;
     end;
 
     local procedure ValidateAddPostGrpPrLocation(var Rec: Record "Sales Header")
@@ -992,97 +982,97 @@ codeunit 50080 "Sales Post Events"
         ValidateCustomer: Boolean;
         lText001: Label '"%1" is not correct on %2.\\Value on Sales Order: %3\Value on Additional Setup: %4.';
     begin
-        with Rec do begin
-            if ("Ship-to Country/Region Code" <> '') and ("Location Code" <> '') and ("Sell-to Customer No." <> '') then begin
-                if Invoice then begin
-                    recAddBillToSetup.SetRange("Country/Region Code", "Sell-to Country/Region Code");
-                    recAddBillToSetup.SetRange("Location Code", "Location Code");
-                    recAddBillToSetup.SetFilter("Customer No.", '%1|%2', '', "Sell-to Customer No.");
-                    if ZGT.IsRhq() then
-                        recAddBillToSetup.SetRange("Company Type", recAddPostGrpSetup."company type"::Main);
-                    if recAddBillToSetup.FindLast() then
-                        if (recAddBillToSetup."Bill-to Customer No." <> '') and
-                           (recAddBillToSetup."Bill-to Customer No." <> "Bill-to Customer No.")
-                        then
-                            Error(lText001, FieldCaption("Bill-to Customer No."), "No.", "Bill-to Customer No.", recAddBillToSetup."Bill-to Customer No.");
-                end;
-
-                if "Document Type" in ["document type"::"Return Order", "document type"::"Credit Memo"] then
-                    recAddPostGrpSetup.SetRange("Country/Region Code", "Sell-to Country/Region Code")
-                else
-                    recAddPostGrpSetup.SetRange("Country/Region Code", "Ship-to Country/Region Code");
-                recAddPostGrpSetup.SetRange("Location Code", "Location Code");
-                recAddPostGrpSetup.SetFilter("Customer No.", '%1|%2', '', "Sell-to Customer No.");
+        //with Rec do begin
+        if (Rec."Ship-to Country/Region Code" <> '') and (Rec."Location Code" <> '') and (Rec."Sell-to Customer No." <> '') then begin
+            if Rec.Invoice then begin
+                recAddBillToSetup.SetRange("Country/Region Code", Rec."Sell-to Country/Region Code");
+                recAddBillToSetup.SetRange("Location Code", Rec."Location Code");
+                recAddBillToSetup.SetFilter("Customer No.", '%1|%2', '', Rec."Sell-to Customer No.");
                 if ZGT.IsRhq() then
-                    recAddPostGrpSetup.SetRange("Company Type", recAddPostGrpSetup."company type"::Main);
-                if recAddPostGrpSetup.FindLast() then begin
-                    recBilltoCust.Get("Bill-to Customer No.");
+                    recAddBillToSetup.SetRange("Company Type", recAddPostGrpSetup."company type"::Main);
+                if recAddBillToSetup.FindLast() then
+                    if (recAddBillToSetup."Bill-to Customer No." <> '') and
+                       (recAddBillToSetup."Bill-to Customer No." <> Rec."Bill-to Customer No.")
+                    then
+                        Error(lText001, Rec.FieldCaption("Bill-to Customer No."), Rec."No.", Rec."Bill-to Customer No.", recAddBillToSetup."Bill-to Customer No.");
+            end;
 
-                    if not "Skip Posting Group Validation" then begin
-                        if GuiAllowed() then
-                            ValidateField(1, 0, FieldCaption("Currency Code"), Format("Document Type"), "No.", 0, "Currency Code", recAddPostGrpSetup."Currency Code", recBilltoCust."Currency Code");
-                        ValidateField(1, 1, FieldCaption("Gen. Bus. Posting Group"), Format("Document Type"), "No.", 0, "Gen. Bus. Posting Group", recAddPostGrpSetup."Gen. Bus. Posting Group", recBilltoCust."Gen. Bus. Posting Group");
-                        ValidateField(1, 1, FieldCaption("VAT Bus. Posting Group"), Format("Document Type"), "No.", 0, "VAT Bus. Posting Group", recAddPostGrpSetup."VAT Bus. Posting Group", recBilltoCust."VAT Bus. Posting Group");
-                        ValidateField(1, 1, FieldCaption("Customer Posting Group"), Format("Document Type"), "No.", 0, "Customer Posting Group", recAddPostGrpSetup."Customer Posting Group", recBilltoCust."Customer Posting Group");
-                    end;
-                    if Invoice and (not "eCommerce Order") then
-                        if ZGT.IsRhq() and
-                           ((ZGT.IsZComCompany() and ("Bill-to Customer No." <> "Sell-to Customer No.")) or (ZGT.IsZNetCompany()))
-                        then
-                            ValidateField(1, 1, FieldCaption("Ship-to VAT"), Format("Document Type"), "No.", 0, copystr("Ship-to VAT", 1, 20), recAddPostGrpSetup."VAT Registration No.", '')
-                        else
-                            ValidateField(1, 1, FieldCaption("VAT Registration No."), Format("Document Type"), "No.", 0, "VAT Registration No.", recAddPostGrpSetup."VAT Registration No.", '');
+            if Rec."Document Type" in [Rec."document type"::"Return Order", Rec."document type"::"Credit Memo"] then
+                recAddPostGrpSetup.SetRange("Country/Region Code", Rec."Sell-to Country/Region Code")
+            else
+                recAddPostGrpSetup.SetRange("Country/Region Code", Rec."Ship-to Country/Region Code");
+            recAddPostGrpSetup.SetRange("Location Code", Rec."Location Code");
+            recAddPostGrpSetup.SetFilter("Customer No.", '%1|%2', '', Rec."Sell-to Customer No.");
+            if ZGT.IsRhq() then
+                recAddPostGrpSetup.SetRange("Company Type", recAddPostGrpSetup."company type"::Main);
+            if recAddPostGrpSetup.FindLast() then begin
+                recBilltoCust.Get(Rec."Bill-to Customer No.");
 
-                    recSalesLine.SetRange("Document Type", "Document Type");
-                    recSalesLine.SetRange("Document No.", "No.");
-                    recSalesLine.SetRange(Type, recSalesLine.Type::Item);
-                    recSalesLine.SetRange("Quantity Invoiced", 0);
-                    if recSalesLine.FindSet() then
-                        repeat
-                            if not recSalesLine."Skip Posting Group Validation" then begin
-                                ValidateField(1, 1,
-                                  FieldCaption("Gen. Bus. Posting Group"), Format("Document Type"), "No.", recSalesLine."Line No.", recSalesLine."Gen. Bus. Posting Group", recAddPostGrpSetup."Gen. Bus. Posting Group", recBilltoCust."Gen. Bus. Posting Group");
-                                ValidateField(1, 1, FieldCaption("VAT Bus. Posting Group"), Format("Document Type"), "No.", recSalesLine."Line No.", recSalesLine."VAT Bus. Posting Group", recAddPostGrpSetup."VAT Bus. Posting Group", recBilltoCust."VAT Bus. Posting Group");
-                                ValidateField(1, 1, recSalesLine.FieldCaption("VAT Prod. Posting Group"), Format("Document Type"), "No.", recSalesLine."Line No.", recSalesLine."VAT Prod. Posting Group", recAddPostGrpSetup."VAT Prod. Posting Group", '');
-                            end;
-                        until recSalesLine.Next() = 0;
-                end else
-                    ValidateCustomer := true;
-            end else
-                ValidateCustomer := true;
-
-            if ValidateCustomer then begin
-                recBilltoCust.Get("Bill-to Customer No.");
-                recSelltoCust.Get("Sell-to Customer No.");
-
-                // Sales Header
-                if not "Skip Posting Group Validation" then begin
+                if not Rec."Skip Posting Group Validation" then begin
                     if GuiAllowed() then
-                        ValidateField(0, 0, FieldCaption("Currency Code"), Format("Document Type"), "No.", 0, "Currency Code", recBilltoCust."Currency Code", '');
-                    ValidateField(0, 1, FieldCaption("Gen. Bus. Posting Group"), Format("Document Type"), "No.", 0, "Gen. Bus. Posting Group", recBilltoCust."Gen. Bus. Posting Group", '');
-                    ValidateField(0, 1, FieldCaption("VAT Bus. Posting Group"), Format("Document Type"), "No.", 0, "VAT Bus. Posting Group", recBilltoCust."VAT Bus. Posting Group", '');
-                    ValidateField(0, 1, FieldCaption("Customer Posting Group"), Format("Document Type"), "No.", 0, "Customer Posting Group", recBilltoCust."Customer Posting Group", '');
+                        ValidateField(1, 0, Rec.FieldCaption("Currency Code"), Format(Rec."Document Type"), Rec."No.", 0, Rec."Currency Code", recAddPostGrpSetup."Currency Code", recBilltoCust."Currency Code");
+                    ValidateField(1, 1, Rec.FieldCaption("Gen. Bus. Posting Group"), Format(Rec."Document Type"), Rec."No.", 0, Rec."Gen. Bus. Posting Group", recAddPostGrpSetup."Gen. Bus. Posting Group", recBilltoCust."Gen. Bus. Posting Group");
+                    ValidateField(1, 1, Rec.FieldCaption("VAT Bus. Posting Group"), Format(Rec."Document Type"), Rec."No.", 0, Rec."VAT Bus. Posting Group", recAddPostGrpSetup."VAT Bus. Posting Group", recBilltoCust."VAT Bus. Posting Group");
+                    ValidateField(1, 1, Rec.FieldCaption("Customer Posting Group"), Format(Rec."Document Type"), Rec."No.", 0, Rec."Customer Posting Group", recAddPostGrpSetup."Customer Posting Group", recBilltoCust."Customer Posting Group");
                 end;
-                if Invoice and (not "eCommerce Order") then
-                    if ZGT.IsRhq() and ZGT.IsZComCompany() and ("Bill-to Customer No." <> "Sell-to Customer No.") then
-                        ValidateField(0, 1, FieldCaption("Ship-to VAT"), Format("Document Type"), "No.", 0, copystr("Ship-to VAT", 1, 20), recSelltoCust."VAT Registration No.", '')
+                if Rec.Invoice and (not Rec."eCommerce Order") then
+                    if ZGT.IsRhq() and
+                       ((ZGT.IsZComCompany() and (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.")) or (ZGT.IsZNetCompany()))
+                    then
+                        ValidateField(1, 1, Rec.FieldCaption("Ship-to VAT"), Format(Rec."Document Type"), Rec."No.", 0, copystr(Rec."Ship-to VAT", 1, 20), recAddPostGrpSetup."VAT Registration No.", '')
                     else
-                        ValidateField(0, 1, FieldCaption("VAT Registration No."), Format("Document Type"), "No.", 0, "VAT Registration No.", recBilltoCust."VAT Registration No.", '');
+                        ValidateField(1, 1, Rec.FieldCaption("VAT Registration No."), Format(Rec."Document Type"), Rec."No.", 0, Rec."VAT Registration No.", recAddPostGrpSetup."VAT Registration No.", '');
 
-                // Sales Line
-                recSalesLine.SetRange("Document Type", "Document Type");
-                recSalesLine.SetRange("Document No.", "No.");
+                recSalesLine.SetRange("Document Type", Rec."Document Type");
+                recSalesLine.SetRange("Document No.", Rec."No.");
                 recSalesLine.SetRange(Type, recSalesLine.Type::Item);
                 recSalesLine.SetRange("Quantity Invoiced", 0);
                 if recSalesLine.FindSet() then
                     repeat
                         if not recSalesLine."Skip Posting Group Validation" then begin
-                            ValidateField(0, 1, FieldCaption("Gen. Bus. Posting Group"), Format("Document Type"), "No.", recSalesLine."Line No.", recSalesLine."Gen. Bus. Posting Group", recBilltoCust."Gen. Bus. Posting Group", '');
-                            ValidateField(0, 1, FieldCaption("VAT Bus. Posting Group"), Format("Document Type"), "No.", recSalesLine."Line No.", recSalesLine."VAT Bus. Posting Group", recBilltoCust."VAT Bus. Posting Group", '');
+                            ValidateField(1, 1,
+                              Rec.FieldCaption("Gen. Bus. Posting Group"), Format(Rec."Document Type"), Rec."No.", recSalesLine."Line No.", recSalesLine."Gen. Bus. Posting Group", recAddPostGrpSetup."Gen. Bus. Posting Group", recBilltoCust."Gen. Bus. Posting Group");
+                            ValidateField(1, 1, Rec.FieldCaption("VAT Bus. Posting Group"), Format(Rec."Document Type"), Rec."No.", recSalesLine."Line No.", recSalesLine."VAT Bus. Posting Group", recAddPostGrpSetup."VAT Bus. Posting Group", recBilltoCust."VAT Bus. Posting Group");
+                            ValidateField(1, 1, recSalesLine.FieldCaption("VAT Prod. Posting Group"), Format(Rec."Document Type"), Rec."No.", recSalesLine."Line No.", recSalesLine."VAT Prod. Posting Group", recAddPostGrpSetup."VAT Prod. Posting Group", '');
                         end;
                     until recSalesLine.Next() = 0;
+            end else
+                ValidateCustomer := true;
+        end else
+            ValidateCustomer := true;
+
+        if ValidateCustomer then begin
+            recBilltoCust.Get(Rec."Bill-to Customer No.");
+            recSelltoCust.Get(Rec."Sell-to Customer No.");
+
+            // Sales Header
+            if not Rec."Skip Posting Group Validation" then begin
+                if GuiAllowed() then
+                    ValidateField(0, 0, Rec.FieldCaption("Currency Code"), Format(Rec."Document Type"), Rec."No.", 0, Rec."Currency Code", recBilltoCust."Currency Code", '');
+                ValidateField(0, 1, Rec.FieldCaption("Gen. Bus. Posting Group"), Format(Rec."Document Type"), Rec."No.", 0, Rec."Gen. Bus. Posting Group", recBilltoCust."Gen. Bus. Posting Group", '');
+                ValidateField(0, 1, Rec.FieldCaption("VAT Bus. Posting Group"), Format(Rec."Document Type"), Rec."No.", 0, Rec."VAT Bus. Posting Group", recBilltoCust."VAT Bus. Posting Group", '');
+                ValidateField(0, 1, Rec.FieldCaption("Customer Posting Group"), Format(Rec."Document Type"), Rec."No.", 0, Rec."Customer Posting Group", recBilltoCust."Customer Posting Group", '');
             end;
+            if Rec.Invoice and (not Rec."eCommerce Order") then
+                if ZGT.IsRhq() and ZGT.IsZComCompany() and (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.") then
+                    ValidateField(0, 1, Rec.FieldCaption("Ship-to VAT"), Format(Rec."Document Type"), Rec."No.", 0, copystr(Rec."Ship-to VAT", 1, 20), recSelltoCust."VAT Registration No.", '')
+                else
+                    ValidateField(0, 1, Rec.FieldCaption("VAT Registration No."), Format(Rec."Document Type"), Rec."No.", 0, Rec."VAT Registration No.", recBilltoCust."VAT Registration No.", '');
+
+            // Sales Line
+            recSalesLine.SetRange("Document Type", Rec."Document Type");
+            recSalesLine.SetRange("Document No.", Rec."No.");
+            recSalesLine.SetRange(Type, recSalesLine.Type::Item);
+            recSalesLine.SetRange("Quantity Invoiced", 0);
+            if recSalesLine.FindSet() then
+                repeat
+                    if not recSalesLine."Skip Posting Group Validation" then begin
+                        ValidateField(0, 1, Rec.FieldCaption("Gen. Bus. Posting Group"), Format(Rec."Document Type"), Rec."No.", recSalesLine."Line No.", recSalesLine."Gen. Bus. Posting Group", recBilltoCust."Gen. Bus. Posting Group", '');
+                        ValidateField(0, 1, Rec.FieldCaption("VAT Bus. Posting Group"), Format(Rec."Document Type"), Rec."No.", recSalesLine."Line No.", recSalesLine."VAT Bus. Posting Group", recBilltoCust."VAT Bus. Posting Group", '');
+                    end;
+                until recSalesLine.Next() = 0;
         end;
+        //end;
     end;
 
     local procedure ValidateField(Type: Option Customer,"Additional Setup"; "Confirm/Error": Option Confirm,Error; Fieldname: Text; DocumentType: Text; DocumentNo: Code[20]; LineNo: Integer; Value1: Code[20]; Value2: Code[20]; BillToCustValue: Code[20])

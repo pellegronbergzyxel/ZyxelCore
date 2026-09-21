@@ -138,25 +138,39 @@ Table 76131 "Vendor Template"
 
     var
         GenBusPostingGrp: Record "Gen. Business Posting Group";
-        DimMgt: Codeunit DimensionManagement;
         greSetup: Record "Purchases & Payables Setup";
-        gcuNoSeriesMgt: Codeunit NoSeriesManagement;
+        DimMgt: Codeunit DimensionManagement;
+        gcuNoSeriesMgt: Codeunit "No. Series"; //UpgradeReady
 
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
         DimMgt.SaveDefaultDim(Database::"Vendor Template", Code, FieldNumber, ShortcutDimCode);
-        Modify;
+        Modify();
     end;
 
 
     procedure AssistEdit(): Boolean
+    var
+        Ishandled: Boolean; //UpgradeReady
+        NoSeriesCode: Code[20]; //UpgradeReady
     begin
-        greSetup.Get;
-        greSetup.TestField("Vendor Nos.");
-        if gcuNoSeriesMgt.SelectSeries(greSetup."Vendor Nos.", "No. Series", "No. Series") then begin
-            exit(true);
-        end;
+        greSetup.Get();
+        //UpgradeReady
+        Ishandled := false;
+        if not Ishandled then
+            if rec.Code = '' then begin
+                greSetup.TestField("Vendor Nos.");
+                NoSeriesCode := greSetup."Vendor Nos.";
+                rec."No. Series" := copystr(NoSeriesCode, 1, 10);
+
+                if gcuNoSeriesMgt.AreRelated(rec."No. Series", xrec."No. Series") then
+                    rec."No. Series" := xrec."No. Series";
+
+                Rec.Code := copystr(gcuNoSeriesMgt.GetNextNo(rec."No. Series", 0D), 1, 10);
+                exit(true);
+            end;
+        //UpgradeReady        
     end;
 }

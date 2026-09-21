@@ -385,6 +385,7 @@ codeunit 50067 "Sales Header/Line Events"
         Rec."Order Desk Resposible Code" := "GetSale/PurchCode"(recCust."Order Desk Resposible Code", 1);
         Rec."Intercompany Purchase" := recCust."Intercompany Purchase";
         Rec."Customer Price Group" := recCust."Customer Price Group";  //Keep Customer price group from Sell-To Customer
+        rec."Combine Eicard Shipments" := recCust."Combine Eicard Shipments"; //17-09-2026 BK #576888
 
         CreateDim_SellToCustomerNo(Rec, xRec);
 
@@ -427,7 +428,7 @@ codeunit 50067 "Sales Header/Line Events"
             recSalesLine.SetRange(Type, recSalesLine.Type::Item);
             if recSalesLine.FindSet(true) then
                 repeat
-                    recSalesLine.Validate("Ship-to Code", GetShipToCodeForSalesLine(Rec));
+                    recSalesLine.Validate("Ship-to Code", Copystr(GetShipToCodeForSalesLine(Rec), 1, 20));
                     recSalesLine.Modify(true);
                 until recSalesLine.Next() = 0;
         end;
@@ -455,7 +456,7 @@ codeunit 50067 "Sales Header/Line Events"
             recSalesLine.SetRange(Type, recSalesLine.Type::Item);
             if recSalesLine.FindSet() then
                 repeat
-                    recSalesLine.Validate("Ship-to Code", GetShipToCodeForSalesLine(Rec));
+                    recSalesLine.Validate("Ship-to Code", Copystr(GetShipToCodeForSalesLine(Rec), 1, 20));
                     recSalesLine.Modify(true);
                 until recSalesLine.Next() = 0;
         end;
@@ -693,7 +694,6 @@ codeunit 50067 "Sales Header/Line Events"
 
     begin
         if SalesHeader."From CDC" then //05-03-2026 BK #549826
-            begin
             if Location.get(SalesHeader."Location Code") then begin
                 if Location."Sales Order Type" <> 0 then
                     SalesHeader."Sales Order Type" := Location."Sales Order Type";
@@ -703,7 +703,6 @@ codeunit 50067 "Sales Header/Line Events"
                 else
                     SalesHeader."Eicard Type" := SalesHeader."eicard type"::" ";
             End;
-        end;
 
         // If the location code has changed we change it back again.
         if ((SalesHeader."Sales Order Type" <> SalesHeader."Sales Order Type"::" ") and (SalesHeader."Sales Order Type" <> SalesHeader."Sales Order Type"::"G/L Account")) and
@@ -1533,11 +1532,10 @@ codeunit 50067 "Sales Header/Line Events"
                         if ItemReference.FindFirst() then
                             if (itemReference."Unit of Measure" = salesline."Unit of Measure Code") or (itemReference."Unit of Measure" = '') then
                                 ishandled := true;
-                    end else begin
+                    end else
                         if (itemreference."Item No." = salesline."No.") and (itemreference."Reference Type" = itemreference."Reference Type"::Customer) and (itemreference."Reference Type No." = salesline."Sell-to Customer No.") then
                             if (itemReference."Unit of Measure" = salesline."Unit of Measure Code") or (itemReference."Unit of Measure" = '') then
                                 ishandled := true;
-                    end;
     end;
 
 
@@ -1859,7 +1857,7 @@ codeunit 50067 "Sales Header/Line Events"
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeValidateEvent', 'Zero Unit Price Accepted', false, false)]
     local procedure OnBeforeValidateZeroUnitPriceAccepted(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
     begin
-        Rec.TestStatusOpen;
+        Rec.TestStatusOpen();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterValidateEvent', 'Gen. Prod. Posting Group', false, false)]
@@ -1915,16 +1913,12 @@ codeunit 50067 "Sales Header/Line Events"
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterValidateEvent', 'Unit Cost', false, false)]
     local procedure OnAfterValidateSLUnitCost(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
-    var
-        recGenBusPostGrp: Record "Gen. Business Posting Group";
     begin
         UpdateUnitPrice(Rec, xRec, CurrFieldNo, true);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterValidateEvent', 'Unit Cost (LCY)', false, false)]
     local procedure OnAfterValidateSLUnitCostLCY(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
-    var
-        recGenBusPostGrp: Record "Gen. Business Posting Group";
     begin
         UpdateUnitPrice(Rec, xRec, CurrFieldNo, true);
     end;

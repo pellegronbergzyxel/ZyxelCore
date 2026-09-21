@@ -56,12 +56,12 @@ report 50044 SalesClaimRebateReportZX
                 SalesLineTmp.TransferFields("Sales Invoice Line");
                 SalesLineTmp.Amount := -SalesLineTmp.Amount;
                 //21-08-2026 BK #567340
-                // if zgt.IsZNetCompany() then
-                //     if SalesLineTmp."External Document No." <> '' then
-                //         if SalesInvoiceHeader.get("Sales Invoice Line"."Document No.") then
-                //             if SalesInvoiceHeader."External Document No." <> '' then
-                //                 SalesLineTmp."External Document No." := SalesInvoiceHeader."External Document No.";
-                // SalesLineTmp.Insert();
+                if zgt.IsZNetCompany() then
+                    if SalesLineTmp."External Document No." <> '' then
+                        if SalesInvoiceHeader.get("Sales Invoice Line"."Document No.") then
+                            if SalesInvoiceHeader."External Document No." <> '' then
+                                SalesLineTmp."External Document No." := SalesInvoiceHeader."External Document No.";
+                SalesLineTmp.Insert();
             end;
 
             trigger OnPostDataItem()
@@ -197,7 +197,6 @@ report 50044 SalesClaimRebateReportZX
         recReturnReason: Record "Return Reason";
         recReturnReasonTmp: Record "Return Reason" temporary;
         SalesInvoiceHeader: Record "Sales Invoice Header"; //21-08-2026 BK #567340
-        SalesCreditMemoHeader: Record "Sales Cr.Memo Header"; //21-08-2026 BK #567340
         ZGT: Codeunit "ZyXEL General Tools";
         Text001: Label 'Return Reason Code';
         Text002: Label 'Return Reason Description';

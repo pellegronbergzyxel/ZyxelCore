@@ -1,16 +1,6 @@
 XmlPort 50059 "Read Purchase Order Response"
 {
-    // 001. 19-02-19 PAB - Updated for new NAV XML
-    // 002. 24-10-19 ZY-LD 2019102210000083 - SerialNumber tag added, because the tag occurs in some files.
-    // 003. 10-01-20 ZY-LD 000 - MinOccurs is set to Zero on Value1..Value9.
-    // 004. 20-03-20 ZY-LD P0388 - Set Order Type Option, and set correct "Customer Reference". We don´t get it correct from VCK.
-    // 005. 10-12-20 ZY-LD P0499 - It happens that a sales return order is sent to the warehouse twice, and they respond on the first document which we have deleted.
-    // 006. 11-10-21 ZY-LD 2021101110000036 - We have seen that the "Customer Message No." on an EDI response from VCK had a reference to another warehouse inbound.
-    // 007. 01-04-22 ZY-LD 000 - Adjustments made for VCK upgrade.
-    // 008. 20-04-22 ZY-LD 000 - We can receive responses with the same status. If the previous haven´t been posted we will close it and use the newest.
-    // 009. 24-06-22 ZY-LD 2022062410000116 - Index is decimal, but we are not using it, so therefore we don´t import it.
-    // 010. 14-04-23 ZY-LD 000 - Before VCK upgrade the field had a value. I have asked VCK to fillin the value again.
-    // 011. 20-03-24 ZY-LD 000 - I don´t know why the other record was used, but it should be like this.
+
 
     Caption = 'Read Purchase Order Response';
     DefaultNamespace = 'http://Allin.BizTalk.Schemas.ZyXELSP_BTS_Response_PO';
@@ -44,16 +34,14 @@ XmlPort 50059 "Read Purchase Order Response"
 
                 trigger OnAfterAssignField()
                 begin
-                    //>> 20-03-20 ZY-LD 004
                     case "Rcpt. Response Header"."Order Type" of
                         'PO':
                             "Rcpt. Response Header"."Order Type Option" := "Rcpt. Response Header"."order type option"::"Purchase Order";
                         'SR':
                             "Rcpt. Response Header"."Order Type Option" := "Rcpt. Response Header"."order type option"::"Sales Return Order";
                         'TO':
-                            "Rcpt. Response Header"."Order Type Option" := "Rcpt. Response Header"."order type option"::"Transfer Order";  // 10-12-20 ZY-LD 005
+                            "Rcpt. Response Header"."Order Type Option" := "Rcpt. Response Header"."order type option"::"Transfer Order";
                     end;
-                    //<< 20-03-20 ZY-LD 004
                 end;
             }
             textelement(ShipmentNo)
@@ -62,8 +50,7 @@ XmlPort 50059 "Read Purchase Order Response"
 
                 trigger OnAfterAssignVariable()
                 begin
-                    //recRcptRespHead."Shipment No." := CopyStr(ShipmentNo, 1, MaxStrLen(recRcptRespHead."Shipment No."));  // 20-03-24 ZY-LD 011
-                    "Rcpt. Response Header"."Shipment No." := CopyStr(ShipmentNo, 1, MaxStrLen("Rcpt. Response Header"."Shipment No."));  // 20-03-24 ZY-LD 011
+                    "Rcpt. Response Header"."Shipment No." := CopyStr(ShipmentNo, 1, MaxStrLen("Rcpt. Response Header"."Shipment No."));
                 end;
             }
             textelement(ShipperReference)
@@ -300,8 +287,6 @@ XmlPort 50059 "Read Purchase Order Response"
 
                     trigger OnAfterInitRecord()
                     begin
-                        // "Rcpt. Response Line"."Order No." := "Rcpt. Response Header"."Order No.";
-                        // "Rcpt. Response Line"."Entry No." := "Rcpt. Response Header"."Entry No.";
                         "Rcpt. Response Line"."Response No." := "Rcpt. Response Header"."No.";
                         "Rcpt. Response Line"."Response Line No." := LineNo;
                         LineNo += 10000;
@@ -311,62 +296,45 @@ XmlPort 50059 "Read Purchase Order Response"
 
             trigger OnBeforeInsertRecord()
             begin
-                //recRespHead."No." := NoSeriesMgt.GetNextNo(recWhseSetup."Whse. Rcpt Response Nos.",TODAY,TRUE);
-
-                // recRespHead.SETRANGE("Order No.","Rcpt. Response Header"."Order No.");
-                // IF recRespHead.FINDLAST THEN
-                //  "Rcpt. Response Header"."Entry No." := recRespHead."Entry No." + 1
-                // ELSE
-                //  "Rcpt. Response Header"."Entry No." := 1;
 
                 Evaluate(StatusInt, "Rcpt. Response Header".Status);
                 "Rcpt. Response Header"."Warehouse Status" := StatusInt / 10;
-                /*IF "Rcpt. Response Header"."Warehouse Status" <> "Rcpt. Response Header"."Warehouse Status"::"On Stock" THEN  // 20-03-20 ZY-LD 004
-                  "Rcpt. Response Header".Open := FALSE;*/
                 "Rcpt. Response Header"."File Management Entry No." := gFileMgtEntryNo;
 
-                if "Rcpt. Response Header"."Customer Message No." <> '' then begin  // 22-08-24 ZY-LD 012
-                    //>> 17-04-20 ZY-LD 004
+                if "Rcpt. Response Header"."Customer Message No." <> '' then begin
                     recWhseIndbHead.SetRange("Message No.", "Rcpt. Response Header"."Customer Message No.");
-                    if recWhseIndbHead.FindFirst then
-                        //>> 11-10-21 ZY-LD 006
-                        if ("Rcpt. Response Header"."Customer Reference" <> recWhseIndbHead."No.") then begin
+                    if recWhseIndbHead.FindFirst() then
+                        if ("Rcpt. Response Header"."Customer Reference" <> recWhseIndbHead."No.") then
                             "Rcpt. Response Header"."After Post Description" :=
                               StrSubstNo(Text003,
                                 "Rcpt. Response Header".FieldCaption("Customer Message No."),
                                 "Rcpt. Response Header"."Customer Message No.",
                                 recWhseIndbHead.TableCaption,
-                                recWhseIndbHead."No.");
-                        end else  //<< 11-10-21 ZY-LD 006
+                                recWhseIndbHead."No.")
+                        else
                             "Rcpt. Response Header"."Customer Reference" := recWhseIndbHead."No.";
-                    //<< 17-04-20 ZY-LD 004
                 end else begin
-                    //>> 22-08-24 ZY-LD 012
                     recWhseIndbHead.SetRange("Shipper Reference", "Rcpt. Response Header"."Shipper Reference");
-                    if recWhseIndbHead.FindFirst then begin
+                    if recWhseIndbHead.FindFirst() then begin
                         "Rcpt. Response Header"."Customer Reference" := recWhseIndbHead."No.";
                         "Rcpt. Response Header"."Customer Message No." := recWhseIndbHead."Message No.";
                     end;
-                    //<< 22-08-24 ZY-LD 012
                 end;
 
-                //>> 10-12-20 ZY-LD 005
                 if "Rcpt. Response Header"."Order Type Option" = "Rcpt. Response Header"."order type option"::"Sales Return Order" then begin
-                    recWhseIndbHead.Reset;
+                    recWhseIndbHead.Reset();
                     if not recWhseIndbHead.Get("Rcpt. Response Header"."Customer Reference") then begin
-                        "Rcpt. Response Header".TestField("Shipment No.");  // 14-04-23 ZY-LD 010
+                        "Rcpt. Response Header".TestField("Shipment No.");
                         recWhseIndbHead.SetRange("Shipment No.", "Rcpt. Response Header"."Shipment No.");
-                        if recWhseIndbHead.FindFirst then
+                        if recWhseIndbHead.FindFirst() then
                             "Rcpt. Response Header"."Customer Reference" := recWhseIndbHead."No.";
                     end;
                 end;
-                //<< 10-12-20 ZY-LD 005
 
-                //>> 20-04-22 ZY-LD 008
                 recRcptRespHead.SetRange("Customer Message No.", "Rcpt. Response Header"."Customer Message No.");
                 recRcptRespHead.SetRange(Status, "Rcpt. Response Header".Status);
                 recRcptRespHead.SetRange(Open, true);
-                if recRcptRespHead.FindLast then begin
+                if recRcptRespHead.FindLast() then begin
                     recRcptRespLine.SetRange("Response No.", recRcptRespHead."No.");
                     if recRcptRespLine.FindSet(true) then
                         repeat
@@ -376,22 +344,18 @@ XmlPort 50059 "Read Purchase Order Response"
 
                     recRcptRespHead."After Post Description" := Text004;
                 end;
-                //<< 20-04-22 ZY-LD 008
 
             end;
         }
     }
 
     trigger OnInitXmlPort()
-    var
-        recVCKPOResponseHeader: Record "Rcpt. Response Header";
-        recVCKPOResponseLine: Record "Rcpt. Response Line";
     begin
     end;
 
     trigger OnPreXmlPort()
     begin
-        recWhseSetup.Get;
+        recWhseSetup.Get();
         recWhseSetup.TestField("Whse. Ship Response Nos.");
         LineNo := 10000;
     end;
@@ -402,12 +366,9 @@ XmlPort 50059 "Read Purchase Order Response"
         recRcptRespHead: Record "Rcpt. Response Header";
         recRcptRespLine: Record "Rcpt. Response Line";
         VCKXML: Codeunit "VCK Communication Management";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
         StatusInt: Integer;
         gFileMgtEntryNo: Integer;
         LineNo: Integer;
-        Text001a: label 'The location code of the VCK warehouse has not been set in the Sales & Receivables Setup.';
-        Text002a: label 'VCK Integration has not been setup correctly in Inventory Setup.';
         Text003: label '"%1" "%2" refers to "%3" %4.';
         Text004: label 'Response is closed/replaced by next document with same status.';
 

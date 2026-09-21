@@ -1,21 +1,15 @@
 PageExtension 50126 SalesOrderZX extends "Sales Order"
 {
-    // 001. 05-02-24 ZY-LD 000 - We have made our own "Item Warehouse Detail" because of the location filter.
-    // 002. 12-03-24 ZY-LD #1536814 - "Ship-to Address" is made editable.
-    // 003. 11-04-24 ZY-LD #2386066 - ItemBudgMgt.GetSOForecast has been add an extra parameter.
-    // 004. 20-05-24 ZY-LD 000 - "Ship-to Code Del. Doc";
     layout
     {
         addlast("Foreign Trade")
         {
-            // 473070 >>
-            // removed -> standard
             field("Send IC Document"; Rec."Send IC Document")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = true;
+                ToolTip = 'Specification of send IC documents';
             }
-            // 473070 >>
 
         }
         modify("Promised Delivery Date")
@@ -99,7 +93,7 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
         {
             trigger OnAfterValidate()
             begin
-                SetActions();  // 01-02-19 ZY-LD 016
+                SetActions();
                 CurrPage.UPDATE(FALSE);
             end;
         }
@@ -109,9 +103,8 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
         }
         modify(Control1901796907)
         {
-            Visible = false;  // 05-02-24 ZY-LD 001
+            Visible = false;
         }
-        //>> 05-02-24 ZY-LD 001
         addafter(Control1907012907)
         {
             part(ItemWarehouseFactBoxPart; "Item Warehouse FactBox")
@@ -133,22 +126,16 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                 Visible = false;
             }
         }
-        //<< 05-02-24 ZY-LD 001
         addafter("No.")
         {
             field("Sales Order Type"; Rec."Sales Order Type")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specification of Sales Order Type';
 
                 trigger OnValidate()
                 begin
-                    //15-51643 -
-                    //>> 25-06-19 ZY-LD 020
-                    //IF "Sales Order Type" = "Sales Order Type"::EICard THEN
-                    //  EnableEiCards(TRUE) ELSE EnableEiCards(FALSE)
-                    //15-51643 +
                     SetActions();
-                    //<< 25-06-19 ZY-LD 020
                 end;
             }
         }
@@ -158,13 +145,14 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
             {
                 ApplicationArea = Basic, Suite;
                 Visible = ShipReqNotesVisible;
+                ToolTip = 'Specification of Shipping Request Notes';
             }
         }
         modify("Location Code")
         {
             trigger OnAfterValidate()
             begin
-                SetActions();  // 01-02-19 ZY-LD 016
+                SetActions();
             end;
         }
         addafter("Location Code")
@@ -173,6 +161,7 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
             {
                 ApplicationArea = Basic, Suite;
                 Visible = EiCardVisible;
+                ToolTip = 'Specification of Eicard Type';
             }
             group(ExternalRef)
             {
@@ -180,27 +169,32 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                 field("External Document No. End Cust"; Rec."External Document No. End Cust")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specification of Exernal Document No. End Cust';
                 }
                 field("E-Invoice Comment"; Rec."E-Invoice Comment")
                 {
                     ApplicationArea = Basic, Suite;
                     Enabled = EInvoiceCommentEnable;
                     ShowMandatory = EInvoiceCommentEnable;
+                    ToolTip = 'Specification of E-Invoice Comment';
                 }
             }
             field("Customer Document No."; Rec."Customer Document No.")
             {
                 ApplicationArea = Basic, Suite;
                 Importance = Additional;
+                ToolTip = 'Specification of Customer Document No.';
             }
             field("SAP No."; Rec."SAP No.")
             {
                 ApplicationArea = Basic, Suite;
                 Importance = Additional;
+                ToolTip = 'Specification of SAP No.';
             }
             field("Backlog Comment"; Rec."Backlog Comment")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specification of Backlog Comment';
             }
         }
         movebefore("External Document No. End Cust"; "External Document No.")
@@ -209,12 +203,14 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
             field("Order Desk Resposible Code"; Rec."Order Desk Resposible Code")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specification of Order Desk Resposible Code';
             }
             field(SystemCreatedBy; CreatedUserName)
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Created By';
                 Visible = false;
+                ToolTip = 'Specification of Created User Name';
             }
 
         }
@@ -240,28 +236,30 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
             {
                 ApplicationArea = Basic, Suite;
                 Importance = Additional;
-                //Visible = VATRegistrationNoSellToVisible;  // 12-02-24 ZY-LD 000
+                ToolTip = 'Specification of Ship-to VAT';
             }
             field("VAT Registration No. Zyxel"; Rec."VAT Registration No. Zyxel")
             {
                 ApplicationArea = Basic, Suite;
                 Importance = Additional;
+                ToolTip = 'Specification of VAT Registration No. Zyxel';
             }
             field("Send Mail"; Rec."Send Mail")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specification of Send Mail';
             }
         }
         modify("Ship-to Country/Region Code")
         {
             trigger OnAfterValidate()
             begin
-                SetActions();  // 01-02-19 ZY-LD 016
+                SetActions();
             end;
         }
         modify("Ship-to Address 2")
         {
-            Editable = true;  // 12-03-24 ZY-LD 
+            Editable = true;
             ToolTip = 'If you want the contact person shown on the delivery note from the warehouse you must there it here.';
         }
         addafter("Currency Code")
@@ -289,21 +287,33 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
+                ToolTip = 'Specification of Amazone PO. No.';
             }
             field(AmazconfirmationStatus; Rec.AmazconfirmationStatus)
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
+                ToolTip = 'Specification of Amazon confirmation Status';
             }
             field(AmazonpurchaseOrderState; Rec.AmazonpurchaseOrderState)
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
+                ToolTip = 'Specification of Amazon Purchase Order State';
             }
             field(AmazonSellpartyid; Rec.AmazonSellpartyid)
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
+                ToolTip = 'Specification of Amazon Sell party ID';
+            }
+        }
+        addafter("Combine Shipments") //17-09-2026 BK #576888
+        {
+            field("Combine Eicard Shipments"; Rec."Combine Eicard Shipments")
+            {
+                ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the Combine Eicard Shipments';
             }
         }
 
@@ -360,8 +370,8 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
             PromotedCategory = Process;
             trigger OnBeforeAction()
             var
-                CustReptMgt: Codeunit "Custom Report Management";
                 CustomReportSelection: Record "Custom Report Selection";
+                CustReptMgt: Codeunit "Custom Report Management";
                 tempmail2: text;
                 temptext: text;
             begin
@@ -369,14 +379,14 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                 if strlen(CustReptMgt.GetEmailAddress(Database::Customer, Rec."Sell-to Customer No.", CustomReportSelection.Usage::"S.Order", tempmail2)) > 80 then begin
                     temptext := CustReptMgt.GetEmailAddress(Database::Customer, Rec."Sell-to Customer No.", CustomReportSelection.Usage::"S.Order", tempmail2);
                     temptext := CopyStr(temptext, 1, StrPos(temptext, ';') - 1);
-                    rec."Sell-to E-Mail" := temptext;
+                    rec."Sell-to E-Mail" := copystr(temptext, 1, 80);
                 end else
-                    rec."Sell-to E-Mail" := CustReptMgt.GetEmailAddress(Database::Customer, Rec."Sell-to Customer No.", CustomReportSelection.Usage::"S.Order", tempmail2);
+                    rec."Sell-to E-Mail" := copystr(CustReptMgt.GetEmailAddress(Database::Customer, Rec."Sell-to Customer No.", CustomReportSelection.Usage::"S.Order", tempmail2), 1, 80);
             end;
 
             trigger OnAfterAction()
             begin
-                rec."Sell-to E-Mail" := Tempmail;
+                rec."Sell-to E-Mail" := copystr(Tempmail, 1, 80);
             end;
         }
         addafter("Warehouse Shipment Lines")
@@ -385,15 +395,13 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Delivery Document';
+                ToolTip = 'Specification of Warehouse Shipment Lines';
                 Image = Delivery;
                 RunObject = Page "VCK Delivery Document List";
                 RunPageLink = "Sell-to Customer No." = field("Sell-to Customer No."),
                               "Warehouse Status" = const(New);
             }
         }
-
-
-
         addafter(Prepayment)
         {
             action("Change Log")
@@ -403,6 +411,7 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                 Image = ChangeLog;
                 Promoted = true;
                 PromotedCategory = Process;
+                ToolTip = 'Specification of Change Log';
 
                 trigger OnAction()
                 var
@@ -427,6 +436,7 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                     RunObject = Page "EiCard Queue";
                     RunPageLink = "Sales Order No." = field("No.");
                     Visible = EiCardVisible;
+                    ToolTip = 'Specification of Eicard Queue';
                 }
             }
         }
@@ -442,13 +452,14 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                     Image = ImportExcel;
                     Promoted = true;
                     PromotedIsBig = true;
+                    ToolTip = 'Specification of Import Sales Order Lines';
 
                     trigger OnAction()
                     var
                         Import: Report "Import Sales Order Lines";
                     begin
                         Import.SetDocumentNo(Rec."No.");
-                        Import.Run
+                        Import.Run();
                     end;
                 }
                 action("GLC-Eicard")
@@ -458,6 +469,7 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                     Image = ImportExcel;
                     RunObject = Page "Config. Package Card";
                     RunPageView = where(Code = const('GLS-EICARD'));
+                    ToolTip = 'Specification of GLC Eicard';
                 }
             }
         }
@@ -469,14 +481,13 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                 Caption = 'Disable Additional Items';
                 Image = DisableAllBreakpoints;
                 Visible = DisableAddtionalItemsVisible;
+                ToolTip = 'Specification of Disable Additional Items';
 
                 trigger OnAction()
                 begin
-                    //>> 09-04-18 ZY-LD 006
                     SalesHeadEvent.DisableEnableAdditionalItems(Rec);
                     SetActions();
-                    CurrPage.Update;
-                    //<< 09-04-18 ZY-LD 006
+                    CurrPage.Update();
                 end;
             }
             action("Enable Additional Items")
@@ -485,14 +496,13 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                 Caption = 'Enable Additional Items';
                 Image = EnableAllBreakpoints;
                 Visible = enableAddtionalItemsVisible;
+                ToolTip = 'Specification of Enable Additional Items';
 
                 trigger OnAction()
                 begin
-                    //>> 09-04-18 ZY-LD 006
                     SalesHeadEvent.DisableEnableAdditionalItems(Rec);
                     SetActions();
-                    CurrPage.Update;
-                    //<< 09-04-18 ZY-LD 006
+                    CurrPage.Update();
                 end;
             }
         }
@@ -508,6 +518,7 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Send order acknowledgement to Anazon';
                     Image = UpdateXML;
+                    ToolTip = 'Specification of Send Order Acknowledgement to Anazon';
 
                     trigger OnAction()
                     var
@@ -515,8 +526,8 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                         Confirmtext: Label 'have you updated quantities on all lines? ';
                     begin
                         if confirm(Confirmtext, true) then begin
-                            AmazonHelper.SetAmazonOrderRejected(rec, rec.AmazonSellpartyid);
-                            commit;
+                            AmazonHelper.SetAmazonOrderRejected(rec, copystr(rec.AmazonSellpartyid, 1, 10));
+                            commit();
                             AmazonHelper.UpdateAmazonstatus(rec);
                         end;
 
@@ -527,11 +538,11 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Update status';
                     Image = UpdateXML;
+                    ToolTip = 'Specification of Update Status';
 
                     trigger OnAction()
                     var
                         AmazonHelper: Codeunit AmazonHelper;
-                        texttemp: text;
                     begin
                         AmazonHelper.UpdateAmazonstatus(rec);
 
@@ -543,11 +554,10 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Check rule - delivery window';
                     Image = UpdateXML;
-
+                    ToolTip = 'Specification of Check Rule - Delivery Window';
                     trigger OnAction()
                     var
                         AmazonHelper: Codeunit AmazonHelper;
-                        texttemp: text;
                     begin
                         AmazonHelper.autorejectSalesheader(rec);
 
@@ -558,29 +568,30 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Check rule - low order value';
                     Image = UpdateXML;
+                    ToolTip = 'Specification of Check Rule - Low Order Value';
 
                     trigger OnAction()
                     var
                         AmazonHelper: Codeunit AmazonHelper;
-                        texttemp: text;
                     begin
                         AmazonHelper.autorejectSalesheaderLowAmount(rec);
 
                     end;
                 }
-                    action(Submitshippinglabelrequest)
+                action(Submitshippinglabelrequest)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Submit Shipping Label Request';
                     Image = PostMail;
+                    ToolTip = 'Specification of Submit Shipping Label Request';
 
                     trigger OnAction()
                     var
                         AmazonHelper: Codeunit AmazonHelper;
-                        
+
                     begin
                         AmazonHelper.SubmitShippingLabelRequest(rec);
-                        
+
                     end;
                 }
 
@@ -589,13 +600,14 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Download packingSlips';
                     Image = Approval;
+                    ToolTip = 'Specification of Download PackingSlip';
 
                     trigger OnAction()
                     var
                         AmazonHelper: Codeunit AmazonHelper;
                         texttemp: text;
                     begin
-                        if AmazonHelper.GETAmazonOrderpackingSlips(texttemp, rec.AmazonSellpartyid, rec) then
+                        if AmazonHelper.GETAmazonOrderpackingSlips(texttemp, copystr(rec.AmazonSellpartyid, 1, 10), rec) then
                             message(texttemp);
                     end;
                 }
@@ -612,17 +624,15 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Auto Confirm';
                     Image = Approval;
+                    ToolTip = 'Specification of Auto Confirm';
 
                     trigger OnAction()
                     var
                         AutoConfirm: Codeunit "Pick. Date Confirm Management";
                     begin
-                        //>> 30-12-20 ZY-LD 029
-                        //AutoConfirm;  // 20-08-18 ZY-LD 001
                         SI.SetValidateFromPage(false);
                         AutoConfirm.PerformManuelConfirm(0, Rec."No.");
                         SI.SetValidateFromPage(true);
-                        //<< 30-12-20 ZY-LD 029
                     end;
                 }
                 action(PrintPickList1SO)
@@ -630,6 +640,7 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Print Picking List (for single SO only)';
                     Visible = false;
+                    ToolTip = 'Specification of Print Picking List';
 
                     trigger OnAction()
                     begin
@@ -646,13 +657,12 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Update Additional Items';
                     Image = UpdateDescription;
+                    ToolTip = 'Specification of Update Additional Items';
 
                     trigger OnAction()
                     begin
-                        //>> 20-11-18 ZY- 014
                         if Confirm(Text007) then
                             AddItemMgt.UpdateAdditionalItems(Rec."Document Type", Rec."No.", Rec."Ship-to Country/Region Code");
-                        //<< 20-11-18 ZY- 014
                     end;
                 }
                 action("Create Spec. Purchase Order")
@@ -661,15 +671,14 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                     Caption = 'Create Spec. Purchase Order';
                     Enabled = CreatePurchaseOrderEnable;
                     Image = CreateDocument;
+                    ToolTip = 'Specification of Create Spec. Purchase Order';
 
                     trigger OnAction()
                     begin
-                        //>> 24-02-20 ZY-LD 028
                         Rec.TestField(Rec.Status, Rec.Status::Released);
                         recSalesHead.SetRange("Document Type", Rec."Document Type");
                         recSalesHead.SetRange("No.", Rec."No.");
                         Report.RunModal(Report::"Create Purchase Order", true, false, recSalesHead);
-                        //<< 24-02-20 ZY-LD 028
                     end;
                 }
             }
@@ -687,7 +696,7 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
 
                     trigger OnAction()
                     begin
-                        DelDocMgt.PerformManuelCreation;
+                        DelDocMgt.PerformManuelCreation();
                     end;
                 }
                 action("Create Delivery Document")
@@ -702,7 +711,7 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                         ReleaseSalesDoc: Codeunit "Release Sales Document";
                     begin
                         ReleaseSalesDoc.Run(Rec);
-                        DelDocMgt.PerformCreationForSingleOrder(Rec."No.");  // 14-06-21 ZY-LD 030
+                        DelDocMgt.PerformCreationForSingleOrder(Rec."No.");
                     end;
                 }
             }
@@ -716,27 +725,24 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                     Enabled = EiCardEnable;
                     Image = Apply;
                     Visible = EiCardVisible;
+                    ToolTip = 'Specification of Add to Eicard Queue';
 
                     trigger OnAction()
                     var
-                        EiCardCodeUnit: Codeunit "ZyXEL EiCards";
                         recCust: Record Customer;
+                        EiCardCodeUnit: Codeunit "ZyXEL EiCards";
                     begin
                         if Rec.Status <> Rec.Status::Released then
                             Error(zyText002);
 
-                        //>> 31-01-20 ZY-LD 027
                         recCust.Get(Rec."Sell-to Customer No.");
                         if recCust.Blocked <> recCust.Blocked::" " then
                             recCust.FieldError(Blocked);
-                        //<< 31-01-20 ZY-LD 027
 
-                        //>> 06-09-19 ZY-LD 023
                         recEiCardQueue.SetRange(Active, true);
                         recEiCardQueue.SetRange("Sales Order No.", Rec."No.");
-                        if recEiCardQueue.FindFirst then
+                        if recEiCardQueue.FindFirst() then
                             Error(zyText003, Rec."No.");
-                        //<< 06-09-19 ZY-LD 023
                         EiCardCodeUnit.CreatePO(Rec);
                     end;
                 }
@@ -748,6 +754,7 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
                     RunObject = Page "EiCard Queue";
                     RunPageLink = "Sales Order No." = field("No.");
                     Visible = false;
+                    ToolTip = 'Specification of Eicard Queue';
                 }
             }
         }
@@ -755,22 +762,20 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
 
     trigger OnOpenPage()
     begin
-        SetActions();  // 09-04-18 ZY-LD 006
-        SI.SetRejectChangeLog(FALSE);  // 25-04-18 ZY-LD 007
+        SetActions();
+        SI.SetRejectChangeLog(FALSE);
 
-        //>> 30-09-19 ZY-LD 025
         IF (Rec."Sell-to Customer No." = '200122') OR (Rec."Sell-to Customer No." = '200150') THEN
             IF NOT recEiCardQueue.GET(Rec."No.") THEN BEGIN
                 recEiCardQueue.VALIDATE("Sales Order No.", Rec."No.");
                 recEiCardQueue.VALIDATE("Customer No.", Rec."Sell-to Customer No.");
                 recEiCardQueue.INSERT(TRUE);
             END;
-        //<< 30-09-19 ZY-LD 025
     end;
 
     trigger OnClosePage()
     begin
-        SI.SetRejectChangeLog(FALSE);  // 25-04-18 ZY-LD 007
+        SI.SetRejectChangeLog(FALSE);
     end;
 
     trigger OnAfterGetCurrRecord()
@@ -782,76 +787,42 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
     begin
         SetActions();
 
-        CreatedUserName := ZGT.GetFullUserName(Rec.SystemCreatedBy);
+        CreatedUserName := copystr(ZGT.GetFullUserName(Rec.SystemCreatedBy), 1, 80);
     end;
 
     var
         SalesOrderHeader: Record "Sales Header";
-        recSalesReceivablesSetup: Record "Sales & Receivables Setup";
-        recCust: Record Customer;
         recEiCardQueue: Record "EiCard Queue";
         recSalesHead: Record "Sales Header";
-        recServEnviron: Record "Server Environment";
         DelDocMgt: Codeunit "Delivery Document Management";
-        ItemBudgetManagement: Codeunit "Item Budget Management";
         SI: Codeunit "Single Instance";
         SalesHeadEvent: Codeunit "Sales Header/Line Events";
         ZyXELVCK: Codeunit "ZyXEL VCK";
         AddItemMgt: Codeunit "ZyXEL Additional Items Mgt";
         ZGT: Codeunit "ZyXEL General Tools";
-        ItemView: Boolean;
         EIFieldsEnable: Boolean;
         DisableAddtionalItemsVisible: Boolean;
         EnableAddtionalItemsVisible: Boolean;
         EInvoiceCommentEnable: Boolean;
         PostButtonsEnabled: Boolean;
-        ShipToCodeDelDocVisible: Boolean;  // 20-05-24 ZY-LD 000
+        ShipToCodeDelDocVisible: Boolean;
         EiCardVisible: Boolean;
         EiCardEnable: Boolean;
         ShipReqNotesVisible: Boolean;
         CreatePurchaseOrderEnable: Boolean;
         VATRegistrationNoSellToVisible: Boolean;
-        DeliveryDays: Integer;
-        SuggestedZone: Text[30];
         CreatedUserName: Text[80];
-        LogContentString: Text[100];
         Tempmail: text;
-        Text003: label 'You must specify a Distributor PO number before the order can be added to the queue.';
-        Text004: label 'Please enter "%1" on item no. %2. (Line %3).';
-        Text005: label 'This is Not an EDI Order.';
-        Text006: label 'An EDI Document Could not be found.';
         Text007: label 'Do you want to update Additional Items?';
-        zyText001: label 'Contact navsupport@zyxel.eu.';
         zyText002: label 'Status must be released before you can add to eicard queue.';
         zyText003: label 'EiCard Queue is already crated on sales order %1.';
-        zyText004: label 'Please customize ribbon, and restore defaults in the buttom right corner of the page.';
-        TextLabel1: label 'These are pre-defined post codes for the selected delivery zone. Please note that other post codes may be covered by this zone.';
-
-    local procedure TouchItemRecords()
-    var
-        recSalesLine: Record "Sales Line";
-        recItem: Record Item;
-    begin
-        recSalesLine.SetFilter("Document No.", Rec."No.");
-        recSalesLine.SetRange(Type, recSalesLine.Type::Item);
-        if recSalesLine.FindFirst then begin
-            repeat
-                recItem.Reset;
-                recItem.SetFilter("No.", recSalesLine."No.");
-                if recItem.FindFirst then begin
-                    recItem.Modify;
-                    Commit;
-                end;
-            until recSalesLine.Next() = 0;
-        end;
-    end;
 
     procedure EnableEiCards(Enable: Boolean)
     var
         recSetup: Record "Sales & Receivables Setup";
         IsEnabled: Boolean;
     begin
-        if recSetup.FindFirst then begin
+        if recSetup.FindFirst() then begin
             IsEnabled := recSetup."EiCard Automation Enabled";
         end;
         if IsEnabled = false then
@@ -865,61 +836,6 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
         Rec.Find('=');
     end;
 
-    local procedure AutoConfirm()
-    var
-        recSalesLine: Record "Sales Line";
-        recItem: Record Item;
-        Forecast: Decimal;
-        ItemBudgetManagement: Codeunit "Item Budget Management Ext.";
-        UpdateShip: Boolean;
-        AllinDates: Codeunit "Delivery Document Management";
-        ShipmentMonth: Integer;
-        ShipmentYear: Integer;
-        BeginDate: Date;
-        EndDate: Date;
-        DateFormula: DateFormula;
-        MonthFormula: Text[10];
-        YearFormula: Text[10];
-        CountryFilter: Text;
-    begin
-        //>> 05-07-19 ZY-LD 021
-        UpdateShip := Confirm('Do you want to update the shipment dates?');
-
-        ShipmentMonth := Date2dmy(Today, 2);
-        ShipmentYear := Date2dmy(Today, 3);
-        BeginDate := Dmy2date(1, ShipmentMonth, ShipmentYear);
-        EndDate := CalcDate('CM', CalcDate('<3M>', BeginDate));
-
-        recSalesLine.LockTable;
-        recSalesLine.SetRange("Document Type", Rec."Document Type");
-        recSalesLine.SetRange("Document No.", Rec."No.");
-        recSalesLine.SetRange("Shipment Date Confirmed", false);
-        recSalesLine.SetRange(recSalesLine.Type, recSalesLine.Type::Item);
-        recSalesLine.SetRange("Shipment Date", BeginDate, EndDate);
-        recSalesLine.SetRange("Additional Item Line No.", 0);
-        if recSalesLine.FindSet(true) then
-            repeat
-                recSalesLine.SetConfirmedDate(true);
-                recSalesLine.SetDontUpdateDeliveryDates(not UpdateShip);
-                recItem.SetRange("Location Filter", Rec."Location Code");
-                if recItem.Get(recSalesLine."No.") then begin
-                    // Calculate forecast
-                    MonthFormula := Format(Date2dmy(recSalesLine."Shipment Date", 2) - Date2dmy(Today, 2)) + 'M';
-                    YearFormula := Format(Date2dmy(recSalesLine."Shipment Date", 3) - Date2dmy(Today, 3)) + 'Y';
-                    Evaluate(DateFormula, MonthFormula + '+' + YearFormula);
-                    Forecast := ItemBudgetManagement.GetSOForecast(recSalesLine."Sell-to Customer No.", '', recSalesLine."No.", recSalesLine."Shortcut Dimension 1 Code", DateFormula, CountryFilter, false, false, false, false);
-
-                    if (recSalesLine.Quantity <= recItem.CalcAvailableStock(false)) and
-                       (recSalesLine.Quantity <= Forecast)
-                    then begin
-                        recSalesLine.Validate("Shipment Date Confirmed", true);
-                        recSalesLine.Modify;
-                    end;
-                end;
-            until recSalesLine.Next() = 0;
-        //<< 05-07-19 ZY-LD 021
-    end;
-
     local procedure SetActions()
     var
         recInvSetup: Record "Inventory Setup";
@@ -928,63 +844,29 @@ PageExtension 50126 SalesOrderZX extends "Sales Order"
         Cust: Record Customer;
         SalesHeadEvent: Codeunit "Sales Header/Line Events";
     begin
-        DisableAddtionalItemsVisible := not Rec."Disable Additional Items";  // 09-04-18 ZY-LD 006
-        EnableAddtionalItemsVisible := Rec."Disable Additional Items";  // 09-04-18 ZY-LD 006
-        recInvSetup.Get;  // 01-02-19 ZY-LD 016
-        EInvoiceCommentEnable := (Rec."Bill-to Country/Region Code" = 'IT') and (Rec."Location Code" = recInvSetup."AIT Location Code");  // 01-02-19 ZY-LD 016
+        DisableAddtionalItemsVisible := not Rec."Disable Additional Items";
+        EnableAddtionalItemsVisible := Rec."Disable Additional Items";
+        recInvSetup.Get();
+        EInvoiceCommentEnable := (Rec."Bill-to Country/Region Code" = 'IT') and (Rec."Location Code" = recInvSetup."AIT Location Code");
         PostButtonsEnabled :=
-          not Rec."Combine Shipments" or  // 01-11-19 ZY-LD 026
-          SalesHeadEvent.HidePostButtons(Rec."Location Code", Rec."No.");  // 13-03-19 ZY-LD 006
-        //>> 25-06-19 ZY-LD 020
-        recSalesSetup.Get;
+          not Rec."Combine Shipments" or
+          SalesHeadEvent.HidePostButtons(Rec."Location Code", Rec."No.");
+        recSalesSetup.Get();
         EiCardVisible := Rec."Sales Order Type" = Rec."sales order type"::EICard;
         EiCardEnable := recSalesSetup."EiCard Automation Enabled";
         EIFieldsEnable := recSalesSetup."EiCard Automation Enabled";
-        //<< 25-06-19 ZY-LD 020
-        ShipReqNotesVisible := (Rec."Sell-to Customer No." = recSalesSetup."Customer No. on Sister Company");  // 16-08-19 ZY-LD 022
-        //>> 24-02-20 ZY-LD 028
+        ShipReqNotesVisible := (Rec."Sell-to Customer No." = recSalesSetup."Customer No. on Sister Company");
         recPurchHead.SetRange("Special Order Sales No.", Rec."No.");
         CreatePurchaseOrderEnable :=
           (Rec."Sales Order Type" = Rec."sales order type"::"Spec. Order") and
-          ZGT.IsRhq and ZGT.IsZNetCompany and
-          not recPurchHead.FindFirst;
-        //<< 24-02-20 ZY-LD 028
-        //>> 18-08-21 ZY-LD 032
+          ZGT.IsRhq() and ZGT.IsZNetCompany() and
+          not recPurchHead.FindFirst();
         VATRegistrationNoSellToVisible :=
-          ZGT.IsRhq and
-          ((ZGT.IsZComCompany and (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.")) or  //<< 18-08-21 ZY-LD 032
-           (ZGT.IsZComCompany and (Rec."Ship-to Country/Region Code" <> Rec."Sell-to Country/Region Code")) or  // 09-02-24 ZY-LD 032
-           (ZGT.IsZNetCompany and (Rec."VAT Registration No." <> Rec."Ship-to VAT")));  // 28-10-21 ZY-LD 032
-        //>> 20-05-24 ZY-LD 005 
+          ZGT.IsRhq() and
+          ((ZGT.IsZComCompany() and (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.")) or
+           (ZGT.IsZComCompany() and (Rec."Ship-to Country/Region Code" <> Rec."Sell-to Country/Region Code")) or
+           (ZGT.IsZNetCompany() and (Rec."VAT Registration No." <> Rec."Ship-to VAT")));
         IF Cust.Get(Rec."Sell-to Customer No.") then
-            ShipToCodeDelDocVisible := ZGT.IsRhq and ZGT.IsZComCompany and Cust."Sample Account" and (Rec."Document Type" = Rec."Document Type"::Order) and (Rec."Sales Order Type" <> Rec."sales order type"::EICard);
-        //<< 20-05-24 ZY-LD 005
-    end;
-
-    local procedure ChangeSubCurrencyCode()
-    var
-        recCurrency: Record Currency;
-        GenericInputPage: Page "Generic Input Page";
-        lText001: label 'Currency Code Sales Document SUB';
-        lText002: label 'New SUB Currency Code';
-        NewCurr: Code[10];
-        lText003: label 'Current value of "%1" is "%2".';
-    begin
-        //>> 05-03-20 ZY-LD 029
-        GenericInputPage.SetPageCaption(lText001);
-        GenericInputPage.SetFieldCaption(lText002);
-        GenericInputPage.SetCode20(Rec."Currency Code Sales Doc SUB");
-        GenericInputPage.SetVisibleField(3);
-        if GenericInputPage.RunModal = Action::OK then begin
-            NewCurr := GenericInputPage.GetCode20;
-            if NewCurr <> Rec."Currency Code Sales Doc SUB" then begin
-                if NewCurr <> '' then
-                    recCurrency.Get(NewCurr);
-                Rec.Validate(Rec."Currency Code Sales Doc SUB", NewCurr);
-                Rec.Modify(true);
-            end;
-        end;
-        Message(lText003, Rec.FieldCaption(Rec."Currency Code Sales Doc SUB"), Rec."Currency Code Sales Doc SUB");
-        //<< 05-03-20 ZY-LD 029
+            ShipToCodeDelDocVisible := ZGT.IsRhq() and ZGT.IsZComCompany() and Cust."Sample Account" and (Rec."Document Type" = Rec."Document Type"::Order) and (Rec."Sales Order Type" <> Rec."sales order type"::EICard);
     end;
 }

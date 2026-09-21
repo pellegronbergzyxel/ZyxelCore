@@ -572,6 +572,12 @@ tableextension 50110 CustomerZX extends Customer
             Caption = 'Last Customer Credit Check';
             DataClassification = CustomerContent;
         }
+
+        field(67017; "Combine Eicard Shipments"; Boolean)
+        {
+            Caption = 'Combine Eicard Shipments'; //17-09-2026 BK #576888
+            DataClassification = CustomerContent;
+        }
     }
 
     fieldgroups

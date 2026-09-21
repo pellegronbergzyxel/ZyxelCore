@@ -243,11 +243,11 @@ codeunit 50087 "Zyxel General Event"
     var
         ReportLayoutList: Record "Report Layout List";
         ReportLayoutSelection: Record "Report Layout Selection";
-        CustomLayout: Integer;
+        CustomLayout: Boolean; //UpgradeReady
     begin
         if ReportLayoutSelection.Get(ReportID, CompanyName()) then begin
-            CustomLayout := ReportLayoutSelection.HasCustomLayout(ReportID);
-            if CustomLayout in [1, 2] then
+            CustomLayout := ReportLayoutSelection.HasExternalLayout(ReportID); //UpgradeReady
+            if CustomLayout then //UpgradeReady
                 exit;
         end;
 
@@ -445,37 +445,36 @@ codeunit 50087 "Zyxel General Event"
         i: Integer;
     begin
         Handled := true;
-        with SalesInvHeader do begin
-            if ZGT.IsRhq() then
-                if not recCountryShipDay.Get(SalesInvHeader."Ship-to Country/Region Code") then
-                    Clear(recCountryShipDay);
-            if (recCountryShipDay."Ship-To Code" <> '') and
-               (SalesInvHeader."Sales Order Type" = SalesInvHeader."Sales Order Type"::Normal)
-            then begin
-                recShiptoAdd.Get(SalesInvHeader."Bill-to Customer No.", recCountryShipDay."Ship-To Code");
+        //UpgradeReady
+        if ZGT.IsRhq() then
+            if not recCountryShipDay.Get(SalesInvHeader."Ship-to Country/Region Code") then
+                Clear(recCountryShipDay);
+        if (recCountryShipDay."Ship-To Code" <> '') and
+            (SalesInvHeader."Sales Order Type" = SalesInvHeader."Sales Order Type"::Normal)
+        then begin
+            recShiptoAdd.Get(SalesInvHeader."Bill-to Customer No.", recCountryShipDay."Ship-To Code");
+            FormatAddr.FormatAddr(
+                AddrArray, recShiptoAdd.Name, recShiptoAdd."Name 2", recShiptoAdd.Contact, recShiptoAdd.Address, recShiptoAdd."Address 2",
+                recShiptoAdd.City, recShiptoAdd."Post Code", recShiptoAdd.County, recShiptoAdd."Country/Region Code");
+        end else
+            if SalesInvHeader."eCommerce Order" then
                 FormatAddr.FormatAddr(
-                  AddrArray, recShiptoAdd.Name, recShiptoAdd."Name 2", recShiptoAdd.Contact, recShiptoAdd.Address, recShiptoAdd."Address 2",
-                  recShiptoAdd.City, recShiptoAdd."Post Code", recShiptoAdd.County, recShiptoAdd."Country/Region Code");
-            end else
-                if "eCommerce Order" then
-                    FormatAddr.FormatAddr(
-                      AddrArray, '', '', '', '', '',
-                      "Ship-to City", "Ship-to Post Code", "Ship-to County", "Ship-to Country/Region Code")
-                else
-                    FormatAddr.FormatAddr(
-                      AddrArray, "Ship-to Name", "Ship-to Name 2", "Ship-to Contact", "Ship-to Address", "Ship-to Address 2",
-                      "Ship-to City", "Ship-to Post Code", "Ship-to County", "Ship-to Country/Region Code");
+                    AddrArray, '', '', '', '', '',
+                    SalesInvHeader."Ship-to City", SalesInvHeader."Ship-to Post Code", SalesInvHeader."Ship-to County", SalesInvHeader."Ship-to Country/Region Code")
+            else
+                FormatAddr.FormatAddr(
+                    AddrArray, SalesInvHeader."Ship-to Name", SalesInvHeader."Ship-to Name 2", SalesInvHeader."Ship-to Contact", SalesInvHeader."Ship-to Address", SalesInvHeader."Ship-to Address 2",
+                    SalesInvHeader."Ship-to City", SalesInvHeader."Ship-to Post Code", SalesInvHeader."Ship-to County", SalesInvHeader."Ship-to Country/Region Code");
 
-            if "Sell-to Customer No." <> "Bill-to Customer No." then begin
+        if SalesInvHeader."Sell-to Customer No." <> SalesInvHeader."Bill-to Customer No." then begin
+            Result := true;
+            exit;
+        end;
+        for i := 1 to ArrayLen(AddrArray) do
+            if AddrArray[i] <> CustAddr[i] then begin
                 Result := true;
                 exit;
             end;
-            for i := 1 to ArrayLen(AddrArray) do
-                if AddrArray[i] <> CustAddr[i] then begin
-                    Result := true;
-                    exit;
-                end;
-        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::ReportManagement, 'OnAfterSubstituteReport', '', false, false)]

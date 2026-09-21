@@ -1,10 +1,5 @@
 Table 66004 "Ship Response Header"
 {
-    // 001. 19-02-19 PAB - Updated for new NAV XML
-    // 002. 09-01-20 ZY-LD 000 - Ask before delete.
-    // 003. 03-12-20 ZY-LD P0499 - New field.
-    // 004. 06-08-22 ZY-LD 000 - We need to block the post of single responses with errors.
-
     Caption = 'Ship Response Header';
     DataCaptionFields = "No.";
     Description = 'Ship Response Header';
@@ -484,7 +479,7 @@ Table 66004 "Ship Response Header"
         recVCKShipResponseLine: Record "Ship Response Line";
         recZyFileMgt: Record "Zyxel File Management";
         recWhseSetup: Record "Warehouse Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series"; //UpgradeReady
         Text001: label 'Do you want to import the document again?';
 
 

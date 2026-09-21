@@ -1,9 +1,5 @@
 XmlPort 50037 "WS Replicate G/L Account"
 {
-    // 001. 17-09-18 ZY-LD 000 - It's easyer for PP when RHQ G/L Account No. is filled.
-    // 002. 03-01-19 ZY-LD 2019010310000064 - Hidden.
-    // 003. 11-02-21 ZY-LD P0464 - Fixed Asset Account.
-    // 004. 07-06-23 ZY-LD 000 - We don´t want to replicate "Freight Approval No." to al companies.
 
     DefaultNamespace = 'urn:microsoft-dynamics-nav/Replicate';
     Encoding = UTF8;
@@ -313,13 +309,11 @@ XmlPort 50037 "WS Replicate G/L Account"
                         end;
                     until recDefDim.Next() = 0;
 
-                //>> 17-09-18 ZY-LD 001
                 if recGLAcc."RHQ G/L Account No." = '' then begin
                     recGLAcc."RHQ G/L Account No." := recGLAcc."No.";
                     recGLAcc."RHQ G/L Account Name" := recGLAcc.Name;
                     recGLAcc.Modify;
                 end;
-            //<< 17-09-18 ZY-LD 001
             until recGLAcc.Next() = 0;
 
         if pNo = '' then begin
@@ -333,7 +327,7 @@ XmlPort 50037 "WS Replicate G/L Account"
                 until recICGLAcc.Next() = 0;
         end;
 
-        Dimension.SetRange("Replicate Together with CoA", true);  // 07-06-23 ZY-LD 004
+        Dimension.SetRange("Replicate Together with CoA", true);
         if Dimension.FindSet then
             repeat
                 recDimValue.SetRange("Dimension Code", Dimension.Code);
@@ -367,7 +361,7 @@ XmlPort 50037 "WS Replicate G/L Account"
                             recGLAcc."No. 2" := "G/L Account"."No. 2";
                             recGLAcc."RHQ G/L Account Name" := "G/L Account".Name;
                             recGLAcc."Name 2" := "G/L Account"."Name 2";
-                            recGLAcc."Fixed Asset Account (Concur)" := "G/L Account"."Fixed Asset Account (Concur)";  // 11-02-21 ZY-LD 003
+                            recGLAcc."Fixed Asset Account (Concur)" := "G/L Account"."Fixed Asset Account (Concur)";
                             recGLAcc.Modify;
 
                             "Default Dimension".SetRange("Table ID", Database::"G/L Account");
@@ -394,7 +388,7 @@ XmlPort 50037 "WS Replicate G/L Account"
                         recGLAcc."Income/Balance" := "G/L Account"."Income/Balance";
                         recGLAcc."Debit/Credit" := "G/L Account"."Debit/Credit";
                         recGLAcc.Blocked := "G/L Account".Blocked;
-                        recGLAcc.Hidden := "G/L Account".Hidden;  // 03-01-19 ZY-LD 002
+                        recGLAcc.Hidden := "G/L Account".Hidden;
                         recGLAcc."Direct Posting" := "G/L Account"."Direct Posting";
                         recGLAcc."Reconciliation Account" := "G/L Account"."Reconciliation Account";
                         recGLAcc."New Page" := "G/L Account"."New Page";
@@ -414,14 +408,10 @@ XmlPort 50037 "WS Replicate G/L Account"
                         recGLAcc."VAT Bus. Posting Group" := "G/L Account"."VAT Bus. Posting Group";
                         recGLAcc."VAT Prod. Posting Group" := "G/L Account"."VAT Prod. Posting Group";
                         recGLAcc."Default IC Partner G/L Acc. No" := "G/L Account"."Default IC Partner G/L Acc. No";
-                        //recGLAcc."Cost Split Type" := "G/L Account"."Cost Split Type";
-                        //recGLAcc."Cost Split Type Mandatory" := "G/L Account"."Cost Split Type Mandatory";
                         recGLAcc."Name 2" := "G/L Account"."Name 2";
-                        //>> 17-09-18 ZY-LD 001
                         recGLAcc."RHQ G/L Account No." := "G/L Account"."No.";
                         recGLAcc."RHQ G/L Account Name" := "G/L Account".Name;
-                        //<< 17-09-18 ZY-LD 001
-                        recGLAcc."Fixed Asset Account (Concur)" := "G/L Account"."Fixed Asset Account (Concur)";  // 11-02-21 ZY-LD 003
+                        recGLAcc."Fixed Asset Account (Concur)" := "G/L Account"."Fixed Asset Account (Concur)";
                         recGLAcc.Insert;
                     end else begin
                         recGLAcc."No. 2" := "G/L Account"."No. 2";
@@ -447,14 +437,10 @@ XmlPort 50037 "WS Replicate G/L Account"
                         recGLAcc."Business Unit Filter" := "G/L Account"."Business Unit Filter";
                         recGLAcc."Automatic Ext. Texts" := "G/L Account"."Automatic Ext. Texts";
                         recGLAcc."Default IC Partner G/L Acc. No" := "G/L Account"."Default IC Partner G/L Acc. No";
-                        //recGLAcc."Cost Split Type" := "G/L Account"."Cost Split Type";
-                        //recGLAcc."Cost Split Type Mandatory" := "G/L Account"."Cost Split Type Mandatory";
                         recGLAcc."Name 2" := "G/L Account"."Name 2";
-                        //>> 17-09-18 ZY-LD 001
                         recGLAcc."RHQ G/L Account No." := "G/L Account"."No.";
                         recGLAcc."RHQ G/L Account Name" := "G/L Account".Name;
-                        //<< 17-09-18 ZY-LD 001
-                        recGLAcc."Fixed Asset Account (Concur)" := "G/L Account"."Fixed Asset Account (Concur)";  // 11-02-21 ZY-LD 003
+                        recGLAcc."Fixed Asset Account (Concur)" := "G/L Account"."Fixed Asset Account (Concur)";
                         recGLAcc.Modify;
                     end;
 
@@ -492,19 +478,12 @@ XmlPort 50037 "WS Replicate G/L Account"
                     until "Dimension Value".Next() = 0;
             until Dimension.Next() = 0;
 
-        // In Italian and Tyrkish Navision the tables must be replaced with 50033
-        //if ZGT.ItalianServer or ZGT.TurkishServer then
-        //27-05-2026 BK #Cloud Ready
-        //if ZGT.TurkishServer then  
         if zgt.IsTRDatabaseServer() then
             if recICGLAcc.TableName = "IC G/L Account".TableName then
                 Error(lText001);
 
         if "IC G/L Account".FindSet then
             repeat
-                // In Turkey we will use the local Turkish account, but only if it's one to one.
-                //27-05-2026 BK #Cloud Ready
-                //if ZGT.TurkishServer then begin
                 if ZGT.IsTRDatabaseServer() then begin
                     recGLAcc.SetRange("RHQ G/L Account No.", "IC G/L Account"."No.");
                     if recGLAcc.Count = 1 then begin
@@ -545,11 +524,9 @@ XmlPort 50037 "WS Replicate G/L Account"
                     ICAccount."Account Type" := GLAccount."Account Type";
                     ICAccount."Income/Balance" := GLAccount."Income/Balance";
                     ICAccount.Validate(Indentation, PrevIndentation);
-                    //>> 04-09-18 ZY-LD 001
                     //Remember to change in ICChartofAccounts_OnCopyFromChartOfAccountsOnBeforeICGLAccInsert in Codeunit 50085 "General Ledger Event" if new changes are made
                     IF ZGT.IsRhq THEN
                         ICAccount."Map-to G/L Acc. No." := ICAccount."No.";
-                    //<< 04-09-18 ZY-LD 001
 
                     ICAccount.Insert();
                 end;
@@ -567,24 +544,24 @@ XmlPort 50037 "WS Replicate G/L Account"
         Text005: Label 'End-Total %1 is missing a matching Begin-Total.';
     begin
         //Copy from Codeunit 3, Status Windows removed
-        with ICGLAcc do
-            if Find('-') then
-                repeat
+        //UPgradeReady
+        if ICGLAcc.Find('-') then
+            repeat
 
-                    if "Account Type" = "Account Type"::"End-Total" then begin
-                        if i < 1 then
-                            Error(
-                              Text005,
-                              "No.");
-                        i := i - 1;
-                    end;
+                if ICGLAcc."Account Type" = ICGLAcc."Account Type"::"End-Total" then begin
+                    if i < 1 then
+                        Error(
+                          Text005,
+                          ICGLAcc."No.");
+                    i := i - 1;
+                end;
 
-                    Validate(Indentation, i);
-                    Modify();
+                ICGLAcc.Validate(Indentation, i);
+                ICGLAcc.Modify();
 
-                    if "Account Type" = "Account Type"::"Begin-Total" then begin
-                        i := i + 1;
-                    end;
-                until Next() = 0;
+                if ICGLAcc."Account Type" = ICGLAcc."Account Type"::"Begin-Total" then begin
+                    i := i + 1;
+                end;
+            until ICGLAcc.Next() = 0;
     end;
 }

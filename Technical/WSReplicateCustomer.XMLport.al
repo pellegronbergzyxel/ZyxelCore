@@ -1,24 +1,5 @@
 xmlport 50036 "WS Replicate Customer"
 {
-    // 001. 02-11-18 ZY-LD 2018103110000111 - Variables for the subs.
-    // 002. 27-11-18 ZY-LD 2018112710000074 - New fields. Italy SDI.
-    // 003. 08-04-19 ZY-LD 2019040810000139 - In Italy, we don't need the invoice and credit memo. lines.
-    // 004. 27-05-19 ZY-LD P0213 - Force replication.
-    // 005. 12- 07-19 ZY-LD P0213 - Customer No. is added to the filter.
-    // 006. 27-09-19 PAB 2019092710000068 - Added se Currency Code from Sales Document
-    // 007. 31-03-20 ZY-LD 000 - Replicate Cross Reference.
-    // 008. 28-05-20 ZY-LD 2020052710001357 - Intercompany Purchase must be set in ZyND DK.
-    // 009. 09-07-20 ZY-LD 2020070910000021 - Only insert, if the item no. exists.
-    // 010. 10-08-20 ZY-LD 2020081010000081 - Transfer Shipment Method.
-    // 011. 03-02-21 ZY-LD P0557 - Sample Setup. We don´t want to replicate the sub companies.
-    // 012. 15-09-21 ZY-LD 2021091310000081 - ExtDocNoTranslation is added.
-    // 013. 07-02-22 ZY-LD 2022012510000105 - Intercompany Purchase
-    // 014. 07-03-23 ZY-LD #3412853 - "Ship-to Address" can be local created or it can be used on a sales order.
-    // 015. 03-05-23 ZY-LD 000 - We don´t delete if it´s part of sales head.
-    // 016. 07-06-23 ZY-LD 000 - Source Type for "Related Company" was in Q4-21 set to text. I don´t know why, but it has been set back to field so the value will be replicated.
-    // 017. 16-02-24 ZY-LD 000 - Sales Person is transferred to sub.
-    // 018. 28-02-24 ZY-LD 000 - Due to Italian Electronic Invoice, the currency code must be blank.
-
     DefaultNamespace = 'urn:microsoft-dynamics-nav/Replicate';
     Encoding = UTF8;
     FormatEvaluate = Xml;

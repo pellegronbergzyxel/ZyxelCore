@@ -137,6 +137,14 @@ pageextension 50113 CustomerCardZX extends "Customer Card"
                 }
             }
         }
+        addafter("Combine Shipments") //17-09-2026 BK #576888
+        {
+            field("Combine Eicard Shipments"; Rec."Combine Eicard Shipments")
+            {
+                ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the Combine Shipments';
+            }
+        }
         addafter("Document Sending Profile")
         {
             group(Finance)

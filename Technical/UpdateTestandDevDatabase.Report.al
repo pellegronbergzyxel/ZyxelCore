@@ -37,9 +37,16 @@ report 50006 "Update Test and Dev. Database"
             if Comp.FindSet then begin
                 // Setup environment
                 if Choice = 1 then
-                    ServerEnvironment.Environment := ServerEnvironment.Environment::Test
+                    if ServerEnvironment.Server = ServerEnvironment.Server::Italian then begin
+                        ServerEnvironment.Environment := ServerEnvironment.Environment::Test;
+                        ServerEnvironment.Server := ServerEnvironment.Server::Italian;
+                    end else begin
+                        ServerEnvironment.Environment := ServerEnvironment.Environment::Test;
+                        ServerEnvironment.Server := ServerEnvironment.Server::Main;
+                    end
                 else
                     ServerEnvironment.Environment := ServerEnvironment.Environment::Development;
+
                 if not ServerEnvironment.Modify then
                     ServerEnvironment.Insert;
 

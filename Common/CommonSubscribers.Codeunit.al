@@ -40,9 +40,9 @@ codeunit 50029 CommonSubscribers
     local procedure OnBeforeGetEmailBodyCustomer(ReportUsage: Integer; RecordVariant: Variant; var TempBodyReportSelections: Record "Report Selections" temporary; CustNo: Code[20]; var CustEmailAddress: Text[250]; var EmailBodyText: Text; var IsHandled: Boolean; var Result: Boolean)
     var
         SalesHeader: Record "Sales Header";
-        recref: RecordRef;
-        CustReptMgt: Codeunit "Custom Report Management";
         CustomReportSelection: Record "Custom Report Selection";
+        CustReptMgt: Codeunit "Custom Report Management";
+        recref: RecordRef;
         temptext: text[250];
     begin
         if RecordVariant.IsRecord then begin
@@ -53,7 +53,7 @@ codeunit 50029 CommonSubscribers
                     begin
                         SalesHeader := RecordVariant;
                         if SalesHeader."Document Type" = SalesHeader."Document Type"::Order then begin
-                            temptext := CustReptMgt.GetEmailAddress(Database::Customer, SalesHeader."Sell-to Customer No.", CustomReportSelection.Usage::"S.Order", temptext);
+                            temptext := copystr(CustReptMgt.GetEmailAddress(Database::Customer, SalesHeader."Sell-to Customer No.", CustomReportSelection.Usage::"S.Order", temptext), 1, 250);
                             if temptext <> '' then
                                 CustEmailAddress := temptext;
                         end
@@ -70,9 +70,9 @@ codeunit 50029 CommonSubscribers
     local procedure OnAfterGetEmailBodyCustomer(var CustomerEmailAddress: Text[250]; ServerEmailBodyFilePath: Text[250]; RecordVariant: Variant; var Result: Boolean; var IsHandled: Boolean)
     var
         SalesHeader: Record "Sales Header";
-        recref: RecordRef;
-        CustReptMgt: Codeunit "Custom Report Management";
         CustomReportSelection: Record "Custom Report Selection";
+        CustReptMgt: Codeunit "Custom Report Management";
+        recref: RecordRef;
         temptext: text[250];
     begin
         if RecordVariant.IsRecord then begin
@@ -83,7 +83,7 @@ codeunit 50029 CommonSubscribers
                     begin
                         SalesHeader := RecordVariant;
                         if SalesHeader."Document Type" = SalesHeader."Document Type"::Order then begin
-                            temptext := CustReptMgt.GetEmailAddress(Database::Customer, SalesHeader."Sell-to Customer No.", CustomReportSelection.Usage::"S.Order", temptext);
+                            temptext := copystr(CustReptMgt.GetEmailAddress(Database::Customer, SalesHeader."Sell-to Customer No.", CustomReportSelection.Usage::"S.Order", temptext), 1, 250);
                             if temptext <> '' then
                                 CustomerEmailAddress := temptext;
                         end
@@ -97,9 +97,11 @@ codeunit 50029 CommonSubscribers
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Notification Entry Dispatcher", 'OnBeforeCreateAndDispatch', '', false, false)]
     local procedure OnBeforeCreateAndDispatch(NotificationSetup: Record "Notification Setup"; var NotificationEntry: Record "Notification Entry")
     var
-    begin
-        if NotificationEntry.type = NotificationEntry.type::Approval then
-            NotificationEntry.Delete(false);
+        zgt: codeunit "ZyXEL General Tools";
+    begin //16-09-2026 BK #582359
+        if Not zgt.ItalianServer() then
+            if NotificationEntry.type = NotificationEntry.type::Approval then
+                NotificationEntry.Delete(false);
     end;
 
     // 491247 <<

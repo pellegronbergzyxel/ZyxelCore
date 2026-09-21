@@ -219,7 +219,7 @@ report 50022 "Calculate Inventory Value ZX"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Calculate Per';
-                        OptionCaption = 'Item Ledger Entry,Item';
+                        //OptionCaption = 'Item Ledger Entry,Item'; UpgradeReady
                         ToolTip = 'Specifies if you want to sum up the inventory value per item ledger entry or per item.';
 
                         trigger OnValidate()
@@ -323,7 +323,8 @@ report 50022 "Calculate Inventory Value ZX"
         Window: Dialog;
         HideDuplWarning: Boolean;
         InsertLinesWithoutUnitPrice: Boolean;
-        CalculatePer: Option "Item Ledger Entry",Item;
+        //CalculatePer: Option "Item Ledger Entry",Item;
+        calculatePer: Enum "Inventory Value Calc. Per"; //UpgradeReady
         CalcBase: Enum "Inventory Value Calc. Base";
         NextDocNo: Code[20];
         AverageUnitCostLCY: Decimal;
@@ -640,7 +641,7 @@ report 50022 "Calculate Inventory Value ZX"
         OnAfterInitItemJnlLine(ItemJnlLine, ItemJnlBatch);
     end;
 
-    procedure InitializeRequest(NewPostingDate: Date; NewDocNo: Code[20]; NewHideDuplWarning: Boolean; NewCalculatePer: Option; NewByLocation: Boolean; NewByVariant: Boolean; NewUpdStdCost: Boolean; NewCalcBase: Option; NewShowDialog: Boolean)
+    procedure InitializeRequest(NewPostingDate: Date; NewDocNo: Code[20]; NewHideDuplWarning: Boolean; NewCalculatePer: Enum "Inventory Value Calc. Per"; NewByLocation: Boolean; NewByVariant: Boolean; NewUpdStdCost: Boolean; NewCalcBase: Option; NewShowDialog: Boolean)
     begin
         PostingDate := NewPostingDate;
         NextDocNo := NewDocNo;
