@@ -54,6 +54,16 @@ page 50016 "Sales Manager ZYXEL RTC"
                 {
                 }
                 */
+                part("Marginal Approval Activities"; "Marginal Approval Activities")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
+                }
+                part("Marginal Approval Activities"; "Marginal Approval Activities")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
+                }
                 systempart(Control1901377608; MyNotes)
                 {
                 }

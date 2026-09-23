@@ -46,6 +46,11 @@ pageextension 50287 SalesManagerRoleCenterZX extends "Sales Manager Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                 }
+                   part("Marginal Approval Activities";"Marginal Approval Activities")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
+                }
             }
         }
         modify(Control1900724808)
