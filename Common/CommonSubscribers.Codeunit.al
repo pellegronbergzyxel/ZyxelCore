@@ -21,18 +21,32 @@ codeunit 50029 CommonSubscribers
         end;
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateShowRecords', '', false, false)]
-    local procedure Navigate_OnAfterNavigateShowRecords(TableID: Integer; DocNoFilter: Text; PostingDateFilter: Text; ItemTrackingSearch: Boolean; var TempDocumentEntry: Record "Document Entry" temporary; SalesInvoiceHeader: Record "Sales Invoice Header"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; PurchInvHeader: Record "Purch. Inv. Header"; PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; ServiceInvoiceHeader: Record "Service Invoice Header"; ServiceCrMemoHeader: Record "Service Cr.Memo Header"; ContactType: Enum "Navigate Contact Type"; ContactNo: Code[250]; ExtDocNo: Code[250])
+    //UpgradeReady
+    [EventSubscriber(ObjectType::Page, Page::Navigate, OnAfterShowRecords, '', false, false)]
+    local procedure Navigate_OnAfterShowRecords(var Sender: Page Navigate; var DocumentEntry: Record "Document Entry"; DocNoFilter: Text; PostingDateFilter: Text; ItemTrackingSearch: Boolean; ContactType: Enum "Navigate Contact Type"; ContactNo: Code[250]; ExtDocNo: Code[250])
     var
         TravelExpHeader: Record "Travel Expense Header";
     begin
-        if TableID = Database::"Travel Expense Header" then begin
+        if DocumentEntry."Table ID" = Database::"Travel Expense Header" then begin
             TravelExpHeader.SetCurrentKey("G/L Document No.", "G/L Posting Date");
             TravelExpHeader.SetFilter("G/L Document No.", DocNoFilter);
             TravelExpHeader.SetFilter("G/L Posting Date", PostingDateFilter);
             Page.Run(Page::"Travel Expense", TravelExpHeader);
         end;
     end;
+
+    // [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateShowRecords', '', false, false)]
+    // local procedure Navigate_OnAfterNavigateShowRecords(TableID: Integer; DocNoFilter: Text; PostingDateFilter: Text; ItemTrackingSearch: Boolean; var TempDocumentEntry: Record "Document Entry" temporary; SalesInvoiceHeader: Record "Sales Invoice Header"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; PurchInvHeader: Record "Purch. Inv. Header"; PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; ServiceInvoiceHeader: Record "Service Invoice Header"; ServiceCrMemoHeader: Record "Service Cr.Memo Header"; ContactType: Enum "Navigate Contact Type"; ContactNo: Code[250]; ExtDocNo: Code[250])
+    // var
+    //     TravelExpHeader: Record "Travel Expense Header";
+    // begin
+    //     if TableID = Database::"Travel Expense Header" then begin
+    //         TravelExpHeader.SetCurrentKey("G/L Document No.", "G/L Posting Date");
+    //         TravelExpHeader.SetFilter("G/L Document No.", DocNoFilter);
+    //         TravelExpHeader.SetFilter("G/L Posting Date", PostingDateFilter);
+    //         Page.Run(Page::"Travel Expense", TravelExpHeader);
+    //     end;
+    // end;
 
 
     // 491247 >>

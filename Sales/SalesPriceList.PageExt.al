@@ -30,6 +30,14 @@ pageextension 50018 "Sales Price List" extends "Sales Price List"
                 end;
 
             }
+            Action(DeletedSalesPriceList)
+            {
+                ApplicationArea = Basic, Suite;
+                Ellipsis = true;
+                Image = Delete;
+                Promoted = true;
+                PromotedCategory = Process;
+            }
         }
     }
 

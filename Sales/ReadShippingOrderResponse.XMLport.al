@@ -306,77 +306,77 @@ xmlport 50060 "Read Shipping Order Response"
                     {
                         MinOccurs = Zero;
 
-                        textelement(serialnumber1)
-                        {
-                            XmlName = 'SerialNumber';
-                            MinOccurs = Zero;
-
-                            trigger OnAfterAssignVariable()
-                            begin
-                                if SerialNumber1 <> '' then begin
-                                    if StrPos(SerialNumber1, 'SN:') <> 0 then
-                                        SerialNumber1 := DelStr(SerialNumber1, StrPos(SerialNumber1, 'SN:'), StrLen('SN:'));
-                                    Clear(recVCKShipResponceSerialNos);
-                                    recVCKShipResponceSerialNos.Init();
-                                    recVCKShipResponceSerialNos."Response No." := "Ship Response Header"."No.";
-                                    recVCKShipResponceSerialNos."Response Line No." := "Ship Response Line"."Response Line No.";
-                                    recVCKShipResponceSerialNos."Serial No." := SerialNumber1;
-
-                                    recVCKShipResponceSerialNos."Item No." := "Ship Response Line"."Product No.";
-                                    recVCKShipResponceSerialNos."Sales Order No." := copystr("Ship Response Line"."Sales Order No.", 1, 20);
-                                    recVCKShipResponceSerialNos."Sales Order Line No." := "Ship Response Line"."Sales Order Line No.";
-
-                                    if not recVCKShipResponceSerialNos.Insert() then
-                                        ErrorOnSerialNo += StrSubstNo(Text005, "Ship Response Header"."No.", "Ship Response Line"."Response Line No.", SerialNumber1);
-
-                                end;
-                            end;
-                        }
-                        // 19-08-2026 BK #542568
-                        // textelement(SerialNumberNode)
+                        // textelement(serialnumber1)
                         // {
                         //     XmlName = 'SerialNumber';
                         //     MinOccurs = Zero;
-                        //     MaxOccurs = Unbounded;
 
-                        //     textelement(Number)
-                        //     {
-                        //         MinOccurs = Zero;
+                        //     trigger OnAfterAssignVariable()
+                        //     begin
+                        //         if SerialNumber1 <> '' then begin
+                        //             if StrPos(SerialNumber1, 'SN:') <> 0 then
+                        //                 SerialNumber1 := DelStr(SerialNumber1, StrPos(SerialNumber1, 'SN:'), StrLen('SN:'));
+                        //             Clear(recVCKShipResponceSerialNos);
+                        //             recVCKShipResponceSerialNos.Init();
+                        //             recVCKShipResponceSerialNos."Response No." := "Ship Response Header"."No.";
+                        //             recVCKShipResponceSerialNos."Response Line No." := "Ship Response Line"."Response Line No.";
+                        //             recVCKShipResponceSerialNos."Serial No." := SerialNumber1;
 
-                        //         trigger OnAfterAssignVariable()
-                        //         begin
-                        //             if Number <> '' then begin
-                        //                 Clear(recVCKShipResponceSerialNos);
-                        //                 recVCKShipResponceSerialNos.Init();
-                        //                 recVCKShipResponceSerialNos."Response No." := "Ship Response Header"."No.";
-                        //                 recVCKShipResponceSerialNos."Response Line No." := "Ship Response Line"."Response Line No.";
-                        //                 recVCKShipResponceSerialNos."Serial No." := Number;
-                        //                 recVCKShipResponceSerialNos."Item No." := "Ship Response Line"."Product No.";
-                        //                 recVCKShipResponceSerialNos."Sales Order No." := CopyStr("Ship Response Line"."Sales Order No.", 1, 20);
-                        //                 recVCKShipResponceSerialNos."Sales Order Line No." := "Ship Response Line"."Sales Order Line No.";
+                        //             recVCKShipResponceSerialNos."Item No." := "Ship Response Line"."Product No.";
+                        //             recVCKShipResponceSerialNos."Sales Order No." := copystr("Ship Response Line"."Sales Order No.", 1, 20);
+                        //             recVCKShipResponceSerialNos."Sales Order Line No." := "Ship Response Line"."Sales Order Line No.";
 
-                        //                 if not recVCKShipResponceSerialNos.Insert() then
-                        //                     ErrorOnSerialNo += StrSubstNo(Text005, "Ship Response Header"."No.", "Ship Response Line"."Response Line No.", Number);
-                        //             end;
+                        //             if not recVCKShipResponceSerialNos.Insert() then
+                        //                 ErrorOnSerialNo += StrSubstNo(Text005, "Ship Response Header"."No.", "Ship Response Line"."Response Line No.", SerialNumber1);
+
                         //         end;
-                        //     }
+                        //     end;
+                        // }
+                        // 19-08-2026 BK #542568
+                        textelement(SerialNumberNode)
+                        {
+                            XmlName = 'SerialNumber';
+                            MinOccurs = Zero;
+                            MaxOccurs = Unbounded;
 
-                        //     textelement(CarrierID)
-                        //     {
-                        //         XmlName = 'Carrier';
-                        //         MinOccurs = Zero;
+                            textelement(Number)
+                            {
+                                MinOccurs = Zero;
 
-                        //         trigger OnAfterAssignVariable()
-                        //         begin
-                        //             if (CarrierID <> '') and
-                        //             (recVCKShipResponceSerialNos."Serial No." <> '')
-                        //             then begin
-                        //                 recVCKShipResponceSerialNos."Carrier ID" := CarrierID;
-                        //                 recVCKShipResponceSerialNos.Modify();
-                        //             end;
-                        //         end;
-                        //     }
-                        // } // 19-08-2026 BK #542568 slut
+                                trigger OnAfterAssignVariable()
+                                begin
+                                    if Number <> '' then begin
+                                        Clear(recVCKShipResponceSerialNos);
+                                        recVCKShipResponceSerialNos.Init();
+                                        recVCKShipResponceSerialNos."Response No." := "Ship Response Header"."No.";
+                                        recVCKShipResponceSerialNos."Response Line No." := "Ship Response Line"."Response Line No.";
+                                        recVCKShipResponceSerialNos."Serial No." := Number;
+                                        recVCKShipResponceSerialNos."Item No." := "Ship Response Line"."Product No.";
+                                        recVCKShipResponceSerialNos."Sales Order No." := CopyStr("Ship Response Line"."Sales Order No.", 1, 20);
+                                        recVCKShipResponceSerialNos."Sales Order Line No." := "Ship Response Line"."Sales Order Line No.";
+
+                                        if not recVCKShipResponceSerialNos.Insert() then
+                                            ErrorOnSerialNo += StrSubstNo(Text005, "Ship Response Header"."No.", "Ship Response Line"."Response Line No.", Number);
+                                    end;
+                                end;
+                            }
+
+                            textelement(CarrierID)
+                            {
+                                XmlName = 'Carrier';
+                                MinOccurs = Zero;
+
+                                trigger OnAfterAssignVariable()
+                                begin
+                                    if (CarrierID <> '') and
+                                    (recVCKShipResponceSerialNos."Serial No." <> '')
+                                    then begin
+                                        recVCKShipResponceSerialNos."Carrier ID" := CarrierID;
+                                        recVCKShipResponceSerialNos.Modify();
+                                    end;
+                                end;
+                            }
+                        } // 19-08-2026 BK #542568 slut
                     }
                     textelement(BatchNumbers)
                     {

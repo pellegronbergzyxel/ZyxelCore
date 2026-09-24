@@ -1776,7 +1776,8 @@ page 50165 "Item List MDM View"
 
                         trigger Onaction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByEvent());
+                            //ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByEvent());
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItem(Rec, Enum::"Item Availability Type"::"Event"); //UpgradeReady
                         end;
                     }
                     action(Period)
@@ -1839,7 +1840,8 @@ page 50165 "Item List MDM View"
 
                         trigger Onaction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByBOM());
+                            //ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByBOM());
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItem(Rec, Enum::"Item Availability Type"::BOM); //UpgradeReady
                         end;
                     }
                     action("Unit of Measure")

@@ -2775,7 +2775,8 @@ Page 50217 "Item List (All fields)"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByEvent());
+                            //ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByEvent());
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItem(Rec, Enum::"Item Availability Type"::"Event"); //UpgradeReady
                         end;
                     }
                     action(Period)
@@ -2838,7 +2839,8 @@ Page 50217 "Item List (All fields)"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByBOM());
+                            //ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByBOM());
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItem(Rec, Enum::"Item Availability Type"::BOM); //UpgradeReady
                         end;
                     }
                     action("Unit of Measure")
