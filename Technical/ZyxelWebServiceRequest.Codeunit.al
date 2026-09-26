@@ -3899,8 +3899,6 @@ Codeunit 50084 "Zyxel Web Service Request"
         TempBlob.CreateOutstream(ReqBodyOutStream, Textencoding::UTF8);
         ReqBodyOutStream.Write(ReqText);
         TempBlob.CreateInstream(ReqBodyInStream, Textencoding::UTF8);
-<<<<<<< HEAD
-
         // Run the WebServReqMgt functions to send the request
         // Username := 'navservice';
         // Password := 'NGsGcv2fB+DYGead';
@@ -3911,14 +3909,6 @@ Codeunit 50084 "Zyxel Web Service Request"
         WebServReqMgt.DisableHttpsCheck;
         PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetBasicCredentials(recWebServiceSetup."User Name", PasswordSecrettext);
-=======
-        WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, Password);
-        WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType());
-        WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(pWsFunctionName, GetWebServiceNo()));
-        WebServReqMgt.SetTraceMode(TraceMode);
-        WebServReqMgt.DisableHttpsCheck();
-        WebServReqMgt.SetBasicCredentials(recWebServiceSetup."User Name", recWebServiceSetup.Password);
->>>>>>> 831d243ca590587ed71f7c889a39a73ecf3801f7
 
         if WebServReqMgt.SendRequestToWebService() then begin
             WebServReqMgt.GetResponseContent(RespBodyInStream);
