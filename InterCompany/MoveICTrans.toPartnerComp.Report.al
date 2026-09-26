@@ -1,12 +1,5 @@
 Report 50017 "Move IC Trans. to Pa. Comp ZX"
 {
-    //Copy of Report 513
-    // 001. 24-10-17 ZY-LD Change of "Buy-from Vendor No.";
-    // 002. 21-02-18 ZY-LD We need to separate on Sell-to Customer No.
-    // 003. 19-06-18 ZY-LD 000 - Inter company by Web Service
-    // 004. 08-02-21 ZY-LD P0557 - Sample setup. We user "IC Partner Code", so we can find the correct vendor in the corresponding company.
-    // 005. 12-04-24 ZY-LD #4895983 - Italy and Turkey is sent by web service, so we can´t update by changecompany.
-
     Caption = 'Move IC Trans. to Partner Comp';
     ProcessingOnly = true;
 
@@ -157,12 +150,8 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
 
                 case "Line Action" of
                     "Line Action"::"Send to IC Partner":
-                        /*ICInboxOutboxMgt.OutboxTransToInbox(
-                          "IC Outbox Transaction", TempICInboxTransaction, ICSetup."IC Partner Code");*/
-                        //>> 08-02-21 ZY-LD 004
                         ICInboxOutboxMgt.OutboxTransToInbox(
                           "IC Outbox Transaction", TempICInboxTransaction, "IC Outbox Transaction"."IC Partner Code");
-                    //<< 08-02-21 ZY-LD 004
 
                     "Line Action"::"Return to Inbox":
                         RecreateInboxTrans("IC Outbox Transaction");
@@ -232,18 +221,16 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
         PartnerICDocDim: Record "IC Document Dimension";
         PartnerICPartner: Record "IC Partner";
         PartnerICCommentLine: Record "IC Comment Line";
-        IcVendorNoSub: Code[20];
         ZyWsReq: Codeunit "Zyxel Web Service Request";
         WSICInboxPurchHead: XmlPort "WS Intercompany";
+        IcVendorNoSub: Code[20];
+
     begin
-        if CurrentPartner."Inbox Type" = CurrentPartner."inbox type"::Database then begin  // 19-06-18 ZY-LD 003
+        if CurrentPartner."Inbox Type" = CurrentPartner."inbox type"::Database then begin
             PartnerICPartner.ChangeCompany(CurrentPartner."Inbox Details");
 
-            /*if not PartnerICPartner.Get(ICSetup."IC Partner Code") then
-                Error(Text001, ICSetup."IC Partner Code", CurrentPartner.Code);*/
             if not PartnerICPartner.Get(CurrentPartner.Code) then
                 Error(Text001, CurrentPartner.Code, CurrentPartner.Code);
-            //<< 09-02-21 ZY-LD 004
 
             PartnerInboxTransaction.ChangeCompany(CurrentPartner."Inbox Details");
             PartnerInboxTransaction.LockTable();
@@ -270,7 +257,6 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
                 until TempICInboxJnlLine.Next() = 0;
 
             PartnerInboxPurchHeader.ChangeCompany(CurrentPartner."Inbox Details");
-            //lBuyfromVendorprLocation.CHANGECOMPANY(CurrentPartner."Inbox Details");  // 24-10-17 ZY-LD 001  // 09-02-21 ZY-LD 004
             if TempInboxPurchHeader.Find('-') then
                 repeat
                     PartnerInboxPurchHeader := TempInboxPurchHeader;
@@ -280,21 +266,6 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
                         PartnerInboxPurchHeader."Ship-to Address" := copystr(PartnerInboxPurchHeader."Ship-to Address", 1, 50);
                         PartnerInboxPurchHeader."Ship-to name" := copystr(PartnerInboxPurchHeader."Ship-to Name", 1, 50);
                     end;
-                    //>> 09-02-21 ZY-LD 004
-                    /*//>> 24-10-17 ZY-LD 001
-                    //>> 21-02-18 ZY-LD 002
-                    //IF lBuyfromVendorprLocation.GET(PartnerICPartner."Vendor No.",TempInboxPurchHeader."Location Code") AND (lBuyfromVendorprLocation."Buy-from Vendor No." <> '') THEN BEGIN
-                    lBuyfromVendorprLocation.SETRANGE("Vendor No.",PartnerICPartner."Vendor No.");
-                    lBuyfromVendorprLocation.SETRANGE(Location,TempInboxPurchHeader."Location Code");
-                    lBuyfromVendorprLocation.SETFILTER("Sell-to Customer No.",'%1|%2',PartnerInboxPurchHeader."Sell-to Customer No.",'');
-                    IF lBuyfromVendorprLocation.FINDLAST AND (lBuyfromVendorprLocation."Buy-from Vendor No." <> '') THEN BEGIN  //<< 21-02-18 ZY-LD 002
-                      PartnerInboxPurchHeader."Buy-from Vendor No." := lBuyfromVendorprLocation."Buy-from Vendor No.";
-                      PartnerInboxPurchHeader."Pay-to Vendor No." := lBuyfromVendorprLocation."Buy-from Vendor No.";
-                    END ELSE BEGIN  //<< 24-10-17 ZY-LD 001
-                      PartnerInboxPurchHeader."Buy-from Vendor No." := PartnerICPartner."Vendor No.";
-                      PartnerInboxPurchHeader."Pay-to Vendor No." := PartnerICPartner."Vendor No.";
-                    END;  // 24-10-17 ZY-LD 001*/
-                    //<< 09-02-21 ZY-LD 004
 
                     OnBeforePartnerInboxPurchHeaderInsert(PartnerInboxPurchHeader, CurrentPartner);
                     PartnerInboxPurchHeader.Insert();
@@ -304,9 +275,9 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
             if TempInboxPurchLine.Find('-') then
                 repeat
                     PartnerInboxPurchLine := TempInboxPurchLine;
-                    if PartnerICPartner.IsTR(CurrentPartner.Code) then begin
+                    if PartnerICPartner.IsTR(CurrentPartner.Code) then
                         TempInboxPurchLine.Description := copystr(TempInboxPurchLine.Description, 1, 50);
-                    end;
+
                     PartnerInboxPurchLine.Insert();
                 until TempInboxPurchLine.Next() = 0;
 
@@ -328,9 +299,9 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
             if TempInboxSalesLine.Find('-') then
                 repeat
                     PartnerInboxSalesLine := TempInboxSalesLine;
-                    if PartnerICPartner.IsTR(CurrentPartner.Code) then begin
+                    if PartnerICPartner.IsTR(CurrentPartner.Code) then
                         PartnerInboxSalesLine.Description := copystr(PartnerInboxSalesLine.Description, 1, 50);
-                    end;
+
                     PartnerInboxSalesLine.Insert();
                 until TempInboxSalesLine.Next() = 0;
 
@@ -347,10 +318,8 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
                     PartnerICDocDim := TempICDocDim;
                     PartnerICDocDim.Insert();
                 until TempICDocDim.Next() = 0;
-            //>> 19-06-18 ZY-LD 003
         end else begin  // Web Service
-                        //IcVendorNoSub := ZyWsReq.ICPartnerExistsInSub(CurrentPartner."Inbox Details",CompanyInfo."IC Partner Code");  // 09-02-21 ZY-LD 004
-            IcVendorNoSub := ZyWsReq.ICPartnerExistsInSub(CurrentPartner."Inbox Details", CurrentPartner.Code);  // 09-02-21 ZY-LD 004
+            IcVendorNoSub := Copystr(ZyWsReq.ICPartnerExistsInSub(CurrentPartner."Inbox Details", CurrentPartner.Code), 1, 20);
             if IcVendorNoSub <> '' then
                 PartnerICPartner."Vendor No." := IcVendorNoSub
             else
@@ -386,7 +355,6 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
 
             ReplicateICInboxPurchDoc(CurrentPartner."Inbox Details", WSICInboxPurchHead);
         end;
-        //<< 19-06-18 ZY-LD 003
 
         if (CurrentPartner."Inbox Type" = CurrentPartner."Inbox Type"::Database) AND PartnerICCommentLine.ReadPermission then begin  // 12-04-24 ZY-LD 005
             PartnerICCommentLine.ChangeCompany(CurrentPartner."Inbox Details");
@@ -395,9 +363,7 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
                     PartnerICCommentLine := TempICCommentLine;
                     PartnerICCommentLine.Insert();
                 until TempICCommentLine.Next() = 0;
-        end;  // 12-04-24 ZY-LD 005
-
-        //OnICInboxTransactionCreated(PartnerInboxTransaction, CurrentPartner."Inbox Details");
+        end;
 
         TempICInboxTransaction.DeleteAll();
         TempInboxPurchHeader.DeleteAll();
@@ -455,87 +421,84 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
                 HandledICCommentLine.Delete();
             until HandledICCommentLine.Next() = 0;
 
-        with HandledICInboxJnlLine do begin
-            SetRange("Transaction No.", ICInboxTrans."Transaction No.");
-            SetRange("IC Partner Code", ICInboxTrans."IC Partner Code");
-            SetRange("Transaction Source", ICInboxTrans."Transaction Source");
-            if Find('-') then
-                repeat
-                    ICInboxJnlLine.TransferFields(HandledICInboxJnlLine, true);
-                    ICInboxJnlLine.Insert();
-                    HandledICInboxOutboxJnlLineDim.SetRange("Table ID", Database::"Handled IC Inbox Jnl. Line");
-                    HandledICInboxOutboxJnlLineDim.SetRange("Transaction No.", "Transaction No.");
-                    HandledICInboxOutboxJnlLineDim.SetRange("IC Partner Code", "IC Partner Code");
-                    if HandledICInboxOutboxJnlLineDim.Find('-') then
-                        repeat
-                            ICInboxOutboxJnlLineDim := HandledICInboxOutboxJnlLineDim;
-                            ICInboxOutboxJnlLineDim."Table ID" := Database::"IC Inbox Jnl. Line";
-                            ICInboxOutboxJnlLineDim.Insert();
-                            HandledICInboxOutboxJnlLineDim.Delete();
-                        until HandledICInboxOutboxJnlLineDim.Next() = 0;
-                    Delete();
-                until Next() = 0;
-        end;
+        //UpgradeReady
+        HandledICInboxJnlLine.SetRange("Transaction No.", ICInboxTrans."Transaction No.");
+        HandledICInboxJnlLine.SetRange("IC Partner Code", ICInboxTrans."IC Partner Code");
+        HandledICInboxJnlLine.SetRange("Transaction Source", ICInboxTrans."Transaction Source");
+        if HandledICInboxJnlLine.Find('-') then
+            repeat
+                ICInboxJnlLine.TransferFields(HandledICInboxJnlLine, true);
+                ICInboxJnlLine.Insert();
+                HandledICInboxOutboxJnlLineDim.SetRange("Table ID", Database::"Handled IC Inbox Jnl. Line");
+                HandledICInboxOutboxJnlLineDim.SetRange("Transaction No.", HandledICInboxJnlLine."Transaction No.");
+                HandledICInboxOutboxJnlLineDim.SetRange("IC Partner Code", HandledICInboxJnlLine."IC Partner Code");
+                if HandledICInboxOutboxJnlLineDim.Find('-') then
+                    repeat
+                        ICInboxOutboxJnlLineDim := HandledICInboxOutboxJnlLineDim;
+                        ICInboxOutboxJnlLineDim."Table ID" := Database::"IC Inbox Jnl. Line";
+                        ICInboxOutboxJnlLineDim.Insert();
+                        HandledICInboxOutboxJnlLineDim.Delete();
+                    until HandledICInboxOutboxJnlLineDim.Next() = 0;
+                HandledICInboxJnlLine.Delete();
+            until HandledICInboxJnlLine.Next() = 0;
 
-        with HandledICInboxSalesHdr do begin
-            SetRange("IC Transaction No.", ICInboxTrans."Transaction No.");
-            SetRange("IC Partner Code", ICInboxTrans."IC Partner Code");
-            SetRange("Transaction Source", ICInboxTrans."Transaction Source");
-            if Find('-') then
-                repeat
-                    ICInboxSalesHdr.TransferFields(HandledICInboxSalesHdr, true);
-                    ICInboxSalesHdr.Insert();
-                    MoveHandledICDocDim(
-                      Database::"Handled IC Inbox Sales Header", Database::"IC Inbox Sales Header",
-                      "IC Transaction No.", "IC Partner Code");
+        //UpgradeReady
+        HandledICInboxSalesHdr.SetRange("IC Transaction No.", ICInboxTrans."Transaction No.");
+        HandledICInboxSalesHdr.SetRange("IC Partner Code", ICInboxTrans."IC Partner Code");
+        HandledICInboxSalesHdr.SetRange("Transaction Source", ICInboxTrans."Transaction Source");
+        if HandledICInboxSalesHdr.Find('-') then
+            repeat
+                ICInboxSalesHdr.TransferFields(HandledICInboxSalesHdr, true);
+                ICInboxSalesHdr.Insert();
+                MoveHandledICDocDim(
+                  Database::"Handled IC Inbox Sales Header", Database::"IC Inbox Sales Header",
+                  HandledICInboxSalesHdr."IC Transaction No.", HandledICInboxSalesHdr."IC Partner Code");
 
-                    HandledICInboxSalesLine.SetRange("IC Transaction No.", "IC Transaction No.");
-                    HandledICInboxSalesLine.SetRange("IC Partner Code", "IC Partner Code");
-                    HandledICInboxSalesLine.SetRange("Transaction Source", "Transaction Source");
-                    if HandledICInboxSalesLine.Find('-') then
-                        repeat
-                            ICInboxSalesLine.TransferFields(HandledICInboxSalesLine, true);
-                            ICInboxSalesLine.Insert();
-                            MoveHandledICDocDim(
-                              Database::"Handled IC Inbox Sales Line", Database::"IC Inbox Sales Line",
-                              "IC Transaction No.", "IC Partner Code");
-                            OnBeforeHandledICInboxSalesLineDelete(HandledICInboxSalesLine);
-                            HandledICInboxSalesLine.Delete();
-                        until HandledICInboxSalesLine.Next() = 0;
-                    OnBeforeHandledICInboxSalesHdrDelete(HandledICInboxSalesHdr);
-                    Delete();
-                until Next() = 0;
-        end;
+                HandledICInboxSalesLine.SetRange("IC Transaction No.", HandledICInboxSalesHdr."IC Transaction No.");
+                HandledICInboxSalesLine.SetRange("IC Partner Code", HandledICInboxSalesHdr."IC Partner Code");
+                HandledICInboxSalesLine.SetRange("Transaction Source", HandledICInboxSalesHdr."Transaction Source");
+                if HandledICInboxSalesLine.Find('-') then
+                    repeat
+                        ICInboxSalesLine.TransferFields(HandledICInboxSalesLine, true);
+                        ICInboxSalesLine.Insert();
+                        MoveHandledICDocDim(
+                          Database::"Handled IC Inbox Sales Line", Database::"IC Inbox Sales Line",
+                          HandledICInboxSalesHdr."IC Transaction No.", HandledICInboxSalesHdr."IC Partner Code");
+                        OnBeforeHandledICInboxSalesLineDelete(HandledICInboxSalesLine);
+                        HandledICInboxSalesLine.Delete();
+                    until HandledICInboxSalesLine.Next() = 0;
+                OnBeforeHandledICInboxSalesHdrDelete(HandledICInboxSalesHdr);
+                HandledICInboxSalesHdr.Delete();
+            until HandledICInboxSalesHdr.Next() = 0;
 
-        with HandledICInboxPurchHdr do begin
-            SetRange("IC Transaction No.", ICInboxTrans."Transaction No.");
-            SetRange("IC Partner Code", ICInboxTrans."IC Partner Code");
-            SetRange("Transaction Source", ICInboxTrans."Transaction Source");
-            if Find('-') then
-                repeat
-                    ICInboxPurchHdr.TransferFields(HandledICInboxPurchHdr, true);
-                    ICInboxPurchHdr.Insert();
-                    MoveHandledICDocDim(
-                      Database::"Handled IC Inbox Purch. Header", Database::"IC Inbox Purchase Header",
-                      "IC Transaction No.", "IC Partner Code");
+        //UpgradeReady
+        HandledICInboxPurchHdr.SetRange("IC Transaction No.", ICInboxTrans."Transaction No.");
+        HandledICInboxPurchHdr.SetRange("IC Partner Code", ICInboxTrans."IC Partner Code");
+        HandledICInboxPurchHdr.SetRange("Transaction Source", ICInboxTrans."Transaction Source");
+        if HandledICInboxPurchHdr.Find('-') then
+            repeat
+                ICInboxPurchHdr.TransferFields(HandledICInboxPurchHdr, true);
+                ICInboxPurchHdr.Insert();
+                MoveHandledICDocDim(
+                  Database::"Handled IC Inbox Purch. Header", Database::"IC Inbox Purchase Header",
+                  HandledICInboxPurchHdr."IC Transaction No.", HandledICInboxPurchHdr."IC Partner Code");
 
-                    HandledICInboxPurchLine.SetRange("IC Transaction No.", "IC Transaction No.");
-                    HandledICInboxPurchLine.SetRange("IC Partner Code", "IC Partner Code");
-                    HandledICInboxPurchLine.SetRange("Transaction Source", "Transaction Source");
-                    if HandledICInboxPurchLine.Find('-') then
-                        repeat
-                            ICInboxPurchLine.TransferFields(HandledICInboxPurchLine, true);
-                            ICInboxPurchLine.Insert();
-                            MoveHandledICDocDim(
-                              Database::"Handled IC Inbox Purch. Line", Database::"IC Inbox Purchase Line",
-                              "IC Transaction No.", "IC Partner Code");
-                            OnBeforeHandledICInboxPurchLineDelete(HandledICInboxPurchLine);
-                            HandledICInboxPurchLine.Delete();
-                        until HandledICInboxPurchLine.Next() = 0;
-                    OnBeforeHandledICInboxPurchHdrDelete(HandledICInboxPurchHdr);
-                    Delete();
-                until Next() = 0;
-        end;
+                HandledICInboxPurchLine.SetRange("IC Transaction No.", HandledICInboxPurchHdr."IC Transaction No.");
+                HandledICInboxPurchLine.SetRange("IC Partner Code", HandledICInboxPurchHdr."IC Partner Code");
+                HandledICInboxPurchLine.SetRange("Transaction Source", HandledICInboxPurchHdr."Transaction Source");
+                if HandledICInboxPurchLine.Find('-') then
+                    repeat
+                        ICInboxPurchLine.TransferFields(HandledICInboxPurchLine, true);
+                        ICInboxPurchLine.Insert();
+                        MoveHandledICDocDim(
+                          Database::"Handled IC Inbox Purch. Line", Database::"IC Inbox Purchase Line",
+                          HandledICInboxPurchHdr."IC Transaction No.", HandledICInboxPurchHdr."IC Partner Code");
+                        OnBeforeHandledICInboxPurchLineDelete(HandledICInboxPurchLine);
+                        HandledICInboxPurchLine.Delete();
+                    until HandledICInboxPurchLine.Next() = 0;
+                OnBeforeHandledICInboxPurchHdrDelete(HandledICInboxPurchHdr);
+                HandledICInboxPurchHdr.Delete();
+            until HandledICInboxPurchHdr.Next() = 0;
     end;
 
     local procedure MoveHandledICDocDim(FromTableID: Integer; ToTableID: Integer; TransactionNo: Integer; PartnerCode: Code[20])
@@ -585,62 +548,19 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
     begin
     end;
 
-    // [IntegrationEvent(true, false)]
-    // [Scope('OnPrem')]
-    // procedure OnICInboxTransactionCreated(var ICInboxTransaction: Record "IC Inbox Transaction"; PartnerCompanyName: Text)
-    // begin
-    // end;
-
     [IntegrationEvent(false, false)]
     local procedure OnTransferToPartnerOnBeforePartnerInboxTransactionInsert(var PartnerInboxTransaction: Record "IC Inbox Transaction"; CurrentICPartner: Record "IC Partner")
     begin
     end;
 
-    /*local procedure ReplicateICInboxPurchDocold(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
-    var
-        recItem: Record Item;
-        StreamOut: OutStream;
-        StreamIn: InStream;
-        TempBlob: Codeunit "Temp Blob";
-        Item: Record Item;
-        WsXmlPort: XmlPort "WS Replicate Tariff Number";
-        XDoc: dotnet XmlDocument;
-        NS: dotnet XmlNamespaceManager;
-        ZyWsRequest: Codeunit "Zyxel Web Service Request";
-        rValue: Text;
-        file: file;
-        OutStr: OutStream;
-        InStr: InStream;
-        amazonhelper: Codeunit AmazonHelper;
-    begin
-        // 2026.03.03: CLOUD READY DELETE 
-        //>> 19-06-18 ZY-LD 003
-        // Create Inner XML
-        TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
-
-        WSICInboxPurchHead.SetDestination(StreamOut);
-        WSICInboxPurchHead.Export;  // Change XMLPortNo.
-
-        TempBlob.CreateInstream(StreamIn, Textencoding::UTF8);
-
-        XDoc := XDoc.XmlDocument();
-        XDoc.Load(StreamIn);
-        NS := NS.XmlNamespaceManager(XDoc.NameTable);
-        NS.AddNamespace('d', 'urn:microsoft-dynamics-nav/Replicate');  // Change "Rep*" here
-        rValue := XDoc.SelectSingleNode('//d:root', NS).InnerXml;
-        amazonhelper.downloadtext2fil(rValue, 'rvalueold.txt');
-
-        ZyWsRequest.ReplicateICInboxPurchHead(pCompanyname, rValue);
-
-        //<< 19-06-18 ZY-LD 003
-    end; */
-
 
     local procedure ReplicateICInboxPurchDoc(pCompanyname: Text; var WSICInboxPurchHead: XmlPort "WS Intercompany")
     var
+        ZyWsRequest: Codeunit "Zyxel Web Service Request";
+        amazonhelper: Codeunit AmazonHelper;
+        TempBlob: Codeunit "Temp Blob";
         StreamOut: OutStream;
         StreamIn: InStream;
-        TempBlob: Codeunit "Temp Blob";
         XmlDoc: XmlDocument;
         XmlNSMgr: XmlNamespaceManager;
         XmlRootNode: XmlNode;
@@ -648,16 +568,15 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
         InnerRootEl: XmlElement;
         InnerChildNodes: XmlNodeList;
         InnerChildNode: XmlNode;
-        ZyWsRequest: Codeunit "Zyxel Web Service Request";
         rValue: Text;
         NodeText: Text;
         ChildText: Text;
-        amazonhelper: Codeunit AmazonHelper;
+
     begin
         // 2026.03.03: CLOUD READY NEW
         TempBlob.CreateOutstream(StreamOut, Textencoding::UTF8);
         WSICInboxPurchHead.SetDestination(StreamOut);
-        WSICInboxPurchHead.Export;  // Change XMLPortNo.
+        WSICInboxPurchHead.Export();  // Change XMLPortNo.
         TempBlob.CreateInstream(StreamIn, Textencoding::UTF16);
         XmlDocument.ReadFrom(StreamIn, XmlDoc);
         XmlNSMgr.NameTable(XmlDoc.NameTable());
@@ -670,8 +589,6 @@ Report 50017 "Move IC Trans. to Pa. Comp ZX"
             rValue := rValue.TrimEnd(' ').TrimStart(' ');
             rValue := amazonhelper.RemoveSpacesBetweenXmlTags(rvalue);
 
-            // Re-parse with namespace on the wrapper so children inherit it.
-            // Write each child individually — the serializer declares xmlns on each element since there is no parent context.
             XmlDocument.ReadFrom('<root xmlns="urn:microsoft-dynamics-nav/Replicate">' + rValue + '</root>', InnerXmlDoc);
             InnerXmlDoc.GetRoot(InnerRootEl);
             InnerChildNodes := InnerRootEl.GetChildElements();

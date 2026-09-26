@@ -34,9 +34,7 @@ tableextension 50109 GLEntryZX extends "G/L Entry"
 
             trigger OnValidate()
             begin
-                //CO4.20: Controling - Basic: Applying G/L Entries;
                 Rec.TestField(Rec.Closed, false);
-                //CO4.20
             end;
         }
         field(50013; Closed; Boolean)
@@ -70,7 +68,7 @@ tableextension 50109 GLEntryZX extends "G/L Entry"
                 //CO4.20
             end;
         }
-        field(50020; Country; Code[20])
+        /*field(50020; Country; Code[20]) //06-08-206 BK performance issue.
         {
             CalcFormula = lookup("Dimension Set Entry"."Dimension Value Code" where("Dimension Set ID" = field("Dimension Set ID"),
                                                                                     "Dimension Code" = const('COUNTRY')));
@@ -84,7 +82,7 @@ tableextension 50109 GLEntryZX extends "G/L Entry"
                                                                                     "Dimension Code" = const('COSTTYPE')));
             Description = 'PAB 1.0';
             FieldClass = FlowField;
-        }
+        } */
         field(50022; "Ignore Country Dimension"; Boolean)
         {
             Description = 'PAB 1.0';
@@ -105,15 +103,7 @@ tableextension 50109 GLEntryZX extends "G/L Entry"
             Description = 'PAB 1.0';
             FieldClass = FlowField;
         }
-        // field(50026; "Remaining Amount"; Decimal)
-        // {
-        //     Caption = 'Remaining Amount';
-        //     Editable = false;
-        //     BlankZero = true;
-        //     FieldClass = FlowField;
-        //     CalcFormula = sum("G/L Entry".Amount where("Reviewed Identifier" = field("Reviewed Identifier")));//,
-        //                                                                                                       //                          "Entry No." = field("Entry No. Filter")));
-        // }
+
     }
 
     keys

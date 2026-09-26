@@ -1,13 +1,10 @@
 Report 62015 "Change Warehouse Status"
 {
-    // 001. 18-11-19 ZY-LD 000 - Change Document Status
-    // 002. 03-12-20 ZY-LD P0499 - Create a response on transfer delivered.
-    // 003. 23-08-22 ZY-LD 000 - Post Response.
-
     Caption = 'Change Warehouse Status - Outbound';
     ProcessingOnly = true;
     ShowPrintStatus = false;
     UseRequestPage = true;
+    usagecategory = reportsandanalysis;
 
     dataset
     {
@@ -27,6 +24,7 @@ Report 62015 "Change Warehouse Status"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Delivery Document';
+                        tooltip = 'Specifies the delivery document number for which you want to change the warehouse status.';
                         Editable = false;
                         Lookup = true;
 
@@ -35,9 +33,8 @@ Report 62015 "Change Warehouse Status"
                             frmDelDoc: Page "VCK Delivery Document Header";
                         begin
                             frmDelDoc.LookupMode(true);
-                            if frmDelDoc.RunModal = Action::LookupOK then begin
-                                Text := frmDelDoc.ReturnCode;
-
+                            if frmDelDoc.RunModal() = Action::LookupOK then begin
+                                Text := frmDelDoc.ReturnCode();
                                 exit(true);
                             end;
                         end;
@@ -46,11 +43,15 @@ Report 62015 "Change Warehouse Status"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Warehouse Status';
+                        tooltip = 'Specifies the warehouse status for the delivery document.';
+                        OptionCaption = 'New,Backorder,"Ready to Pick",Picking,Packed,"Waiting for invoice","Invoice Received",Posted,"In Transit",Delivered,Error';
                     }
                     field(DocStatus; DocStatus)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Document Status';
+                        tooltip = 'Specifies the document status for the delivery document.';
+                        OptionCaption = 'Open,Released,Posted';
                     }
                 }
             }
@@ -69,43 +70,34 @@ Report 62015 "Change Warehouse Status"
     begin
         if DeliveryDoc = '' then
             Error('You must specify a Delivery Document No.');
+        //UpgradeReady
+        if recDelDocHead.Get(DeliveryDoc) then begin
+            recShipRespHead.SetRange("Customer Message No.", DeliveryDoc);
+            if not recShipRespHead.FindLast() then
+                Clear(recShipRespHead);
 
-        // 18-11-19 ZY-LD 001
-        //recDeliveryDocumentHeader.SETFILTER("No.",DeliveryDoc);
-        //IF NOT recDeliveryDocumentHeader.FINDFIRST THEN
-        //  ERROR('The Delivery Document Does Not Exist!');
-
-        //IF recDeliveryDocumentHeader.FINDfirst THEN BEGIN
-        with recDelDocHead do
-            if Get(DeliveryDoc) then begin  // 18-11-19 ZY-LD 001
-                recShipRespHead.SetRange("Customer Message No.", DeliveryDoc);
-                if not recShipRespHead.FindLast then
-                    Clear(recShipRespHead);
-
-                if ("Document Type" = "document type"::Sales) or
-                   (("Document Type" = "document type"::Transfer) and
-                    (recShipRespHead."Warehouse Status" = recShipRespHead."warehouse status"::Delivered))
-                then begin
-                    if "Warehouse Status" <> Status then
-                        Validate("Warehouse Status", Status);
-                    if "Document Status" <> DocStatus then
-                        Validate("Document Status", DocStatus);  // 18-11-19 ZY-LD 001
-                    Modify(true);
-                end else begin
-                    //>> 03-12-20 ZY-LD 002
-                    ResponseNo := ReleaseDeliveryDoc.CreateResponse(recDelDocHead, true);
-                    if PostResponse and  // 23-08-22 ZY-LD 003
-                       (ResponseNo <> '')
-                    then
-                        PostShipRespMgt.PostShippingOrderResponse(ResponseNo);
-                    //<< 03-12-20 ZY-LD 002
-                end;
+            if (recDelDocHead."Document Type" = recDelDocHead."document type"::Sales) or
+                ((recDelDocHead."Document Type" = recDelDocHead."document type"::Transfer) and
+                (recShipRespHead."Warehouse Status" = recShipRespHead."warehouse status"::Delivered))
+            then begin
+                if recDelDocHead."Warehouse Status" <> Status then
+                    recDelDocHead.Validate("Warehouse Status", Status);
+                if recDelDocHead."Document Status" <> DocStatus then
+                    recDelDocHead.Validate("Document Status", DocStatus);
+                recDelDocHead.Modify(true);
+            end else begin
+                ResponseNo := ReleaseDeliveryDoc.CreateResponse(recDelDocHead, true);
+                if PostResponse and
+                    (ResponseNo <> '')
+                then
+                    PostShipRespMgt.PostShippingOrderResponse(ResponseNo);
             end;
+        end;
     end;
 
     trigger OnPreReport()
     begin
-        SI.UseOfReport(3, 62015, 2);  // 14-10-20 ZY-LD 000
+        SI.UseOfReport(3, 62015, 2);
     end;
 
     var
@@ -114,11 +106,10 @@ Report 62015 "Change Warehouse Status"
         ReleaseDeliveryDoc: Codeunit "Release Delivery Document";
         PostShipRespMgt: Codeunit "Post Ship Response Mgt.";
         SI: Codeunit "Single Instance";
-        DeliveryDoc: Code[20];
-        ResponseNo: Code[20];
         Status: Option New,Backorder,"Ready to Pick",Picking,Packed,"Waiting for invoice","Invoice Received",Posted,"In Transit",Delivered,Error;
         DocStatus: Option Open,Released,Posted;
-        Text001: label 'Please specify a Delivery Document No.';
+        DeliveryDoc: Code[20];
+        ResponseNo: Code[20];
         PostResponse: Boolean;
 
 
@@ -126,8 +117,8 @@ Report 62015 "Change Warehouse Status"
     begin
         DeliveryDoc := NewDeliveryDoc;
         Status := NewStatus;
-        DocStatus := NewDocStatus;  // 18-11-19 ZY-LD 001
-        PostResponse := NewPostResponse;  // 23-08-22 ZY-LD 003
+        DocStatus := NewDocStatus;
+        PostResponse := NewPostResponse;
     end;
 }
 

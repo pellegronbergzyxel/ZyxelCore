@@ -1,6 +1,5 @@
 Report 50061 "Travel Expense Document"
 {
-    // 001. 16-10-20 ZY-LD 2020101510000192 - Filter is changed on the line.
 
     Caption = 'Travel Expense Document';
     ProcessingOnly = true;
@@ -20,7 +19,7 @@ Report 50061 "Travel Expense Document"
 
                 trigger OnAfterGetRecord()
                 begin
-                    MakeExcelLine;
+                    MakeExcelLine();
                 end;
 
                 trigger OnPostDataItem()
@@ -31,14 +30,14 @@ Report 50061 "Travel Expense Document"
 
             trigger OnAfterGetRecord()
             begin
-                ExcelBuf.DeleteAll;
-                ExcelBuf.ClearNewRow;
-                MakeExcelHead;
+                ExcelBuf.DeleteAll();
+                ExcelBuf.ClearNewRow();
+                MakeExcelHead();
             end;
 
             trigger OnPostDataItem()
             begin
-                CloseExcelbook;
+                CloseExcelbook();
             end;
         }
     }
@@ -61,17 +60,16 @@ Report 50061 "Travel Expense Document"
 
     trigger OnPreReport()
     begin
-        SI.UseOfReport(3, 50061, 3);  // 14-10-20 ZY-LD 000
+        SI.UseOfReport(3, 50061, 3);
     end;
 
     var
         ExcelBuf: Record "Excel Buffer" temporary;
-        Col: Integer;
+        SI: Codeunit "Single Instance";
         ExcelBookCreated: Boolean;
+        DoNotGiveUserControl: Boolean;
         Text001: label 'HEADER';
         Text002: label 'LINES';
-        DoNotGiveUserControl: Boolean;
-        SI: Codeunit "Single Instance";
 
 
     procedure InitReport(pDoNotGiveUserControl: Boolean)
@@ -90,35 +88,35 @@ Report 50061 "Travel Expense Document"
         lText005: label 'Employee ID';
     begin
         begin
-            ExcelBuf.NewRow;
+            ExcelBuf.NewRow();
             ExcelBuf.AddColumn(Text001, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.NewRow;
+            ExcelBuf.NewRow();
             ExcelBuf.AddColumn("Travel Expense Header".FieldCaption("Travel Expense Header"."No."), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn("Travel Expense Header"."No.", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.NewRow;
+            ExcelBuf.NewRow();
             ExcelBuf.AddColumn("Travel Expense Header".FieldCaption("Travel Expense Header"."Concur Batch ID"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn("Travel Expense Header"."Concur Batch ID", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.NewRow;
+            ExcelBuf.NewRow();
             ExcelBuf.AddColumn("Travel Expense Header".FieldCaption("Travel Expense Header"."Concur Report Name"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn("Travel Expense Header"."Concur Report Name", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.NewRow;
+            ExcelBuf.NewRow();
             ExcelBuf.AddColumn("Travel Expense Header".FieldCaption("Travel Expense Header"."Employee Name"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn("Travel Expense Header"."Employee Name", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.NewRow;
+            ExcelBuf.NewRow();
             ExcelBuf.AddColumn("Travel Expense Header".FieldCaption("Travel Expense Header"."Posting Date"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn("Travel Expense Header"."Posting Date", false, '', false, false, false, '', ExcelBuf."cell type"::Date);
-            ExcelBuf.NewRow;
+            ExcelBuf.NewRow();
             ExcelBuf.AddColumn("Travel Expense Header".FieldCaption("Travel Expense Header"."Currency Code"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn("Travel Expense Header"."Currency Code", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.NewRow;
+            ExcelBuf.NewRow();
             ExcelBuf.AddColumn("Travel Expense Header".FieldCaption("Travel Expense Header".Amount), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn("Travel Expense Header".Amount, false, '', false, false, false, '##,###,##0.00', ExcelBuf."cell type"::Number);
         end;
         begin
-            ExcelBuf.NewRow;
-            ExcelBuf.NewRow;
+            ExcelBuf.NewRow();
+            ExcelBuf.NewRow();
             ExcelBuf.AddColumn(Text002, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.NewRow;
+            ExcelBuf.NewRow();
             ExcelBuf.AddColumn("Travel Expense Line".FieldCaption("Travel Expense Line".Type), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn("Travel Expense Line".FieldCaption("Travel Expense Line"."Expense Type"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn("Travel Expense Line".FieldCaption("Travel Expense Line"."Account Type"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
@@ -132,14 +130,12 @@ Report 50061 "Travel Expense Document"
             ExcelBuf.AddColumn("Travel Expense Line".FieldCaption("Travel Expense Line".Amount), false, '', true, false, false, '##,###,##0.00', ExcelBuf."cell type"::Number);
             ExcelBuf.AddColumn("Travel Expense Line".FieldCaption("Travel Expense Line"."Bal. Account Type"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn("Travel Expense Line".FieldCaption("Travel Expense Line"."Bal. Account No."), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.NewRow;
+            ExcelBuf.NewRow();
         end;
     end;
 
 
     procedure MakeExcelLine()
-    var
-        recHrHist: Record "HR Role History";
     begin
         begin
             ExcelBuf.AddColumn(Format("Travel Expense Line".Type), false, '', false, false, false, '', ExcelBuf."cell type"::Text);
@@ -155,7 +151,7 @@ Report 50061 "Travel Expense Document"
             ExcelBuf.AddColumn(Format("Travel Expense Line".Amount), false, '', false, false, false, '##,###,##0.00', ExcelBuf."cell type"::Number);
             ExcelBuf.AddColumn(Format("Travel Expense Line"."Bal. Account Type"), false, '', false, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn("Travel Expense Line"."Bal. Account No.", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.NewRow;
+            ExcelBuf.NewRow();
         end;
     end;
 
@@ -163,12 +159,11 @@ Report 50061 "Travel Expense Document"
     procedure CreateExcelbook(SheetName: Text)
     begin
         if not ExcelBookCreated then begin
-            // ExcelBuf.CreateBook('', SheetName); CLOUD ready DELETE
-            ExcelBuf.CreateNewBook(SheetName);
+            ExcelBuf.CreateNewBook(Copystr(SheetName, 1, 250));
             ExcelBuf.WriteSheet(SheetName, CompanyName(), UserId());
             ExcelBookCreated := true;
         end else begin
-            ExcelBuf.AddNewSheet(SheetName);
+            ExcelBuf.AddNewSheet(copystr(SheetName, 1, 250));
             ExcelBuf.WriteSheet(SheetName, CompanyName(), UserId());
         end;
     end;
@@ -176,10 +171,10 @@ Report 50061 "Travel Expense Document"
 
     procedure CloseExcelbook()
     begin
-        ExcelBuf.CloseBook;
+        ExcelBuf.CloseBook();
 
         if GuiAllowed and (not DoNotGiveUserControl) then begin
-            ExcelBuf.OpenExcel;
+            ExcelBuf.OpenExcel();
         end;
     end;
 
@@ -195,6 +190,6 @@ Report 50061 "Travel Expense Document"
 
     procedure GetFilename(): Text
     begin
-        exit(ExcelBuf.GetFileNameServer);
+        exit(ExcelBuf.GetFileNameServer());
     end;
 }

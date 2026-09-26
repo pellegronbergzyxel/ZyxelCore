@@ -105,7 +105,7 @@ pageextension 50199 SalesLinesZX extends "Sales Lines"
     end;
 
     var
-        SellToCustomerName: Text[50];
+        SellToCustomerName: Text[100]; //21-09-2026 BK #594875
         CustomerCard: Record Customer;
         ReqDeliveryOverDue: Integer;
 }

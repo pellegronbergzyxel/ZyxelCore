@@ -718,7 +718,7 @@ codeunit 50055 AmazonHelper
     procedure createorClearAmazonorder(billcustomerno: code[20]; sellcustomerno: code[20]; Amazonorder: code[35]; var SalesRecord: record "Sales Header"; Partyid: code[10]): Boolean
     var
         salesline: record "Sales Line";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series"; //UpgradeReady
         salesSetup: Record "Sales & Receivables Setup";
         Amazonsetup: record "Amazon Setup";
     begin

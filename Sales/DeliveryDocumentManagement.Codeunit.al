@@ -1037,6 +1037,7 @@ codeunit 50008 "Delivery Document Management"
         If LocSalesHeader."Shipping Advice" = LocSalesHeader."Shipping Advice"::Complete then begin
             LocSalesLine.SetRange("Document Type", LocSalesLine."Document Type"::Order);
             LocSalesLine.SetRange("Document No.", LocSalesHeader."No.");
+            locsalesline.SetRange("Hide Line", false); //12-08-26 BK #580967
             if LocSalesLine.FindSet() then
                 repeat
                     If NOT LocSalesLine."Shipment Date Confirmed" then

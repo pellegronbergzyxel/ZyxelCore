@@ -478,6 +478,15 @@ Page 50053 "Shipment Response Card"
                 RunObject = Page "VCK Delivery Document";
                 RunPageLink = "No." = field("Customer Reference");
             }
+            action("Show Serial No. List")
+            { //24-08-2026 BK #542568
+                ApplicationArea = Basic, Suite;
+                Caption = 'Show Serial No. List';
+                ToolTip = 'Specify the Show Serial No. List';
+                Image = List;
+                RunObject = Page "VCK Delivery Document";
+                RunPageLink = "No." = field("Customer Reference");
+            }
         }
     }
 

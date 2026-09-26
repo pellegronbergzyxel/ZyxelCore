@@ -46,8 +46,10 @@ codeunit 50033 SalesSubscribers
         recSalesShipLine.SetRange("Document No.", SalesShptLine."Document No.");
         recSalesShipLine.SetRange(Type, recSalesShipLine.Type::Item);
         recSalesShipLine.SetFilter("Qty. Shipped Not Invoiced", '<>0');
-        if not recSalesShipLine.FindFirst() then;
-        //<< 23-09-20 ZY-LD 008
+        //06-08-2026 BK #561934
+        if recSalesShipLine.FindFirst() then
+            Location.Get(recSalesShipLine."Location Code");
+
         TranslationHelper.SetGlobalLanguageByCode(SalesInvHeader."Language Code");
         if Location.Warehouse <> 0 then begin  //Not blank 22-04-2026 BK #561934
             if recSellToCust.Get(recSalesShipLine."Sell-to Customer No.") and recSellToCust."Create Invoice pr. Order" and (recSalesShipLine."Order No." <> '') then  // 18-06-20 ZY-LD 006

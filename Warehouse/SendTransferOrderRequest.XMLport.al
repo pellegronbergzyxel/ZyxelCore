@@ -245,7 +245,7 @@ XmlPort 50062 "Send Transfer Order Request"
     trigger OnPreXmlPort()
     var
         recSalesReceivablesSetup: Record "Sales & Receivables Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series"; //UpgradeReady
     begin
     end;
 

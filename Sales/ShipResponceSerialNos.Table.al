@@ -56,6 +56,10 @@ Table 73008 "Ship Responce Serial Nos."
         {
             Caption = 'Response Line No.';
         }
+        field(204; "Carrier ID"; code[20]) //19-08-2026 BK #542568
+        {
+            Caption = 'Carrier ID';
+        }
     }
 
     keys

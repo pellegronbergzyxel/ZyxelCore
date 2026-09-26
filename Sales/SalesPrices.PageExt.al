@@ -35,7 +35,7 @@ pageextension 50269 SalesPriceZX extends "Price List Lines"
 
                 trigger OnAction()
                 begin
-                    UpdateLineDiscountPct();  // 03-05-18 ZY-LD 001
+                    UpdateLineDiscountPct();
                 end;
             }
             action(Replace)
@@ -80,7 +80,7 @@ pageextension 50269 SalesPriceZX extends "Price List Lines"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Margin Approval';
-                    Image = Profit;
+                    Image = SalesPrices; //UpgradeReadey
 
                     trigger OnAction()
                     var
@@ -101,10 +101,8 @@ pageextension 50269 SalesPriceZX extends "Price List Lines"
 
     local procedure UpdateLineDiscountPct()
     begin
-        //>> 03-05-18 ZY-LD 001
         if (Rec."Line Discount %" <> 0) and (Rec."Source Type" = Rec."Source Type"::Customer) then
             UpdateAllSalesDocuments(Rec."Source No.", Rec."Starting Date", Rec."Line Discount %");
-        //<< 03-05-18 ZY-LD 001
     end;
 
     local procedure UpdateAllSalesDocuments(pCustNo: Code[20]; pDate: Date; NewLineDiscount: Decimal)
@@ -120,15 +118,13 @@ pageextension 50269 SalesPriceZX extends "Price List Lines"
         lText004: Label 'Update all sales documents,Update all sales documents equal or newer than %1';
         lText005: Label 'Select Update Period';
     begin
-        //>> 03-05-18 ZY-LD 003
-        Choice := StrMenu(StrSubstNo(lText004, pDate), 1, lText005);  // 10-01-23 ZY-LD 004
-        if Choice > 0 then begin  // 10-01-23 ZY-LD 004
+        Choice := StrMenu(StrSubstNo(lText004, pDate), 1, lText005);
+        if Choice > 0 then begin
             recSalesHead.SetRange("Bill-to Customer No.", pCustNo);
             recSalesHead.SetRange("Completely Invoiced", false);
             for i := 1 to 3 do begin
-                //recSalesHead.RESET;
                 recSalesHead.SetRange("Document Type", i);
-                if Choice = 2 then  // 10-01-23 ZY-LD 004
+                if Choice = 2 then
                     if i = 1 then  // Orders
                         recSalesHead.SetFilter("Order Date", '%1..', pDate)
                     else  // Invoices and Cr. Memos
@@ -140,9 +136,8 @@ pageextension 50269 SalesPriceZX extends "Price List Lines"
 
             Clear(UpdateSDoc);
             for i := 1 to 3 do begin
-                //recSalesHead.RESET;
                 recSalesHead.SetRange("Document Type", i);
-                if Choice = 2 then  // 10-01-23 ZY-LD 004
+                if Choice = 2 then
                     if i = 1 then  // Orders
                         recSalesHead.SetFilter("Order Date", '%1..', pDate)
                     else  // Invoices and Cr. Memos
@@ -153,24 +148,19 @@ pageextension 50269 SalesPriceZX extends "Price List Lines"
                         recSalesLine.SetRange("Document No.", recSalesHead."No.");
                         recSalesLine.SetRange(Type, recSalesLine.Type::Item);
                         recSalesLine.SetFilter("No.", '<>%1', '');
-                        recSalesLine.SetRange("Completely Invoiced", false);  // 10-01-23 ZY-LD 
+                        recSalesLine.SetRange("Completely Invoiced", false);
                         if recSalesLine.FindSet(true) then begin
                             recSalesLine.SuspendStatusCheck(true);
                             repeat
-                                //"PrevLineDisc%" := recSalesLine."Line Discount %";
-                                //FindSalesLineLineDisc(recSalesHead,recSalesLine);
-                                //IF "PrevLineDisc%" <> recSalesLine."Line Discount %" THEN BEGIN
                                 recSalesLine.Validate("Line Discount %", NewLineDiscount);
                                 recSalesLine.Modify();
                                 UpdateSDoc[i] += 1;
-                            //END;
                             until recSalesLine.Next() = 0;
                             recSalesLine.SuspendStatusCheck(false);
                         end;
                     until recSalesHead.Next() = 0;
             end;
             Message(lText003, UpdateSDoc[1], UpdateSDoc[2], UpdateSDoc[3]);
-            //<< 03-05-18 ZY-LD 003
         end;
     end;
 }

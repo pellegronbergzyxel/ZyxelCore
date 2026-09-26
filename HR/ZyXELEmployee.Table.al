@@ -1,25 +1,6 @@
 Table 50109 "ZyXEL Employee"
 {
-    // 001. 25-01-18 ZY-LD 2018011910000116 - New field.
-    // 002. 21-02-18 ZY-LD 2018021610000058 - New field.
-    // 003. 23-02-18 ZY-LD 2018022310000133 - Fullname is called when name is changed.
-    // 004. 06-04-18 ZY-LD 2018040310000195 - If number is renamed, absence need to be renamed too.
-    // 005. 11-04-18 ZY-LD 000 - New fields.
-    // 006. 16-04-18 ZY-LD 2018041610000072 - New field.
-    // 007. 30-04-18 ZY-LD 2018042610000161 - New fields.
-    // 008. 22-08-18 ZY-LD 2018050910000191 - Table relation set on Cost Type.
-    // 009. 27-07-18 ZY-LD 2018062910000259 - New field.
-    // 010. 15-10-18 ZY-LD 2018101510000026 - New fields.
-    // 011. 17-10-18 ZY-LD 2018101710000068 - Setup No. Series.
-    // 012. 29-11-18 ZY-LD 2018111310000046 - Calc of Probation Date.
-    // 013. 26-02-19 ZY-LD 2019022610000055 - New field.
-    // 014. 26-06-19 ZY-LD 2019062410000088 - New field.
-    // 015. 17-10-19 ZY-LD 2019101610000157 - New field.
-    // 016. 24-10-19 ZY-LD 2019102410000052 - Bank Account No. is extended from 30 to 40 charcteres.
-    // 017. 28-10-19 ZY-LD 2019102710000047 - Send e-mail if cost type changes.
-    // 018. 28-09-20 ZY-LD 2020092810000054 - "Termination Date" has got a new caption "Notice Date".
-    // 019. 18-11-20 ZY-LD 2020111010000074 - New field.
-    // 020. 16-08-21 ZY-LD 2021081310000064 - Nationality has changed sub table from "Country/Region" to Natiolality.
+
 
     Caption = 'Employee';
     DataCaptionFields = "No.", "First Name", "Middle Name", "Last Name";
@@ -36,12 +17,12 @@ Table 50109 "ZyXEL Employee"
             trigger OnValidate()
             begin
                 if "No." <> xRec."No." then begin
-                    HumanResSetup.Get;
+                    HumanResSetup.Get();
                     NoSeriesMgt.TestManual(HumanResSetup."Employee Nos.");
                     "No. Series" := '';
                 end;
 
-                HumanResSetup.Get;
+                HumanResSetup.Get();
                 NoSeriesMgt.TestManual(HumanResSetup."Employee Nos.");
                 "No. Series" := '';
             end;
@@ -53,7 +34,7 @@ Table 50109 "ZyXEL Employee"
 
             trigger OnValidate()
             begin
-                "Full Name" := FullName;  // 23-02-18 ZY-LD 003
+                "Full Name" := FullName();
             end;
         }
         field(3; "Middle Name"; Text[30])
@@ -63,7 +44,7 @@ Table 50109 "ZyXEL Employee"
 
             trigger OnValidate()
             begin
-                "Full Name" := FullName;  // 23-02-18 ZY-LD 003
+                "Full Name" := FullName();
             end;
         }
         field(4; "Last Name"; Text[30])
@@ -73,7 +54,7 @@ Table 50109 "ZyXEL Employee"
 
             trigger OnValidate()
             begin
-                "Full Name" := FullName;  // 23-02-18 ZY-LD 003
+                "Full Name" := FullName();
             end;
         }
         field(5; Initials; Text[30])
@@ -118,13 +99,11 @@ Table 50109 "ZyXEL Employee"
             TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
             else
             if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
             begin
-                PostCode.ValidateCity(City, "Post Code", County, "Country/Region Code", (CurrFieldNo <> 0) and GuiAllowed);
+                PostCode.ValidateCity(City, "Post Code", County, "Country/Region Code", (CurrFieldNo <> 0) and GuiAllowed());
             end;
         }
         field(11; "Post Code"; Code[20])
@@ -134,13 +113,11 @@ Table 50109 "ZyXEL Employee"
             TableRelation = if ("Country/Region Code" = const('')) "Post Code"
             else
             if ("Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
             begin
-                PostCode.ValidatePostCode(City, "Post Code", County, "Country/Region Code", (CurrFieldNo <> 0) and GuiAllowed);
+                PostCode.ValidatePostCode(City, "Post Code", County, "Country/Region Code", (CurrFieldNo <> 0) and GuiAllowed());
             end;
         }
         field(12; County; Text[30])
@@ -197,18 +174,6 @@ Table 50109 "ZyXEL Employee"
         {
             Caption = 'Social Security No.';
             Description = 'PAB 1.0';
-
-            trigger OnValidate()
-            var
-                Employee: Record Employee;
-                Weight: Text[10];
-                I: Integer;
-                Ok: Boolean;
-                V: Integer;
-                C: Integer;
-                "Sum": Integer;
-            begin
-            end;
         }
         field(22; "Union Code"; Code[10])
         {
@@ -263,7 +228,7 @@ Table 50109 "ZyXEL Employee"
 
             trigger OnValidate()
             begin
-                Validate("Probation Period (Months)");  // 29-11-18 ZY-LD 012
+                Validate("Probation Period (Months)");
             end;
         }
         field(30; "Next Birth Date"; Date)
@@ -282,25 +247,12 @@ Table 50109 "ZyXEL Employee"
         {
             Caption = 'Inactive Date';
             Description = 'PAB 1.0';
-
-            trigger OnValidate()
-            var
-                bEndingDateReset: Boolean;
-                bPeriodFound: Boolean;
-            begin
-            end;
         }
         field(33; "Cause of Inactivity Code"; Code[10])
         {
             Caption = 'Cause of Inactivity Code';
             Description = 'PAB 1.0';
             TableRelation = "Cause of Inactivity";
-
-            trigger OnValidate()
-            var
-                CauseOfInactivity: Record "Cause of Inactivity";
-            begin
-            end;
         }
         field(34; "Termination Date"; Date)
         {
@@ -312,12 +264,6 @@ Table 50109 "ZyXEL Employee"
             Caption = 'Grounds for Term. Code';
             Description = 'PAB 1.0';
             TableRelation = "Grounds for Termination";
-
-            trigger OnValidate()
-            var
-                GroundsForTerm: Record "Grounds for Termination";
-            begin
-            end;
         }
         field(36; "Global Dimension 1 Code"; Code[20])
         {
@@ -475,10 +421,8 @@ Table 50109 "ZyXEL Employee"
 
             trigger OnValidate()
             begin
-                //>> 29-11-18 ZY-LD 012
                 if recHrOffice.Get(Company) and (recHrOffice."Probation Period (Month)" <> 0) then
                     Validate("Probation Period (Months)", recHrOffice."Probation Period (Month)");
-                //<< 29-11-18 ZY-LD 012
             end;
         }
         field(50001; "Known As"; Text[30])
@@ -742,7 +686,6 @@ Table 50109 "ZyXEL Employee"
 
             trigger OnValidate()
             begin
-                //>> 29-11-18 ZY-LD 012
                 if not "Probation Passed" then begin
                     if ("Probation Period (Months)" <> 0) and ("Employment Date" <> 0D) then begin
                         Evaluate(DateFormula, StrSubstNo('<%1M>', "Probation Period (Months)"));
@@ -750,7 +693,6 @@ Table 50109 "ZyXEL Employee"
                     end;
                 end else
                     "Probation Period (Months)" := xRec."Probation Period (Months)";
-                //<< 29-11-18 ZY-LD 012
             end;
         }
         field(50071; "Probation Review Meeting"; Date)
@@ -928,17 +870,15 @@ Table 50109 "ZyXEL Employee"
 
             trigger OnValidate()
             begin
-                UpdateEmloyeeHistory;  // 22-08-18 ZY-LD 008
+                UpdateEmloyeeHistory();
 
-                //>> 28-10-19 ZY-LD 017
                 if ("Cost Type" <> xRec."Cost Type") and (xRec."Cost Type" <> '') then begin
                     SI.SetMergefield(100, "No.");
                     SI.SetMergefield(101, xRec."Cost Type");
                     SI.SetMergefield(102, "Cost Type");
                     EmailAddMgt.CreateSimpleEmail('HR-COSTTYP', '', '');
-                    EmailAddMgt.Send;
+                    EmailAddMgt.Send();
                 end;
-                //<< 28-10-19 ZY-LD 017
             end;
         }
         field(50133; "Date when fund allocated"; Date)
@@ -1023,11 +963,9 @@ Table 50109 "ZyXEL Employee"
 
             trigger OnValidate()
             begin
-                //>> 30-04-18 ZY-LD 007
                 "GDPR Training Completed Date" := 0D;
                 if "GDPR Training Completed" then
-                    "GDPR Training Completed Date" := Today;
-                //<< 30-04-18 ZY-LD 007
+                    "GDPR Training Completed Date" := Today();
             end;
         }
         field(50152; "GDPR Training Completed Date"; Date)
@@ -1042,11 +980,9 @@ Table 50109 "ZyXEL Employee"
 
             trigger OnValidate()
             begin
-                //>> 30-04-18 ZY-LD 007
                 "GDPR Consent Form Ret. Date" := 0D;
                 if "GDPR Consent Form Returned" then
-                    "GDPR Consent Form Ret. Date" := Today;
-                //<< 30-04-18 ZY-LD 007
+                    "GDPR Consent Form Ret. Date" := Today();
             end;
         }
         field(50154; "GDPR Consent Form Ret. Date"; Date)
@@ -1061,11 +997,9 @@ Table 50109 "ZyXEL Employee"
 
             trigger OnValidate()
             begin
-                //>> 30-04-18 ZY-LD 007
                 "GDPR Consent Form Signed Date" := 0D;
                 if "GDPR Consent Form Signed" then
-                    "GDPR Consent Form Signed Date" := Today;
-                //<< 30-04-18 ZY-LD 007
+                    "GDPR Consent Form Signed Date" := Today();
             end;
         }
         field(50156; "GDPR Consent Form Signed Date"; Date)
@@ -1080,11 +1014,9 @@ Table 50109 "ZyXEL Employee"
 
             trigger OnValidate()
             begin
-                //>> 30-04-18 ZY-LD 007
                 "GDPR Consent Withdrawn Date" := 0D;
                 if "GDPR Consent Withdrawn" then
-                    "GDPR Consent Withdrawn Date" := Today;
-                //<< 30-04-18 ZY-LD 007
+                    "GDPR Consent Withdrawn Date" := Today();
             end;
         }
         field(50158; "GDPR Consent Withdrawn Date"; Date)
@@ -1177,112 +1109,73 @@ Table 50109 "ZyXEL Employee"
 
     trigger OnInsert()
     begin
-        //>> 17-10-18 ZY-LD 011
         if "No." = '' then begin
-            HumanResSetup.Get;
+            HumanResSetup.Get();
             HumanResSetup.TestField("Employee Nos.");
-            NoSeriesMgt.InitSeries(HumanResSetup."Employee Nos.", xRec."No. Series", 0D, "No.", "No. Series");
+            NoSeriesCode := HumanResSetup."Employee Nos.";
+            rec."No. Series" := CopyStr(HumanResSetup."Employee Nos.", 1, 10); //UpgradeReady
+
+            if NoSeriesMgt.AreRelated("No. Series", xRec."No. Series") then
+                "No. Series" := xRec."No. Series";
+
+            "No." := NoSeriesMgt.GetNextNo("No. Series", 0D);
         end;
         //<< 17-10-18 ZY-LD 011
     end;
 
     trigger OnModify()
     begin
-        "Last Date Modified" := Today;
+        "Last Date Modified" := Today();
     end;
 
     trigger OnRename()
-    var
-        EmployeeQualification: Record "Employee Qualification";
-        EmployeeQualification2: Record "Employee Qualification";
-    begin
-        "Last Date Modified" := Today;
 
-        //>> 06-04-18 ZY-LD 004
+    begin
+        "Last Date Modified" := Today();
+
         EmpAbs.SetRange("Employee No.", xRec."No.");
-        if EmpAbs.FindSet then
+        if EmpAbs.FindSet() then
             repeat
                 EmpAbs."Employee No." := "No.";
-                EmpAbs.Modify;
+                EmpAbs.Modify();
             until EmpAbs.Next() = 0;
-        //<< 06-04-18 ZY-LD 004
     end;
 
     var
         HumanResSetup: Record "Human Resources Setup";
         Employee: Record "ZyXEL Employee";
-        Res: Record Resource;
+
         PostCode: Record "Post Code";
-        EmployeeQualification: Record "Employee Qualification";
-        EmployeeAbsence: Record "Employee Absence";
-        HumanResComment: Record "Human Resource Comment Line";
-        SalespersonPurchaser: Record "Salesperson/Purchaser";
         EmpAbs: Record "Employee Absence";
         recHrOffice: Record "HR Offices";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
-        EmployeeResUpdate: Codeunit "Employee/Resource Update";
-        EmployeeSalespersonUpdate: Codeunit "Employee/Salesperson Update";
+        NoSeriesMgt: Codeunit "No. Series"; //UpgradeReady
         DimMgt: Codeunit DimensionManagement;
-        Text000: label 'Before you can use Online Map, you must fill in the Online Map Setup window.\See Setting Up Online Map in Help.';
-        Text1160030000: label '%1 and %2 cannot be entered at the same time.';
-        Text1160030001: label 'This field is only used when the Pay Frequency is fortnightly.';
-        Text1160030003: label '%1 cannot be blank when %2 is not.';
-        Text1160030004: label '%1 cannot be before %2.';
-        Text1160030005: label 'An employee cannot both be inactive and absent in the same period.';
-        Text1160030002: label 'An employee with this Social Security No. already exists.';
-        Text1160030022: label 'Employment Date cannot be blank.';
-        Text1160030023: label 'Employment Date cannot be before last Termination Date.';
-        Text1160030024: label 'Data cannot be entered in %1 when either %2 or %3 have been entered.';
-        Text1160030025: label 'Inactivity Date cannot be before Employment Date.';
-        Text1160030026: label 'Inactivity Date cannot be removed.\This happens automatically when entering a new Employment Date.';
-        Text1160030027: label 'Termination Date cannot be removed.\This happens automatically when entering a new Employment Date.';
-        Text1160030028: label 'Termination Date cannot be before Employment Date.';
-        Text1160030029: label 'Employee %1  cannot be deleted. Posted entries exit.';
-        Text1240470007: label 'There is already an applicant with this Employee No. %1.';
-        Text1161020000: label 'Municipality Address Code %1 does not exist for Municipality Code %2';
-        Text1161020003: label 'Employee %1  cannot be deleted. Payroll Documents exit.';
-        Text1161020004: label 'It is not possible to pay more than 100 % in tax.';
-        Text1161020005: label 'It is not possible to enter a negative number.';
-        Text1161020007: label 'SE-No. "%1" is not a valid SE-No.';
-        Text1161020008: label 'SE-No. and Social Security No. can not both be applied at the same time.\\Do you wish to delete Social Security No. "%1" for Employee %2 %3?';
-        Text1161020009: label 'Action canceled by user.';
-        Text1161020010: label 'SE-No. and Social Security No. can not both be applied at the same time.\\Do you wish to delete SE-No. "%1" for Employee %2 %3?';
-        Text1161020011: label 'Employee: "%1 %2"\Data in the Absence Reg. Journals will be deleted.\Do you wish to continue?';
-        Text1161020012: label 'Ii is not possible to use Nemkonto, because an agreement about it not made.  ';
-        EmployeeFilterDelimitation: Code[20];
-        bEmployeeTemplate: Boolean;
-        Text161024001: label 'The Field  "%1" must be filled.';
-        Text161029000: label 'You are about to change the agreement code that has FV Setup.\Do You wish to continue?';
-        Text161029001: label 'You have selected an agreement code that has FV Setup.\Do You wish to continue?';
-        Text1160030017: label 'This Period covers an existing period.';
-        Text1160030009: label '%1 can''t be deleted when %2 are filled.';
-        InsertFromHR: Boolean;
-        Text1161020015: label 'Do you wish to create a relation to Human Resource for %1 %2?';
-        Text1161020016: label '%1 %2 has relations to one Human Resource, which not will be deleted.';
-        constLanguageID: label 'Language ID: %1 is not a valid value.';
-        constWorkCalChange: label 'Medarbejder %1 %2 er aktiv på LESSOR-Portalen. Du skal være opmærksom på at du selv evt. skal ændre saldi på LESSOR-Portalen.';
-        constCPRCheck: label 'Social Security No. %1 does not comply with modulus 11 control.\Do you want to continue?';
-        DateFormula: DateFormula;
         EmailAddMgt: Codeunit "E-mail Address Management";
         SI: Codeunit "Single Instance";
+        DateFormula: DateFormula;
+        NoSeriesCode: Code[20]; //UpgradeReady
 
 
     procedure AssistEdit(OldEmployee: Record "ZyXEL Employee"): Boolean
     begin
-        //>> 17-10-18 ZY-LD 011
         begin
             Employee := Rec;
-            HumanResSetup.Get;
+            HumanResSetup.Get();
             HumanResSetup.TestField("Employee Nos.");
-            if NoSeriesMgt.SelectSeries(HumanResSetup."Employee Nos.", OldEmployee."No. Series", Employee."No. Series") then begin
-                HumanResSetup.Get;
-                HumanResSetup.TestField("Employee Nos.");
-                NoSeriesMgt.SetSeries(Employee."No.");
+
+            NoSeriesCode := HumanResSetup."Employee Nos.";
+            rec."No. Series" := copystr(NoSeriesCode, 1, 10);
+            if NoSeriesMgt.AreRelated("No. Series", OldEmployee."No. Series") then begin //upgradeReady
+                "No. Series" := OldEmployee."No. Series";
+
+                //if NoSeriesMgt.SelectSeries(HumanResSetup."Employee Nos.", OldEmployee."No. Series", Employee."No. Series") then begin
+                //    HumanResSetup.Get;
+                //    HumanResSetup.TestField("Employee Nos.");
+                //    NoSeriesMgt.SetSeries(Employee."No.");
                 Rec := Employee;
                 exit(true);
             end;
         end;
-        //<< 17-10-18 ZY-LD 011
     end;
 
 
@@ -1298,31 +1191,30 @@ Table 50109 "ZyXEL Employee"
     begin
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
         DimMgt.SaveDefaultDim(Database::Employee, "No.", FieldNumber, ShortcutDimCode);
-        Modify;
+        Modify();
     end;
 
     local procedure UpdateEmloyeeHistory()
     var
         recHRRoleHist: Record "HR Role History";
-        lText001: label 'There is more than one employee registered on this cost type.';
         recCostTypeName: Record "Cost Type Name";
         RecordIsChanged: Boolean;
+
     begin
-        //>> 22-08-18 ZY-LD 008
         if recCostTypeName.Get("Cost Type") then begin
             recHRRoleHist.SetRange("Employee No.", "No.");
-            recHRRoleHist.SetRange("Start Date", Today);
-            if not recHRRoleHist.FindFirst then begin
+            recHRRoleHist.SetRange("Start Date", Today());
+            if not recHRRoleHist.FindFirst() then begin
                 recHRRoleHist.SetRange("Start Date");
-                if recHRRoleHist.FindLast and (recHRRoleHist."Start Date" < Today) then begin
+                if recHRRoleHist.FindLast() and (recHRRoleHist."Start Date" < Today()) then begin
                     recHRRoleHist.UID := recHRRoleHist.GetNextUID("No.");
-                    recHRRoleHist."Start Date" := Today;
+                    recHRRoleHist."Start Date" := Today();
                     recHRRoleHist.Insert(true);
                 end else begin
                     Clear(recHRRoleHist);
                     recHRRoleHist.UID := recHRRoleHist.GetNextUID("No.");
                     recHRRoleHist."Employee No." := "No.";
-                    recHRRoleHist."Start Date" := Today;
+                    recHRRoleHist."Start Date" := Today();
                     recHRRoleHist.Insert(true);
                 end;
             end;
@@ -1338,22 +1230,21 @@ Table 50109 "ZyXEL Employee"
 
             if RecordIsChanged then begin
                 recHRRoleHist.Changed := true;
-                recHRRoleHist.Modify;
+                recHRRoleHist.Modify();
             end;
         end;
-        //<< 22-08-18 ZY-LD 008
     end;
 
 
     procedure GetJobTitle()
     var
         recRoles: Record "HR Role History";
-        LastDate: Date;
+
     begin
         "Job Title" := '';
         recRoles.SetRange("Employee No.", "No.");
         Copyfilter("Date Filter History", recRoles."Start Date");
-        if recRoles.FindLast then
+        if recRoles.FindLast() then
             "Job Title" := recRoles."Job Title";
     end;
 
@@ -1361,13 +1252,13 @@ Table 50109 "ZyXEL Employee"
     procedure GetManager()
     var
         recRoles: Record "HR Role History";
-        ManagerCode: Code[20];
         recEmployee: Record "ZyXEL Employee";
+
     begin
         "Manager Fullname" := '';
         recRoles.SetRange("Employee No.", "No.");
         Copyfilter("Date Filter History", recRoles."Start Date");
-        if recRoles.FindLast and (recRoles."Line Manager" <> '') then
+        if recRoles.FindLast() and (recRoles."Line Manager" <> '') then
             recEmployee.Get(recRoles."Line Manager");
         "Manager Fullname" := recEmployee."Full Name";
     end;

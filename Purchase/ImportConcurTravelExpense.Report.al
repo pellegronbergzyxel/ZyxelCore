@@ -1,15 +1,5 @@
 Report 62038 "Import Concur Travel Expense"
 {
-    // 001. 16-10-20 ZY-LD 2020101510000192 - Import of "Payer Payment Type".
-    // 002. 21-10-20 ZY-LD 2020101210000205 - Check on the existense of "Country Code", "VAT Prod Posting Group" and G/L Account. // 29-11-21 ZY-LD - After implementing Turkish G/L Account No. we can´t validate G/L Account
-    // 003. 17-12-20 ZY-LD 2020121710000131 - If the line is splitted, car milage is set to zero on the copied line, so we don´t calculate it twice.
-    // 004. 27-08-21 ZY-LD 2021082610000058 - Employee is added as option.
-    // 005. 17-01-22 ZY-LD 000 - Handling Cash Advance.
-    // 006. 10-05-22 ZY-LD 2022050610000081 - Cash advance was not setup correct.
-    // 007. 09-06-22 ZY-LD 2022060910000056 - Cash advance must be handled different in TR.
-    // 008. 30-05-23 ZY-LD 6905495 - New fields.
-    // 009. 24-09-24 ZY-LD 000 - Users often write wrong dimensions in Concur, therefore we now read the dimensions internally instead.
-
     Caption = 'Import Concur Travel Expense';
     ProcessingOnly = true;
 
@@ -31,30 +21,6 @@ Report 62038 "Import Concur Travel Expense"
                     group("Import from")
                     {
                         Caption = 'Import from';
-                        // CLOUD READY DELETE
-                        // field(FileName; FileName)
-                        // {
-                        //     ApplicationArea = Basic, Suite;
-                        //     AssistEdit = true;
-                        //     Caption = 'Workbook File Name';
-
-                        //     trigger OnAssistEdit()
-                        //     begin
-                        //         UploadFile;
-                        //     end;
-                        // }
-                        // field(SheetName; SheetName)
-                        // {
-                        //     ApplicationArea = Basic, Suite;
-                        //     Caption = 'Worksheet Name';
-
-                        //     trigger OnAssistEdit()
-                        //     var
-                        //         ExcelBuf: Record "Excel Buffer";
-                        //     begin
-                        //         SheetName := ExcelBuf.SelectSheetsName(UploadedFileName)
-                        //     end;
-                        // }
                     }
                 }
             }
@@ -63,7 +29,7 @@ Report 62038 "Import Concur Travel Expense"
         actions
         {
         }
-          trigger OnQueryClosePage(CloseAction: Action): Boolean
+        trigger OnQueryClosePage(CloseAction: Action): Boolean
         var
             UploadExcelMsg: Label 'Please Choose the Excel file';
             NofileMsg: Label 'Please select file';
@@ -95,12 +61,6 @@ Report 62038 "Import Concur Travel Expense"
 
     trigger OnPreReport()
     begin
-        // if UploadedFileName = '' then
-        //     Error(Text001);
-
-        // if SheetName = '' then
-        //     Error(Text002);
-
         if ZGT.IsRhq and ZGT.IsZNetCompany then
             Error(Text004);
 
@@ -111,7 +71,7 @@ Report 62038 "Import Concur Travel Expense"
         recTrExpHead.SetRange("Importing Date", CDT);
         recTrExpHead.ModifyAll("Document Status", recTrExpHead."document status"::Open);
 
-        SI.UseOfReport(3, 62038, 3);  // 14-10-20 ZY-LD 000
+        SI.UseOfReport(3, 62038, 3);
     end;
 
     var
@@ -152,7 +112,6 @@ Report 62038 "Import Concur Travel Expense"
     begin
         FileName := NewFilename;
         UploadedFileName := FileName;
-     //   SheetName := ExcelBuf.SelectSheetsName(FileName);
     end;
 
     local procedure ImportExcelSheet()
@@ -202,7 +161,7 @@ Report 62038 "Import Concur Travel Expense"
                                 'DR':
                                     recTrExpLine.Validate("Debit / Credit Type", recTrExpLine."debit / credit type"::DR);
                             end;
-                        //>> 16-10-20 ZY-LD 001
+
                         if ExcelBuf.Get(Row, 163) then  // Journal Payer Payment Type Name
                             case UpperCase(ExcelBuf."Cell Value as Text") of
                                 'COMPANY':
@@ -216,22 +175,12 @@ Report 62038 "Import Concur Travel Expense"
                                 'TVA20':
                                     recTrExpLine.Validate("Payer Payment Type", recTrExpLine."payer payment type"::TVA20);
                                 'EMPLOYEE':
-                                    recTrExpLine.Validate("Payer Payment Type", recTrExpLine."payer payment type"::Employee);  // 27-08-21 ZY-LD 004
+                                    recTrExpLine.Validate("Payer Payment Type", recTrExpLine."payer payment type"::Employee);
                                 else
                                     if recTrExpLine."Debit / Credit Type" = recTrExpLine."debit / credit type"::DR then
                                         Error(Text006, recTrExpLine.FieldCaption("Payer Payment Type"), ExcelBuf."Cell Value as Text");
                             end;
-                        //<< 16-10-20 ZY-LD 001
 
-                        //>> 10-05-22 ZY-LD 006
-                        /*IF (ExcelBuf.GET(Row,68) AND (UPPERCASE(ExcelBuf."Cell Value as Text") = 'Y')) THEN  // Personal Expense
-                          recTrExpLine.Type := recTrExpLine.Type::"Personal Expense";
-                        IF ExcelBuf.GET(Row,126) AND (UPPERCASE(ExcelBuf."Cell Value as Text") = 'CASH') THEN  // Out of Pocket
-                          recTrExpLine.Type := recTrExpLine.Type::"Out of Pocket";
-                        //>> 17-01-22 ZY-LD 005
-                        IF ExcelBuf.GET(Row,250) AND (UPPERCASE(ExcelBuf."Cell Value as Text") = 'CASH ADVANCE') THEN  // Cash Advance
-                          recTrExpLine.Type := recTrExpLine.Type::"Cash Advance";
-                        //<< 17-01-22 ZY-LD 005*/
                         if ExcelBuf.Get(Row, 250) then
                             case UpperCase(ExcelBuf."Cell Value as Text") of
                                 'CASH ADVANCE',
@@ -246,19 +195,16 @@ Report 62038 "Import Concur Travel Expense"
                             end;
                         if (ExcelBuf.Get(Row, 68) and (UpperCase(ExcelBuf."Cell Value as Text") = 'Y')) then  // Personal Expense
                             recTrExpLine.Type := recTrExpLine.Type::"Personal Expense";
-                        //<< 10-05-22 ZY-LD 006
 
                         case recTrExpLine.Type of
                             recTrExpLine.Type::Company:
                                 begin
                                     recTrExpLine."Account Type" := recTrExpLine."account type"::"G/L Account";
                                     if ExcelBuf.Get(Row, 167) then begin  // Account No.
-                                                                          //recGLAcc.GET(ExcelBuf."Cell Value as Text");  // 21-10-20 ZY-LD 002  // 29-11-21 ZY-LD 002
                                         recTrExpLine."Account No." := ExcelBuf."Cell Value as Text";
                                     end;
 
-                                    //recTrExpLine."Bal. Account Type" := recTrExpLine."Bal. Account Type"::Vendor;  // 03-03-21 ZY-LD 004
-                                    recTrExpLine."Bal. Account Type" := recCostType."Bal. Account Type";  // 03-03-21 ZY-LD 004
+                                    recTrExpLine."Bal. Account Type" := recCostType."Bal. Account Type";
                                     recTrExpLine."Bal. Account No." := recCostType."Concur Credit Card Vendor No."
                                 end;
                             recTrExpLine.Type::"Personal Expense":
@@ -266,31 +212,19 @@ Report 62038 "Import Concur Travel Expense"
                                     recTrExpLine."Account Type" := recTrExpLine."account type"::Vendor;
                                     recTrExpLine."Account No." := recCostType."Concur Personal Vendor No.";
 
-                                    //recTrExpLine."Bal. Account Type" := recTrExpLine."Bal. Account Type"::Vendor;  // 03-03-21 ZY-LD 004
-                                    recTrExpLine."Bal. Account Type" := recCostType."Bal. Account Type";  // 03-03-21 ZY-LD 004
+                                    recTrExpLine."Bal. Account Type" := recCostType."Bal. Account Type";
                                     recTrExpLine."Bal. Account No." := recCostType."Concur Credit Card Vendor No."
                                 end;
                             recTrExpLine.Type::"Out of Pocket":
                                 begin
                                     recTrExpLine."Account Type" := recTrExpLine."account type"::"G/L Account";
                                     if ExcelBuf.Get(Row, 167) then begin  // Account No.
-                                                                          //recGLAcc.GET(ExcelBuf."Cell Value as Text");  // 21-10-20 ZY-LD 002  // 29-11-21 ZY-LD 002
                                         recTrExpLine."Account No." := ExcelBuf."Cell Value as Text";
                                     end;
-
-                                    //>> 10-05-22 ZY-LD 006 - Moved to Cash Advance.
-                                    /*//>> 16-11-21 ZY-LD 005
-                                    IF ExcelBuf.GET(Row,165) AND (UPPERCASE(ExcelBuf."Cell Value as Text") = 'CASH ADVANCE') THEN BEGIN
-                                      recConcurSetup.TESTFIELD("Cash Advance Account No.");
-                                      recTrExpLine."Bal. Account Type" := recTrExpLine."Bal. Account Type"::"G/L Account";
-                                      recTrExpLine."Bal. Account No." := recConcurSetup."Cash Advance Account No.";
-                                    END ELSE BEGIN  //<< 16-11-21 ZY-LD 005*/  //<< 10-05-22 ZY-LD 006
-                                                                               //recTrExpLine."Bal. Account Type" := recTrExpLine."Bal. Account Type"::Vendor;  // 03-03-21 ZY-LD 004
-                                    recTrExpLine."Bal. Account Type" := recCostType."Bal. Account Type";  // 03-03-21 ZY-LD 004
+                                    recTrExpLine."Bal. Account Type" := recCostType."Bal. Account Type";
                                     recTrExpLine."Bal. Account No." := recCostType."Concur Personal Vendor No."
-                                    //END;
                                 end;
-                            //>> 10-05-22 ZY-LD 006
+
                             recTrExpLine.Type::"Cash Advance":
                                 begin
                                     if ExcelBuf.Get(Row, 167) then  // Account No.
@@ -299,12 +233,11 @@ Report 62038 "Import Concur Travel Expense"
                                     if StrPos(recCostType."Concur Company Name", 'TR') <> 0 then begin
                                         recTrExpLine."Bal. Account Type" := recCostType."Bal. Account Type";
                                         recTrExpLine."Bal. Account No." := recCostType."Concur Credit Card Vendor No.";
-                                    end else begin  //<< 09-06-22 ZY-LD 007
+                                    end else begin
                                         recConcurSetup.TestField("Cash Advance Account No.");
                                         recTrExpLine.Validate("Bal. Account No.", recConcurSetup."Cash Advance Account No.");
                                     end;
                                 end;
-                        //<< 10-05-22 ZY-LD 006
                         end;
 
                         if ExcelBuf.Get(Row, 69) then  // Business Purpose
@@ -323,14 +256,12 @@ Report 62038 "Import Concur Travel Expense"
                         end;
                         if ExcelBuf.Get(Row, 64) then  // Transaction Date
                             recTrExpLine."Transaction Date" := ZGT.ConvertTextToDate(ExcelBuf."Cell Value as Text", 1);
-                        //>> 30-05-23 ZY-LD 008
                         IF ExcelBuf.GET(Row, 336) THEN  // From Location
                             recTrExpLine."From Location" := ExcelBuf."Cell Value as Text";
                         IF ExcelBuf.GET(Row, 337) THEN  // To Location
                             recTrExpLine."To Location" := ExcelBuf."Cell Value as Text";
-                        //<< 30-05-23 ZY-LD 008
 
-                        GetConcurID(row);  // 24-09-24 ZY-LD 009
+                        GetConcurID(row);
                         recGenSetup.Get;
                         if OldDimensionInplacement then begin
                             if ExcelBuf.Get(Row, 193) then  // Division Code
@@ -347,7 +278,6 @@ Report 62038 "Import Concur Travel Expense"
                                 else
                                     Error(Text007, recTrExpLine.FieldCaption("Country Code"), ExcelBuf."Cell Value as Text");
                         end else begin
-                            //>> 24-09-24 ZY-LD 009
                             recTrExpLine."Division Code - Zyxel" := GetCostNameDim(ConcurID, DimType::Division);  // Division Code (192)
                             if recTrExpLine."Account Type" = recTrExpLine."account type"::"G/L Account" then  // Department Code (193)
                                 recTrExpLine."Department Code - Zyxel" := GetDimensionValue(recTrExpLine."Account No.", recGenSetup."Global Dimension 2 Code", GetCostNameDim(ConcurID, DimType::Departmant))
@@ -355,25 +285,8 @@ Report 62038 "Import Concur Travel Expense"
                                 recTrExpLine."Department Code - Zyxel" := GetCostNameDim(ConcurID, DimType::Departmant);
                             recTrExpLine."Country Code" := GetCostNameDim(ConcurID, DimType::Country);  // Country Code (194)
 
-                            // if ExcelBuf.Get(Row, 192) then  // Division Code
-                            //     recTrExpLine.Validate("Division Code - Concur", ExcelBuf."Cell Value as Text");
-                            // if ExcelBuf.Get(Row, 193) then  // Department Code
-                            //     if recTrExpLine."Account Type" = recTrExpLine."account type"::"G/L Account" then begin
-                            //         recTrExpLine.Validate("Department Code - Zyxel", GetDimensionValue(recTrExpLine."Account No.", recGenSetup."Global Dimension 2 Code", ExcelBuf."Cell Value as Text"));
-                            //         recTrExpLine."Department Code - Concur" := ExcelBuf."Cell Value as Text";
-                            //     end else
-                            //         recTrExpLine.Validate("Department Code - Zyxel", ExcelBuf."Cell Value as Text");
-                            // if ExcelBuf.Get(Row, 194) then  // Country Code
-                            //     recTrExpLine.Validate("Country Code", ExcelBuf."Cell Value as Text");
-                            //<< 24-09-24 ZY-LD 009
                         end;
 
-                        //>> 24-09-24 ZY-LD 009
-                        // if ExcelBuf.Get(Row, 197) and (ExcelBuf."Cell Value as Text" <> '') then  // Cost Type - Line
-                        //     recTrExpLine."Cost Type" := GetCostType(ExcelBuf."Cell Value as Text")
-                        // else
-                        //     if ExcelBuf.Get(Row, 5) and (ExcelBuf."Cell Value as Text" <> '') then  // Cost Type - Header
-                        //         recTrExpLine."Cost Type" := GetCostType(ExcelBuf."Cell Value as Text");
                         recTrExpLine."Cost Type" := GetCostNameDim(ConcurID, DimType::"Cost Type");
                         //<< 24-09-24 ZY-LD 009
 
@@ -418,11 +331,9 @@ Report 62038 "Import Concur Travel Expense"
                         recTrExpLine.Insert(true);
 
                         // Split line
-                        //IF recTrExpLine."Debit / Credit Type" = recTrExpLine."Debit / Credit Type"::DR THEN BEGIN
                         if recTrExpLine."Show Expense" then begin
-                            //recDimSplit.SetRange("Dimension Code", recTrExpLine."Division Code - Concur");  // 24-09-24 ZY-LD 009
-                            recDimSplit.SetRange("Source Type", recDimSplit."Source Type"::Division);  // 24-09-24 ZY-LD 009
-                            recDimSplit.SetRange("Dimension Code", recTrExpLine."Division Code - Zyxel");  // 24-09-24 ZY-LD 009
+                            recDimSplit.SetRange("Source Type", recDimSplit."Source Type"::Division);
+                            recDimSplit.SetRange("Dimension Code", recTrExpLine."Division Code - Zyxel");
                             if recDimSplit.FindSet then begin
                                 SplitAmount := recTrExpLine.Amount;
                                 SplittedAmount := 0;
@@ -435,8 +346,8 @@ Report 62038 "Import Concur Travel Expense"
                                         CurrentLineHandled := true;
                                     end else begin
                                         recTrExpLine.Validate("Line No.", recTrExpLine."Line No." + 100);
-                                        recTrExpLine."Car Business Distance" := 0;  // 17-12-20 ZY-LD 003
-                                        recTrExpLine."Car Personal Distance" := 0;  // 17-12-20 ZY-LD 003
+                                        recTrExpLine."Car Business Distance" := 0;
+                                        recTrExpLine."Car Personal Distance" := 0;
                                         recTrExpLine.Insert(true);
                                     end;
 
@@ -515,7 +426,7 @@ Report 62038 "Import Concur Travel Expense"
         if ExcelBuf.FindLast then
             pRowCount := ExcelBuf."Row No.";
     end;
-// CLOUD READY
+    // CLOUD READY
     // local procedure ReadExcelSheet()
     // begin
     //     if UploadedFileName = '' then
@@ -566,7 +477,7 @@ Report 62038 "Import Concur Travel Expense"
                 recTrExpHead."Concur Report ID" := CcReportID;
 
                 if ExcelBuf.Get(pRow, 5) and (ExcelBuf."Cell Value as Text" <> '') then
-                    GetCostNameDim(ExcelBuf."Cell Value as Text", DimType::"Cost Type")  // 24-09-24 ZY-LD 009
+                    GetCostNameDim(ExcelBuf."Cell Value as Text", DimType::"Cost Type")
                 else
                     Error(lText002);
                 recTrExpHead."Cost Type Name" := recCostType.Code;
@@ -611,12 +522,10 @@ Report 62038 "Import Concur Travel Expense"
         recDimValue: Record "Dimension Value";
         lText001: label 'Country Code %1 is not valid.';
     begin
-        //>> 21-10-20 ZY-LD 002
         recGenSetup.Get;
         if not recDimValue.Get(recGenSetup."Shortcut Dimension 3 Code", pCountryCode) or recDimValue.Blocked then
             Error(lText001, pCountryCode);
         exit(pCountryCode);
-        //<< 21-10-20 ZY-LD 002
     end;
 
     local procedure GetCostNameDim(pEmployeeNo: Code[40]; pDimType: Option "Cost Type",Country,Departmant,Division) rValue: Code[20]
@@ -631,12 +540,8 @@ Report 62038 "Import Concur Travel Expense"
                 recCostType.FindFirst;
             end;
             recCostType.TestField("Concur Company Name");
-            //recCostType.TESTFIELD("Concur Credit Card Vendor No.");
-            //recCostType.TESTFIELD("Concur Personal Vendor No.");
         end;
 
-        //>> 23-09-24 ZY-LD 009
-        //rValue := recCostType.Code;
         case pDimType of
             pDimType::"Cost Type":
                 rValue := recCostType.Code;
@@ -647,7 +552,6 @@ Report 62038 "Import Concur Travel Expense"
             pDimType::Division:
                 rValue := recCostType.Division;
         end;
-        //<<< 23-09-24 ZY-LD 009
     end;
 
     local procedure GetDimensionValue(pAccountNo: Code[20]; pDimensionCode: Code[20]; pDimensionCodeValue: Code[20]) rValue: Code[20]

@@ -14,58 +14,72 @@ page 50110 "Effective Permission List"
                 field("User Security ID"; Rec."User Security ID")
                 {
                     ApplicationArea = All;
+                    tooltip = 'Specifies the user security ID.';
                 }
                 field("User Name"; Rec."User Name")
                 {
                     ApplicationArea = All;
+                    tooltip = 'Specifies the user name.';
                 }
                 field("Company Name"; Rec."Company Name")
                 {
                     ApplicationArea = All;
+                    tooltip = 'Specifies the company name.';
                 }
                 field("App Name"; Rec."App Name")
                 {
                     ApplicationArea = All;
+                    tooltip = 'Specifies the application name.';
                 }
                 field("Role ID"; Rec."Role ID")
                 {
                     ApplicationArea = All;
+                    tooltip = 'Specifies the role ID.';
                 }
                 field("Role Name"; Rec."Role Name")
                 {
                     ApplicationArea = All;
+                    tooltip = 'Specifies the role name.';
                 }
                 field("Object Type"; Rec."Object Type")
                 {
                     ApplicationArea = All;
+                    tooltip = 'Specifies the object type.';
                 }
                 field("Object ID"; Rec."Object ID")
                 {
                     ApplicationArea = All;
+                    tooltip = 'Specifies the object ID.';
                 }
                 field("Object Name"; Rec."Object Name")
                 {
                     ApplicationArea = All;
+                    tooltip = 'Specifies the object name.';
                 }
                 field("Read Permission"; Rec."Read Permission")
                 {
                     ApplicationArea = All;
+                    tooltip = 'Specifies the read permission.';
                 }
                 field("Modify Permission"; Rec."Modify Permission")
                 {
                     ApplicationArea = All;
+                    tooltip = 'Specifies the modify permission.';
                 }
                 field("Insert Permission"; Rec."Insert Permission")
                 {
                     ApplicationArea = All;
+                    tooltip = 'Specifies the insert permission.';
                 }
                 field("Execute Permission"; Rec."Execute Permission")
                 {
                     ApplicationArea = All;
+                    tooltip = 'Specifies the execute permission.';
                 }
                 field("Delete Permission"; Rec."Delete Permission")
                 {
                     ApplicationArea = All;
+                    tooltip = 'Specifies the delete permission.';
                 }
             }
         }
@@ -73,7 +87,7 @@ page 50110 "Effective Permission List"
     trigger OnOpenPage()
     var
         AccessControl: Record "Access Control";
-        RecPermission: Record Permission;
+        RecPermission: Record "Expanded Permission"; //UpgradeReady
     begin
         AccessControl.Reset();
         AccessControl.SetAutoCalcFields("Role Name", "User Name");

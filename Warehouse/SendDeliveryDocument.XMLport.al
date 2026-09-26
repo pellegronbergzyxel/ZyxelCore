@@ -1,15 +1,5 @@
 XmlPort 50058 "Send Delivery Document"
 {
-    // 001. 19-02-19 PAB - Updated for new NAV XML
-    // 002. 13-02-20 ZY-LD 2020021210000051 - Only packing is a posibility for comments on the item line. Comments moved from line to header.
-    // 003. 20-04-20 ZY-LD P0388 - Set "Receiver Reference" for local transfer.
-    // 004. 26-08-20 ZY-LD 000 - Cross Reference must be opened for the lines, otherwise it will show a wrong number.
-    // 005. 26-01-22 ZY-LD 2022012610000032 - "Delivery Terms City" was not correct for all "Shipment Methods".
-    // 006. 22-02-22 ZY-LD P0767 - Namespace is changed.
-    // 007. 18-05-22 ZY-LD 2022011110000088 - "Freight Cost Item" added as a filter on DD-Line.
-    // 008. 23-05-22 ZY-LD 000 - Due to e-mail from VCK. When it´s DAMAGE location, the warehouse location must be the main warehouse location.
-    // 009. 01-08-22 ZY-LD 000 - After VCK upgrade it must be "SO" for transfer orders as well.
-
     Caption = 'Send Delivery Document';
     DefaultNamespace = 'http://schemas.allincontrol.com/BizTalk/2013';
     Direction = Export;
@@ -369,15 +359,11 @@ XmlPort 50058 "Send Delivery Document"
 
                     trigger OnBeforePassVariable()
                     begin
-                        //>> 20-04-20 ZY-LD 003
                         if "VCK Delivery Document Header"."Sell-to Customer No." = recSalesSetup."Customer No. on Sister Company" then
                             ReceiverReference := "VCK Delivery Document Header"."No.";
-                        //<< 20-04-20 ZY-LD 003
 
-                        //>> 06-04-22 ZY-LD 007
                         if StrLen(ReceiverReference) > 80 then
                             ReceiverReference := CopyStr(ReceiverReference, 1, 80);
-                        //<< 06-04-22 ZY-LD 007
                     end;
                 }
             }
@@ -401,7 +387,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General2 := HeadGenArr[2];
                         if General2 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general3)
@@ -413,7 +399,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General3 := HeadGenArr[3];
                         if General3 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general4)
@@ -425,7 +411,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General4 := HeadGenArr[4];
                         if General4 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general5)
@@ -437,7 +423,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General5 := HeadGenArr[5];
                         if General5 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general6)
@@ -449,7 +435,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General6 := HeadGenArr[6];
                         if General6 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general7)
@@ -461,7 +447,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General7 := HeadGenArr[7];
                         if General7 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general8)
@@ -473,7 +459,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General8 := HeadGenArr[8];
                         if General8 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general9)
@@ -485,7 +471,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General9 := HeadGenArr[9];
                         if General9 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general10)
@@ -497,7 +483,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General10 := HeadGenArr[10];
                         if General10 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general11)
@@ -509,7 +495,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General11 := HeadGenArr[11];
                         if General11 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general12)
@@ -521,7 +507,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General12 := HeadGenArr[12];
                         if General12 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general13)
@@ -533,7 +519,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General13 := HeadGenArr[13];
                         if General13 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general14)
@@ -545,7 +531,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General14 := HeadGenArr[14];
                         if General14 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general15)
@@ -557,7 +543,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General15 := HeadGenArr[15];
                         if General15 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general16)
@@ -569,7 +555,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General16 := HeadGenArr[16];
                         if General16 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general17)
@@ -581,7 +567,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General17 := HeadGenArr[17];
                         if General17 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general18)
@@ -593,7 +579,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General18 := HeadGenArr[18];
                         if General18 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general19)
@@ -605,7 +591,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General19 := HeadGenArr[19];
                         if General19 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(general20)
@@ -617,7 +603,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         General20 := HeadGenArr[20];
                         if General20 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking1)
@@ -638,7 +624,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking2 := HeadPickArr[2];
                         if Picking2 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking3)
@@ -650,7 +636,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking3 := HeadPickArr[3];
                         if Picking3 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking4)
@@ -662,7 +648,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking4 := HeadPickArr[4];
                         if Picking4 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking5)
@@ -674,7 +660,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking5 := HeadPickArr[5];
                         if Picking5 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking6)
@@ -686,7 +672,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking6 := HeadPickArr[6];
                         if Picking6 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking7)
@@ -698,7 +684,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking7 := HeadPickArr[7];
                         if Picking7 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking8)
@@ -710,7 +696,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking8 := HeadPickArr[8];
                         if Picking8 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking9)
@@ -722,7 +708,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking9 := HeadPickArr[9];
                         if Picking9 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking10)
@@ -734,7 +720,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking10 := HeadPickArr[10];
                         if Picking10 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking11)
@@ -746,7 +732,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking11 := HeadPickArr[11];
                         if Picking11 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking12)
@@ -758,7 +744,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking12 := HeadPickArr[12];
                         if Picking12 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking13)
@@ -770,7 +756,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking13 := HeadPickArr[13];
                         if Picking13 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking14)
@@ -782,7 +768,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking14 := HeadPickArr[14];
                         if Picking14 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking15)
@@ -794,7 +780,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking15 := HeadPickArr[15];
                         if Picking15 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking16)
@@ -806,7 +792,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking16 := HeadPickArr[16];
                         if Picking16 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking17)
@@ -818,7 +804,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking17 := HeadPickArr[17];
                         if Picking17 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking18)
@@ -830,7 +816,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking18 := HeadPickArr[18];
                         if Picking18 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking19)
@@ -842,7 +828,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking19 := HeadPickArr[19];
                         if Picking19 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(picking20)
@@ -854,7 +840,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Picking20 := HeadPickArr[20];
                         if Picking20 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack1)
@@ -875,7 +861,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack2 := HeadPackArr[2];
                         if Pack2 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack3)
@@ -887,7 +873,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack3 := HeadPackArr[3];
                         if Pack3 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack4)
@@ -899,7 +885,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack4 := HeadPackArr[4];
                         if Pack4 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack5)
@@ -911,7 +897,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack5 := HeadPackArr[5];
                         if Pack5 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack6)
@@ -923,7 +909,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack6 := HeadPackArr[6];
                         if Pack6 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack7)
@@ -935,7 +921,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack7 := HeadPackArr[7];
                         if Pack7 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack8)
@@ -947,7 +933,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack8 := HeadPackArr[8];
                         if Pack8 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack9)
@@ -959,7 +945,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack9 := HeadPackArr[9];
                         if Pack9 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack10)
@@ -971,7 +957,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack10 := HeadPackArr[10];
                         if Pack10 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack11)
@@ -983,7 +969,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack11 := HeadPackArr[11];
                         if Pack11 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack12)
@@ -995,7 +981,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack12 := HeadPackArr[12];
                         if Pack12 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack13)
@@ -1007,7 +993,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack13 := HeadPackArr[13];
                         if Pack13 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack14)
@@ -1019,7 +1005,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack14 := HeadPackArr[14];
                         if Pack14 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack15)
@@ -1031,7 +1017,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack15 := HeadPackArr[15];
                         if Pack15 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack16)
@@ -1043,7 +1029,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack16 := HeadPackArr[16];
                         if Pack16 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack17)
@@ -1055,7 +1041,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack17 := HeadPackArr[17];
                         if Pack17 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack18)
@@ -1067,7 +1053,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack18 := HeadPackArr[18];
                         if Pack18 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack19)
@@ -1079,7 +1065,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack19 := HeadPackArr[19];
                         if Pack19 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(pack20)
@@ -1091,7 +1077,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Pack20 := HeadPackArr[20];
                         if Pack20 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport1)
@@ -1112,7 +1098,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport2 := HeadTransArr[2];
                         if Transport2 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport3)
@@ -1124,7 +1110,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport3 := HeadTransArr[3];
                         if Transport3 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport4)
@@ -1136,7 +1122,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport4 := HeadTransArr[4];
                         if Transport4 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport5)
@@ -1148,7 +1134,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport5 := HeadTransArr[5];
                         if Transport5 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport6)
@@ -1160,7 +1146,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport6 := HeadTransArr[6];
                         if Transport6 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport7)
@@ -1172,7 +1158,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport7 := HeadTransArr[7];
                         if Transport7 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport8)
@@ -1184,7 +1170,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport8 := HeadTransArr[8];
                         if Transport8 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport9)
@@ -1196,7 +1182,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport9 := HeadTransArr[9];
                         if Transport9 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport10)
@@ -1208,7 +1194,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport10 := HeadTransArr[10];
                         if Transport10 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport11)
@@ -1220,7 +1206,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport11 := HeadTransArr[11];
                         if Transport11 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport12)
@@ -1232,7 +1218,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport12 := HeadTransArr[12];
                         if Transport12 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport13)
@@ -1244,7 +1230,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport13 := HeadTransArr[13];
                         if Transport13 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport14)
@@ -1256,7 +1242,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport14 := HeadTransArr[14];
                         if Transport14 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport15)
@@ -1268,7 +1254,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport15 := HeadTransArr[15];
                         if Transport15 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport16)
@@ -1280,7 +1266,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport16 := HeadTransArr[16];
                         if Transport16 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport17)
@@ -1292,7 +1278,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport17 := HeadTransArr[17];
                         if Transport17 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport18)
@@ -1304,7 +1290,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport18 := HeadTransArr[18];
                         if Transport18 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport19)
@@ -1316,7 +1302,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport19 := HeadTransArr[19];
                         if Transport19 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(transport20)
@@ -1328,7 +1314,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Transport20 := HeadTransArr[20];
                         if Transport20 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export1)
@@ -1349,7 +1335,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export2 := HeadExpArr[2];
                         if Export2 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export3)
@@ -1361,7 +1347,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export3 := HeadExpArr[3];
                         if Export3 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export4)
@@ -1373,7 +1359,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export4 := HeadExpArr[4];
                         if Export4 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export5)
@@ -1385,7 +1371,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export5 := HeadExpArr[5];
                         if Export5 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export6)
@@ -1397,7 +1383,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export6 := HeadExpArr[6];
                         if Export6 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export7)
@@ -1409,7 +1395,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export7 := HeadExpArr[7];
                         if Export7 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export8)
@@ -1421,7 +1407,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export8 := HeadExpArr[8];
                         if Export8 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export9)
@@ -1433,7 +1419,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export9 := HeadExpArr[9];
                         if Export9 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export10)
@@ -1445,7 +1431,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export10 := HeadExpArr[10];
                         if Export10 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export11)
@@ -1457,7 +1443,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export11 := HeadExpArr[11];
                         if Export11 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export12)
@@ -1469,7 +1455,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export12 := HeadExpArr[12];
                         if Export12 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export13)
@@ -1481,7 +1467,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export13 := HeadExpArr[13];
                         if Export13 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export14)
@@ -1493,7 +1479,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export14 := HeadExpArr[14];
                         if Export14 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export15)
@@ -1505,7 +1491,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export15 := HeadExpArr[15];
                         if Export15 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export16)
@@ -1517,7 +1503,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export16 := HeadExpArr[16];
                         if Export16 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export17)
@@ -1529,7 +1515,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export17 := HeadExpArr[17];
                         if Export17 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export18)
@@ -1541,7 +1527,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export18 := HeadExpArr[18];
                         if Export18 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export19)
@@ -1553,7 +1539,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export19 := HeadExpArr[19];
                         if Export19 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(export20)
@@ -1565,7 +1551,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Export20 := HeadExpArr[20];
                         if Export20 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer1)
@@ -1586,7 +1572,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer2 := HeadCustArr[2];
                         if Customer2 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer3)
@@ -1598,7 +1584,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer3 := HeadCustArr[3];
                         if Customer3 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer4)
@@ -1610,7 +1596,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer4 := HeadCustArr[4];
                         if Customer4 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer5)
@@ -1622,7 +1608,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer5 := HeadCustArr[5];
                         if Customer5 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer6)
@@ -1634,7 +1620,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer6 := HeadCustArr[6];
                         if Customer6 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer7)
@@ -1646,7 +1632,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer7 := HeadCustArr[7];
                         if Customer7 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer8)
@@ -1658,7 +1644,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer8 := HeadCustArr[8];
                         if Customer8 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer9)
@@ -1670,7 +1656,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer9 := HeadCustArr[9];
                         if Customer9 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer10)
@@ -1682,7 +1668,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer10 := HeadCustArr[10];
                         if Customer10 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer11)
@@ -1693,7 +1679,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer11 := HeadCustArr[11];
                         if Customer11 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer12)
@@ -1704,7 +1690,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer12 := HeadCustArr[12];
                         if Customer12 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer13)
@@ -1715,7 +1701,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer13 := HeadCustArr[13];
                         if Customer13 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer14)
@@ -1726,7 +1712,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer14 := HeadCustArr[14];
                         if Customer14 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer15)
@@ -1737,7 +1723,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer15 := HeadCustArr[15];
                         if Customer15 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer16)
@@ -1748,7 +1734,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer16 := HeadCustArr[16];
                         if Customer16 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer17)
@@ -1759,7 +1745,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer17 := HeadCustArr[17];
                         if Customer17 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer18)
@@ -1770,7 +1756,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer18 := HeadCustArr[18];
                         if Customer18 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer19)
@@ -1781,7 +1767,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer19 := HeadCustArr[19];
                         if Customer19 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(customer20)
@@ -1792,7 +1778,7 @@ XmlPort 50058 "Send Delivery Document"
                     begin
                         Customer20 := HeadCustArr[20];
                         if Customer20 = '' then
-                            currXMLport.Skip;
+                            currXMLport.Skip();
                     end;
                 }
                 textelement(saphead)
@@ -1905,7 +1891,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing2 := LinePackArr[2];
                                 if Packing2 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing3)
@@ -1917,7 +1903,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing3 := LinePackArr[3];
                                 if Packing3 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing4)
@@ -1929,7 +1915,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing4 := LinePackArr[4];
                                 if Packing4 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing5)
@@ -1941,7 +1927,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing5 := LinePackArr[5];
                                 if Packing5 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing6)
@@ -1953,7 +1939,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing6 := LinePackArr[6];
                                 if Packing6 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing7)
@@ -1965,7 +1951,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing7 := LinePackArr[7];
                                 if Packing7 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing8)
@@ -1977,7 +1963,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing8 := LinePackArr[8];
                                 if Packing8 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing9)
@@ -1989,7 +1975,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing9 := LinePackArr[9];
                                 if Packing9 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing10)
@@ -2001,7 +1987,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing10 := LinePackArr[10];
                                 if Packing10 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing11)
@@ -2013,7 +1999,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing11 := LinePackArr[11];
                                 if Packing11 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing12)
@@ -2025,7 +2011,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing12 := LinePackArr[12];
                                 if Packing12 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing13)
@@ -2037,7 +2023,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing13 := LinePackArr[13];
                                 if Packing13 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing14)
@@ -2049,7 +2035,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing14 := LinePackArr[14];
                                 if Packing14 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing15)
@@ -2061,7 +2047,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing15 := LinePackArr[15];
                                 if Packing15 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing16)
@@ -2073,7 +2059,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing16 := LinePackArr[16];
                                 if Packing16 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing17)
@@ -2085,7 +2071,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing17 := LinePackArr[17];
                                 if Packing17 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing18)
@@ -2097,7 +2083,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing18 := LinePackArr[18];
                                 if Packing18 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing19)
@@ -2109,7 +2095,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing19 := LinePackArr[19];
                                 if Packing19 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                         textelement(packing20)
@@ -2121,7 +2107,7 @@ XmlPort 50058 "Send Delivery Document"
                             begin
                                 Packing20 := LinePackArr[20];
                                 if Packing20 = '' then
-                                    currXMLport.Skip;
+                                    currXMLport.Skip();
                             end;
                         }
                     }
@@ -2349,32 +2335,7 @@ XmlPort 50058 "Send Delivery Document"
                                 InsertIntoArray(HeadCustArr, StrSubstNo('#%1: EAN: %2', LineNumber, recItemCrossRef."Cross-Reference EAN Code"), false);
                         end;
                     until recDelDocLine.Next() = 0;
-                //<< 13-02-20 ZY-LD 002
 
-                // ActionCodeHeader := VCKXML.ReplaceString("VCK Delivery Document Header"."Action Code",';',',');
-                // IF STRLEN(ActionCodeHeader) > 0 THEN BEGIN
-                //  ActionCodeHeader := UPPERCASE(ActionCodeHeader);
-                //  Count := VCKXML.CountActionCode(ActionCodeHeader);
-                //  IF Count = 0 THEN BEGIN
-                //    IF VCKXML.GetActionCodeType(ActionCodeHeader) = 2 THEN
-                //      General1 := VCKXML.GetActionCodeDescription(ActionCodeHeader);
-                //    IF VCKXML.GetActionCodeType(ActionCodeHeader) = 1 THEN
-                //      LineActionCode := ActionCodeHeader;
-                //  END;
-                //  IF Count > 0 THEN BEGIN
-                //    WorkString := CONVERTSTR(ActionCodeHeader,'-',',');
-                //    FOR i := 1 TO Count + 1 DO BEGIN
-                //      ThisCode := SELECTSTR(i,WorkString);
-                //      IF VCKXML.GetActionCodeType(ThisCode) = 2 THEN
-                //        AddHeaderActionCode(ThisCode);
-                //      IF VCKXML.GetActionCodeType(ThisCode) = 1 THEN
-                //        LineActionCode := LineActionCode + ActionCodeHeader + ',';
-                //    END;
-                //    LineActionCode := DELCHR(LineActionCode,'>',',');
-                //  END;
-                // END;
-
-                //>> 26-01-22 ZY-LD 005
                 DeliveryTermsCity := '';
                 recShipMeth.Get("VCK Delivery Document Header"."Delivery Terms Terms");
                 case recShipMeth."Read Incoterms City From" of
@@ -2386,7 +2347,6 @@ XmlPort 50058 "Send Delivery Document"
                             DeliveryTermsCity := recLocation.City;
                         end;
                 end;
-                //<< 26-01-22 ZY-LD 005
 
             end;
         }
@@ -2412,9 +2372,9 @@ XmlPort 50058 "Send Delivery Document"
 
     trigger OnPreXmlPort()
     var
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series";
     begin
-        recSalesSetup.Get;  // 20-04-20 ZY-LD 003
+        recSalesSetup.Get;
     end;
 
     var
@@ -2425,7 +2385,6 @@ XmlPort 50058 "Send Delivery Document"
         recSalesSetup: Record "Sales & Receivables Setup";
         recShipMeth: Record "Shipment Method";
         recLocation: Record Location;
-        LineActionCode: Text;
         VCKXML: Codeunit "VCK Communication Management";
         ItemLogisticEvent: Codeunit "Item / Logistic Events";
         HeadGenArr: array[20] of Text[150];
@@ -2435,6 +2394,7 @@ XmlPort 50058 "Send Delivery Document"
         HeadExpArr: array[20] of Text[150];
         HeadCustArr: array[20] of Text[150];
         LinePackArr: array[20] of Text[150];
+        LineActionCode: Text;
         i: Integer;
         PrevYourRef: Code[20];
 

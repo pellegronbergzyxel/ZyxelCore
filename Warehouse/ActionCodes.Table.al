@@ -213,7 +213,7 @@ Table 66005 "Action Codes"
         recDelDocAction: Record "Delivery Document Action Code";
         recDelDocHead: Record "VCK Delivery Document Header";
         recDelDocHeadTmp: Record "VCK Delivery Document Header" temporary;
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series";//UpgradeReady
         Text001: label '"%1" us used %2 times on Default Action.\If you accept to delete, the default action code(s) will be removed.\\Do you want to continue?';
         Text002: label 'E-mails is automatic send when warehouse status is:\Confirmation: "Delivered / Proff of Delivery"\Notification: "In Transit"\Pre-Alert: "Ready to Ship".';
         ZGT: Codeunit "ZyXEL General Tools";

@@ -53,7 +53,7 @@ Page 50217 "Item List (All fields)"
                 }
                 field(InventoryField; Rec.Inventory)
                 {
-                    ApplicationArea = Invoicing, Basic, Suite;
+                    ApplicationArea = Basic, Suite;
                     HideValue = IsNonInventoriable;
                     ToolTip = 'Specifies how many units, such as pieces, boxes, or cans, of the item are in inventory.';
                 }
@@ -92,7 +92,7 @@ Page 50217 "Item List (All fields)"
                 }
                 field("Base Unit of Measure"; Rec."Base Unit of Measure")
                 {
-                    ApplicationArea = Invoicing, Basic, Suite;
+                    ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the base unit used to measure the item, such as piece, box, or pallet. The base unit of measure also serves as the conversion basis for alternate units of measure.';
                 }
                 field("Shelf No."; Rec."Shelf No.")
@@ -143,7 +143,7 @@ Page 50217 "Item List (All fields)"
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-                    ApplicationArea = Invoicing, Basic, Suite;
+                    ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the price for one unit of the item, in LCY.';
                 }
                 field("Inventory Posting Group"; Rec."Inventory Posting Group")
@@ -1624,6 +1624,10 @@ Page 50217 "Item List (All fields)"
                 {
                     ToolTip = 'Specifies the value of the Pallet Weight field.';
                 }
+                field("Min. Carton Qty. Enabled"; Rec."Min. Carton Qty. Enabled") //27-07-2026 BK #586468
+                {
+                    ToolTip = 'Specifies the value of the Min. Carton Qty. Enabled field.';
+                }
             }
         }
         area(factboxes)
@@ -1691,7 +1695,7 @@ Page 50217 "Item List (All fields)"
                               "Serial No. Filter" = FIELD("Serial No. Filter");
                 Visible = false;
             }
-            part("Attached Documents"; "Document Attachment Factbox")
+            part("Attached Documents"; "Doc. Attachment List Factbox") // UpgradeReady
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
@@ -1756,6 +1760,7 @@ Page 50217 "Item List (All fields)"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Whse. Ledger Entries';
+                        toolTip = 'View the history of warehouse transactions that have been posted for the selected record.';
                         Image = Warehouse;
                         RunObject = Page "Whse. Item Ledger Entry";
                         RunPageLink = "Item No." = field("No.");
@@ -1765,6 +1770,7 @@ Page 50217 "Item List (All fields)"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Change Log';
+                        toolTip = 'View the history of changes that have been made to the selected record.';
                         Image = ChangeLog;
                         RunObject = Page "Change Log Entries";
                         RunPageLink = "Primary Key Field 1 Value" = field("No.");
@@ -2769,7 +2775,8 @@ Page 50217 "Item List (All fields)"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByEvent());
+                            //ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByEvent());
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItem(Rec, Enum::"Item Availability Type"::"Event"); //UpgradeReady
                         end;
                     }
                     action(Period)
@@ -2832,7 +2839,8 @@ Page 50217 "Item List (All fields)"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByBOM());
+                            //ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByBOM());
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItem(Rec, Enum::"Item Availability Type"::BOM); //UpgradeReady
                         end;
                     }
                     action("Unit of Measure")
@@ -3565,7 +3573,7 @@ Page 50217 "Item List (All fields)"
 
     trigger OnInit()
     begin
-        CurrPage.PowerBIEmbeddedReportPart.PAGE.InitPageRatio(PowerBIServiceMgt.GetFactboxRatio());
+        //CurrPage.PowerBIEmbeddedReportPart.PAGE.InitPageRatio(PowerBIServiceMgt.GetFactboxRatio()); //UpgradeReady
         CurrPage.PowerBIEmbeddedReportPart.PAGE.SetPageContext(CurrPage.ObjectId(false));
     end;
 
@@ -3602,13 +3610,13 @@ Page 50217 "Item List (All fields)"
             CurrPage.CAPTION := 'Item List [Filtered]';
         END;
         //15-51643 +
-        Rec.SetLocationFilterOnMainWarehouse();  // 05-07-19 ZY-LD 008
+        Rec.SetLocationFilterOnMainWarehouse();
 
     end;
 
     trigger OnClosePage()
     begin
-        SI.SetRejectChangeLog(FALSE);  // 25-04-18 ZY-LD 007
+        SI.SetRejectChangeLog(FALSE);
     end;
 
     var
@@ -3616,7 +3624,6 @@ Page 50217 "Item List (All fields)"
         TempItemFilteredFromAttributes: Record Item temporary;
         TempItemFilteredFromPickItem: Record Item temporary;
         ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
-        PowerBIServiceMgt: Codeunit "Power BI Service Mgt.";
         CalculateStdCost: Codeunit "Calculate Standard Cost";
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
@@ -3626,12 +3633,12 @@ Page 50217 "Item List (All fields)"
         ItemListFilter: text;
 
     protected var
+        SI: Codeunit "Single Instance";
         IsFoundationEnabled: Boolean;
         CRMIntegrationEnabled: Boolean;
         CRMIsCoupledToRecord: Boolean;
         BlockedFilterApplied: Boolean;
         ExtendedPriceEnabled: Boolean;
-        NewFromPictureVisible: Boolean;
         OpenApprovalEntriesExist: Boolean;
         EnabledApprovalWorkflowsExist: Boolean;
         CanCancelApprovalForRecord: Boolean;
@@ -3646,17 +3653,7 @@ Page 50217 "Item List (All fields)"
         [InDataSet]
         IsInventoriable: Boolean;
 
-        SI: Codeunit "Single Instance";
-        ZyWsMgt: Codeunit "Zyxel Web Service Management";
-        Text001: Label 'Do you want to replicate %1 to subs?';
-        VckXmlMgt: Codeunit "VCK Download and  Import Doc.";
-        Text002: Label 'Do you want to resend %1 to VCK?';
-        Text003: Label 'Do you want to send all active items to VCK?';
-        Text004: Label 'Are you sure?';
-        Text005: Label 'Item %1 was sent.';
-        Text006: Label 'Item %1 was not sent.';
-        AvailabilityprLocation: Page "Availability pr Location";
-        SendAllItemsToVCKVisible: Boolean;
+
 
     procedure SelectActiveItems(): Text
     var

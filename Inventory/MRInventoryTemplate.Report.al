@@ -1,19 +1,5 @@
 Report 50098 "MR Inventory Template"
 {
-    // 001. 18-06-18 ZY-LD 2018061510000034 - Create list on a previous date.
-    // 002. 25-01-19 ZY-LD 2019012310000071 - Adjustments for reporting 2019.
-    // 003. 23-01-20 ZY-LD 000 - Audit found errors in the aging when we transfered from one location to another. That is now fixed.
-    // 004. 11-02-20 ZY-LD 000 - Create Inventory Movements is running in a job queue, and is updating every day.
-    // 005. 07-04-20 ZY-LD 2020040710000076 - When a transfer comes from a journal it doesn´t have an Order No. We use Document No. instead when it comes from the journal.
-    // 006. 15-04-20 ZY-LD 2020041410000035 - Jamie wants the inventory movements pr. aging code.
-    // 007. 01-12-20 ZY-LD 2020113010000045 - E-mail the report.
-    // 008. 06-04-21 ZY-LD 2021040610000076 - Changed for ZNet.
-    // 009. 01-11-21 ZY-LD 2021102910000048 - We have two reports doing the same. It has now been merged into one with an option to select layout.
-    // 010. 24-06-22 ZY-LD 2022041110000108 - It was possible to set the aging to a newer date than the posted one.
-    // 011. 08-06-23 ZY-LD #6888660 - HQ has requested that aging days is calculated without calculating - 1 day. I don´t know why it was setup that way in the first place.
-    // 012. 15-11-23 ZY-LD 000 - Filtering on Item Type = Inventory.
-    // 013. 21-06-24 ZY-LD #439287 - Requested by Maria.
-
     Caption = 'MR Inventory Template - Detailed';
     ProcessingOnly = true;
     UsageCategory = ReportsandAnalysis;
@@ -27,7 +13,7 @@ Report 50098 "MR Inventory Template"
             dataitem(Item; Item)
             {
                 CalcFields = "Net Change", "Cost Amount (Actual)", "Cost Amount (Expected)", "Cost Posted to G/L";
-                DataItemTableView = sorting("Item Category Code", Description) order(descending) where(Type = const(Inventory));  // 15-11-23 ZY-LD 012
+                DataItemTableView = sorting("Item Category Code", Description) order(descending) where(Type = const(Inventory));
                 RequestFilterFields = "No.";
                 dataitem("Item Ledger Entry"; "Item Ledger Entry")
                 {
@@ -44,44 +30,39 @@ Report 50098 "MR Inventory Template"
                         TotalCostAmount += "Item Ledger Entry"."Cost Amount (Actual)" + "Item Ledger Entry"."Cost Amount (Expected)";
 
                         UnappliedQty := "Item Ledger Entry".CalculateRemQuantity("Item Ledger Entry"."Entry No.", BaseDate);
-                        //LineCostAmount := AverageCostAmount * UnappliedQty;  // 23-01-20 ZY-LD 003
-                        //LineCostAmountGL := AverageCostAmountGL * UnappliedQty;  // 23-01-20 ZY-LD 003
 
                         if (UnappliedQty <> 0) or (ROUND(AverageCostAmount * UnappliedQty) <> 0) or (ROUND(AverageCostAmountGL * UnappliedQty) <> 0) or ShowClosedDetailedEntries then begin
-                            //ItemCostAmount += LineCostAmount;  // 23-01-20 ZY-LD 003
-                            //ItemCostAmountGL += LineCostAmountGL;  // 23-01-20 ZY-LD 003
                             ItemQuantity += UnappliedQty;
                             PostingDate := "Item Ledger Entry"."Posting Date";
                             EntryPosted := false;
 
-                            //>> 23-01-20 ZY-LD 003
                             if ("Item Ledger Entry"."Entry Type" = "Item Ledger Entry"."entry type"::Transfer) and ("Item Ledger Entry"."Order No." <> '') or ("Item Ledger Entry"."Document No." <> '') then begin
-                                if "Item Ledger Entry"."Order No." <> '' then begin  // 07-04-20 ZY-LD 005
+                                if "Item Ledger Entry"."Order No." <> '' then begin
                                     if "Item Ledger Entry"."Order No." <> recItemLedgEntry."Order No." then
-                                        ItemAppEntryTmp2.DeleteAll;
-                                end else //>> 07-04-20 ZY-LD 005
+                                        ItemAppEntryTmp2.DeleteAll();
+                                end else
                                     if "Item Ledger Entry"."Document No." <> recItemLedgEntry."Document No." then
-                                        ItemAppEntryTmp2.DeleteAll;
-                                //<< 07-04-20 ZY-LD 005
+                                        ItemAppEntryTmp2.DeleteAll();
+
 
                                 recItemLedgEntry.SetRange("Item No.", "Item Ledger Entry"."Item No.");
                                 recItemLedgEntry.SetRange("Entry Type", "Item Ledger Entry"."Entry Type");
-                                if "Item Ledger Entry"."Order No." <> '' then  // 07-04-20 ZY-LD 005
+                                if "Item Ledger Entry"."Order No." <> '' then
                                     recItemLedgEntry.SetRange("Order No.", "Item Ledger Entry"."Order No.")
-                                else  // 07-04-20 ZY-LD 005
-                                    recItemLedgEntry.SetRange("Document No.", "Item Ledger Entry"."Document No.");  // 07-04-20 ZY-LD 005
+                                else
+                                    recItemLedgEntry.SetRange("Document No.", "Item Ledger Entry"."Document No.");
                                 recItemLedgEntry.SetRange("Location Code", recInvSetup."AIT Location Code");
-                                if recItemLedgEntry.FindFirst then begin
-                                    ItemAppEntryTmp.Reset;  // 24-06-22 ZY-LD 010
-                                    ItemAppEntryTmp.DeleteAll;
+                                if recItemLedgEntry.FindFirst() then begin
+                                    ItemAppEntryTmp.Reset();
+                                    ItemAppEntryTmp.DeleteAll();
                                     ShowAppEntries.FindAppliedEntries(recItemLedgEntry, ItemAppEntryTmp);
                                     TransferUnappQty := UnappliedQty;
 
                                     ItemAppEntryTmp.SetCurrentkey("Item No.", "Posting Date");
-                                    ItemAppEntryTmp.SetFilter("Posting Date", '<%1', PostingDate);  // 24-06-22 ZY-LD 010
+                                    ItemAppEntryTmp.SetFilter("Posting Date", '<%1', PostingDate);
                                     ItemAppEntryTmp.Ascending(false);
-                                    if ItemAppEntryTmp.FindSet then
-                                        if ItemAppEntryTmp.Count = 1 then
+                                    if ItemAppEntryTmp.FindSet() then
+                                        if ItemAppEntryTmp.Count() = 1 then
                                             PostingDate := ItemAppEntryTmp."Posting Date"
                                         else
                                             repeat
@@ -105,17 +86,17 @@ Report 50098 "MR Inventory Template"
                                                       UnappQtyToCreate,
                                                       LineCostAmount,
                                                       LineCostAmountGL,
-                                                      "Item Ledger Entry"."Entry Type");  // 11-02-20 ZY-LD 004
+                                                      "Item Ledger Entry"."Entry Type");
                                                     ItemCostAmount += LineCostAmount;
                                                     ItemCostAmountGL += LineCostAmountGL;
 
                                                     if ItemAppEntryTmp2."Entry No." <> 0 then begin
                                                         ItemAppEntryTmp2.Quantity += UnappQtyToCreate;
-                                                        ItemAppEntryTmp2.Modify;
+                                                        ItemAppEntryTmp2.Modify();
                                                     end else begin
                                                         ItemAppEntryTmp2."Entry No." := ItemAppEntryTmp."Entry No.";
                                                         ItemAppEntryTmp2.Quantity := UnappQtyToCreate;
-                                                        ItemAppEntryTmp2.Insert;
+                                                        ItemAppEntryTmp2.Insert();
                                                     end;
 
                                                     TransferUnappQty -= UnappQtyToCreate;
@@ -124,22 +105,21 @@ Report 50098 "MR Inventory Template"
                                             until (ItemAppEntryTmp.Next() = 0) or (TransferUnappQty <= 0);
                                 end;
                             end;
-                            //<< 23-01-20 ZY-LD 003
 
                             if not EntryPosted then begin
-                                LineCostAmount := AverageCostAmount * UnappliedQty;  // 23-01-20 ZY-LD 003
-                                LineCostAmountGL := AverageCostAmountGL * UnappliedQty;  // 23-01-20 ZY-LD 003
+                                LineCostAmount := AverageCostAmount * UnappliedQty;
+                                LineCostAmountGL := AverageCostAmountGL * UnappliedQty;
                                 CreateItemLedgerEntryTemp(
                                   "Item Ledger Entry"."Item No.",
                                   "Item Ledger Entry"."Location Code",
-                                  "Item Ledger Entry"."Global Dimension 1 Code",  // 25-01-19 ZY-LD 002
+                                  "Item Ledger Entry"."Global Dimension 1 Code",
                                   PostingDate,
                                   UnappliedQty,
                                   LineCostAmount,
                                   LineCostAmountGL,
-                                  "Item Ledger Entry"."Entry Type");  // 11-02-20 ZY-LD 004
-                                ItemCostAmount += LineCostAmount;  // 23-01-20 ZY-LD 003
-                                ItemCostAmountGL += LineCostAmountGL;  // 23-01-20 ZY-LD 003
+                                  "Item Ledger Entry"."Entry Type");
+                                ItemCostAmount += LineCostAmount;
+                                ItemCostAmountGL += LineCostAmountGL;
                             end;
                         end;
                     end;
@@ -151,7 +131,7 @@ Report 50098 "MR Inventory Template"
                                 CreateItemLedgerEntryTemp(
                                   Item."No.",
                                   Location.Code,
-                                  "Item Ledger Entry"."Global Dimension 1 Code",  // 25-01-19 ZY-LD 002
+                                  "Item Ledger Entry"."Global Dimension 1 Code",
                                   "Item Ledger Entry"."Posting Date",
                                   Item."Net Change" - ItemQuantity,
                                   (Item."Net Change" - ItemQuantity) * AverageCostAmount,
@@ -164,7 +144,7 @@ Report 50098 "MR Inventory Template"
                         TotalCostAmount := 0;
                         ItemCostAmount := 0;
                         ItemQuantity := 0;
-                        ItemLedgEntryTmp.Reset;
+                        ItemLedgEntryTmp.Reset();
 
                         "Item Ledger Entry".SetFilter("Item Ledger Entry"."Last Applying Date", '%1|%2..', 0D, CalcDate('<-CM-3M>', BaseDate));
                     end;
@@ -172,15 +152,13 @@ Report 50098 "MR Inventory Template"
 
                 trigger OnAfterGetRecord()
                 begin
-                    //27-05-2026 BK #Cloud Ready
-                    //if ZGT.TurkishServer then begin
                     if ZGT.IsTRDatabaseServer() then begin
                         ConvItem.Get(Item."No.");
                         Item."Cost Posted to G/L" := Item."Cost Posted to G/L" + ConvItem."Cost Amount (Actual)";
                     end;
 
                     if (Item."Net Change" = 0) and (Item."Cost Amount (Actual)" + Item."Cost Amount (Expected)" = 0) and (Item."Cost Posted to G/L" = 0) then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
 
                     if Item."Net Change" <> 0 then begin
                         AverageCostAmount := (Item."Cost Amount (Actual)" + Item."Cost Amount (Expected)") / Item."Net Change";
@@ -195,8 +173,8 @@ Report 50098 "MR Inventory Template"
                           Item."Net Change",
                           Item."Cost Amount (Actual)" + Item."Cost Amount (Expected)",
                           Item."Cost Posted to G/L",
-                          "Item Ledger Entry Type"::Value99);  // 11-02-20 ZY-LD 004
-                        CurrReport.Skip;
+                          "Item Ledger Entry Type"::Value99);
+                        CurrReport.Skip();
                     end;
                 end;
 
@@ -206,8 +184,6 @@ Report 50098 "MR Inventory Template"
 
                     Item.SetRange(Item."Date Filter", 0D, BaseDate);
                     Item.SetRange(Item."Location Filter", Location.Code);
-                    //27-05-2026 BK #Cloud Ready
-                    //if ZGT.TurkishServer then begin
                     if ZGT.IsTRDatabaseServer() then begin
                         ConvItem.SetRange("Date Filter", 0D, 20180930D);
                         ConvItem.SetRange("Location Filter", Location.Code);
@@ -312,10 +288,8 @@ Report 50098 "MR Inventory Template"
 
     trigger OnPostReport()
     begin
-        //>> 28-12-17 ZY-LD 007
         if QtyAndValueIsZero then
             Message(Text003);
-        //<< 28-12-17 ZY-LD 007
 
         if not BlockExcelInventory then begin
             CreateExcelLines;
@@ -325,41 +299,38 @@ Report 50098 "MR Inventory Template"
 
             CreateExcelbook;
         end else begin
-            //>> 11-02-20 ZY-LD 004
             if recInvMoveTmp.FindSet then
                 repeat
-                    if not recInvMovement.Get(recInvMoveTmp.Year, recInvMoveTmp.Month, recInvMoveTmp."Item No.", recInvMoveTmp."Max. Aging Code") then begin  // 15-04-20 ZY-LD 006
+                    if not recInvMovement.Get(recInvMoveTmp.Year, recInvMoveTmp.Month, recInvMoveTmp."Item No.", recInvMoveTmp."Max. Aging Code") then begin
                         recInvMovement := recInvMoveTmp;
                         recInvMovement.Insert(true);
                     end else begin
                         if (recInvMoveTmp.Quantity <> recInvMovement.Quantity) or
                            (recInvMoveTmp.Amount <> recInvMovement.Amount)
-                        //(recInvMoveTmp."Max. Aging Code" <> recInvMovement."Max. Aging Code")  // 15-04-20 ZY-LD 006
                         then begin
-                            //recInvMovement."Max. Aging Code" := recInvMoveTmp."Max. Aging Code";  // 15-04-20 ZY-LD 006
                             recInvMovement.Quantity := recInvMoveTmp.Quantity;
                             recInvMovement.Amount := recInvMoveTmp.Amount;
                             recInvMovement.Modify(true);
                         end;
                     end;
                 until recInvMoveTmp.Next() = 0;
-            //<< 11-02-20 ZY-LD 004
+
         end;
     end;
 
     trigger OnPreReport()
     begin
-        AgingCode := '0-180';  // 23-07-18 ZY-LD 001
-        if not BlockExcelInventory then begin  // 11-02-20 ZY-LD 004
+        AgingCode := '0-180';
+        if not BlockExcelInventory then begin
             MakeExcelHead;
             MakeExcelHeadColumn;
             MakeExcelHeadRMA;
         end;
-        recGenLedgSetup.Get;  // 25-01-19 ZY-LD 002
-        recInvSetup.Get;  // 23-01-20 ZY-LD 003
-        recItemLedgEntry.SetCurrentkey("Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date");  // 23-01-20 ZY-LD 003
+        recGenLedgSetup.Get();
+        recInvSetup.Get();
+        recItemLedgEntry.SetCurrentkey("Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date");
 
-        SI.UseOfReport(3, 50098, 3);  // 14-10-20 ZY-LD 000
+        SI.UseOfReport(3, 50098, 3);
     end;
 
     var
@@ -447,33 +418,32 @@ Report 50098 "MR Inventory Template"
     begin
         AgiCode := recAgingCode.GetAgingCode(AgingCode, CalcDueDate(BaseDate - pPostingDate));
 
-        if not BlockExcelInventory then begin  // 11-02-20 ZY-LD 004
+        if not BlockExcelInventory then begin
             ItemLedgEntryTmp.SetRange("Item No.", pItemNo);
             ItemLedgEntryTmp.SetRange("Location Code", pLocationCode);
             ItemLedgEntryTmp.SetRange("Variant Code", AgiCode);
-            ItemLedgEntryTmp.SetRange("Global Dimension 1 Code", pDivisionCode);  // 25-01-19 ZY-LD 002
-            ItemLedgEntryTmp.SetRange("Posting Date", pPostingDate);  // 23-01-20 ZY-LD 003
-            if not ItemLedgEntryTmp.FindFirst then begin
+            ItemLedgEntryTmp.SetRange("Global Dimension 1 Code", pDivisionCode);
+            ItemLedgEntryTmp.SetRange("Posting Date", pPostingDate);
+            if not ItemLedgEntryTmp.FindFirst() then begin
                 EntryNo += 1;
                 ItemLedgEntryTmp."Entry No." := EntryNo;
                 ItemLedgEntryTmp."Item No." := pItemNo;
                 ItemLedgEntryTmp."Location Code" := pLocationCode;
-                ItemLedgEntryTmp."Global Dimension 1 Code" := pDivisionCode;  // 25-01-19 ZY-LD 002
+                ItemLedgEntryTmp."Global Dimension 1 Code" := pDivisionCode;
                 ItemLedgEntryTmp."Variant Code" := AgiCode;
                 ItemLedgEntryTmp."Posting Date" := pPostingDate;
                 ItemLedgEntryTmp.Quantity := pQuantity;
                 ItemLedgEntryTmp."Invoiced Quantity" := pLineCostAmount;
                 ItemLedgEntryTmp."Remaining Quantity" := pLineCostAmountGL;
-                ItemLedgEntryTmp.Insert;
+                ItemLedgEntryTmp.Insert();
             end else begin
                 ItemLedgEntryTmp.Quantity := ItemLedgEntryTmp.Quantity + pQuantity;
                 ItemLedgEntryTmp."Invoiced Quantity" := ItemLedgEntryTmp."Invoiced Quantity" + pLineCostAmount;
                 ItemLedgEntryTmp."Remaining Quantity" := ItemLedgEntryTmp."Remaining Quantity" + pLineCostAmountGL;
-                ItemLedgEntryTmp.Modify;
+                ItemLedgEntryTmp.Modify();
             end;
         end else begin
-            //>> 11-02-20 ZY-LD 004
-            if not recInvMoveTmp.Get(Date2dmy(BaseDate, 3), Date2dmy(BaseDate, 2), pItemNo, AgiCode) then begin  // 15-04-20 ZY-LD 006
+            if not recInvMoveTmp.Get(Date2dmy(BaseDate, 3), Date2dmy(BaseDate, 2), pItemNo, AgiCode) then begin
                 recInvMoveTmp."Period End Date" := BaseDate;
                 recInvMoveTmp.Year := Date2dmy(BaseDate, 3);
                 recInvMoveTmp.Month := Date2dmy(BaseDate, 2);
@@ -481,14 +451,12 @@ Report 50098 "MR Inventory Template"
                 recInvMoveTmp."Max. Aging Code" := AgiCode;
                 recInvMoveTmp.Quantity := pQuantity;
                 recInvMoveTmp.Amount := pLineCostAmount;
-                recInvMoveTmp.Insert;
+                recInvMoveTmp.Insert();
             end else begin
-                //recInvMoveTmp."Max. Aging Code" := recAgingCode.GetMaxAcingCode(AgingCode,recInvMoveTmp."Max. Aging Code",AgiCode);  // 15-04-20 ZY-LD 006
                 recInvMoveTmp.Quantity += pQuantity;
                 recInvMoveTmp.Amount += pLineCostAmount;
-                recInvMoveTmp.Modify;
+                recInvMoveTmp.Modify();
             end;
-            //<< 11-02-20 ZY-LD 004
         end;
     end;
 
@@ -501,32 +469,32 @@ Report 50098 "MR Inventory Template"
         CostTemp: Decimal;
     begin
         ItemLedgEntryTmp.Reset;
-        if not ItemLedgEntryTmp.IsEmpty then begin
+        if not ItemLedgEntryTmp.IsEmpty() then begin
             // Excel Sheet pr. Line
             ItemLedgEntryTmp.Reset;
             ItemLedgEntryTmp.SetCurrentkey("Item No.");
-            if ItemLedgEntryTmp.FindSet then
+            if ItemLedgEntryTmp.FindSet() then
                 repeat
                     MakeExcelLine(ItemLedgEntryTmp);
                 until ItemLedgEntryTmp.Next() = 0;
 
             // Excel Sheet pr. Column
-            if recItem.FindSet then begin
+            if recItem.FindSet() then begin
                 ZGT.OpenProgressWindow('', recItem.Count);
                 repeat
                     ZGT.UpdateProgressWindow(lText001, 0, true);
 
                     ItemLedgEntryTmp.SetRange("Item No.", recItem."No.");
                     ItemLedgEntryTmp.SetRange("Variant Code");
-                    ItemLedgEntryTmp.SetRange("Location Code");  //  xx
-                    if not ItemLedgEntryTmp.IsEmpty then begin
-                        //>> 01-11-21 ZY-LD 009
+                    ItemLedgEntryTmp.SetRange("Location Code");
+                    if not ItemLedgEntryTmp.IsEmpty() then begin
+
                         if ShowSummedUpAs = Showsummedupas::Location then begin
                             Location.Copyfilter(Code, recLocation.Code);
-                            if recLocation.FindSet then
+                            if recLocation.FindSet() then
                                 repeat
                                     ItemLedgEntryTmp.SetRange("Location Code", recLocation.Code);
-                                    if ItemLedgEntryTmp.FindFirst then begin
+                                    if ItemLedgEntryTmp.FindFirst() then begin
                                         MakeExcelLineColumnSum(recItem, 1, true, recLocation.Code);
                                         QuantityTemp := 0;
                                         CostTemp := 0;
@@ -538,13 +506,13 @@ Report 50098 "MR Inventory Template"
                                     end else
                                         MakeExcelLineColumn(recItem, 2, 0, 0, 0, false, recLocation.Code);
                                 until recLocation.Next() = 0;
-                        end else begin  //<< 01-11-21 ZY-LD 009
+                        end else begin
                             MakeExcelLineColumnSum(recItem, 1, true, recLocation.Code);
                             recAgingCode.SetRange(Code, AgingCode);
-                            if recAgingCode.FindSet then begin
+                            if recAgingCode.FindSet() then begin
                                 repeat
                                     ItemLedgEntryTmp.SetRange("Variant Code", recAgingCode."Aging Code");
-                                    if ItemLedgEntryTmp.FindFirst then begin
+                                    if ItemLedgEntryTmp.FindFirst() then begin
                                         QuantityTemp := 0;
                                         CostTemp := 0;
                                         repeat
@@ -559,7 +527,7 @@ Report 50098 "MR Inventory Template"
                                 // RMA Over 181
                                 MakeExcelLineColumn(recItem, 3, 0, 0, 0, false, '');
                                 ItemLedgEntryTmp.SetFilter("Location Code", '%1', 'RMA*');
-                                if ItemLedgEntryTmp.FindFirst then begin
+                                if ItemLedgEntryTmp.FindFirst() then begin
                                     QuantityTemp := 0;
                                     CostTemp := 0;
                                     repeat
@@ -580,7 +548,7 @@ Report 50098 "MR Inventory Template"
             end;
 
             // RMA
-            if recItem.FindSet then begin
+            if recItem.FindSet() then begin
                 ZGT.OpenProgressWindow('', recItem.Count);
                 ItemLedgEntryTmp.Reset;
                 ItemLedgEntryTmp.SetFilter("Location Code", '%1', 'RMA*');
@@ -589,14 +557,14 @@ Report 50098 "MR Inventory Template"
 
                     ItemLedgEntryTmp.SetRange("Item No.", recItem."No.");
                     ItemLedgEntryTmp.SetRange("Variant Code");
-                    if not ItemLedgEntryTmp.IsEmpty then begin
+                    if not ItemLedgEntryTmp.IsEmpty() then begin
                         MakeExcelLineRMASum(recItem, 1, true);
 
                         recAgingCode.SetRange(Code, AgingCode);
-                        if recAgingCode.FindSet then
+                        if recAgingCode.FindSet() then
                             repeat
                                 ItemLedgEntryTmp.SetRange("Variant Code", recAgingCode."Aging Code");
-                                if ItemLedgEntryTmp.FindFirst then begin
+                                if ItemLedgEntryTmp.FindFirst() then begin
                                     QuantityTemp := 0;
                                     CostTemp := 0;
                                     repeat
@@ -622,15 +590,15 @@ Report 50098 "MR Inventory Template"
         ExcelBuf.AddColumn(StrSubstNo(Text024, CurrentDatetime), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
 
         Col := 37;
-        ExcelBuf.NewRow;
+        ExcelBuf.NewRow();
         ExcelBuf.AddColumn(Text001, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(Text002, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(Text003, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(Text004, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(Text005, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(Text008, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn(Text034, false, '', true, false, false, '', ExcelBuf."cell type"::Text);  // 25-01-19 ZY-LD 002
-        ExcelBuf.AddColumn(Text035, false, '', true, false, false, '', ExcelBuf."cell type"::Text);  // 25-01-19 ZY-LD 002
+        ExcelBuf.AddColumn(Text034, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn(Text035, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(Text006, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(Text007, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(Text009, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
@@ -638,7 +606,7 @@ Report 50098 "MR Inventory Template"
         ExcelBuf.AddColumn(Text011, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(Text012, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(Text013, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn(Text036, false, '', true, false, false, '', ExcelBuf."cell type"::Text);  // 25-01-19 ZY-LD 002
+        ExcelBuf.AddColumn(Text036, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(Text014, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(Text015, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         if ShowDifference then begin
@@ -654,10 +622,6 @@ Report 50098 "MR Inventory Template"
         ExcelBuf.AddColumn(Text022, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(Text005, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(Text023, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-
-        // ExcelBuf.AddColumn("Item Ledger Entry".FieldCaption("Location Code"),FALSE,'',TRUE,FALSE,FALSE,'',ExcelBuf."Cell Type"::Text);
-        // ExcelBuf.AddColumn(Text025,FALSE,'',TRUE,FALSE,FALSE,'',ExcelBuf."Cell Type"::Text);
-
         RowNo := 2;
     end;
 
@@ -675,26 +639,22 @@ Report 50098 "MR Inventory Template"
         recInvPostSetup.Get(pItemLedgerEntry."Location Code", recItem."Inventory Posting Group");
         recGlAcc.Get(recInvPostSetup."Inventory Account");
 
-        ExcelBuf.NewRow;
-        //>> 21-06-24 ZY-LD 013
-        //ExcelBuf.AddColumn(Date2dmy(pItemLedgerEntry."Posting Date", 3), false, '', false, false, false, '', ExcelBuf."cell type"::Number);
-        //ExcelBuf.AddColumn(Date2dmy(pItemLedgerEntry."Posting Date", 2), false, '', false, false, false, '', ExcelBuf."cell type"::Number);
+        ExcelBuf.NewRow();
         ExcelBuf.AddColumn(Date2dmy(today, 3), false, '', false, false, false, '', ExcelBuf."cell type"::Number);
         ExcelBuf.AddColumn(Date2dmy(today, 2), false, '', false, false, false, '', ExcelBuf."cell type"::Number);
-        //<< 21-06-24 ZY-LD 013
-        //>> 06-04-21 ZY-LD 008
+
         if ZGT.IsZNetCompany then
             ExcelBuf.AddColumn('ZNet AS', false, '', false, false, false, '', ExcelBuf."cell type"::Number)
         else
             if ZGT.CompanyNameIs(11) then  // ZyND DE
                 ExcelBuf.AddColumn('ZyDE', false, '', false, false, false, '', ExcelBuf."cell type"::Number)
-            else  //<< 06-04-21 ZY-LD 008
+            else
                 ExcelBuf.AddColumn('ZyAS', false, '', false, false, false, '', ExcelBuf."cell type"::Number);
         ExcelBuf.AddColumn(recGlAcc."No. 2", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(recGlAcc."Name 2", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(recGenLedgSetup."LCY Code", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn(recInvPostSetup."Inventory Account", false, '', false, false, false, '', ExcelBuf."cell type"::Text);  // 25-01-19 ZY-LD 002
-        ExcelBuf.AddColumn(recGlAcc.Name, false, '', false, false, false, '', ExcelBuf."cell type"::Text);  // 25-01-19 ZY-LD 002
+        ExcelBuf.AddColumn(recInvPostSetup."Inventory Account", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn(recGlAcc.Name, false, '', false, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(pItemLedgerEntry."Location Code", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(pItemLedgerEntry."Item No.", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
@@ -702,7 +662,7 @@ Report 50098 "MR Inventory Template"
         ExcelBuf.AddColumn(recItem."Category 2 Code", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(recItem."Category 1 Code", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(recItem.Description, false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-        //>> 25-01-19 ZY-LD 002
+
         if StrPos(pItemLedgerEntry."Global Dimension 1 Code", 'CH') <> 0 then  // Channel
             ExcelBuf.AddColumn(lText001, false, '', false, false, false, '', ExcelBuf."cell type"::Text)
         else
@@ -710,7 +670,7 @@ Report 50098 "MR Inventory Template"
                 ExcelBuf.AddColumn(lText002, false, '', false, false, false, '', ExcelBuf."cell type"::Text)
             else
                 ExcelBuf.AddColumn(lText003, false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-        //<< 25-01-19 ZY-LD 002
+
         ExcelBuf.AddColumn(pItemLedgerEntry.Quantity, false, '', false, false, false, '##,###,##0', ExcelBuf."cell type"::Number);
         ExcelBuf.AddColumn(pItemLedgerEntry."Invoiced Quantity", false, '', false, false, false, '##,###,##0.00', ExcelBuf."cell type"::Number);
         if ShowDifference then begin
@@ -726,7 +686,6 @@ Report 50098 "MR Inventory Template"
         ExcelBuf.AddColumn('', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(recGlAcc."Name 2", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn('', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        //ExcelBuf.AddColumn(pItemLedgerEntry."Entry No.",FALSE,'',TRUE,FALSE,FALSE,'',ExcelBuf."Cell Type"::Text);
 
         RowNo += 1;
     end;
@@ -751,8 +710,8 @@ Report 50098 "MR Inventory Template"
         i: Integer;
     begin
         Col := 37;
-        ExcelBuf.NewRow;
-        ExcelBuf.NewRow;
+        ExcelBuf.NewRow();
+        ExcelBuf.NewRow();
         ExcelBuf.AddColumn('Grand Total:', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ColumnNo := 16;
         for i := 1 to ColumnNo - 1 do
@@ -771,38 +730,37 @@ Report 50098 "MR Inventory Template"
         lText002: label 'Summed Up %1';
         lText003: label 'RMA %1';
     begin
-        //ExcelBuf.CreateBook('', StrSubstNo(lText001, AgingCode)); CLOUD ready DELETE
         ExcelBuf.CreateNewBook(StrSubstNo(lText001, AgingCode));
         // Detailed
         ExcelBuf.WriteSheet(StrSubstNo(lText001, AgingCode), CompanyName(), UserId());
 
         // Summed Up
-        if ExcelBuf2.FindFirst then begin
-            ExcelBuf.DeleteAll;
+        if ExcelBuf2.FindFirst() then begin
+            ExcelBuf.DeleteAll();
             repeat
                 ExcelBuf := ExcelBuf2;
-                ExcelBuf.Insert;
+                ExcelBuf.Insert();
             until ExcelBuf2.Next() = 0;
             ExcelBuf.AddNewSheet(StrSubstNo(lText002, AgingCode));
             ExcelBuf.WriteSheet(StrSubstNo(lText002, AgingCode), CompanyName(), UserId());
         end;
 
         // RMA
-        if ExcelBufRMA.FindFirst then begin
-            ExcelBuf.DeleteAll;
+        if ExcelBufRMA.FindFirst() then begin
+            ExcelBuf.DeleteAll();
             repeat
                 ExcelBuf := ExcelBufRMA;
-                ExcelBuf.Insert;
+                ExcelBuf.Insert();
             until ExcelBufRMA.Next() = 0;
             ExcelBuf.AddNewSheet(StrSubstNo(lText003, AgingCode));
             ExcelBuf.WriteSheet(StrSubstNo(lText003, AgingCode), CompanyName(), UserId());
         end;
 
-        ExcelBuf.CloseBook;
+        ExcelBuf.CloseBook();
         if GuiAllowed and (not skipcreate) then begin
-            ExcelBuf.OpenExcel;
+            ExcelBuf.OpenExcel();
         end else
-            FilenameServer := ExcelBuf.GetFileNameServer;  // 01-12-20 ZY-LD 007
+            FilenameServer := ExcelBuf.GetFileNameServer();
     end;
 
     local procedure MakeExcelHeadColumn()
@@ -815,7 +773,7 @@ Report 50098 "MR Inventory Template"
         ExcelBuf2.AddColumn(StrSubstNo(Text004, CurrentDatetime), false, '', true, false, false, '', ExcelBuf2."cell type"::Text);
 
         Col := 37;
-        ExcelBuf2.NewRow;
+        ExcelBuf2.NewRow();
         ExcelBuf2.AddColumn('Company_Code', false, '', true, false, false, '', ExcelBuf2."cell type"::Text);
         ExcelBuf2.AddColumn('Item_No', false, '', true, false, false, '', ExcelBuf2."cell type"::Text);
         ExcelBuf2.AddColumn('Description', false, '', true, false, false, '', ExcelBuf2."cell type"::Text);
@@ -849,7 +807,7 @@ Report 50098 "MR Inventory Template"
     local procedure MakeExcelLineColumn(pItem: Record Item; pType: Integer; pQuantity: Decimal; pAmount: Decimal; pCostPosted: Decimal; pNewRow: Boolean; pLocation: Code[20])
     begin
         if pNewRow then begin
-            ExcelBuf2.NewRow;
+            ExcelBuf2.NewRow();
             RowNoCol += 1;
         end;
 
@@ -897,10 +855,10 @@ Report 50098 "MR Inventory Template"
                 CostAmount += ItemLedgEntryTmp."Invoiced Quantity";
                 CostAmountGL += ItemLedgEntryTmp."Remaining Quantity";
             until ItemLedgEntryTmp.Next() = 0;
-            //>> 01-11-21 ZY-LD 009
+
             if ShowSummedUpAs = Showsummedupas::Location then
                 MakeExcelLineColumn(pItem, pType, Qty, CostAmount, CostAmountGL, pNewRow, pLocation)
-            else  //<< 01-11-21 ZY-LD 009
+            else
                 MakeExcelLineColumn(pItem, pType, Qty, CostAmount, CostAmountGL, pNewRow, '');
         end;
     end;
@@ -909,8 +867,8 @@ Report 50098 "MR Inventory Template"
     var
         lText001: label '=SUM(%1%2:%1%3)';
     begin
-        ExcelBuf2.NewRow;
-        ExcelBuf2.NewRow;
+        ExcelBuf2.NewRow();
+        ExcelBuf2.NewRow();
         ExcelBuf2.AddColumn(Text030, false, '', true, false, false, '', ExcelBuf2."cell type"::Text);
         ExcelBuf2.AddColumn('', false, '', false, false, false, '', ExcelBuf2."cell type"::Text);
         ExcelBuf2.AddColumn('', false, '', false, false, false, '', ExcelBuf2."cell type"::Text);
@@ -954,12 +912,11 @@ Report 50098 "MR Inventory Template"
 
     local procedure CreateExcelbookColumn()
     begin
-        //ExcelBuf2.CreateBook('', 'MR Inventory Template'); CLOUD ready DELETE
         ExcelBuf2.CreateNewBook('MR Inventory Template');
         ExcelBuf2.WriteSheet('MR Inventory Template', CompanyName(), UserId());
-        ExcelBuf2.CloseBook;
+        ExcelBuf2.CloseBook();
         if GuiAllowed then begin
-            ExcelBuf2.OpenExcel;
+            ExcelBuf2.OpenExcel();
         end;
     end;
 
@@ -987,7 +944,7 @@ Report 50098 "MR Inventory Template"
         ExcelBufRMA.AddColumn(StrSubstNo(Text004, CurrentDatetime), false, '', true, false, false, '', ExcelBufRMA."cell type"::Text);
 
         Col := 37;
-        ExcelBufRMA.NewRow;
+        ExcelBufRMA.NewRow();
         ExcelBufRMA.AddColumn('Company_Code', false, '', true, false, false, '', ExcelBufRMA."cell type"::Text);
         ExcelBufRMA.AddColumn('Item_No', false, '', true, false, false, '', ExcelBufRMA."cell type"::Text);
         ExcelBufRMA.AddColumn('Item_No', false, '', true, false, false, '', ExcelBufRMA."cell type"::Text);
@@ -1015,7 +972,7 @@ Report 50098 "MR Inventory Template"
     local procedure MakeExcelLineRMA(pItem: Record Item; pType: Integer; pQuantity: Decimal; pAmount: Decimal; pCostPosted: Decimal; pNewRow: Boolean)
     begin
         if pNewRow then begin
-            ExcelBufRMA.NewRow;
+            ExcelBufRMA.NewRow();
             RowNoRMA += 1;
         end;
 
@@ -1065,8 +1022,8 @@ Report 50098 "MR Inventory Template"
     var
         lText001: label '=SUM(%1%2:%1%3)';
     begin
-        ExcelBufRMA.NewRow;
-        ExcelBufRMA.NewRow;
+        ExcelBufRMA.NewRow();
+        ExcelBufRMA.NewRow();
         ExcelBufRMA.AddColumn(Text030, false, '', true, false, false, '', ExcelBufRMA."cell type"::Text);
         ExcelBufRMA.AddColumn('', false, '', false, false, false, '', ExcelBufRMA."cell type"::Text);
         ExcelBufRMA.AddColumn('', false, '', false, false, false, '', ExcelBufRMA."cell type"::Text);
@@ -1123,8 +1080,8 @@ Report 50098 "MR Inventory Template"
         if pDueDate < 0 then
             exit(0)
         else
-            exit(pDueDate);  // 08-06-23 ZY-LD 011
-                             //EXIT(pDueDate - 1);  // 08-06-23 ZY-LD 011
+            exit(pDueDate);
+
     end;
 
     local procedure PrevUnappQty()
@@ -1135,9 +1092,9 @@ Report 50098 "MR Inventory Template"
     procedure InitReport(pBaseDate: Date; pShowQuantity: Boolean; pShowDifference: Boolean; pShowClosedDetailedEntries: Boolean; pBlockExcel: Boolean; pSkipcreate: Boolean)
     begin
         BaseDate := pBaseDate;
-        ShowQuantity := pShowQuantity;  // 01-12-20 ZY-LD 007
-        ShowDifference := pShowDifference;  // 01-12-20 ZY-LD 007
-        ShowClosedDetailedEntries := pShowClosedDetailedEntries;  // 01-12-20 ZY-LD 007
+        ShowQuantity := pShowQuantity;
+        ShowDifference := pShowDifference;
+        ShowClosedDetailedEntries := pShowClosedDetailedEntries;
         BlockExcelInventory := pBlockExcel;
         Skipcreate := pSkipcreate;
     end;
@@ -1145,7 +1102,7 @@ Report 50098 "MR Inventory Template"
 
     procedure GetFilenameServer(): Text
     begin
-        exit(FilenameServer);  // 01-12-20 ZY-LD 007
+        exit(FilenameServer);
     end;
 
     // PG 18-07-2025

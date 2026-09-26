@@ -607,6 +607,12 @@ page 50165 "Item List MDM View"
                     ToolTip = 'Specifies the quantity of the item that is reserved for return merchandise authorizations (RMAs).';
                     Visible = false;
                 }
+                field("Min. Carton Qty. Enabled"; Rec."Min. Carton Qty. Enabled") //27-07-2026 BK #586468
+                {
+                    Caption = 'Min. Carton Qty. Enabled';
+                    ToolTip = 'Specifies the value of the Min. Carton Qty. Enabled field.';
+                    Visible = true;
+                }
 
             }
         }
@@ -675,7 +681,7 @@ page 50165 "Item List MDM View"
                               "Serial No. Filter" = field("Serial No. Filter");
                 Visible = false;
             }
-            part("Attached Documents"; "Document Attachment Factbox")
+            part("Attached Documents"; "Doc. Attachment List Factbox")
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
@@ -1770,7 +1776,8 @@ page 50165 "Item List MDM View"
 
                         trigger Onaction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByEvent());
+                            //ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByEvent());
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItem(Rec, Enum::"Item Availability Type"::"Event"); //UpgradeReady
                         end;
                     }
                     action(Period)
@@ -1833,7 +1840,8 @@ page 50165 "Item List MDM View"
 
                         trigger Onaction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByBOM());
+                            //ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByBOM());
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItem(Rec, Enum::"Item Availability Type"::BOM); //UpgradeReady
                         end;
                     }
                     action("Unit of Measure")
@@ -2573,7 +2581,7 @@ page 50165 "Item List MDM View"
 
     trigger OnInit()
     begin
-        CurrPage.PowerBIEmbeddedReportPart.Page.InitPageRatio(PowerBIServiceMgt.GetFactboxRatio());
+        //CurrPage.PowerBIEmbeddedReportPart.Page.InitPageRatio(PowerBIServiceMgt.GetFactboxRatio()); //UpgradeReady
         CurrPage.PowerBIEmbeddedReportPart.Page.SetPageContext(CurrPage.ObjectId(false));
     end;
 

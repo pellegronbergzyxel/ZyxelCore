@@ -106,6 +106,10 @@ XmlPort 50061 "Read Stock Correction"
             fieldelement(Quantity; "Whse. Stock Corr. Led. Entry".Quantity)
             {
             }
+            fieldelement(SerialNumber; "Whse. Stock Corr. Led. Entry".Serialno) //RMA automation
+            {
+                MinOccurs = Zero; //RMA automation
+            }
         }
     }
 
@@ -124,6 +128,7 @@ XmlPort 50061 "Read Stock Correction"
     var
         VCKComMgt: Codeunit "VCK Communication Management";
         gFileMgtEntryNo: Integer;
+        Serialno: code[100];
         Text001: label 'Unknown "Posting Type".';
 
 

@@ -71,19 +71,22 @@ XmlPort 50028 "HQ EiCard Download Link"
 
     procedure GetData(var pEicardQueue: Record "EiCard Queue" temporary; var pEiCardLinkLine: Record "EiCard Link Line" temporary)
     begin
-        if "EiCard Queue".FindSet then
+        if "EiCard Queue".FindSet() then
             repeat
                 pEicardQueue := "EiCard Queue";
-                pEicardQueue.Insert;
+                pEicardQueue.Insert();
 
                 "EiCard Link Line".SetRange("Purchase Order No.", "EiCard Queue"."Purchase Order No.");
-                if "EiCard Link Line".FindSet then
+                if "EiCard Link Line".FindSet() then
                     repeat
                         pEiCardLinkLine := "EiCard Link Line";
                         //30-06-2026 BK #581893
                         pEiCardLinkLine.Quantity := FindPurchaseOrder("EiCard Link Line"."Purchase Order No.", "EiCard Link Line"."Purchase Order Line No.");
                         pEiCardLinkLine.Insert;
                     until "EiCard Link Line".Next() = 0;
+                //08-07-2026 BK #583385
+                pEicardQueue."Comparision of Qty and Link Ok" := True;
+                pEicardQueue.Modify();
             until "EiCard Queue".Next() = 0;
     end;
 

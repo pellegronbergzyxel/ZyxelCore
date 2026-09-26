@@ -1,8 +1,5 @@
 Page 50109 "Goods in Transit"
 {
-    // 001. 05-04-18 ZY-LD 2018040510000101 - New category codes.
-    // 002. 14-01-19 ZY-LD 000 - Fields peplaced with calculated fields.
-    // 003. 14-01-20 ZY-LD 000 - Filtered on SBU Company.
 
     ApplicationArea = Basic, Suite;
     Caption = 'HQ - Goods in Transit';
@@ -137,6 +134,24 @@ Page 50109 "Goods in Transit"
                 RunObject = Page "Purchase Order";
                 RunPageLink = "Document Type" = const(Order),
                               "No." = field("Purchase Order No.");
+            }
+            action("Export Report")
+            { //24-08-2026 BK #590491
+                ApplicationArea = Basic, Suite;
+                Caption = 'Export GIT Report';
+                Image = Excel;
+                Promoted = true;
+                PromotedCategory = Process;
+                //RunObject = report "Goods in Transit to Excel";
+
+                trigger OnAction()
+                var
+                    GoodsInTransitToExcel: Report "Goods in Transit to Excel";
+                begin
+                    GoodsInTransitToExcel.SetTableView(Rec);
+                    GoodsInTransitToExcel.UseRequestPage(false);
+                    GoodsInTransitToExcel.Run();
+                end;
             }
         }
     }
