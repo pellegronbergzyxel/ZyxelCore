@@ -256,40 +256,12 @@ Codeunit 50039 "Process EiCard Links"
                             recEiCardLinkLine.modify;
                             if (recEiCardLinkLine."Purchase Order No." <> '') and (recEiCardLinkLine."Purchase Order Line No." <> 0) then //30-06-2026 BK ##581893
                                 recEiCardLinkLine.Quantity := FindPurchaseOrder(recEiCardLinkLine."Purchase Order No.", recEiCardLinkLine."Purchase Order Line No.");
-                            //    end;
-                            //     if FileMgt.ServerFileExists(Filename) then begin
-                            //       recEiCardLinkLine.Filename := Filename;
-
-                            // // Find the size of the file
-                            // recFile.SetRange(Path, FileMgt.GetDirectoryName(recEiCardLinkLine.Filename));
-                            // recFile.SetRange(Name, FileMgt.GetFileName(recEiCardLinkLine.Filename));
-                            // if recFile.FindFirst and (recFile.Size > 0) then
-                            //     recEiCardLinkLine."Size (MB)" := ROUND(recFile.Size / 1000000);
-
-
-                            // // Count number of .pdf files. It has to be the same as on the sales order.
-                            // recFile.Reset;
-                            // ServerDir := StrSubstNo('%1\%2', FileMgt.GetDirectoryName(recEiCardLinkLine.Filename), PurchOrderNo);
-                            // FileMgt.ServerCreateDirectory(ServerDir);
-                            // ExtractZipFile(recEiCardLinkLine.Filename, ServerDir);
-                            // recFile.SetRange(Path, ServerDir);
-                            // recFile.SetRange("Is a file", true);
-                            // recFile.SetFilter(Name, '*.pdf');
-                            // recEiCardLinkLine.Quantity := recFile.Count;
-                            // FileMgt.ServerRemoveDirectory(ServerDir, true);
-
                             recEiCardLinkLine.Modify(true);
                             Commit;  // The file is downloaded, so we have to commit here.
-
                             rValue := true;
-                            //     end else
-                            //   Error(lText001, Filename);
                         end else begin
-                            //>> 20-04-22 ZY-LD 010
                             recEiCardLinkLine.Quantity := recSalesLine.Quantity;
                             recEiCardLinkLine.Modify(true);
-                            //<< 20-04-22 ZY-LD 010
-
                             rValue := true;
                         end;
                     end else
