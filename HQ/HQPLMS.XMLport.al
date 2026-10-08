@@ -166,14 +166,14 @@ XmlPort 50026 "HQ PLMS"
                 fieldelement(WeeeCategory; Item."WEEE Category")
                 {
                 }
-                fieldelement(DeviceWeight; Item."Device Weight") //30-09-226 BK #Request from HQ
-                {
+                // fieldelement(DeviceWeight; Item."Device Weight") //30-09-226 BK #Request from HQ
+                // {
 
-                }
-                fieldelement(TariffNo; item."Tariff No.") //30-09-226 BK #Request from HQ
-                {
+                // }
+                // fieldelement(TariffNo; item."Tariff No.") //30-09-226 BK #Request from HQ
+                // {
 
-                }
+                // }
 
                 trigger OnBeforeInsertRecord()
                 begin
