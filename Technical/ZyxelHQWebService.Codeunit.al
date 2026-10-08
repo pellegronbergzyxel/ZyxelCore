@@ -1,7 +1,5 @@
 codeunit 50076 "Zyxel HQ Web Service"
 {
-    // 001. 16-04-24 ZY-LD 000 - Moved to handle everything in the xmlport.
-    // 002. 17-07-24 ZY-LD 000 - Zyxel Store ship from VCK.
 
     Permissions = tabledata "Sales Invoice Header" = m,
                   tabledata "Transfer Receipt Header" = m;
@@ -30,11 +28,7 @@ codeunit 50076 "Zyxel HQ Web Service"
     begin
         if ZGT.IsRhq then begin
             HQPLMS.Import();
-            //>> 16-04-24 ZY-LD 001
             exit(HQPLMS.GetData);
-            //HQPLMS.GetData(recItemTmp, recHqDimTmp);  // 18-10-19 ZY-LD 004
-            //exit(ZyHqWebServMgt.PLMS(recItemTmp, recHqDimTmp));  // 18-10-19 ZY-LD 004
-            //<< 16-04-24 ZY-LD 001
         end;
     end;
 
@@ -46,11 +40,8 @@ codeunit 50076 "Zyxel HQ Web Service"
     begin
         if ZGT.IsRhq then begin
             EiCardLinks.Import();
-            //>> 09-06-23 ZY-LD 011
-            //EiCardLinks.GetData(recEiCardLinkHeadTmp,recEiCardLinkLineTmp);
-            //IF ZyHqWebServMgt.EiCardLinks(recEiCardLinkHeadTmp,recEiCardLinkLineTmp) THEN
             EiCardLinks.GetData(recEicardQueueTmp, recEiCardLinkLineTmp);
-            if ZyHqWebServMgt.EiCardLinks(recEicardQueueTmp, recEiCardLinkLineTmp) then  //<< 09-06-23 ZY-LD 011
+            if ZyHqWebServMgt.EiCardLinks(recEicardQueueTmp, recEiCardLinkLineTmp) then
                 rValue := true
             else begin
                 SendErrorToNavSupport(lText001);
@@ -106,7 +97,6 @@ codeunit 50076 "Zyxel HQ Web Service"
 
     local procedure GetForecast(BudgetName: Code[50]; StartingDate: Date; var HQForecast: XmlPort "HQ Forecast")
     begin
-        // HQ is reading forecast direct in the sql database via a sql-view.
         if ZGT.IsRhq then;
     end;
 
@@ -173,7 +163,6 @@ codeunit 50076 "Zyxel HQ Web Service"
 
     procedure SendUnshippedQuantity(HqCompany: Code[4]; UnshippedQuantitys: XmlPort "HQ Unshipped Quantity") ReturnValue: Boolean
     var
-        //TempPurchLine: Record "Purchase Line" temporary;
         TempUnshipPurchOrder: Record "Unshipped Purchase Order" temporary;
         VendorType: Enum VendorType;
         UnshippedQuantityLbl: Label 'Unshipped Quantity';
@@ -216,7 +205,6 @@ codeunit 50076 "Zyxel HQ Web Service"
         lText001: Label 'An error occured running "Send Purchase Price".<br>Run "Process EMEA Purchase Price" manually.';
     begin
         if ZGT.IsRhq or (ZGT.IsZComCompany and (ZGT.CompanyNameIs(9) or ZGT.CompanyNameIs(14))) then begin
-            //>> 05-12-19 ZY-LD 006
             PurchsePrices.Import();
             PurchsePrices.GetData(recPurchPriceTmp);
             rValue := ZyHqWebServMgt.PurchasePrice(recPurchPriceTmp);
@@ -225,7 +213,6 @@ codeunit 50076 "Zyxel HQ Web Service"
                 if not ProcessEMEAPurchasePrice.Run then
                     SendErrorToNavSupport(lText001);
             end;
-            //<< 05-12-19 ZY-LD 006
         end;
     end;
 
@@ -238,7 +225,6 @@ codeunit 50076 "Zyxel HQ Web Service"
             PurchOrderLines.Import();
             PurchOrderLines.GetLines(recPurchLineTmp);
             rValue := ZyHqWebServMgt.PurchaseOrderLine(recPurchLineTmp);
-            //<< 10-02-20 ZY-LD 008
         end;
     end;
 
@@ -260,12 +246,10 @@ codeunit 50076 "Zyxel HQ Web Service"
         EmailAddMgt: Codeunit "E-mail Address Management";
         SI: Codeunit "Single Instance";
     begin
-        //>> 13-02-19 ZY-LD 001
         if recServEnviron.ProductionEnvironment then begin
             SI.SetMergefield(100, pText);
             EmailAddMgt.CreateEmailWithBodytext('HQWEBSERR', CopyStr(GetLastErrorText, 1, 1000), '');
         end;
-        //<< 13-02-19 ZY-LD 001
     end;
 
     procedure SendBatteryCertificate(BatteryCertificates: XmlPort "HQ Battery Certificate") rValue: Boolean
@@ -284,13 +268,11 @@ codeunit 50076 "Zyxel HQ Web Service"
         recItemTmp: Record Item temporary;
         recHqDimTmp: Record SBU temporary;
     begin
-        //>> 13-01-19 ZY-LD 007
         if ZGT.IsRhq then begin
             HQCategory.Import();
             HQCategory.GetData(recItemTmp, recHqDimTmp);
             exit(ZyHqWebServMgt.Category(recItemTmp, recHqDimTmp));
         end;
-        //<< 13-01-19 ZY-LD 007
     end;
 
     procedure SendCurrencyExchangeRate(CurrencyExchangeRates: XmlPort "HQ Exchange Rate") rValue: Boolean
@@ -335,12 +317,10 @@ codeunit 50076 "Zyxel HQ Web Service"
     var
         ServerEnviron: Record "Server Environment";
     begin
-        //>> 17-07-24 ZY-LD 002            
         if ZGT.IsRhq and ZGT.IsZNetCompany then begin
             eCommerceOrders.Import();
             rValue := eCommerceOrders.ValidateOrder;
         end;
-        //<< 17-07-24 ZY-LD 002        
     end;
 
 
@@ -350,7 +330,6 @@ codeunit 50076 "Zyxel HQ Web Service"
         recDelNoteLineTmp: Record "Sales Shipment Line" temporary;
     begin
         //27-05-2026 BK #Cloud Ready
-        //if ZGT.TurkishServer and ZGT.IsZComCompany then begin
         if ZGT.IsTRDatabaseServer() and ZGT.IsZComCompany then begin
             DeliveryNotes.Import();
             DeliveryNotes.GetData(recDelNoteHeadTmp, recDelNoteLineTmp);

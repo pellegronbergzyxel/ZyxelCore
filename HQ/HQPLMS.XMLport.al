@@ -1,13 +1,5 @@
 XmlPort 50026 "HQ PLMS"
 {
-    // 001. 30-08-18 ZY-LD 000 - Number pr. parcel is added.
-    // 002. 18-10-19 ZY-LD 000 - SBU Company is added.
-    // 003. 23-03-20 ZY-LD P0394 - New fields.
-    // 004. 11-08-20 ZY-LD 000 - Qty. per Color Box is added.
-    // 005. 15-12-20 ZY-LD 000 - FieldValidate is set to NO on the category fields.
-    // 006. 02-03-22 ZY-LD 2022030210000038 - Handle Tax Reduction Rate. It can be N/A.
-    // 007. 17-05-23 ZY-LD 000 - WEEE Category.
-    // 008. 16-04-24 ZY-LD 000 - SCIP No. is moved to a sub table. At the same time code from 50077 has been moved to GetData.
 
     DefaultNamespace = 'urn:microsoft-dynamics-nav/plms';
     Direction = Import;
@@ -100,7 +92,6 @@ XmlPort 50026 "HQ PLMS"
 
                     trigger OnAfterAssignVariable()
                     begin
-                        //>> 02-03-22 ZY-LD 006
                         if TaxReductionRate in ['NA', 'N/A'] then begin
                             Item."Tax Reduction Rate Active" := false;
                             Item."Tax Reduction rate" := 0;
@@ -108,7 +99,6 @@ XmlPort 50026 "HQ PLMS"
                             Evaluate(Item."Tax Reduction rate", TaxReductionRate);
                             Item."Tax Reduction Rate Active" := true;
                         end;
-                        //<< 02-03-22 ZY-LD 006
                     end;
                 }
                 fieldelement(EanCode; Item.GTIN)
@@ -152,14 +142,9 @@ XmlPort 50026 "HQ PLMS"
                 fieldelement(QtyPerColorBox; Item."Qty. per Color Box")
                 {
                 }
-                //>> 16-04-24 ZY-LD 008
-                /*fieldelement(ScipNo; Item."SCIP No.")
-                {
-                }*/
                 textelement(ScipNo)
                 {
                 }
-                //<< 16-04-24 ZY-LD 
                 fieldelement(SvhcHigherThan1000ppm; Item."SVHC > 1000 ppm")
                 {
                 }
@@ -168,7 +153,6 @@ XmlPort 50026 "HQ PLMS"
 
                     trigger OnAfterAssignVariable()
                     begin
-                        //>> 17-05-23 ZY-LD 007
                         case UpperCase(ProductUseBattery) of
                             'NO':
                                 Item."Product use Battery" := Item."product use battery"::No;
@@ -177,25 +161,29 @@ XmlPort 50026 "HQ PLMS"
                             else
                                 Item."Product use Battery" := Item."product use battery"::" ";
                         end;
-                        //<< 17-05-23 ZY-LD 007
                     end;
                 }
                 fieldelement(WeeeCategory; Item."WEEE Category")
                 {
                 }
+                fieldelement(DeviceWeight; Item."Device Weight") //30-09-226 BK #Request from HQ
+                {
+
+                }
+                fieldelement(TariffNo; item."Tariff No.") //30-09-226 BK #Request from HQ
+                {
+
+                }
 
                 trigger OnBeforeInsertRecord()
                 begin
-                    //>> 18-10-19 ZY-LD 002
                     case UpperCase(SbuCompany) of
                         'ZCOM':
                             Item."SBU Company" := Item."sbu company"::"ZCom HQ";
                         'ZNET':
                             Item."SBU Company" := Item."sbu company"::"ZNet HQ";
                     end;
-                    //<< 18-10-19 ZY-LD 002
 
-                    //>> 16-04-24 ZY-LD 008
                     if ScipNo <> '' then begin
                         repeat
                             ScipNoTmp."Item No." := Item."No.";
@@ -208,7 +196,6 @@ XmlPort 50026 "HQ PLMS"
                             end;
                             ScipNoTmp.Insert;
                         until ScipNo = '';
-                        //<< 16-04-24 ZY-LD 008
                     end;
                 end;
             }
@@ -227,72 +214,6 @@ XmlPort 50026 "HQ PLMS"
         }
     }
 
-    //>> 16-04-24 ZY-LD 008
-    /*
-        procedure GetDataOLD(var pItem: Record Item temporary; var pHqDimension: Record SBU temporary)
-        begin
-            if Item.FindSet then
-                repeat
-                    pItem := Item;
-                    pItem.Insert;
-
-                    //>> 18-10-19 ZY-LD 002
-                    if (Item."Category 1 Code" <> '') and
-                       not pHqDimension.Get(pHqDimension.Type::"Category 1", Item."Category 1 Code")
-                    then begin
-                        pHqDimension.Type := pHqDimension.Type::"Category 1";
-                        pHqDimension.Code := Item."Category 1 Code";
-                        pHqDimension.Description := Item."Category 1 Code";
-                        pHqDimension.Insert;
-                    end;
-                    if (Item."Category 2 Code" <> '') and
-                       not pHqDimension.Get(pHqDimension.Type::"Category 2", Item."Category 2 Code")
-                    then begin
-                        pHqDimension.Type := pHqDimension.Type::"Category 2";
-                        pHqDimension.Code := Item."Category 2 Code";
-                        pHqDimension.Description := Item."Category 2 Code";
-                        pHqDimension.Insert;
-                    end;
-                    if (Item."Category 3 Code" <> '') and
-                       not pHqDimension.Get(pHqDimension.Type::"Category 3", Item."Category 3 Code")
-                    then begin
-                        pHqDimension.Type := pHqDimension.Type::"Category 3";
-                        pHqDimension.Code := Item."Category 3 Code";
-                        pHqDimension.Description := Item."Category 3 Code";
-                        pHqDimension.Insert;
-                    end;
-                    if (Item."Business Center" <> '') and
-                       not pHqDimension.Get(pHqDimension.Type::"Business Center", Item."Business Center")
-                    then begin
-                        pHqDimension.Type := pHqDimension.Type::"Business Center";
-                        pHqDimension.Code := Item."Business Center";
-                        pHqDimension.Description := Item."Business Center";
-                        pHqDimension.Insert;
-                    end;
-                    if (Item.SBU <> '') and
-                       not pHqDimension.Get(pHqDimension.Type::SBU, Item.SBU)
-                    then begin
-                        pHqDimension.Type := pHqDimension.Type::SBU;
-                        pHqDimension.Code := Item.SBU;
-                        pHqDimension.Description := Item.SBU;
-                        pHqDimension.Insert;
-                    end;
-                    //<< 18-10-19 ZY-LD 002
-
-                    //>> 17-05-23 ZY-LD 007
-                    if (Item."WEEE Category" <> '') and
-                       not pHqDimension.Get(pHqDimension.Type::"WEEE Category", Item."WEEE Category")
-                    then begin
-                        pHqDimension.Type := pHqDimension.Type::"WEEE Category";
-                        pHqDimension.Code := Item."WEEE Category";
-                        pHqDimension.Description := Item."WEEE Category";
-                        pHqDimension.Insert;
-                    end;
-                //<< 17-05-23 ZY-LD 007
-                until Item.Next() = 0;
-        end;
-    */
-    //<< 16-04-24 ZY-LD 008
     procedure GetData(): Boolean
     var
         recItem: Record Item;
@@ -362,21 +283,22 @@ XmlPort 50026 "HQ PLMS"
                        (recItem."Category 1 Code" <> Item."Category 1 Code") or
                        (recItem."Category 2 Code" <> Item."Category 2 Code") or
                        (recItem."Category 3 Code" <> Item."Category 3 Code") or
-                       //(recItem."Category 4 Code" <> Item."Category 4 Code") OR  // 23-07-18 ZY-LD 001
                        (recItem."Business Center" <> Item."Business Center") or
                        (recItem.SBU <> Item.SBU) or
-                       (recItem."SBU Company" <> Item."SBU Company") or  // 24-10-19 ZY-LD 021
+                       (recItem."SBU Company" <> Item."SBU Company") or
                        (recItem."HQ Model Phase" <> Item."HQ Model Phase") or
-                       (recItem."Product Length (cm)" <> Item."Product Length (cm)") or  // 17-08-18 ZY-LD 002
-                       (recItem."Lifecycle Phase" <> Item."Lifecycle Phase") or  // 23-03-20 ZY-LD 026
-                       (recItem."Last Buy Date" <> Item."Last Buy Date") or  // 23-03-20 ZY-LD 026
-                       (recItem."Qty. per Color Box" <> Item."Qty. per Color Box") or  // 11-08-20 ZY-LD 030
-                       ((recItem."Cartons Per Pallet" <> Item."Cartons Per Pallet") and (Item."Cartons Per Pallet" <> 0) or  // 11-09-20 ZY-LD 031
-                       (recItem."SCIP No." <> Item."SCIP No.") or  // 06-01-21 ZY-LD 035
-                       (recItem."Tax Reduction Rate Active" <> Item."Tax Reduction Rate Active") or  // 03-03-22 ZY-LD 045
-                       (recItem."SVHC > 1000 ppm" <> Item."SVHC > 1000 ppm") or  // 02-11-22 ZY-LD 057
-                       (recItem."Product use Battery" <> Item."Product use Battery") or  // 17-05-23 ZY-LD 064
-                       (recItem."WEEE Category" <> Item."WEEE Category"))  // 17-05-23 ZY-LD 064
+                       (recItem."Product Length (cm)" <> Item."Product Length (cm)") or
+                       (recItem."Lifecycle Phase" <> Item."Lifecycle Phase") or
+                       (recItem."Last Buy Date" <> Item."Last Buy Date") or
+                       (recItem."Qty. per Color Box" <> Item."Qty. per Color Box") or
+                       ((recItem."Cartons Per Pallet" <> Item."Cartons Per Pallet") and (Item."Cartons Per Pallet" <> 0)) or
+                       (recItem."SCIP No." <> Item."SCIP No.") or
+                       (recItem."Tax Reduction Rate Active" <> Item."Tax Reduction Rate Active") or
+                       (recItem."SVHC > 1000 ppm" <> Item."SVHC > 1000 ppm") or
+                       (recItem."Product use Battery" <> Item."Product use Battery") or
+                       (recItem."WEEE Category" <> Item."WEEE Category") or
+                       (recItem."Device Weight" <> item."Device Weight") or
+                       ((recItem."Tariff No." <> item."Tariff No.") and (item."Tariff No." <> ''))
                     then begin
                         recItem."Height (cm)" := Item."Height (cm)";
                         recItem."Width (cm)" := Item."Width (cm)";
@@ -405,42 +327,40 @@ XmlPort 50026 "HQ PLMS"
                         recItem."Tax Reduction rate" := Item."Tax Reduction rate";
                         recItem."Model Description" := Item."Model Description";
                         recItem.GTIN := Item.GTIN;
-                        recItem.Validate("Category 1 Code", Item."Category 1 Code");  // 19-10-20 ZY-LD 032
-                        recItem.Validate("Category 2 Code", Item."Category 2 Code");  // 19-10-20 ZY-LD 032
-                        recItem.Validate("Category 3 Code", Item."Category 3 Code");  // 19-10-20 ZY-LD 032
-                                                                                      //recItem."Category 4 Code" := pItemTmp."Category 4 Code";  // 23-07-18 ZY-LD 001
+                        recItem.Validate("Category 1 Code", Item."Category 1 Code");
+                        recItem.Validate("Category 2 Code", Item."Category 2 Code");
+                        recItem.Validate("Category 3 Code", Item."Category 3 Code");
                         recItem."Business Center" := Item."Business Center";
                         recItem.SBU := Item.SBU;
-                        recItem."SBU Company" := Item."SBU Company";  // 24-10-19 ZY-LD 021
+                        recItem."SBU Company" := Item."SBU Company";
                         recItem."HQ Model Phase" := Item."HQ Model Phase";
-                        recItem."Product Length (cm)" := Item."Product Length (cm)";  // 17-08-18 ZY-LD 002
-                        recItem."Number per parcel" := Item."Number per parcel";  // 30-08-18 ZY-LD 003
-                        recItem."Lifecycle Phase" := Item."Lifecycle Phase";  // 23-03-20 ZY-LD 026
-                        recItem."Last Buy Date" := Item."Last Buy Date";  // 23-03-20 ZY-LD 026
-                        recItem.Validate("Qty. per Color Box", Item."Qty. per Color Box");  // 11-08-20 ZY-LD 030
-                        if Item."Cartons Per Pallet" <> 0 then  // 11-09-20 ZY-LD 031
-                            recItem."Cartons Per Pallet" := Item."Cartons Per Pallet";  // 11-09-20 ZY-LD 031
-                        recItem."SCIP No." := Item."SCIP No.";  // 06-01-21 ZY-LD 035
-                        recItem."Tax Reduction Rate Active" := Item."Tax Reduction Rate Active";  // 03-03-22 ZY-LD 045
-                                                                                                  //>> 17-03-22 ZY-LD 046
+                        recItem."Product Length (cm)" := Item."Product Length (cm)";
+                        recItem."Number per parcel" := Item."Number per parcel";
+                        recItem."Lifecycle Phase" := Item."Lifecycle Phase";
+                        recItem."Last Buy Date" := Item."Last Buy Date";
+                        recItem.Validate("Qty. per Color Box", Item."Qty. per Color Box");
+                        if Item."Cartons Per Pallet" <> 0 then
+                            recItem."Cartons Per Pallet" := Item."Cartons Per Pallet";
+                        recItem."SCIP No." := Item."SCIP No.";
+                        recItem."Tax Reduction Rate Active" := Item."Tax Reduction Rate Active";
                         if recItem."Volume (cm3)" <> 0 then
                             recItem."Unit Volume" := recItem."Volume (cm3)"
                         else
                             if recItem."Volume (ctn)" <> 0 then
                                 recItem."Unit Volume" := recItem."Volume (ctn)";
-                        //<< 17-03-22 ZY-LD 046
-                        recItem."SVHC > 1000 ppm" := Item."SVHC > 1000 ppm";  // 02-11-22 ZY-LD 057
-                        recItem."Product use Battery" := Item."Product use Battery";  // 17-05-23 ZY-LD 064
-                        recItem."WEEE Category" := Item."WEEE Category";  // 17-05-23 ZY-LD 064
+                        recItem."SVHC > 1000 ppm" := Item."SVHC > 1000 ppm";
+                        recItem."Product use Battery" := Item."Product use Battery";
+                        recItem."WEEE Category" := Item."WEEE Category";
+                        recItem."Device Weight" := Item."Device Weight"; //30-09-2026 BK #Request from HQ
+                        if recItem."Tariff No." = '' then
+                            recItem."Tariff No." := Item."Tariff No.";//30-09-2026 BK #Request from HQ
                         recItem.Modify(true);
 
-                        //>> 24-03-23 ZY-LD 062
                         recReworkItem.SetRange("Update PLMS from Item No.", recItem."No.");
                         if recReworkItem.FindSet(true) then
                             repeat
                                 recReworkItem.TransferPlmsFields;
                             until recReworkItem.Next() = 0;
-                        //<< 24-03-23 ZY-LD 062
 
                         WebServLogEntry."Quantity Modified" += 1;
                     end;
@@ -460,13 +380,11 @@ XmlPort 50026 "HQ PLMS"
 
             exit(true);
         end;
-        //<< 16-04-24 ZY-LD 008
     end;
 
     local procedure InsertHQDimension(pDim: Enum "HQ Dimension"; pCode: Code[50])
     HqDimension: Record SBU;
     begin
-        //>> 16-04-24 ZY-LD 008
         if (pCode <> '') and
            not HqDimension.Get(pDim, pCode)
         then begin
@@ -475,9 +393,8 @@ XmlPort 50026 "HQ PLMS"
             HqDimension.Description := pCode;
             HqDimension.Insert;
         end;
-        //<< 16-04-24 ZY-LD 008
     end;
 
     var
-        ScipNoTmp: Record "SCIP Number" temporary;  // 16-04-24 ZY-LD 008
+        ScipNoTmp: Record "SCIP Number" temporary;
 }

@@ -511,6 +511,13 @@ codeunit 50085 "General Ledger Event"
                 end;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Gen. Jnl.-Check Line", OnBeforeCheckDimensions, '', false, false)]
+    local procedure "Gen. Jnl.-Check Line_OnBeforeCheckDimensions"(var Sender: Codeunit "Gen. Jnl.-Check Line"; var GenJnlLine: Record "Gen. Journal Line"; var CheckDone: Boolean)
+    begin
+        //28-09-2026 BK #552510
+        if (GenJnlLine."Posting Date" <> NormalDate(GenJnlLine."Posting Date")) then
+            CheckDone := true;
+    end;
 
 
     local procedure ErrorOnDeletePostedDocument()
@@ -546,5 +553,82 @@ codeunit 50085 "General Ledger Event"
         if AllowPostingTo = 0D then
             AllowPostingTo := DMY2Date(31, 12, 9999);
         exit(PostingDate in [AllowPostingFrom .. AllowPostingTo]);
+    end;
+
+    // 01-10-2026 BK #595844
+    Procedure FindPaymentApprovalEntres(TableID: Integer; DocumentNO: Code[20]; entryNo: Integer; recID: recordid)
+    var
+        PostedApprovalEntry: Record "Posted Approval Entry";
+        GLRegister: Record "G/L Register";
+        EmptyRecordID: RecordId;
+        Found: Boolean;
+
+    Begin
+        Case TableID of
+            25:
+                Begin // Vendor Ledger Entries
+                    found := false;
+                    if (recID <> EmptyRecordID) then begin
+                        PostedApprovalEntry.Setrange(PostedApprovalEntry."Posted Record ID", recID);
+                        if postedApprovalEntry.FindSet() then
+                            Found := true;
+                    end;
+                    if (not Found) and (entryNo <> 0) then begin
+                        postedApprovalEntry.reset();
+                        GLRegister.SetFilter(GLRegister."From Entry No.", '..%1', entryNo);
+                        GLRegister.SetFilter(GLRegister."To Entry No.", '%1..', entryNo);
+                        if GLRegister.FindFirst() then begin
+                            PostedApprovalEntry.Setrange(PostedApprovalEntry."Posted Record ID", glRegister.RecordId);
+                            if postedApprovalEntry.Findset() then
+                                Found := true;
+                        end;
+                    end;
+                    if found then
+                        PAGE.Run(PAGE::"Posted Approval Entries", PostedApprovalEntry)
+                end;
+            271:
+                Begin // Bank Account Ledger Entries
+                    if (recID <> EmptyRecordID) then begin
+                        PostedApprovalEntry.Setrange(PostedApprovalEntry."Posted Record ID", recID);
+                        if postedApprovalEntry.FindSet() then
+                            Found := true;
+                    end;
+                    if (not Found) and (entryNo <> 0) then begin
+                        postedApprovalEntry.reset();
+                        GLRegister.SetFilter(GLRegister."From Entry No.", '..%1', entryNo);
+                        GLRegister.SetFilter(GLRegister."To Entry No.", '%1..', entryNo);
+                        if GLRegister.FindFirst() then begin
+                            PostedApprovalEntry.Setrange(PostedApprovalEntry."Posted Record ID", glRegister.RecordId);
+                            if postedApprovalEntry.Findset() then
+                                Found := true;
+                        end;
+                    end;
+                    if found then
+                        PAGE.Run(PAGE::"Posted Approval Entries", PostedApprovalEntry)
+                end;
+            17:
+                begin
+                    found := false;
+                    if (EntryNo <> 0) then begin
+                        postedApprovalEntry.reset();
+                        GLRegister.SetFilter(GLRegister."From Entry No.", '..%1', EntryNo);
+                        GLRegister.SetFilter(GLRegister."To Entry No.", '%1..', EntryNo);
+                        if GLRegister.FindFirst() then begin
+                            PostedApprovalEntry.Setrange(PostedApprovalEntry."Posted Record ID", glRegister.RecordId);
+                            if postedApprovalEntry.Findset() then
+                                found := true;
+                        end;
+                        if (documentNo <> '') and (not found) then begin
+                            postedApprovalEntry.reset();
+                            postedApprovalEntry.SetFilter(PostedApprovalEntry."Document No.", '%1', documentNo);
+                            if postedApprovalEntry.Findset() then
+                                found := true;
+                        end;
+                        if found then
+                            PAGE.Run(PAGE::"Posted Approval Entries", PostedApprovalEntry)
+                    end;
+
+                end;
+        End;
     end;
 }

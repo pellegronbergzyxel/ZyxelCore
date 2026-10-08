@@ -492,6 +492,13 @@ xmlport 50033 "WS Replicate Item"
                 fieldelement(WeightPrCarton; Item."Weight p_Carton")
                 {
                 }
+                fieldelement(DeviceWeight; Item."Device Weight") //30-09-2026 BK #Request from HQ
+                {
+                }
+                fieldelement(emptyOuterCartonWeight; Item."Empty Outer Carton Weight") //30-09-2026 BK #Request from HQ
+                {
+                }
+
                 textelement(SuccItemNo)
                 {
                     trigger OnBeforePassVariable()

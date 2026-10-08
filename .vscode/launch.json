@@ -125,6 +125,26 @@
             //"startupCompany": "ZNet ES"
         },
         {
+            "name": "Zyxel TESTEMEA ZNet BE",
+            "type": "al",
+            "request": "launch",
+            "server": "http://ZyEU-D365BC02.zyeu.zyxel.eu",
+            "port": 7049,
+            "serverInstance": "TESTEMEA",
+            "authentication": "AAD",
+            "startupObjectId": 1140,
+            "startupObjectType": "Page",
+            "breakOnError": "All",
+            "launchBrowser": true,
+            "enableLongRunningSqlStatements": true,
+            "enableSqlInformationDebugger": true,
+            "environmentType": "OnPrem",
+            // "tenant": "default",
+            //"primaryTenantDomain": "89443d20-e988-4407-a3c1-0c80570fb401",
+            "schemaUpdateMode": "ForceSync",
+            "startupCompany": "ZNet BE"
+        },
+        {
             "name": "Zyxel TESTIT ZNet IT",
             "type": "al",
             "request": "launch",
@@ -166,7 +186,7 @@
             "schemaUpdateMode": "ForceSync",
             "startupCompany": "ZyND IT"
         },
-        
+        /*
         {
             "name": "Zyxel EMEA ZCom",
             "type": "al",
@@ -189,7 +209,7 @@
             "dependencyPublishingOption": "Ignore",
             //"startupCompany": "ZNet DK"
             "startupCompany": "ZyND DK"
-        }, 
+        }, */
         /*
         { 
             "name": "Zyxel EMEA ZNet",
@@ -214,8 +234,8 @@
             "startupCompany": "ZNet DK"
             //"startupCompany": "ZNet FI"
             //"startupCompany": "ZNet UK"
-        }, */
-            
+        }, 
+         */   
         /*{
             "name": "Zyxel IT",
             "type": "al",

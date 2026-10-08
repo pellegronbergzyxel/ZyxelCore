@@ -1,8 +1,8 @@
-pageextension 50118 VendorLedgerEntriesZX extends "Vendor Ledger Entries"
+pageextension 50317 BankAccountLedgerEntriesZX extends "Bank Account Ledger Entries"
 {
     actions
     {
-        addafter(ShowDocumentAttachment)
+        addlast("Ent&ry")
         {
             action(FindApprovalEntries)
             {
@@ -14,16 +14,10 @@ pageextension 50118 VendorLedgerEntriesZX extends "Vendor Ledger Entries"
                 trigger OnAction()
                 var
                     GLEvent: Codeunit "General Ledger Event";
-
                 begin
-                    GLEvent.FindPaymentApprovalEntres(Rec.RecordID.tableno, rec."Document No.", rec."Entry No.", rec.RecordId);
+                    GLEvent.FindPaymentApprovalEntres(Rec.RecordId.TableNo, Rec."Document No.", Rec."Entry No.", Rec.RecordId);
                 end;
             }
         }
     }
-    trigger OnOpenPage()
-    begin
-        Rec.Ascending(false);
-        if not Rec.FindFirst() then;
-    end;
 }

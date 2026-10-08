@@ -320,8 +320,8 @@ codeunit 50035 "Exch. Rate Adjmt. Proc. Zyxel"
                     TaxJurisdiction2."Unreal. Tax Acc. (Sales)", TaxJurisdiction2.TableCaption(), TaxJurisdiction2.FieldCaption("Unreal. Tax Acc. (Sales)"));
             until TaxJurisdiction2.Next() = 0;
 
-        AddCurrCurrencyFactor :=
-            CurrExchRate2.ExchangeRateAdjmt(ExchRateAdjmtParameters."Posting Date", GetAdditionalReportingCurrency());
+        //AddCurrCurrencyFactor := CurrExchRate2.ExchangeRateAdjmt(ExchRateAdjmtParameters."Posting Date", GetAdditionalReportingCurrency());
+        AddCurrCurrencyFactor := CurrExchRate2.ExchangeRateAdjmt(ExchRateAdjmtParameters."Exchange Rate Date", GetAdditionalReportingCurrency()); //08-10-2026 BK #597518   
     end;
 
     local procedure ProcessBankAccount(var BankAccount: Record "Bank Account"; Currency: Record Currency)

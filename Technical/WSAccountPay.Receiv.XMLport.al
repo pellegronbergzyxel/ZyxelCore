@@ -1,11 +1,5 @@
 XmlPort 50015 "WS Account Pay./Receiv"
 {
-    // 001. 02-11-21 ZY-LD 000 - Posting groups is taken from the Customer/Vendor instead of the entries.
-    // 002. 31-01-22 ZY-LD 2022013110000031 - "Credit Limit" must be calculated in reporting currency.
-    // 003. 15-08-22 ZY-LD 2022081510000077 - HQ Company Name.
-    // 004. 16-06-23 ZY-LD #4416638 - Due Date has been added to Payable.
-    // 005. 11-10-23 ZY-LD #4160925 - .
-
     Caption = 'WS Account Pay./Receiv';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/acc';
     Encoding = UTF8;
@@ -131,7 +125,7 @@ XmlPort 50015 "WS Account Pay./Receiv"
                 trigger OnBeforeInsertRecord()
                 begin
                     if "Account Pay./Receiv Buffer"."Entry No." = 0 then
-                        currXMLport.Skip;
+                        currXMLport.Skip();
                 end;
             }
         }
@@ -177,7 +171,7 @@ XmlPort 50015 "WS Account Pay./Receiv"
 
             recVend.SetFilter("Date Filter", '..%1', gEndDate);
             recVend.SetFilter("Net Change", '<>0');
-            if recVend.FindSet then
+            if recVend.FindSet() then
                 repeat
                     Clear("Account Pay./Receiv Buffer");
                     "Account Pay./Receiv Buffer".Init;
@@ -198,7 +192,7 @@ XmlPort 50015 "WS Account Pay./Receiv"
                     //SETFILTER("Date Filter",'..%1',gEndDate);
                     recVendLedgEntry.SetFilter(recVendLedgEntry."Remaining Amount", '<>0');
                     recVendLedgEntry.SetAutocalcFields(recVendLedgEntry.Amount, recVendLedgEntry."Amount (LCY)", recVendLedgEntry."Remaining Amount", recVendLedgEntry."Remaining Amt. (LCY)");
-                    if recVendLedgEntry.FindSet then
+                    if recVendLedgEntry.FindSet() then
                         repeat
                             if recVendLedgEntry."Currency Code" = '' then
                                 recVendLedgEntry."Currency Code" := recGlSetup."LCY Code";
@@ -237,10 +231,13 @@ XmlPort 50015 "WS Account Pay./Receiv"
                                     "Account Pay./Receiv Buffer"."RPT Amount" := recVendLedgEntry.Amount;
                                     "Account Pay./Receiv Buffer"."RPT Ending Balance" := recVendLedgEntry."Remaining Amount";
                                 end else begin
-                                    "Account Pay./Receiv Buffer"."RPT Amount" := recCurrExchRate.ExchangeAmount(recVendLedgEntry.Amount, recVendLedgEntry."Currency Code", ReportingCurrency, gCurrencyDate);
-                                    "Account Pay./Receiv Buffer"."RPT Ending Balance" := recCurrExchRate.ExchangeAmount(recVendLedgEntry."Remaining Amount", recVendLedgEntry."Currency Code", ReportingCurrency, gCurrencyDate);
+                                    //06-10-2026 BK #597518
+                                    //"Account Pay./Receiv Buffer"."RPT Amount" := recCurrExchRate.ExchangeAmount(recVendLedgEntry.Amount, recVendLedgEntry."Currency Code", ReportingCurrency, gCurrencyDate);
+                                    //"Account Pay./Receiv Buffer"."RPT Ending Balance" := recCurrExchRate.ExchangeAmount(recVendLedgEntry."Remaining Amount", recVendLedgEntry."Currency Code", ReportingCurrency, gCurrencyDate);
+                                    "Account Pay./Receiv Buffer"."RPT Amount" := recCurrExchRate.ExchangeAmount(recVendLedgEntry."Amount (LCY)", recGlSetup."LCY Code", ReportingCurrency, gCurrencyDate);
+                                    "Account Pay./Receiv Buffer"."RPT Ending Balance" := recCurrExchRate.ExchangeAmount(recVendLedgEntry."Remaining Amt. (LCY)", recGlSetup."LCY Code", ReportingCurrency, gCurrencyDate);
                                 end;
-                            "Account Pay./Receiv Buffer".Insert;
+                            "Account Pay./Receiv Buffer".Insert();
                         until recVendLedgEntry.Next() = 0;
                 until recVend.Next() = 0;
 
@@ -263,47 +260,38 @@ XmlPort 50015 "WS Account Pay./Receiv"
         recCompInfo: Record "Company Information";
     begin
         begin
-            recGlSetup.Get;
-            recCompInfo.Get;  // 15-08-22 ZY-LD 003
+            recGlSetup.Get();
+            recCompInfo.Get();
 
             recCust.SetFilter("Date Filter", '..%1', gEndDate);
             recCust.SetFilter("Net Change", '<>0');
-            if recCust.FindSet then
+            if recCust.FindSet() then
                 repeat
                     Clear("Account Pay./Receiv Buffer");
-                    "Account Pay./Receiv Buffer".Init;
+                    "Account Pay./Receiv Buffer".Init();
                     "Account Pay./Receiv Buffer"."Company Name" := CompanyName();
-                    "Account Pay./Receiv Buffer"."HQ Company Name" := recCompInfo."HQ Company Name";  // 15-08-22 ZY-LD 003
+                    "Account Pay./Receiv Buffer"."HQ Company Name" := recCompInfo."HQ Company Name";
                     "Account Pay./Receiv Buffer"."Source No." := recCust."No.";
                     "Account Pay./Receiv Buffer"."Source Name" := recCust.Name;
                     "Account Pay./Receiv Buffer"."Payment Terms" := recCust."Payment Terms Code";
-                    if recGlSetup."LCY Code" = ReportingCurrency then  // 31-01-22 ZY-LD 002
+                    if recGlSetup."LCY Code" = ReportingCurrency then
                         "Account Pay./Receiv Buffer"."Credit Limit" := recCust."Credit Limit (LCY)"
                     else
                         "Account Pay./Receiv Buffer"."Credit Limit" := recCurrExchRate.ExchangeAmount(recCust."Credit Limit (LCY)", recGlSetup."LCY Code", ReportingCurrency, gCurrencyDate);  // 31-01-22 ZY-LD 002
 
-                    //>> 02-11-21 ZY-LD 001
                     if recCustPostGrp.Code <> recCust."Customer Posting Group" then begin
                         recCustPostGrp.Get(recCust."Customer Posting Group");
                         recGlAcc.Get(recCustPostGrp."Receivables Account");
                     end;
-                    //<< 02-11-21 ZY-LD 001
 
                     recCustLedgEntry.SetRange(recCustLedgEntry."Customer No.", recCust."No.");
                     recCust.Copyfilter("Date Filter", recCustLedgEntry."Date Filter");
                     recCustLedgEntry.SetFilter(recCustLedgEntry."Remaining Amount", '<>0');
                     recCustLedgEntry.SetAutocalcFields(recCustLedgEntry.Amount, recCustLedgEntry."Amount (LCY)", recCustLedgEntry."Remaining Amount", recCustLedgEntry."Remaining Amt. (LCY)");
-                    if recCustLedgEntry.FindSet then
+                    if recCustLedgEntry.FindSet() then
                         repeat
                             if recCustLedgEntry."Currency Code" = '' then
                                 recCustLedgEntry."Currency Code" := recGlSetup."LCY Code";
-
-                            //>> 02-11-21 ZY-LD 001
-                            /*IF recCustPostGrp.Code <> "Customer Posting Group" THEN BEGIN
-                              recCustPostGrp.GET("Customer Posting Group");
-                              recGlAcc.GET(recCustPostGrp."Receivables Account");
-                            END;*/
-                            //<< 02-11-21 ZY-LD 001
 
                             LbNo += 1;
                             "Account Pay./Receiv Buffer"."Entry No." := LbNo;
@@ -332,10 +320,14 @@ XmlPort 50015 "WS Account Pay./Receiv"
                                     "Account Pay./Receiv Buffer"."RPT Amount" := recCustLedgEntry.Amount;
                                     "Account Pay./Receiv Buffer"."RPT Ending Balance" := recCustLedgEntry."Remaining Amount";
                                 end else begin
-                                    "Account Pay./Receiv Buffer"."RPT Amount" := recCurrExchRate.ExchangeAmount(recCustLedgEntry.Amount, recCustLedgEntry."Currency Code", ReportingCurrency, gCurrencyDate);
-                                    "Account Pay./Receiv Buffer"."RPT Ending Balance" := recCurrExchRate.ExchangeAmount(recCustLedgEntry."Remaining Amount", recCustLedgEntry."Currency Code", ReportingCurrency, gCurrencyDate);
+                                    //06-10-2026 BK #597518
+                                    // "Account Pay./Receiv Buffer"."RPT Amount" := recCurrExchRate.ExchangeAmount(recCustLedgEntry.Amount, recCustLedgEntry."Currency Code", ReportingCurrency, gCurrencyDate);
+                                    // "Account Pay./Receiv Buffer"."RPT Ending Balance" := recCurrExchRate.ExchangeAmount(recCustLedgEntry."Remaining Amount", recCustLedgEntry."Currency Code", ReportingCurrency, gCurrencyDate);
+                                    "Account Pay./Receiv Buffer"."RPT Amount" := recCurrExchRate.ExchangeAmount(recCustLedgEntry."Amount (LCY)", recGlSetup."LCY Code", ReportingCurrency, gCurrencyDate);
+                                    "Account Pay./Receiv Buffer"."RPT Ending Balance" := recCurrExchRate.ExchangeAmount(recCustLedgEntry."Remaining Amt. (LCY)", recGlSetup."LCY Code", ReportingCurrency, gCurrencyDate);
+
                                 end;
-                            "Account Pay./Receiv Buffer".Insert;
+                            "Account Pay./Receiv Buffer".Insert();
                         until recCustLedgEntry.Next() = 0;
                 until recCust.Next() = 0;
 
@@ -362,9 +354,9 @@ XmlPort 50015 "WS Account Pay./Receiv"
                 SetDataReceivable;
         end;
 
-        if "Account Pay./Receiv Buffer".FindSet then begin
+        if "Account Pay./Receiv Buffer".FindSet() then begin
             ZGT.OpenProgressWindow('', "Account Pay./Receiv Buffer".Count);
-            if AccPayBuff.FindLast then
+            if AccPayBuff.FindLast() then
                 NextEntryNo := AccPayBuff."Entry No.";
 
             repeat
@@ -392,7 +384,7 @@ XmlPort 50015 "WS Account Pay./Receiv"
             'SP':
                 rValue := lText002;
             else
-                IF ZGT.IsZNetCompany AND (pGlDim1Code = '') THEN  // 11-10-23 ZY-LD 005
+                IF ZGT.IsZNetCompany AND (pGlDim1Code = '') THEN
                     rValue := lText001
                 ELSE
                     rValue := lText003;

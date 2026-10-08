@@ -353,6 +353,9 @@ report 50185 "Del. Doc. - Customs Invoice"
                     column(VatRegNoBillTo; VatRegNoBillTo)
                     {
                     }
+                    column(ShippedToPhone; ShippedToPhone)
+                    {
+                    }
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "VCK Delivery Document Header";
@@ -379,14 +382,11 @@ report 50185 "Del. Doc. - Customs Invoice"
                             Clear(DimText);
                             Continue := false;
                             repeat
-                                OldDimText := DimText;
+                                OldDimText := copystr(DimText, 1, 75);
                                 if DimText = '' then
-                                    DimText := StrSubstNo('%1 %2', DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code")
+                                    DimText := copystr(StrSubstNo('%1 %2', DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code"), 1, 120)
                                 else
-                                    DimText :=
-                                      StrSubstNo(
-                                        '%1, %2 %3', DimText,
-                                        DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code");
+                                    DimText := copystr(StrSubstNo('%1, %2 %3', DimText, DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code"), 1, 120);
                                 if StrLen(DimText) > MaxStrLen(OldDimText) then begin
                                     DimText := OldDimText;
                                     Continue := true;
@@ -568,7 +568,7 @@ report 50185 "Del. Doc. - Customs Invoice"
                                 if "Sales Shipment Buffer".Number = 1 then
                                     SalesShipmentBuffer.Find('-')
                                 else
-                                    SalesShipmentBuffer.Next;
+                                    SalesShipmentBuffer.Next();
                             end;
 
                             trigger OnPreDataItem()
@@ -601,14 +601,11 @@ report 50185 "Del. Doc. - Customs Invoice"
                                 Clear(DimText);
                                 Continue := false;
                                 repeat
-                                    OldDimText := DimText;
+                                    OldDimText := copystr(DimText, 1, 75);
                                     if DimText = '' then
                                         DimText := StrSubstNo('%1 %2', DimSetEntry2."Dimension Code", DimSetEntry2."Dimension Value Code")
                                     else
-                                        DimText :=
-                                          StrSubstNo(
-                                            '%1, %2 %3', DimText,
-                                            DimSetEntry2."Dimension Code", DimSetEntry2."Dimension Value Code");
+                                        DimText := copystr(StrSubstNo('%1, %2 %3', DimText, DimSetEntry2."Dimension Code", DimSetEntry2."Dimension Value Code"), 1, 120);
                                     if StrLen(DimText) > MaxStrLen(OldDimText) then begin
                                         DimText := OldDimText;
                                         Continue := true;
@@ -644,13 +641,11 @@ report 50185 "Del. Doc. - Customs Invoice"
                             }
 
                             trigger OnAfterGetRecord()
-                            var
-                                ItemTranslation: Record "Item Translation";
                             begin
                                 if AsmLoop.Number = 1 then
                                     TempPostedAsmLine.FindSet()
                                 else
-                                    TempPostedAsmLine.Next;
+                                    TempPostedAsmLine.Next();
                             end;
 
                             trigger OnPreDataItem()
@@ -666,7 +661,8 @@ report 50185 "Del. Doc. - Customs Invoice"
 
                         trigger OnAfterGetRecord()
                         var
-                            recVATPostSetup: Record "VAT Posting Setup";
+                            TariffLable: Label 'Tariff: %1';
+                            CountryOfOriginLable: Label '; Country of Origin: %1';
                         begin
                             "VCK Delivery Document Line".TestField("VCK Delivery Document Line"."Unit Price");
 
@@ -679,7 +675,7 @@ report 50185 "Del. Doc. - Customs Invoice"
                             VATAmountLine."VAT Base" := "VCK Delivery Document Line".Amount;
                             VATAmountLine."Amount Including VAT" := "VCK Delivery Document Line"."Amount Including VAT";
                             VATAmountLine."Line Amount" := "VCK Delivery Document Line"."Line Amount";
-                            VATAmountLine.InsertLine;
+                            VATAmountLine.InsertLine();
 
                             TotalSubTotal += "VCK Delivery Document Line"."Line Amount";
                             TotalAmount += "VCK Delivery Document Line".Amount;
@@ -693,10 +689,10 @@ report 50185 "Del. Doc. - Customs Invoice"
                             if ("VCK Delivery Document Line"."Item No." <> '') then begin
                                 recItem.Get("VCK Delivery Document Line"."Item No.");
                                 TarrifCode := '';
-                                TarrifCode := StrSubstNo('Tariff: %1', recItem."Tariff No.");
+                                TarrifCode := StrSubstNo(TariffLable, recItem."Tariff No.");
 
                                 if recItem."Country/Region of Origin Code" <> '' then
-                                    TarrifCode := TarrifCode + StrSubstNo('; Country of Origin: %1', recItem."Country/Region of Origin Code");
+                                    TarrifCode := TarrifCode + StrSubstNo(CountryOfOriginLable, recItem."Country/Region of Origin Code");
 
                                 TotalGrossWeight += "VCK Delivery Document Line".Quantity * recItem."Gross Weight";
                                 TotalNetWeight += "VCK Delivery Document Line".Quantity * recItem."Net Weight";
@@ -723,7 +719,7 @@ report 50185 "Del. Doc. - Customs Invoice"
                             VATAmountLine.DeleteAll();
                             SalesShipmentBuffer.Reset();
                             SalesShipmentBuffer.DeleteAll();
-                            FirstValueEntryNo := 0;
+                            //FirstValueEntryNo := 0;
                             MoreLines := "VCK Delivery Document Line".Find('+');
                             while MoreLines and ("VCK Delivery Document Line".Description = '') and ("VCK Delivery Document Line"."Item No." = '') and ("VCK Delivery Document Line".Quantity = 0) and ("VCK Delivery Document Line".Amount = 0) do
                                 MoreLines := "VCK Delivery Document Line".Next(-1) <> 0;
@@ -898,7 +894,7 @@ report 50185 "Del. Doc. - Customs Invoice"
 
                             if LineFee.Number = 1 then begin
                                 if not TempLineFeeNoteOnReportHist.FindSet() then
-                                    CurrReport.Break
+                                    CurrReport.Break()
                             end else
                                 if TempLineFeeNoteOnReportHist.Next() = 0 then
                                     CurrReport.Break();
@@ -1026,6 +1022,10 @@ report 50185 "Del. Doc. - Customs Invoice"
                 EoriNoCompany := companyInfo."EORI No."; // 1105-2026 BK #570417
                 VatRegNoBillTo := "VCK Delivery Document Header"."Bill-to TaxID";
 
+                //28-09-2026 BK #596691
+                if "VCK Delivery Document Header"."Ship-to Phone" = '' then
+                    FindShipToPhone("VCK Delivery Document Header"."Ship-to Code");
+
                 EoriNoCaption := '';
                 EoriNoCustomer := '';
                 if recCountry.Get("VCK Delivery Document Header"."Ship-to Country/Region Code") and (recCountry."Customs Customer No." <> '') then begin
@@ -1064,7 +1064,7 @@ report 50185 "Del. Doc. - Customs Invoice"
                     EoriNoCaption := EoriNoCaptionLbl;
 
                 if "VCK Delivery Document Header"."Ship-to TaxID" <> '' then
-                    SellVATID := "VCK Delivery Document Header"."Ship-to TaxID"
+                    SellVATID := copystr("VCK Delivery Document Header"."Ship-to TaxID", 1, 20)
                 else
                     SellVATID := sellcust."VAT Registration No.";
 
@@ -1207,7 +1207,7 @@ report 50185 "Del. Doc. - Customs Invoice"
         GLSetup.Get();
         CompanyInfo.Get();
         SalesSetup.Get();
-        CompanyInfo.VerifyAndSetPaymentInfo;
+        CompanyInfo.VerifyAndSetPaymentInfo();
         case SalesSetup."Logo Position on Documents" of
             SalesSetup."logo position on documents"::Left:
                 begin
@@ -1281,8 +1281,8 @@ report 50185 "Del. Doc. - Customs Invoice"
         CopyText: Text[30];
         ShowShippingAddr: Boolean;
         i: Integer;
-        NextEntryNo: Integer;
-        FirstValueEntryNo: Integer;
+        //NextEntryNo: Integer;
+        //FirstValueEntryNo: Integer;
         DimText: Text[120];
         OldDimText: Text[75];
         ShowInternalInfo: Boolean;
@@ -1305,8 +1305,6 @@ report 50185 "Del. Doc. - Customs Invoice"
         Text001: Label 'Total %1';
         Text002: Label 'Total %1 Incl. VAT';
         Text003: Label 'COPY';
-        Text004: Label '%2 - Invoice %1';
-        Text005: Label 'Delivery Document';
         PageCaptionCap: Label 'Page %1 of %2';
         Text006: Label 'Total %1 Excl. VAT';
 
@@ -1322,11 +1320,12 @@ report 50185 "Del. Doc. - Customs Invoice"
         EoriNoCaption: Text[10];
         EoriNoCompany: Code[15];
         EoriNoCustomer: Code[15];
+        ShippedToPhone: Text[50]; //28-09-2026 BK #596691
         TotalGrossWeight: Decimal;
         TotalNetWeight: Decimal;
         TotalNoOfItems: Decimal;
         LineHeaderDescription: Text;
-        VatRegNoBillTo: Code[20];
+        VatRegNoBillTo: Code[50];
         FirstLine: Boolean;
         Text011: Label 'Total quantity of items: %1.';
         CompanyInfoPhoneNoCaptionLbl: Label 'Phone No.';
@@ -1367,6 +1366,7 @@ report 50185 "Del. Doc. - Customs Invoice"
         Text50006: Label 'Total number of Items: %1';
         Text50007: Label 'Total Gross Weight: %1 kg';
         Text50008: Label 'Total Net Weight: %1 kg.';
+        TextPhone: label 'Phone ';  //28-09-2026 BK #596691
 
     procedure InitLogInteraction()
     begin
@@ -1375,14 +1375,8 @@ report 50185 "Del. Doc. - Customs Invoice"
 
 
     procedure FindPostedShipmentDate(): Date
-    var
-        SalesShipmentHeader: Record "Sales Shipment Header";
-        SalesShipmentBuffer2: Record "Sales Shipment Buffer" temporary;
     begin
-        NextEntryNo := 1;
-
         exit(0D);
-
     end;
 
     procedure CorrectShipment(var SalesShipmentLine: Record "Sales Shipment Line")
@@ -1404,7 +1398,7 @@ report 50185 "Del. Doc. - Customs Invoice"
     begin
         if not UnitOfMeasure.Get(UOMCode) then
             exit(UOMCode);
-        exit(UnitOfMeasure.Description);
+        exit(copystr(UnitOfMeasure.Description, 1, 10));
     end;
 
 
@@ -1430,13 +1424,13 @@ report 50185 "Del. Doc. - Customs Invoice"
 
         LineFeeNoteOnReportHist.SetRange("Cust. Ledger Entry No", CustLedgerEntry."Entry No.");
         LineFeeNoteOnReportHist.SetRange("Language Code", Customer."Language Code");
-        if LineFeeNoteOnReportHist.FindSet() then begin
+        if LineFeeNoteOnReportHist.FindSet() then
             repeat
                 TempLineFeeNoteOnReportHist.Init();
                 TempLineFeeNoteOnReportHist.Copy(LineFeeNoteOnReportHist);
                 TempLineFeeNoteOnReportHist.Insert();
-            until LineFeeNoteOnReportHist.Next() = 0;
-        end else begin
+            until LineFeeNoteOnReportHist.Next() = 0
+        else begin
             LineFeeNoteOnReportHist.SetRange("Language Code", LanguageCU.GetLanguageCode(GlobalLanguage));
             if LineFeeNoteOnReportHist.FindSet() then
                 repeat
@@ -1445,5 +1439,19 @@ report 50185 "Del. Doc. - Customs Invoice"
                     TempLineFeeNoteOnReportHist.Insert();
                 until LineFeeNoteOnReportHist.Next() = 0;
         end;
+    end;
+
+    //28-09-2026 BK #596691
+    local procedure FindShipToPhone(ShipToCode: Code[20])
+    var
+        ShipToAdd: Record "Ship-to Address";
+        pos: Integer;
+
+    begin
+        pos := StrPos(shiptocode, '.');
+        if ShipToAdd.get(copystr(ShipToCode, 1, pos - 1), copystr(ShipToCode, pos + 1, 50)) then
+            if ShipToAdd."Phone No." <> '' then
+                ShippedToPhone := TextPhone + ShipToAdd."Phone No.";
+
     end;
 }

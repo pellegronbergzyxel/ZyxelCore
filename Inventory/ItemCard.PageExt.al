@@ -276,6 +276,13 @@ pageextension 50119 ItemCardZX extends "Item Card"
                 ToolTip = 'Specifies the value of the UN Code field.';
                 Editable = PLMSUpdateEditable;
             }
+            //30-09-2026 BK #Request from HQ
+            field("Device Weight"; Rec."Device Weight")
+            {
+                ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the Device Weight in Kg';
+                Editable = PLMSUpdateEditable;
+            }
             group(Pallet)
             {
                 Caption = 'Pallet';

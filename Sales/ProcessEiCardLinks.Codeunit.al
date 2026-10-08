@@ -166,20 +166,12 @@ Codeunit 50039 "Process EiCard Links"
                             if (recEiCardLinkLine."Purchase Order No." <> '') and (recEiCardLinkLine."Purchase Order Line No." <> 0) then //30-06-2026 BK ##581893
                                 recEiCardLinkLine.Quantity := FindPurchaseOrder(recEiCardLinkLine."Purchase Order No.", recEiCardLinkLine."Purchase Order Line No.");
                             recEiCardLinkLine.Modify(true);
-<<<<<<< HEAD
-=======
-
->>>>>>> 831d243ca590587ed71f7c889a39a73ecf3801f7
                             Commit;  // The file is downloaded, so we have to commit here.
                             rValue := true;
                         end else begin
                             recEiCardLinkLine.Quantity := recSalesLine.Quantity;
                             recEiCardLinkLine.Modify(true);
-<<<<<<< HEAD
-                            rValue := true;
-=======
                             Error(lText003); //08-07-2026 BK #585893
->>>>>>> 831d243ca590587ed71f7c889a39a73ecf3801f7
                         end;
                     end else begin
                         rValue := true;

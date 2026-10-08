@@ -1345,6 +1345,11 @@ tableextension 50114 ItemZX extends Item
             Caption = 'Pallet Weight (kg)';
             DecimalPlaces = 2 : 2;
         }
+        field(62535; "Device Weight"; Decimal)//30-09-2026 BK #Request from HQ
+        {
+            Caption = 'Device Weight (Kg)';
+            DecimalPlaces = 2 : 2;
+        }
     }
 
     keys
@@ -1353,10 +1358,6 @@ tableextension 50114 ItemZX extends Item
         {
         }
     }
-
-    procedure "-->> fnDT"()
-    begin
-    end;
 
     procedure CalcVolume(Length: Decimal; Width: Decimal; Height: Decimal) Volume: Decimal
     begin
@@ -1433,6 +1434,9 @@ tableextension 50114 ItemZX extends Item
                 Rec.Validate(Rec."Qty. per Color Box", recItem."Qty. per Color Box");
                 Rec.Validate(Rec."SCIP No.", recItem."SCIP No.");
                 Rec.Validate(Rec."SVHC > 1000 ppm", recItem."SVHC > 1000 ppm");
+                //30-09-2026 BK #Request from HQ
+                rec.validate(rec."Device Weight", recItem."Device Weight");
+                rec.Validate(rec."Tariff No.", recItem."Tariff No.");
                 Rec.Modify(true);
             end;
     end;

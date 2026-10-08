@@ -28,26 +28,6 @@ pageextension 50112 GeneralLedgerEntriesZX extends "General Ledger Entries"
                 Visible = false;
             }
         }
-        /*addafter("Global Dimension 2 Code") //06-08-2026 BK Performance issue.
-        {
-            field("Location Code"; Rec."Location Code")
-            {
-                ApplicationArea = Basic, Suite;
-                tooltip = 'Should be deleted'; //04-08-2026 BK Performance issue.
-            }
-        }
-        {
-            field(Country; Rec.Country)
-            {
-                ApplicationArea = Basic, Suite;
-                tooltip = 'Should be deleted'; //04-08-2026 BK Performance issue.
-            }
-            field("Cost Type"; Rec."Cost Type")
-            {
-                ApplicationArea = Basic, Suite;
-                tooltip = 'Should be deleted'; //04-08-2026 BK Performance issue.
-            }
-        } */
         addafter("Gen. Prod. Posting Group")
         {
             field("System-Created Entry"; Rec."System-Created Entry")
@@ -66,7 +46,16 @@ pageextension 50112 GeneralLedgerEntriesZX extends "General Ledger Entries"
             }
 
         }
+        //25-09-2026 BK #596378
+        addafter(IncomingDocAttachFactBox)
+        {
+            part(HQInvoices; "Posted HQ Invoice ListPart")
+            {
+                ApplicationArea = All;
+                SubPageLink = "No." = field("External Document No.");
+            }
 
+        }
     }
     actions
     {
@@ -74,6 +63,23 @@ pageextension 50112 GeneralLedgerEntriesZX extends "General Ledger Entries"
         {
             Enabled = false;
             Visible = false;
+        }
+        addlast("Ent&ry")
+        {
+            action(FindApprovalEntries)
+            {
+                ApplicationArea = All;
+                Caption = 'Find Approval Entries';
+                Image = Approval;
+
+                // 01-10-2026 BK 595844
+                trigger OnAction()
+                var
+                    GLEvent: Codeunit "General Ledger Event";
+                begin
+                    GLEvent.FindPaymentApprovalEntres(Rec.RecordId.TableNo, Rec."Document No.", Rec."Entry No.", Rec.RecordId);
+                end;
+            }
         }
     }
 
