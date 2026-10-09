@@ -7,7 +7,7 @@ Table 50035 "Add. Eicard Order Info"
 
     fields
     {
-        field(1; "Document Type"; Enum "sales document type") //BK#Error
+        field(1; "Document Type"; Enum "Gen. Journal Document Type")
         {
             Caption = 'Document Type';
         }

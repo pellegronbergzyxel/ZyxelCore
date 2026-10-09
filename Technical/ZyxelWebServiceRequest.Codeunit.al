@@ -50,12 +50,12 @@ Codeunit 50084 "Zyxel Web Service Request"
         // Run the WebServReqMgt functions to send the request
         Username := '';
         Clear(PasswordSecrettext);
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
         WebServReqMgt.SetTraceMode(TraceMode);
         WebServReqMgt.DisableHttpsCheck;
-        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetBasicCredentials(recWebServiceSetup."User Name", PasswordSecrettext);
 
         if WebServReqMgt.SendRequestToWebService() then begin
@@ -117,6 +117,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         Username := '';
 
         Clear(PasswordSecrettext);
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
@@ -186,6 +187,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         Username := '';
 
         Clear(PasswordSecrettext);
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
@@ -251,13 +253,13 @@ Codeunit 50084 "Zyxel Web Service Request"
         // Run the WebServReqMgt functions to send the request
         Username := '';
         Clear(PasswordSecrettext);
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
         WebServReqMgt.SetTraceMode(TraceMode);
         WebServReqMgt.DisableHttpsCheck;
         WebServReqMgt.SetBasicCredentials(recWebServiceSetup."User Name", PasswordSecrettext);
-
         if WebServReqMgt.SendRequestToWebService() then begin
             WebServReqMgt.GetResponseContent(RespBodyInStream);
             XmlDocument.ReadFrom(RespBodyInStream, ResponseXmlDoc);
@@ -316,6 +318,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         Username := '';
 
         Clear(PasswordSecrettext);
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
@@ -380,8 +383,8 @@ Codeunit 50084 "Zyxel Web Service Request"
         // Run the WebServReqMgt functions to send the request
         Username := '';
         Clear(PasswordSecrettext);
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
-
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
         WebServReqMgt.SetTraceMode(TraceMode);
@@ -445,12 +448,12 @@ Codeunit 50084 "Zyxel Web Service Request"
         // Run the WebServReqMgt functions to send the request
         Username := '';
         Clear(PasswordSecrettext);
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
         WebServReqMgt.SetTraceMode(TraceMode);
         WebServReqMgt.DisableHttpsCheck;
-        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetBasicCredentials(recWebServiceSetup."User Name", PasswordSecrettext);
 
         if WebServReqMgt.SendRequestToWebService() then begin
@@ -510,12 +513,12 @@ Codeunit 50084 "Zyxel Web Service Request"
         // Run the WebServReqMgt functions to send the request
         Username := '';
         Clear(PasswordSecrettext);
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
         WebServReqMgt.SetTraceMode(TraceMode);
         WebServReqMgt.DisableHttpsCheck;
-        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetBasicCredentials(recWebServiceSetup."User Name", PasswordSecrettext);
 
         if WebServReqMgt.SendRequestToWebService then begin
@@ -575,12 +578,12 @@ Codeunit 50084 "Zyxel Web Service Request"
         // Run the WebServReqMgt functions to send the request
         Username := '';
         Clear(PasswordSecrettext);
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
         WebServReqMgt.SetTraceMode(TraceMode);
         WebServReqMgt.DisableHttpsCheck;
-        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetBasicCredentials(recWebServiceSetup."User Name", PasswordSecrettext);
 
         if WebServReqMgt.SendRequestToWebService() then begin
@@ -659,12 +662,12 @@ Codeunit 50084 "Zyxel Web Service Request"
         // Run the WebServReqMgt functions to send the request
         Username := '';
         Clear(PasswordSecrettext);
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
         WebServReqMgt.SetTraceMode(TraceMode);
         WebServReqMgt.DisableHttpsCheck;
-        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetBasicCredentials(recWebServiceSetup."User Name", PasswordSecrettext);
 
         if WebServReqMgt.SendRequestToWebService() then begin
@@ -773,12 +776,12 @@ Codeunit 50084 "Zyxel Web Service Request"
         // Run the WebServReqMgt functions to send the request
         Username := '';
         Clear(PasswordSecrettext);
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(pWsFunctionName, GetWebServiceNo));
         WebServReqMgt.SetTraceMode(TraceMode);
         WebServReqMgt.DisableHttpsCheck;
-        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetBasicCredentials(recWebServiceSetup."User Name", PasswordSecrettext);
 
         if WebServReqMgt.SendRequestToWebService() then begin
@@ -895,6 +898,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         TempBlob.CreateInstream(ReqBodyInStream, Textencoding::UTF8);
 
         // Run the WebServReqMgt functions to send the request
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(pWsFunctionName, GetWebServiceNo));
@@ -925,90 +929,6 @@ Codeunit 50084 "Zyxel Web Service Request"
             Error(ErrorTxt);
         end;
     end;
-
-    /*
-    procedure GetExchangeInfoOLD(pCompany: Text[80]; pWsFunctionName: Text; pWsHeader: Text; pInnerText: Text; var pCurrExchRateBuf: Record "Currency Exchange Rate Buffer" temporary)
-    var
-        recWebServiceSetup: Record "Web Service Setup";
-        WebServiceRequestMgt: Codeunit "SOAP Web Service Request Mgt.";
-        ResponseInStream: InStream;
-        ReqBodyInStream: InStream;
-        ReqBodyOutStream: OutStream;
-        RespBodyInStream: InStream;
-        TempBlob: Codeunit "Temp Blob";
-        Url: Text;
-        ReqText: Text;
-        Username: Text;
-        PasswordSecrettext: SecretText;
-        WebServReqMgt: Codeunit "SOAP Web Service Request Mgt.";
-        ResponseXmlDoc: dotnet XmlDocument;
-        ErrorTxt: Text;
-        XMLNsMgr: dotnet XmlNamespaceManager;
-        WorkNodes: dotnet XmlNodeList;
-        WorkNode: dotnet XmlNode;
-        i: Integer;
-        ServerFilename: Text;
-        ClientFilename: Text;
-        FileMgt: Codeunit "File Management";
-        TraceMode: Boolean;
-        CurDT: DateTime;
-    begin
-        // CLOUD READY DELETE
-        Url := recWebServiceSetup.GetWsUrl(GetSetupCode, pCompany, GetWebServiceNo);
-        //WsFunctionName := 'SendSalesOrders';
-        TraceMode := SetTraceMode(pCompany);
-
-        ReqText := StrSubstNo('<%1 xmlns="urn:microsoft-dynamics-schemas/codeunit/ZyWS">', pWsFunctionName) +
-                     StrSubstNo('<%1>', pWsHeader) +
-                      pInnerText +
-                     StrSubstNo('</%1>', pWsHeader) +
-                   StrSubstNo('</%1>', pWsFunctionName);
-
-        // Save request text in instream
-        TempBlob.CreateOutstream(ReqBodyOutStream, Textencoding::UTF8);
-        ReqBodyOutStream.Write(ReqText);
-        TempBlob.CreateInstream(ReqBodyInStream, Textencoding::UTF8);
-
-        // Run the WebServReqMgt functions to send the request
-        WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
-        WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
-        WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(pWsFunctionName, GetWebServiceNo));
-        WebServReqMgt.SetTraceMode(TraceMode);
-        WebServReqMgt.DisableHttpsCheck;
-        WebServReqMgt.SetBasicCredentials(recWebServiceSetup."User Name", PasswordSecrettext);
-
-        //CurDT := CURRENTDATETIME;
-        if WebServReqMgt.SendRequestToWebService then begin
-            // Get the response
-            WebServReqMgt.GetResponseContent(RespBodyInStream);
-            ResponseXmlDoc := ResponseXmlDoc.XmlDocument;
-            ResponseXmlDoc.Load(RespBodyInStream);
-            //  MESSAGE(ResponseXmlDoc.InnerXml);
-            //  ServerFilename := FileMgt.ServerTempFileName('');
-            //  ClientFilename := FileMgt.ClientTempFileName('xml');
-            //  ResponseXmlDoc.Save(ServerFilename);
-            //  FileMgt.DownloadToFile(ServerFilename,ClientFilename);
-            //  HYPERLINK(ClientFilename);
-
-            XMLNsMgr := XMLNsMgr.XmlNamespaceManager(ResponseXmlDoc.NameTable);
-            XMLNsMgr.AddNamespace('s', 'urn:microsoft-dynamics-nav/exchrate');  //   recWebServiceSetup.GetSoapAction('',GetWebServiceNo));
-            WorkNodes := ResponseXmlDoc.SelectNodes(StrSubstNo('//s:%1', 'ExchangeRate', pWsFunctionName), XMLNsMgr);
-
-            for i := 0 to WorkNodes.Count - 1 do begin
-                WorkNode := WorkNodes.ItemOf(i);
-
-                pCurrExchRateBuf.Company := WorkNode.SelectSingleNode('s:Company', XMLNsMgr).InnerText;
-                pCurrExchRateBuf."Currency Code" := WorkNode.SelectSingleNode('s:CurrencyCode', XMLNsMgr).InnerText;
-                pCurrExchRateBuf."LCY Code" := WorkNode.SelectSingleNode('s:LCYCode', XMLNsMgr).InnerText;
-                Evaluate(pCurrExchRateBuf."Exchange Rate Amount", WorkNode.SelectSingleNode('s:ExchangeRangeAmount', XMLNsMgr).InnerText, 9);
-                pCurrExchRateBuf.Insert;
-            end;
-        end else begin
-            WebServiceRequestMgt.ProcessFaultResponse(ErrorTxt);
-            Error(ErrorTxt);
-        end;
-    end; */
-
 
     procedure GetConcurVendor(pCompany: Text[80]; pWsFunctionName: Text; pWsHeader: Text; pInnerText: Text; var pVendTmp: Record Vendor temporary; pVendorNo: Code[20])
     var
@@ -1049,6 +969,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         TempBlob.CreateInstream(ReqBodyInStream, Textencoding::UTF8);
 
         // Run the WebServReqMgt functions to send the request
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(pWsFunctionName, GetWebServiceNo));
@@ -1156,12 +1077,12 @@ Codeunit 50084 "Zyxel Web Service Request"
         // Run the WebServReqMgt functions to send the request
         Username := '';
         Clear(PasswordSecrettext);
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
         WebServReqMgt.SetTraceMode(TraceMode);
         WebServReqMgt.DisableHttpsCheck;
-        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetBasicCredentials(recWebServiceSetup."User Name", PasswordSecrettext);
 
         if WebServReqMgt.SendRequestToWebService() then begin
@@ -1178,91 +1099,6 @@ Codeunit 50084 "Zyxel Web Service Request"
             Error(ErrorTxt);
         end;
     end;
-
-    /*
-    procedure SendSalesInvoiceNoOLD(pCompany: Text[80]; pRHQSalesInvNo: Code[20]; pSubSalesInvNo: Code[20]) rValue: Boolean
-    var
-        recWebServiceSetup: Record "Web Service Setup";
-        WebServiceRequestMgt: Codeunit "SOAP Web Service Request Mgt.";
-        ResponseInStream: InStream;
-        ReqBodyInStream: InStream;
-        ReqBodyOutStream: OutStream;
-        RespBodyInStream: InStream;
-        TempBlob: Codeunit "Temp Blob";
-        Url: Text;
-        ReqText: Text;
-        Username: Text;
-        PasswordSecrettext: SecretText;
-        WebServReqMgt: Codeunit "SOAP Web Service Request Mgt.";
-        ResponseXmlDoc: dotnet XmlDocument;
-        ErrorTxt: Text;
-        XMLNsMgr: dotnet XmlNamespaceManager;
-        WorkNodes: dotnet XmlNodeList;
-        WorkNode: dotnet XmlNode;
-        i: Integer;
-        WsFunctionName: Text;
-        ServerFilename: Text;
-        ClientFilename: Text;
-        FileMgt: Codeunit "File Management";
-        TraceMode: Boolean;
-        CurDT: DateTime;
-        recCustCredLimit: Record "Customer Credit Limited";
-        recRHQCust: Record Customer;
-    begin
-        // CLOUD READY DELETE
-        //>> 11-04-19 ZY-LD 001
-        Url := recWebServiceSetup.GetWsUrl(GetSetupCode, pCompany, GetWebServiceNo);
-        WsFunctionName := 'SendSalesInvoiceNo';
-        TraceMode := SetTraceMode(pCompany);
-
-        ReqText := '<SendSalesInvoiceNo xmlns="urn:microsoft-dynamics-schemas/codeunit/ZyWS">' +
-                     StrSubstNo('<pRHQSalesInvNo>%1</pRHQSalesInvNo>', pRHQSalesInvNo) +
-                     StrSubstNo('<pSubSalesInvNo>%1</pSubSalesInvNo>', pSubSalesInvNo) +
-                   '</SendSalesInvoiceNo>';
-
-        // Save request text in instream
-        TempBlob.CreateOutstream(ReqBodyOutStream, Textencoding::UTF8);
-        ReqBodyOutStream.Write(ReqText);
-        TempBlob.CreateInstream(ReqBodyInStream, Textencoding::UTF8);
-
-        // Run the WebServReqMgt functions to send the request
-        Username := '';
-        Clear(PasswordSecrettext);
-        WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
-        WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
-        WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
-        WebServReqMgt.SetTraceMode(TraceMode);
-        WebServReqMgt.DisableHttpsCheck;
-        WebServReqMgt.SetBasicCredentials(recWebServiceSetup."User Name", PasswordSecrettext);
-
-        //CurDT := CURRENTDATETIME;
-        if WebServReqMgt.SendRequestToWebService then begin
-            // Get the response
-            WebServReqMgt.GetResponseContent(RespBodyInStream);
-            ResponseXmlDoc := ResponseXmlDoc.XmlDocument;
-            ResponseXmlDoc.Load(RespBodyInStream);
-
-            //  MESSAGE(COPYSTR(ResponseXmlDoc.OuterXml,1,1024));
-            //  ServerFilename := FileMgt.ServerTempFileName('');
-            //  ClientFilename := FileMgt.ClientTempFileName('xml');
-            //  ResponseXmlDoc.Save(ServerFilename);
-            //  FileMgt.DownloadToFile(ServerFilename,ClientFilename);
-            //  HYPERLINK(ClientFilename);
-
-            XMLNsMgr := XMLNsMgr.XmlNamespaceManager(ResponseXmlDoc.NameTable);
-            XMLNsMgr.AddNamespace('s', recWebServiceSetup.GetSoapAction('', GetWebServiceNo));
-            WorkNodes := ResponseXmlDoc.SelectNodes(StrSubstNo('//s:%1_Result', WsFunctionName), XMLNsMgr);
-
-            for i := 0 to WorkNodes.Count - 1 do begin
-                WorkNode := WorkNodes.ItemOf(i);
-                Evaluate(rValue, WorkNode.SelectSingleNode('s:return_value', XMLNsMgr).InnerText);
-            end;
-        end else begin
-            WebServiceRequestMgt.ProcessFaultResponse(ErrorTxt);
-            Error(ErrorTxt);
-        end;
-        //<< 11-04-19 ZY-LD 001
-    end; */
 
 
     procedure SendPurchaseOrder(pCompany: Text[80]; pInnerText: Text) rValue: Boolean
@@ -1306,12 +1142,12 @@ Codeunit 50084 "Zyxel Web Service Request"
         // Run the WebServReqMgt functions to send the request
         Username := '';
         Clear(PasswordSecrettext);
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
         WebServReqMgt.SetTraceMode(TraceMode);
         WebServReqMgt.DisableHttpsCheck;
-        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetBasicCredentials(recWebServiceSetup."User Name", PasswordSecrettext);
 
         if WebServReqMgt.SendRequestToWebService() then begin
@@ -1372,12 +1208,12 @@ Codeunit 50084 "Zyxel Web Service Request"
         // Run the WebServReqMgt functions to send the request
         Username := '';
         Clear(PasswordSecrettext);
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
         WebServReqMgt.SetTraceMode(TraceMode);
         WebServReqMgt.DisableHttpsCheck;
-        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetBasicCredentials(recWebServiceSetup."User Name", PasswordSecrettext);
 
         if WebServReqMgt.SendRequestToWebService() then begin
@@ -1438,12 +1274,12 @@ Codeunit 50084 "Zyxel Web Service Request"
         // Run the WebServReqMgt functions to send the request
         Username := '';
         Clear(PasswordSecrettext);
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
         WebServReqMgt.SetTraceMode(TraceMode);
         WebServReqMgt.DisableHttpsCheck;
-        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetBasicCredentials(recWebServiceSetup."User Name", PasswordSecrettext);
 
         if WebServReqMgt.SendRequestToWebService() then begin
@@ -1513,6 +1349,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         TempBlob.CreateInstream(ReqBodyInStream, Textencoding::UTF8);
 
         // Run the WebServReqMgt functions to send the request
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(pWsFunctionName, GetWebServiceNo));
@@ -1577,6 +1414,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         // Run the WebServReqMgt functions to send the request
         // Username := 'navservice';
         // Password := 'NGsGcv2fB+DYGead';
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(pWsFunctionName, GetWebServiceNo));
@@ -1641,6 +1479,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         // Run the WebServReqMgt functions to send the request
         // Username := 'navservice';
         // Password := 'NGsGcv2fB+DYGead';
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(pWsFunctionName, GetWebServiceNo));
@@ -1707,6 +1546,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         // Run the WebServReqMgt functions to send the request
         //Username := 'navservice';
         //Password := 'NGsGcv2fB+DYGead';
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
@@ -1773,6 +1613,7 @@ Codeunit 50084 "Zyxel Web Service Request"
         // Run the WebServReqMgt functions to send the request
         //Username := 'navservice';
         //Password := 'NGsGcv2fB+DYGead';
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
@@ -1848,8 +1689,9 @@ Codeunit 50084 "Zyxel Web Service Request"
 
         // Run the WebServReqMgt functions to send the request
         // PELLE: kan ikke være i brug længere
-        Username := 'navservice';
-        PasswordSecrettext := SecretText.SecretStrSubstNo('NGsGcv2fB+DYGead');
+        //Username := 'navservice';
+        //PasswordSecrettext := SecretText.SecretStrSubstNo('NGsGcv2fB+DYGead');
+        PasswordSecrettext := secretText.SecretStrSubstNo(recWebServiceSetup.Password);
         WebServReqMgt.SetGlobals(ReqBodyInStream, Url, Username, PasswordSecrettext);
         WebServReqMgt.SetContentType(recWebServiceSetup.GetContentType);
         WebServReqMgt.SetAction(recWebServiceSetup.GetSoapAction(WsFunctionName, GetWebServiceNo));
