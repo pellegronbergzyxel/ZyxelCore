@@ -54,25 +54,18 @@ codeunit 50087 "Zyxel General Event"
         if Rec."User Name" = '' then
             exit;
 
-        //27-05-2026 BK #Cloud Ready
         //01-07-2026 BK #582369
         if (ZGT.IsEMEADatabaseServer()) then
             recUserSetup.ChangeCompany(ZGT.GetRHQCompanyName());
         recUserSetup.Validate("User ID", Rec."User Name");
         if not recUserSetup.Insert(true) then;
 
-        //27-05-2026 BK #Cloud Ready
-        //if not ZGT.ItalianServer() and not ZGT.TurkishServer() then
         if ZGT.IsEMEADatabaseServer() then
             recUserSetup.ChangeCompany(ZGT.GetSistersCompanyName(1))
         else
-            //27-05-2026 BK #Cloud Ready
-            //if ZGT.ItalianServer() then
             if ZGT.IsITDatabaseServer() then
                 recUserSetup.ChangeCompany(ZGT.GetSistersCompanyName(14))
             else
-                //27-05-2026 BK #Cloud Ready
-                //if ZGT.TurkishServer() then
                 if ZGT.IsTRDatabaseServer() then
                     recUserSetup.ChangeCompany(ZGT.GetSistersCompanyName(15));
         if not recUserSetup.Insert(true) then;
@@ -207,15 +200,8 @@ codeunit 50087 "Zyxel General Event"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', false, false)]
     local procedure OnAfterCompanyOpen()
     var
-    // CLOUD READY DELETE >>
-    //ServicePointManager: dotnet ServicePointManager;
-    // SecurityProtocolType: dotnet SecurityProtocolType;
-    // CLOUD READY DELETE >>
+
     begin
-        // CLOUD READY DELETE >>
-        // ServicePointManager.SecurityProtocol := SecurityProtocolType.Tls12;
-        // CLOUD READY DELETE <<
-        // Change default document layout on standard reports
         UpdateReportLayoutSelection(Report::"Purchase - Invoice", './Layouts/PurchaseInvoiceZyxel.rdlc');
         UpdateReportLayoutSelection(Report::"Purchase - Credit Memo", './Layouts/PurchaseCreditMemoZyxel.rdlc');
     end;
@@ -227,18 +213,7 @@ codeunit 50087 "Zyxel General Event"
     begin
         SI.UseOfReport(3, ReportID, 1);
     end;
-    // CLOUD READY DELETE
-    /*
-        [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeCompanyClose', '', false, false)]
-        local procedure OnBeforeCompanyClose()
-        var
-            SI: Codeunit "Single Instance";
 
-        begin
-            if GuiAllowed() then
-                SI.SaveUseOfReport();
-        end;
-    */
     local procedure UpdateReportLayoutSelection(ReportID: Integer; NewLayout: Text)
     var
         ReportLayoutList: Record "Report Layout List";
@@ -507,6 +482,14 @@ codeunit 50087 "Zyxel General Event"
                     NewReportId := SubtiRep."New Report Id";
         end;
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::"User Setup", OnBeforeValidateApprovalAdministrator, '', false, false)]
+    local procedure "User Setup_OnBeforeValidateApprovalAdministrator"(var UserSetup: Record "User Setup"; var IsHandled: Boolean)
+    begin
+        //13-10-2026 BK #598963
+        isHandled := true;
+    end;
+
 
     var
         TempChangeLogSetupTable2: Record "Change Log Setup (Table)" temporary;

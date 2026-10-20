@@ -17,10 +17,26 @@ Report 50026 "WEEE Excel Export"
             var
                 Qty: Integer;
                 recBatteryUNCodes: Record "Battery UN Codes";
-                Exclude: Boolean;
+                Item: Record Item;
+                Exclude: Boolean; //15-10-2026 BK #569701
+                LastItemNo: Code[20]; //15-10-2026 BK #569701
+
             begin
                 ZGT.UpdateProgressWindow("Item Ledger Entry"."Item No.", 0, true);
-                HandleItemLedgerEntry("Item Ledger Entry", '', 'RHQ');
+                //15-10-2026 BK #569701
+                if LastItemNo <> "item ledger entry"."Item No." then begin
+                    if item.get("Item Ledger Entry"."Item No.") then
+                        if Item."WEEE Category" <> '' then begin
+                            HandleItemLedgerEntry("Item Ledger Entry", '', 'RHQ');
+                            lastItemNo := "Item Ledger Entry"."Item No.";
+                        end;
+                end else begin
+                    if Item."WEEE Category" <> '' then begin
+                        HandleItemLedgerEntry("Item Ledger Entry", '', 'RHQ');
+                        lastItemNo := "Item Ledger Entry"."Item No.";
+                    end;
+                end;
+                //HandleItemLedgerEntry("Item Ledger Entry", '', 'RHQ');
             end;
 
             trigger OnPostDataItem()
@@ -38,30 +54,6 @@ Report 50026 "WEEE Excel Export"
                 GetExcluedCust;
             end;
         }
-        // dataitem(ItemLedgerEntryDE; "Item Ledger Entry")
-        // {
-        //     DataItemTableView = sorting("Item No.", "Posting Date") where("Entry Type" = const(Sale));
-
-        //     trigger OnAfterGetRecord()
-        //     begin
-        //         ZGT.UpdateProgressWindow(ItemLedgerEntryDE."Item No.", 0, true);
-        //         HandleItemLedgerEntry(ItemLedgerEntryDE, 'ZyND DE', 'eCommerce DE');
-        //     end;
-
-        //     trigger OnPostDataItem()
-        //     begin
-        //         ZGT.CloseProgressWindow;
-        //     end;
-
-        //     trigger OnPreDataItem()
-        //     begin
-        //         ItemLedgerEntryDE.ChangeCompany('ZyND DE');
-        //         ItemLedgerEntryDE.CopyFilters("Item Ledger Entry");
-        //         ItemLedgerEntryDE.SetRange(ItemLedgerEntryDE."Source No.", 'D030774');
-        //         CustTmp.DeleteAll;
-        //         ZGT.OpenProgressWindow('', ItemLedgerEntryDE.Count);
-        //     end;
-        // }
         dataitem(ItemLedgerEntryRMA; "Item Ledger Entry")
         {
             DataItemTableView = sorting("Item No.", "Posting Date") where("Entry Type" = filter("Positive Adjmt." | "Negative Adjmt."), "Global Dimension 2 Code" = const('RMA'));
@@ -185,7 +177,7 @@ Report 50026 "WEEE Excel Export"
         if not ZGT.IsRhq then
             Message(Text005, ZGT.GetRHQCompanyName);
 
-        SI.UseOfReport(3, 50026, 3);  // 14-10-20 ZY-LD 000
+        SI.UseOfReport(3, 50026, 3);
     end;
 
     var
@@ -293,7 +285,6 @@ Report 50026 "WEEE Excel Export"
                             end;
 
                         else
-                    //    Error(Text002, pItemLedgerEntry.FieldCaption(pItemLedgerEntry."Document Type"), pItemLedgerEntry."Document Type");
                     end;
 
                     recItem.SetRange("No.", pItemLedgerEntry."Item No.");
@@ -338,39 +329,52 @@ Report 50026 "WEEE Excel Export"
         Col := 37;
         ExcelBuf.NewRow;
 
-        ExcelBuf.AddColumn("Item Ledger Entry".FieldCaption("Item No."), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn(recItem.FieldCaption(Description), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+
         ExcelBuf.AddColumn("Item Ledger Entry".FieldCaption("Posting Date"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn(lText003, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn(recSalesShipHead.FieldCaption("Ship-to Country/Region Code"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn("Item Ledger Entry".FieldCaption("Document Type"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn("Item Ledger Entry".FieldCaption("Document No."), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-
         ExcelBuf.AddColumn("Item Ledger Entry".FieldCaption(Quantity), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn(recItem.FieldCaption("Cartons Per Pallet"), false, '', true, false, false, '', ExcelBuf."cell type"::Text); //13-04-2026 BK #567065
-        ExcelBuf.AddColumn(recItem.FieldCaption("Qty Per Pallet"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn("Item Ledger Entry".FieldCaption("Sales Amount (Actual)"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-
         ExcelBuf.AddColumn(recItem.FieldCaption("Net Weight"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(recItem.FieldCaption("Net Weight") + lText001, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn(recItem.FieldCaption("Gross Weight") + lText001, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn('WEEE Weight', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn('WEEE Weight Total', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn(lText005, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn(recItem.FieldCaption("Product Length (cm)"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn(recItem.FieldCaption("Tariff No."), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn(recItem.FieldCaption("Battery weight"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn(recItem.FieldCaption("Battery weight") + lText001, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn(recItem.FieldCaption("Business to"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(recItem.FieldCaption("Paper Weight"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(recItem.FieldCaption("Paper Weight") + lText001, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn(recItem.FieldCaption("Total Qty. per Carton"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn(recItem.FieldCaption("Cartons Per Pallet"), false, '', true, false, false, '', ExcelBuf."cell type"::Text); //13-04-2026 BK #567065
         ExcelBuf.AddColumn(recItem.FieldCaption("Empty Outer Carton Weight"), false, '', true, false, false, '', ExcelBuf."cell type"::Text); //03-02-2026 BK #553504
         ExcelBuf.AddColumn(recItem.FieldCaption("Empty Outer Carton Weight") + lText001, false, '', true, false, false, '', ExcelBuf."cell type"::Text); //03-02-2026 BK #553504
         ExcelBuf.AddColumn(recItem.FieldCaption("Plastic Weight"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn(recItem.FieldCaption("Plastic Weight") + lText001, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn(recItem.FieldCaption("Battery weight"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn(recItem.FieldCaption("Battery weight") + lText001, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn(recItem.FieldCaption("Qty Per Pallet"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn('Pallet Type', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn('Empty Pallet Weight', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn('Empty Pallet Weight Total', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn('Strapping Belt Type', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn('Strapping Belt Weight', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn('Strapping Belt Weight Total', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn('Edgeboard Type', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn('Edgeboard Weight', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn('Edgeboard Weight Total', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn('Stretch Film Type', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn('Stretch Film Weight', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn('Stretch Film Weight Total', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn('Cloth Bag Type', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn('Cloth Bag Weight', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn('Cloth Bag Weight Total', false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.AddColumn("Item Ledger Entry".FieldCaption("Location Code"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn("Item Ledger Entry".FieldCaption("Return Reason Code"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn(recItem.FieldCaption("Tariff No."), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn(recItem.FieldCaption("UN Code"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn(recItem.FieldCaption("UN Code") + lText002, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn(lText005, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
-        ExcelBuf.AddColumn(lText004, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn("Item Ledger Entry".FieldCaption("Item No."), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn(recItem.FieldCaption(Description), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn(lText003, false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn(recSalesShipHead.FieldCaption("Ship-to Country/Region Code"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn("Item Ledger Entry".FieldCaption("Document Type"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn("Item Ledger Entry".FieldCaption("Document No."), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+        ExcelBuf.AddColumn("Item Ledger Entry".FieldCaption("Sales Amount (Actual)"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
 
-        ExcelBuf.AddColumn(recItem.FieldCaption("Business to"), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
         ExcelBuf.NewRow;
     end;
 
@@ -378,36 +382,51 @@ Report 50026 "WEEE Excel Export"
     procedure MakeExcelLine(pItemLedgerEntry: Record "Item Ledger Entry"; pRelation: Code[10])
     begin
         begin
+
+            ExcelBuf.AddColumn(pItemLedgerEntry."Posting Date", false, '', false, false, false, '', ExcelBuf."cell type"::Date);
+            AddColumnDecimal(pItemLedgerEntry.Quantity, '#,###,##0');
+            AddColumnDecimal(recItem."Net Weight", '#,###,##0.000');
+            AddColumnDecimal(recItem."Net Weight" * pItemLedgerEntry.Quantity, '#,###,##0.000');
+            ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            ExcelBuf.AddColumn(recItem."Product Length (cm)" > 50, false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            AddColumnDecimal(RecItem."Product Length (cm)", '#,###,##0.000');
+            ExcelBuf.AddColumn(recItem."Tariff No.", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            AddColumnDecimal(recItem."Battery weight", '#,###,##0.0000000000');
+            AddColumnDecimal(recItem."Battery weight" * pItemLedgerEntry.Quantity, '#,###,##0.0000000000');
+            ExcelBuf.AddColumn(StrSubstNo('%1 %2', recItem.FieldCaption("Business to"), Format(recItem."Business to")), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
+            AddColumnDecimal(recItem."Paper Weight", '#,###,##0.000');
+            AddColumnDecimal(recItem."Paper Weight" * pItemLedgerEntry.Quantity, '#,###,##0.000');
+            AddColumnDecimal(RecItem."Total Qty. per Carton", '#,###,##0.000');
+            AddColumnDecimal(recItem."Cartons Per Pallet", '#,###,##0'); //13-04-2026 BK #567065
+            AddColumnDecimal(recItem."Empty Outer Carton Weight", '#,###,##0.000'); //03-02-2026 BK #553504
+            AddColumnDecimal(recItem."Empty Outer Carton Weight" * pItemLedgerEntry.Quantity, '#,###,##0.000'); //03-02-2026 BK #553504
+            AddColumnDecimal(recItem."Plastic Weight", '#,###,##0.0000000000');
+            AddColumnDecimal(recItem."Plastic Weight" * pItemLedgerEntry.Quantity, '#,###,##0.000');
+            AddColumnDecimal(recItem."Qty Per Pallet", '#,###,##0.00');
+            ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            ExcelBuf.AddColumn('', false, '', false, false, false, '', ExcelBuf."cell type"::Text);
+            ExcelBuf.AddColumn(pItemLedgerEntry."Location Code", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn(pItemLedgerEntry."Item No.", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn(recItem.Description, false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.AddColumn(pItemLedgerEntry."Posting Date", false, '', false, false, false, '', ExcelBuf."cell type"::Date);
             ExcelBuf.AddColumn(pItemLedgerEntry."Source No.", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn(ShipToCountry, false, '', false, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn(Format(pItemLedgerEntry."Document Type"), false, '', false, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.AddColumn(pItemLedgerEntry."Document No.", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-            AddColumnDecimal(pItemLedgerEntry.Quantity, '#,###,##0');
-            AddColumnDecimal(recItem."Cartons Per Pallet", '#,###,##0'); //13-04-2026 BK #567065
-            AddColumnDecimal(recItem."Qty Per Pallet", '#,###,##0.00');
             AddColumnDecimal(pItemLedgerEntry."Sales Amount (Actual)", '#,###,##0.00');
-            AddColumnDecimal(recItem."Net Weight", '#,###,##0.000');
-            AddColumnDecimal(recItem."Net Weight" * pItemLedgerEntry.Quantity, '#,###,##0.000');
-            AddColumnDecimal(recItem."Gross Weight" * pItemLedgerEntry.Quantity, '#,###,##0.000');
-            AddColumnDecimal(recItem."Paper Weight", '#,###,##0.000');
-            AddColumnDecimal(recItem."Paper Weight" * pItemLedgerEntry.Quantity, '#,###,##0.000');
-            AddColumnDecimal(recItem."Empty Outer Carton Weight", '#,###,##0.000'); //03-02-2026 BK #553504
-            AddColumnDecimal(recItem."Empty Outer Carton Weight" * pItemLedgerEntry.Quantity, '#,###,##0.000'); //03-02-2026 BK #553504
-            AddColumnDecimal(recItem."Plastic Weight", '#,###,##0.000');
-            AddColumnDecimal(recItem."Plastic Weight" * pItemLedgerEntry.Quantity, '#,###,##0.000');
-            AddColumnDecimal(recItem."Battery weight", '#,###,##0.0000000000');
-            AddColumnDecimal(recItem."Battery weight" * pItemLedgerEntry.Quantity, '#,###,##0.0000000000');
-            ExcelBuf.AddColumn(pItemLedgerEntry."Location Code", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.AddColumn(pItemLedgerEntry."Return Reason Code", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.AddColumn(recItem."Tariff No.", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.AddColumn(recItem."UN Code", false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.AddColumn(recBatteryUNCodes.Description, false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.AddColumn(recItem."Product Length (cm)" > 50, false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.AddColumn(pRelation, false, '', false, false, false, '', ExcelBuf."cell type"::Text);
-            ExcelBuf.AddColumn(StrSubstNo('%1 %2', recItem.FieldCaption("Business to"), Format(recItem."Business to")), false, '', true, false, false, '', ExcelBuf."cell type"::Text);
             ExcelBuf.NewRow;
         end;
     end;
@@ -447,9 +466,9 @@ Report 50026 "WEEE Excel Export"
 
     procedure CreateExcelbook(SheetName: Text[30])
     var
-     
+
     begin
-       // ExcelBuf2.CreateBook('', SheetName); CLOUD ready DELETE
+        // ExcelBuf2.CreateBook('', SheetName); CLOUD ready DELETE
         ExcelBuf2.CreateNewBook(SheetName);
         ExcelBuf2.WriteSheet(SheetName, SheetName, UserId());
         ExcelBuf2.ClearNewRow;

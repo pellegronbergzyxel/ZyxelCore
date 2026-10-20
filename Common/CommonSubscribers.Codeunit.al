@@ -111,12 +111,26 @@ codeunit 50029 CommonSubscribers
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Notification Entry Dispatcher", 'OnBeforeCreateAndDispatch', '', false, false)]
     local procedure OnBeforeCreateAndDispatch(NotificationSetup: Record "Notification Setup"; var NotificationEntry: Record "Notification Entry")
     var
+        ApprovalEntry: Record "Approval Entry";
         zgt: codeunit "ZyXEL General Tools";
-    begin //16-09-2026 BK #582359
-        if Not zgt.ItalianServer() then
-            if NotificationEntry.type = NotificationEntry.type::Approval then
-                NotificationEntry.Delete(false);
+        RecRef: RecordRef;
+
+    begin
+        // 15-10-2026 BK #598255
+        RecRef := NotificationEntry."Triggered By Record".GetRecord();
+
+        if RecRef.Number = Database::"Approval Entry" then begin
+            RecRef.SetTable(ApprovalEntry);
+
+            // ApprovalEntry indeholder nu Approval Entry 6264
+            if Not zgt.ItalianServer() then
+                if approvalEntry."Table ID" = Database::"Purchase Header" then
+                    if NotificationEntry.type = NotificationEntry.type::Approval then
+                        NotificationEntry.Delete(false);
+        end;
     end;
+
+
 
     // 491247 <<
 

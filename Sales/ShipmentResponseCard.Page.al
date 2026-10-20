@@ -484,8 +484,43 @@ Page 50053 "Shipment Response Card"
                 Caption = 'Show Serial No. List';
                 ToolTip = 'Specify the Show Serial No. List';
                 Image = List;
-                RunObject = Page "VCK Delivery Document";
-                RunPageLink = "No." = field("Customer Reference");
+                //13-10-2026 BK #542568
+                RunObject = Page "VCK Delivery Document SNos";
+                RunPageLink = "Delivery Document No." = field("Customer Message No.");
+            }
+            action("Transfer Pallet ID to DD")
+            {   //24-08-2026 BK #542568
+                ApplicationArea = Basic, Suite;
+                Caption = 'Transfer Pallet ID to DD';
+                ToolTip = 'Specify the Transfer Pallet ID to DD';
+                Image = TransferOrder;
+                //Promoted = true;
+                //PromotedCategory = Process;
+
+                trigger OnAction()
+                var
+                    VCKDelDocSNos: Record "VCK Delivery Document SNos";
+                    ShipResponseSerialNo: Record "Ship Responce Serial Nos.";
+                    labelconfirm: label 'Do you want to transfer Pallet ID to blank Pallet ID on the Delivery Document Serial No. List?';
+
+                begin
+                    vckDelDocSNos.SetRange("Delivery Document No.", Rec."Customer Message No.");
+                    vckDelDocSNos.SetFilter("Pallet No.", '=%1', '');
+                    if vckDelDocSNos.FindSet() then
+                        if Confirm(labelconfirm) then begin
+                            repeat
+                                ShipResponseSerialNo.setrange("Serial No.", vckDelDocSNos."Serial No.");
+                                shipResponseSerialNo.setrange("Sales Order No.", vckDelDocSNos."Delivery Document No.");
+                                ShipResponseSerialNo.setrange("Sales Order Line No.", vckDelDocSNos."Delivery Document Line No.");
+                                if ShipResponseSerialNo.FindFirst() then
+                                    if ShipResponseSerialNo."Carrier ID" <> '' then begin
+                                        vckDelDocSNos."Pallet No." := ShipResponseSerialNo."Carrier ID";
+                                        vckDelDocSNos.Modify();
+                                    end;
+                            until vckDelDocSNos.Next() = 0;
+                        end;
+                    CurrPage.Update(false);
+                end;
             }
         }
     }

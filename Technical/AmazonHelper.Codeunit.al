@@ -3589,73 +3589,53 @@ codeunit 50055 AmazonHelper
     end;
 
     // 09-10-2026 BK #558088
-    [EventSubscriber(ObjectType::Table, Database::"Price List Header", 'OnBeforeDeleteEvent', '', false, false)]
-    local procedure PriceListHeaderOnBeforeDelete(var Rec: Record "Price List Header"; RunTrigger: Boolean)
+    [EventSubscriber(ObjectType::Table, Database::"Price List Line", 'OnBeforeDeleteEvent', '', false, false)]
+    local procedure PriceListLineOnBeforeDelete(var Rec: Record "Price List Line"; RunTrigger: Boolean)
     begin
         // Only archive Sales Price Lists
         if Rec."Price Type" <> Rec."Price Type"::Sale then
             exit;
 
-        ArchivePriceList(Rec.Code);
+        ArchivePriceListLine(Rec);
     end;
 
     //09-10-2026 BK #558088
-    procedure ArchivePriceList(PriceListCode: Code[20])
+    procedure ArchivePriceListLine(PriceListLine: Record "Price List Line")
     var
-        PriceListLine: Record "Price List Line";
         PriceListLineArchive: Record "Price List Line Archive";
     begin
-        // Remove an old archive if the same Price List Code already exists
-        PriceListLineArchive.SetRange("Price List Code", PriceListCode);
-        PriceListLineArchive.DeleteAll();
+        PriceListLineArchive.Init();
+        PriceListLineArchive.TransferFields(PriceListLine, false);
 
-        PriceListLine.SetRange("Price List Code", PriceListCode);
+        PriceListLineArchive."Entry No." := 0;
+        PriceListLineArchive."Line No." := PriceListLine."Line No.";
 
-        if PriceListLine.FindSet() then
-            repeat
-                PriceListLineArchive.Init();
-
-                PriceListLineArchive.TransferFields(PriceListLine, false);
-
-                // Preserve original line number
-                PriceListLineArchive."Line No." := PriceListLine."Line No.";
-
-                PriceListLineArchive.Insert();
-            until PriceListLine.Next() = 0;
+        PriceListLineArchive.Insert();
     end;
-
     //09-10-2026 BK #558088
     procedure RestorePriceListLines(PriceListCode: Code[20])
     var
-        PriceListHeader: Record "Price List Header";
         PriceListLine: Record "Price List Line";
         PriceListLineArchive: Record "Price List Line Archive";
     begin
-        if not PriceListHeader.Get(PriceListCode) then
-            Error(
-                'Price List %1 does not exist. Create the Price List Header before restoring the lines.',
-                PriceListCode);
-
         PriceListLineArchive.SetRange("Price List Code", PriceListCode);
-
-        if PriceListLineArchive.IsEmpty() then
-            Error(
-                'No archived price list lines exist for Price List %1.',
-                PriceListCode);
 
         if PriceListLineArchive.FindSet() then
             repeat
-                PriceListLine.Init();
+                if not PriceListLine.Get(
+                    PriceListCode,
+                    PriceListLineArchive."Line No.")
+                then begin
 
-                PriceListLine.TransferFields(PriceListLineArchive, false);
+                    PriceListLine.Init();
+                    PriceListLine.TransferFields(PriceListLineArchive, false);
 
-                PriceListLine."Price List Code" := PriceListCode;
+                    // Set primary key explicitly
+                    PriceListLine."Price List Code" := PriceListLineArchive."Price List Code";
+                    PriceListLine."Line No." := PriceListLineArchive."Line No.";
 
-                if not PriceListLine.Insert(true) then
-                    Error(
-                        'Price List Line %1 already exists on Price List %2.',
-                        PriceListLineArchive."Line No.",
-                        PriceListCode);
+                    PriceListLine.Insert(true);
+                end;
 
             until PriceListLineArchive.Next() = 0;
     end;

@@ -9,13 +9,11 @@ table 50105 "Price List Line Archive"
         {
             Caption = 'Price List Code';
             DataClassification = CustomerContent;
-            TableRelation = "Price List Header";
         }
         field(2; "Line No."; Integer)
         {
             Caption = 'Line No.';
             DataClassification = CustomerContent;
-            AutoIncrement = true;
         }
         field(3; "Source Type"; Enum "Price Source Type")
         {
@@ -278,13 +276,24 @@ table 50105 "Price List Line Archive"
             Caption = 'New Price';
             InitValue = true;
         }
+        field(50000; "Entry No."; Integer)
+        {
+            Caption = 'Entry No.';
+            DataClassification = CustomerContent;
+            AutoIncrement = true;
+        }
     }
 
     keys
     {
-        key(PK; "Price List Code", "Line No.")
+        key(PK; "entry No.")
         {
             Clustered = true;
+        }
+
+        key(PriceListLine; "Price List Code", "Line No.")
+        {
+
         }
         key(Key1; "Asset Type", "Asset No.", "Source Type", "Source No.", "Starting Date", "Currency Code", "Variant Code", "Unit of Measure Code", "Minimum Quantity")
         {
