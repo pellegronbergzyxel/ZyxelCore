@@ -347,6 +347,11 @@ pageextension 50119 ItemCardZX extends "Item Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the Country only for country specific Items.';
                 }
+                field("Included in WEEE"; Rec."Included in WEEE")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the if the Item is included in the WEEE Reports';
+                }
             }
             group(ColourBox)
             {
@@ -1036,7 +1041,7 @@ pageextension 50119 ItemCardZX extends "Item Card"
                 Image = "Report";
                 RunObject = Report "Item - Chemical Tax Red. Rate";
             }
-            action(ScipNo)  // 17-04-24 ZY-LD 000
+            action(ScipNo)
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'SCIP No.';
@@ -1044,6 +1049,49 @@ pageextension 50119 ItemCardZX extends "Item Card"
                 RunObject = page "SCIP Numbers";
                 RunPageLink = "Item No." = field("No.");
                 ToolTip = 'Specifies SCIP Number that is related to chemical tax in Sweden. The SCIP number is a random sequence of 36 hexadecimal characters that follows the Universally Unique Identifier (UUID) format. There is no relationship between the SCIP number for one supplier part and another part submitted by the same supplier.';
+            }
+        }
+        addafter(ScipNo)
+        {
+            group(WEEEReporting)
+            { //23-10-2026 BK #569701
+                Caption = 'WEEE Reporting';
+                ToolTip = 'The WEEE Reporting with All or Marked';
+                Image = Report;
+
+                action(WEEEMarked)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'WEEE Report WEEE-Marked';
+                    Image = PrintExcise;
+                    ToolTip = 'Specification of WEEE Report ALL';
+
+                    Trigger OnAction()
+                    var
+                        WEEEReport: Report "WEEE Excel Export";
+
+                    begin
+                        WEEEReport.SetItemSelection(1);
+                        WEEEReport.Runmodal();
+                    end;
+                }
+                action(WEEEAll)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'WEEE Report All';
+                    ToolTip = 'WEEE Report with All Items';
+                    Image = "Report";
+
+                    Trigger OnAction()
+                    var
+                        WEEEReport: Report "WEEE Excel Export";
+
+                    begin
+                        WEEEReport.SetItemSelection(0);
+                        WEEEReport.Runmodal();
+                    end;
+                }
+
             }
         }
 

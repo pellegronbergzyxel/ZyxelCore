@@ -1350,6 +1350,10 @@ tableextension 50114 ItemZX extends Item
             Caption = 'Device Weight (Kg)';
             DecimalPlaces = 2 : 2;
         }
+        Field(62538; "Included in WEEE"; Boolean)
+        {
+            Caption = 'Included in WEEE'; //23-10-2026 BK #569701
+        }
     }
 
     keys

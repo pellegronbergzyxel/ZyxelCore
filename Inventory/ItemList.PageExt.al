@@ -26,37 +26,44 @@ pageextension 50120 ItemListZX extends "Item List"
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of Creation Date';
             }
             field("Created By"; Rec."Created By")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the value of Creation By';
             }
             field("Manually OLAP"; Rec."Manually OLAP")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of Manually OLAP';
             }
             field(IsEICard; Rec.IsEICard)
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of IsEICard';
             }
             field("Trans. Ord. Shipment (Qty.)"; Rec."Trans. Ord. Shipment (Qty.)")
             {
                 ApplicationArea = Basic, Suite;
                 DecimalPlaces = 0 : 0;
                 Visible = false;
+                ToolTip = 'Specifies the value of Trans. Ord. Shipment (Qty.)';
             }
             field("Transferred (Qty.)"; Rec."Transferred (Qty.)")
             {
                 ApplicationArea = Basic, Suite;
                 DecimalPlaces = 0 : 0;
                 Visible = false;
+                ToolTip = 'Specifies the value of Transferred (Qty.)';
             }
             field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of Global Dimension 1 Code';
             }
         }
         addafter("Tariff No.")
@@ -65,58 +72,70 @@ pageextension 50120 ItemListZX extends "Item List"
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of Country/Region of Origin Code';
             }
             field(MDM; Rec.MDM)
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the value of MDM';
             }
             field("Safety Stock Quantity"; Rec."Safety Stock Quantity")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the value of Safety Stock Quantity';
             }
             field(SCM; Rec.SCM)
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the value of SCM';
             }
             field("Number per carton"; Rec."Number per carton")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of Number per Carton';
             }
             field("Carton Weight"; Rec."Carton Weight")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of Carton Weight';
             }
             field("Number per parcel"; Rec."Number per parcel")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of Number per Parcel';
             }
             field("Tax Reduction rate"; Rec."Tax Reduction rate")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of Tax Reduction Rate';
             }
             field("Category 1 Code"; Rec."Category 1 Code")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of Category 1 Code';
             }
             field("Category 2 Code"; Rec."Category 2 Code")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of Category 2 Code';
             }
             field("Category 3 Code"; Rec."Category 3 Code")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of Category 3 Code';
             }
             field("Business Center"; Rec."Business Center")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of Business Center';
             }
         }
         addafter("Search Description")
@@ -125,21 +144,25 @@ pageextension 50120 ItemListZX extends "Item List"
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of SBU';
             }
             field("SBU Company"; Rec."SBU Company")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of SBU Company';
             }
             field("PP-Product CAT"; Rec."PP-Product CAT")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of PP-Product CAT';
             }
             field("UN Code"; Rec."UN Code")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of UN Code';
             }
         }
         addafter("Overhead Rate")
@@ -148,6 +171,7 @@ pageextension 50120 ItemListZX extends "Item List"
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of Net Change';
             }
         }
         addafter("Default Deferral Template Code")
@@ -156,11 +180,13 @@ pageextension 50120 ItemListZX extends "Item List"
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of Total Qty. per Carton';
             }
             field("Net Weight"; Rec."Net Weight")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of Net Weight';
             }
         }
         addafter("Net Weight")
@@ -169,95 +195,118 @@ pageextension 50120 ItemListZX extends "Item List"
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of End of Life Date';
             }
         }
         modify("Created From Nonstock Item")
         {
             Visible = false;
+            ToolTip = 'Specifies the value of Created From Nonstock Item';
         }
         modify("Substitutes Exist")
         {
             Visible = false;
+            ToolTip = 'Specifies the value of Substitutes Exist';
         }
         modify("Production BOM No.")
         {
             Visible = false;
+            ToolTip = 'Specifies the value of Production BOM No. ';
         }
         modify("Routing No.")
         {
             Visible = false;
+            ToolTip = 'Specifies the value of Routing No';
         }
         modify("Costing Method")
         {
             Visible = true;
+            ToolTip = 'Specifies the value of Costing Method';
         }
         modify("Last Direct Cost")
         {
             Visible = false;
+            ToolTip = 'Specifies the value of Last Direct Cost';
         }
         modify("Price/Profit Calculation")
         {
             Visible = true;
+            ToolTip = 'Specifies the value of Price/Profit Calculation';
         }
         modify("Profit %")
         {
             Visible = true;
+            ToolTip = 'Specifies the value of Profit %';
         }
         modify("Inventory Posting Group")
         {
             Visible = true;
+            ToolTip = 'Specifies the value of Inventory Posting Group';
         }
         modify("VAT Prod. Posting Group")
         {
             Visible = true;
+            ToolTip = 'Specifies the value of VAT Prod. Posting Group';
         }
         modify("Item Disc. Group")
         {
             Visible = true;
+            ToolTip = 'Specifies the value of Item Disc. Group';
         }
         modify("Vendor Item No.")
         {
             Visible = true;
+            ToolTip = 'Specifies the value of Vendor Item No.';
         }
         modify("Indirect Cost %")
         {
             Visible = false;
+            ToolTip = 'Specifies the value of Indirect Cost %';
         }
         modify("Item Category Code")
         {
             Visible = false;
+            ToolTip = 'Specifies the value of Item Category Code';
         }
         modify(Blocked)
         {
             Visible = false;
+            ToolTip = 'Specifies the value of Blocked';
         }
         modify("Sales Unit of Measure")
         {
             Visible = false;
+            ToolTip = 'Specifies the value of Sales Unit of Measure';
         }
         modify("Replenishment System")
         {
             Visible = false;
+            ToolTip = 'Specifies the value of Replenishment System';
         }
         modify("Purch. Unit of Measure")
         {
             Visible = false;
+            ToolTip = 'Specifies the value of Purch. Unit of Measure';
         }
         modify("Lead Time Calculation")
         {
             Visible = false;
+            ToolTip = 'Specifies the value of Lead Time Calculation';
         }
         modify("Manufacturing Policy")
         {
             Visible = false;
+            ToolTip = 'Specifies the value of Manufacturing Policy';
         }
         modify("Flushing Method")
         {
             Visible = false;
+            ToolTip = 'Specifies the value of Flushing Method';
         }
         modify("Item Tracking Code")
         {
             Visible = false;
+            ToolTip = 'Specifies the value of Item Tracking Code';
         }
         addlast(Control1)
         {
@@ -266,6 +315,7 @@ pageextension 50120 ItemListZX extends "Item List"
             {
                 ApplicationArea = Basic, Suite;
                 Visible = false;
+                ToolTip = 'Specifies the value of Amaz_ASIN';
             }
         }
         addfirst(factboxes)
@@ -316,12 +366,13 @@ pageextension 50120 ItemListZX extends "Item List"
             action(Forecast)
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the value of Forecast';
                 Caption = 'Forecast';
                 Image = Forecast;
 
                 trigger OnAction()
                 begin
-                    ShowForecast;
+                    ShowForecast();
                 end;
             }
         }
@@ -330,13 +381,14 @@ pageextension 50120 ItemListZX extends "Item List"
             action("Item pr. Location")
             {
                 ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the value of Item Pr. Location';
                 Caption = 'Item pr. Location';
 
                 trigger OnAction()
                 begin
                     Clear(AvailabilityprLocation);
                     AvailabilityprLocation.InitiatePage(Rec."No.");
-                    AvailabilityprLocation.RunModal;
+                    AvailabilityprLocation.RunModal();
                 end;
             }
         }
@@ -361,6 +413,7 @@ pageextension 50120 ItemListZX extends "Item List"
                 Image = Item;
                 RunObject = Page "Additional Item List";
                 RunPageLink = "Item No." = field("No.");
+                ToolTip = 'Specifies the value of Additional Items';
             }
             action("Block Customer")
             {
@@ -369,6 +422,7 @@ pageextension 50120 ItemListZX extends "Item List"
                 Image = Stop;
                 RunObject = Page "Item/Customer Relation";
                 RunPageLink = "Customer No." = field("No.");
+                ToolTip = 'Specifies the value of Block Customers';
             }
             action("Item List (All fields)")
             {
@@ -376,6 +430,7 @@ pageextension 50120 ItemListZX extends "Item List"
                 Caption = 'Item List (All fields)';
                 Image = ItemGroup;
                 RunObject = Page "Item List (All fields)";
+                ToolTip = 'Specifies the value of Item List (All fields)';
             }
             action("Chemical Tax Reduction Rate")
             {
@@ -383,6 +438,7 @@ pageextension 50120 ItemListZX extends "Item List"
                 Caption = 'Chemical Tax Reduction Rate';
                 Image = TaxPayment;
                 RunObject = Page "Chemical Tax Rates";
+                ToolTip = 'Specifies the value of Chemical Tax Reduction Rate';
             }
         }
         addafter(Production)
@@ -391,6 +447,7 @@ pageextension 50120 ItemListZX extends "Item List"
             {
                 Caption = 'Rework';
                 Image = BOM;
+                ToolTip = 'Specifies the value of Rework';
                 action("Rework BOM")
                 {
                     ApplicationArea = Basic, Suite;
@@ -398,6 +455,7 @@ pageextension 50120 ItemListZX extends "Item List"
                     Image = BOM;
                     RunObject = Page "Rework BOM";
                     RunPageLink = "Parent Item No." = field("No.");
+                    ToolTip = 'Specifies the value of Rework BOM';
                 }
             }
         }
@@ -411,11 +469,13 @@ pageextension 50120 ItemListZX extends "Item List"
                 RunObject = Page "Whse. Item Ledger Entry";
                 RunPageLink = "Item No." = field("No.");
                 ShortCutKey = 'Shift+F7';
+                ToolTip = 'Specifies the value of Whse. Ledger Entries';
             }
             action("Item Forecast Entries")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Item Forecast Entries';
+                ToolTip = 'Specifies the value of Item Forecast Entries';
                 Image = Forecast;
                 RunObject = Page "Item Budget Entries";
                 RunPageLink = "Item No." = field("No.");
@@ -427,6 +487,7 @@ pageextension 50120 ItemListZX extends "Item List"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Change Log';
+                ToolTip = 'Specifies the value of Change Log';
                 Image = ChangeLog;
                 RunObject = Page "Change Log Entries";
                 RunPageLink = "Primary Key Field 1 Value" = field("No.");
@@ -441,6 +502,7 @@ pageextension 50120 ItemListZX extends "Item List"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'eCommerce Entries';
+                ToolTip = 'Specifies the value of eCommerce Entries';
                 Image = InwardEntry;
                 RunObject = Page "eCommerce Order Entries";
                 RunPageLink = "Item No." = field("No.");
@@ -449,6 +511,7 @@ pageextension 50120 ItemListZX extends "Item List"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Serial No. Entries';
+                ToolTip = 'Specifies the value of Serial No. Entries';
                 Image = SerialNo;
                 RunObject = Page "VCK Delivery Document SNos";
                 RunPageLink = "Item No." = field("No.");
@@ -459,6 +522,7 @@ pageextension 50120 ItemListZX extends "Item List"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'RMA';
+                ToolTip = 'Specifies the value of RMA';
                 Image = Entries;
                 RunObject = Page "RMA Entries";
                 RunPageLink = "Item No." = field("No.");
@@ -470,6 +534,7 @@ pageextension 50120 ItemListZX extends "Item List"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Start Picking Date pr. Country';
+                ToolTip = 'Specifies the value of Start Picking Date pr. Country';
                 Image = CalculateShipment;
                 RunObject = Page "Item Picking Date pr. Country";
                 RunPageLink = "Item No." = field("No.");
@@ -480,10 +545,12 @@ pageextension 50120 ItemListZX extends "Item List"
             group(Document)
             {
                 Caption = 'Document';
+                ToolTip = 'Specifies the value of Document';
                 action("Battery Certificate")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Battery Certificate';
+                    ToolTip = 'Specifies the value of Battery Certificate';
                     Image = Certificate;
                     RunObject = Page "Battery Certificates";
                     RunPageLink = "Item No." = field("No.");
@@ -496,37 +563,41 @@ pageextension 50120 ItemListZX extends "Item List"
             group(Replicate)
             {
                 Caption = 'Replicate';
+                ToolTip = 'Specifies the value of Replicate';
                 action("Replicate Item")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Replicate Item';
+                    ToolTip = 'Specifies the value of Replicate Item';
                     Image = Web;
 
                     trigger OnAction()
                     begin
-                        ReplicateItem(false, false);  // 07-01-19 ZY-LD 009
+                        ReplicateItem(false, false);
                     end;
                 }
                 action("Force Replication Item")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Force Replication Item';
+                    ToolTip = 'Specifies the value of Force Replication Item';
                     Image = Web;
 
                     trigger OnAction()
                     begin
-                        ReplicateItem(false, true);  // 07-01-19 ZY-LD 009
+                        ReplicateItem(false, true);
                     end;
                 }
                 action("Replicate Items (DMY/Dummy)")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Replicate Items (DMY/Dummy)';
+                    ToolTip = 'Specifies the value of Replicate Items (DMY/Dummy)';
                     Image = Web;
 
                     trigger OnAction()
                     begin
-                        ReplicateItem(true, false);  // 07-01-19 ZY-LD 009
+                        ReplicateItem(true, false);
                     end;
                 }
             }
@@ -537,6 +608,7 @@ pageextension 50120 ItemListZX extends "Item List"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Resend Item to VCK';
+                    ToolTip = 'Specifies the value of Resend Item to VCK';
                     Image = SendTo;
 
                     trigger OnAction()
@@ -552,6 +624,7 @@ pageextension 50120 ItemListZX extends "Item List"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Send All Active Items to VCK';
+                    ToolTip = 'Specifies the value of Send All Active Items to VCK';
                     Image = XMLFile;
                     Visible = SendAllItemsToVCKVisible;
 
@@ -564,7 +637,6 @@ pageextension 50120 ItemListZX extends "Item List"
                                     Message(Text005, '"ALL"')
                                 else
                                     Message(Text006, Rec."No.");
-                        //<< 22-02-22 ZY-LD 011
                     end;
                 }
             }
@@ -572,19 +644,11 @@ pageextension 50120 ItemListZX extends "Item List"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Count';
+                ToolTip = 'Specifies the value of Count';
 
                 trigger OnAction()
-                var
-                    recItem: Record Item;
-                    FilterNo: Code[50];
                 begin
                     Message('%1 %2', StrLen(Rec."No."), Rec.Count());
-
-                    // FilterNo := STRSUBSTNO('*@%1*','USG100-CC1-ZZ0101F');
-                    // recItem.SETFILTER("No.",'%1',FilterNo);
-                    // IF recItem.FINDSET THEN REPEAT
-                    //  MESSAGE('%1 %2',recItem."No.",STRLEN(recItem."No."));
-                    // UNTIL recItem.Next() = 0;
                 end;
             }
         }
@@ -594,10 +658,11 @@ pageextension 50120 ItemListZX extends "Item List"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Item - Chemical Tax Reduction Rate';
+                ToolTip = 'Specifies the value of Item - Chemical Tax Reduction Rate';
                 Image = "Report";
                 RunObject = Report "Item - Chemical Tax Red. Rate";
             }
-            action(ScipNo)  // 17-04-24 ZY-LD 000
+            action(ScipNo)
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'SCIP No.';
@@ -607,52 +672,88 @@ pageextension 50120 ItemListZX extends "Item List"
                 ToolTip = 'Specifies SCIP Number that is related to chemical tax in Sweden. The SCIP number is a random sequence of 36 hexadecimal characters that follows the Universally Unique Identifier (UUID) format. There is no relationship between the SCIP number for one supplier part and another part submitted by the same supplier.';
             }
         }
+        addafter(ScipNo)
+        {
+            group(WEEEReporting)
+            { //23-10-2026 BK #569701
+                Caption = 'WEEE Reporting';
+                ToolTip = 'The WEEE Reporting with All or Marked';
+                Image = Report;
+
+                action(WEEEMarked)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'WEEE Report WEEE-Marked';
+                    Image = PrintExcise;
+                    ToolTip = 'Specification of WEEE Report ALL';
+
+                    Trigger OnAction()
+                    var
+                        WEEEReport: Report "WEEE Excel Export";
+
+                    begin
+                        WEEEReport.SetItemSelection(1);
+                        WEEEReport.Runmodal();
+                    end;
+                }
+                action(WEEEAll)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'WEEE Report All';
+                    ToolTip = 'WEEE Report with All Items';
+                    Image = "Report";
+
+                    Trigger OnAction()
+                    var
+                        WEEEReport: Report "WEEE Excel Export";
+
+                    begin
+                        WEEEReport.SetItemSelection(0);
+                        WEEEReport.Runmodal();
+                    end;
+                }
+
+            }
+        }
     }
 
     trigger OnOpenPage()
     begin
         Rec.SetRange(Inactive, false);
-
-        //15-51643 -
         if ItemListFilter <> '' then begin
             Rec.SetFilter("No.", ItemListFilter);
             CurrPage.CAPTION := 'Item List [Filtered]';
         end;
-        //15-51643 +
-        SI.SetRejectChangeLog(false);  // 25-04-18 ZY-LD 007
-        Rec.SetLocationFilterOnMainWarehouse();  // 05-07-19 ZY-LD 010
-        SetActions;  // 22-02-22 ZY-LD 011
+        SI.SetRejectChangeLog(false);
+        Rec.SetLocationFilterOnMainWarehouse();
+        SetActions();
     end;
 
     trigger OnClosePage()
     begin
-        SI.SetRejectChangeLog(false);  // 25-04-18 ZY-LD 007
+        SI.SetRejectChangeLog(false);
     end;
 
     trigger OnAfterGetRecord()
     begin
-        Rec.SetLocationFilterOnMainWarehouse();  // 03-06-22 ZY-LD 012
-        SetActions;  // 22-02-22 ZY-LD 011
+        Rec.SetLocationFilterOnMainWarehouse();
+        SetActions();
     end;
 
     var
-        ItemListFilter: Text[1024];
         SI: Codeunit "Single Instance";
         ZyWsMgt: Codeunit "Zyxel Web Service Management";
-        Text001: Label 'Do you want to replicate %1 to subs?';
         VckXmlMgt: Codeunit "VCK Communication Management";
+        AvailabilityprLocation: Page "Availability pr Location";
+        SendAllItemsToVCKVisible: Boolean;
+        ItemListFilter: Text[1024];
+        Text001: Label 'Do you want to replicate %1 to subs?';
         Text002: Label 'Do you want to resend %1 to VCK?';
         Text003: Label 'Do you want to send all active items to VCK?';
         Text004: Label 'Are you sure?';
         Text005: Label 'Item %1 was sent.';
         Text006: Label 'Item %1 was not sent.';
-        AvailabilityprLocation: Page "Availability pr Location";
-        SendAllItemsToVCKVisible: Boolean;
 
-    procedure SetItemFilter(ItemFilter: Text[1024])
-    begin
-        //ItemListFilter := ItemFilter;
-    end;
 
     local procedure ShowForecast()
     var
@@ -666,8 +767,7 @@ pageextension 50120 ItemListZX extends "Item List"
     var
         recRepComp: Record "Replication Company";
     begin
-        //>> 07-01-19 ZY-LD 009
-        if Confirm(Text001, false, Rec."No.") then begin
+        if Confirm(Text001, false, Rec."No.") then
             if pForce then begin
                 recRepComp.SetRange("Replicate Item", true);
                 if Page.RunModal(Page::"Replicate Company Select", recRepComp) = Action::LookupOK then
@@ -677,14 +777,12 @@ pageextension 50120 ItemListZX extends "Item List"
                     ZyWsMgt.ReplicateItems('', '', true, false)
                 else
                     ZyWsMgt.ReplicateItems('', '', false, false);
-        end;
-        //<< 07-01-19 ZY-LD 009
     end;
 
     local procedure SetActions()
     var
         ZGT: Codeunit "ZyXEL General Tools";
     begin
-        SendAllItemsToVCKVisible := ZGT.UserIsDeveloper;
+        SendAllItemsToVCKVisible := ZGT.UserIsDeveloper();
     end;
 }
