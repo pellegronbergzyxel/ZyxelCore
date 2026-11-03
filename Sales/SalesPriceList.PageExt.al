@@ -1,5 +1,18 @@
 pageextension 50018 "Sales Price List" extends "Sales Price List"
 {
+    layout
+    {
+        modify("StartingDate")
+        {
+            Editable = DatesEditable;
+            ToolTip = 'Specifies the date until which the price list is valid.';
+        }
+        modify("EndingDate")
+        {
+            Editable = DatesEditable;
+            ToolTip = 'Specifies the date until which the price list is valid.';
+        }
+    }
     actions
     {
         modify(VerifyLines)
@@ -10,10 +23,7 @@ pageextension 50018 "Sales Price List" extends "Sales Price List"
         {
             Action(ImportexceltolineXml)
             {
-                // Caption = 'Copy to lines...';
-                //image = Copy;
                 ApplicationArea = Basic, Suite;
-                // Enabled = PriceListIsEditable and CopyLinesEnabled;
                 Ellipsis = true;
                 Image = CreateXMLFile;
                 Promoted = true;
@@ -38,6 +48,28 @@ pageextension 50018 "Sales Price List" extends "Sales Price List"
                 Promoted = true;
                 PromotedCategory = Process;
             }
+            Action(EditableDates)
+            {
+                ApplicationArea = Basic, Suite;
+                Ellipsis = true;
+                Image = EditLines;
+                Promoted = true;
+                PromotedCategory = Process;
+                Caption = 'Editable Dates';
+                ToolTip = 'Make the starting and ending dates editable';
+
+                trigger OnAction()
+                var
+                    Confirm: Label 'Are you sure you want to change the editability of the starting and ending dates?';
+                    ReallySure: Label 'Are you really sure?';
+                begin
+                    if confirm(Confirm) then
+                        if confirm(ReallySure) then begin
+                            DatesEditable := true;
+                            currPage.Update();
+                        end;
+                end;
+            }
         }
     }
 
@@ -45,6 +77,7 @@ pageextension 50018 "Sales Price List" extends "Sales Price List"
     var
         MarginApprovalVisible: Boolean;
         VeryfyLinesEnabled: Boolean;
+        DatesEditable: Boolean;
 
     trigger OnOpenPage()
     var
@@ -56,6 +89,8 @@ pageextension 50018 "Sales Price List" extends "Sales Price List"
 
         VeryfyLinesEnabled := true;
         if Rec."Amount Type" <> Rec."Amount Type"::Discount then
-            VeryfyLinesEnabled := not MarginApp.MarginApprovalActive()
+            VeryfyLinesEnabled := not MarginApp.MarginApprovalActive();
+
+        DatesEditable := false;
     end;
 }

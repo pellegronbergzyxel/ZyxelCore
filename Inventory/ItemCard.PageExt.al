@@ -11,6 +11,7 @@ pageextension 50119 ItemCardZX extends "Item Card"
                 Caption = 'HQ Model Description';
                 Importance = Additional;
                 ToolTip = 'Specifies the value of the HQ Model Description field.';
+                Editable = PLMSUpdateEditable; //29-10-2026 BK #Request from Peer
             }
 
             field(Status; Rec.Status)
@@ -474,11 +475,13 @@ pageextension 50119 ItemCardZX extends "Item Card"
         modify("Net Weight")
         {
             Caption = 'Net Weight (kg)';
+            Editable = PLMSUpdateEditable; //29-10-2026 BK #Request from Peer
         }
         moveafter("Net Weight"; "Gross Weight")
         modify("Gross Weight")
         {
             Caption = 'Gross Weight (kg)';
+            Editable = PLMSUpdateEditable; //29-10-2026 BK #Request from Peer
         }
         addafter("Gross Weight")
         {
@@ -486,6 +489,7 @@ pageextension 50119 ItemCardZX extends "Item Card"
             field("Qty. per Color Box"; Rec."Qty. per Color Box")
             {
                 ApplicationArea = Basic, Suite;
+                Editable = PLMSUpdateEditable; //29-10-2026 BK #Request from Peer
                 ToolTip = 'Specifies the value of the Qty. per Color Box field.';
             }
         }
@@ -785,6 +789,7 @@ pageextension 50119 ItemCardZX extends "Item Card"
                 field("SVHC > 1000 ppm"; Rec."SVHC > 1000 ppm")
                 {
                     ApplicationArea = Basic, Suite;
+                    Editable = PLMSUpdateEditable; //29-10-2026 BK #Request from Peer
                     ToolTip = 'The obligation to submit a SCIP notification covers all articles placed on the EU market containing a substance of very high concern on the Candidate List in a concentration above 0.1 % w/w.';
                 }
                 field("SCIP No."; Rec.GetScipNo())
@@ -792,7 +797,8 @@ pageextension 50119 ItemCardZX extends "Item Card"
                     ApplicationArea = Basic, Suite;
                     Caption = 'SCIP No.';
                     ToolTip = 'SCIP is the database for information on Substances of Concern In articles as such or in complex objects (Products) established under the Waste Framework Directive (WFD).';
-                    Editable = false;
+                    Editable = PLMSUpdateEditable; //29-10-2026 BK #Request from Peer
+                    //Editable = false;
 
                     trigger OnDrillDown()
                     var

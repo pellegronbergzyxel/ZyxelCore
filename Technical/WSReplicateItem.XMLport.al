@@ -498,6 +498,9 @@ xmlport 50033 "WS Replicate Item"
                 fieldelement(emptyOuterCartonWeight; Item."Empty Outer Carton Weight") //30-09-2026 BK #Request from HQ
                 {
                 }
+                fieldelement(IncludedInWEEE; Item."Included in WEEE") //29-10-2026 BK #Request from Peer
+                {
+                }
 
                 textelement(SuccItemNo)
                 {
@@ -1150,11 +1153,10 @@ xmlport 50033 "WS Replicate Item"
             recItem.SetFilter("No.", 'DMY*');
         end else begin
             if recRepCompany.Get(pCompany) and
-               not pForceReplication  // 01-01-19 ZY-LD 005
+               not pForceReplication
             then begin
                 recRepCompany.TestField("Country/Region Code");
-                //recItem.SETRANGE("Date Filter",CALCDATE('<-1Y>',TODAY),TODAY);  // 06-11-18 ZY-LD 003  // 13-12-18 ZY-LD 004
-                recItem.SetFilter("Date Filter", '%1..', CalcDate('<-1Y>', Today));  // 13-12-18 ZY-LD 004
+                recItem.SetFilter("Date Filter", '%1..', CalcDate('<-1Y>', Today));
                 CompanyRegionFilter := recRepCompany."Country/Region Code";
                 recItem.SetFilter("Country/Region Filter", CompanyRegionFilter);
                 recItem.SetRange("Country/Region Exists", true);
@@ -1258,14 +1260,12 @@ xmlport 50033 "WS Replicate Item"
                         end;
                     until recSalesPrice.Next() = 0;
 
-                //>> 31-03-20 ZY-LD 006
                 recItemIdent.SetRange("Item No.", recItem."No.");
                 if recItemIdent.FindSet() then
                     repeat
                         "Item Identifier" := recItemIdent;
                         "Item Identifier".Insert();
                     until recItemIdent.Next() = 0;
-            //<< 31-03-20 ZY-LD 006
             until recItem.Next() = 0;
 
             ZGT.CloseProgressWindow;
@@ -1298,8 +1298,8 @@ xmlport 50033 "WS Replicate Item"
                     recItem := Item;
                     if recItemKeepValues."No." <> '' then begin
                         recItem."Cost is Adjusted" := recItemKeepValues."Cost is Adjusted";
-                        recItem."Unit Cost" := recItemKeepValues."Unit Cost";  // 23-10-18 ZY-LD 002
-                        recItem."Last Direct Cost" := recItemKeepValues."Last Direct Cost";  // 23-10-18 ZY-LD 002
+                        recItem."Unit Cost" := recItemKeepValues."Unit Cost";
+                        recItem."Last Direct Cost" := recItemKeepValues."Last Direct Cost";
                     end;
                     recItem.Modify();
                 end else begin
@@ -1310,8 +1310,6 @@ xmlport 50033 "WS Replicate Item"
                 // Default Dimensions
                 recDefDim.SetRange("Table ID", Database::Item);
                 recDefDim.SetRange("No.", Item."No.");
-                //>> 04-06-24 ZY-LD 007
-                //recDefDim.DeleteAll();
                 if recDefDim.FindSet then
                     repeat
                         "Default Dimension".SetRange("No.", Item."No.");
@@ -1319,7 +1317,6 @@ xmlport 50033 "WS Replicate Item"
                         if not "Default Dimension".FindFirst then
                             recDefDim.Delete(true);
                     until recDefDim.Next = 0;
-                //<< 04-06-24 ZY-LD 007
                 recDefDim.Reset();
 
                 "Default Dimension".Reset();
@@ -1327,22 +1324,15 @@ xmlport 50033 "WS Replicate Item"
                 if "Default Dimension".FindSet() then
                     repeat
                         recDefDim := "Default Dimension";
-                        if not recDefDim.Modify(true) then  // 04-06-24 ZY-LD 007
+                        if not recDefDim.Modify(true) then
                             recDefDim.Insert();
                     until "Default Dimension".Next() = 0;
-
-                // Item Unit of Measure
-                //>> 04-06-24 ZY-LD 007
-                /*recItemUOM.SetRange("Item No.", Item."No.");
-                recItemUOM.DeleteAll();
-                recItemUOM.Reset();*/
-                //<< 04-06-24 ZY-LD 007
 
                 "Item Unit of Measure".SetRange("Item No.", Item."No.");
                 if "Item Unit of Measure".FindSet() then
                     repeat
                         recItemUOM := "Item Unit of Measure";
-                        if not recItemUOM.Insert(true) then;  // 04-06-24 ZY-LD 007 - If is added.
+                        if not recItemUOM.Insert(true) then;
                     until "Item Unit of Measure".Next() = 0;
 
                 "Sales Price".SetRange("Asset Type", "Sales Price"."Asset Type"::Item);
@@ -1359,23 +1349,6 @@ xmlport 50033 "WS Replicate Item"
                         end;
                     until "Sales Price".Next() = 0;
 
-            //>> 04-06-24 ZY-LD 007 - Code has moved outside the item loop.
-            //>> 31-03-20 ZY-LD 006
-            /*recItemIdent.SetRange("Item No.", Item."No.");
-            recItemIdent.DeleteAll(true);
-
-            "Item Identifier".SetRange("Item No.", Item."No.");
-            if "Item Identifier".FindSet() then begin
-                recItemIdent.SetRange("Item No.", Item."No.");
-                recItemIdent.DeleteAll(true);
-
-                repeat
-                    recItemIdent := "Item Identifier";
-                    recItemIdent.Insert(true);
-                until "Item Identifier".Next() = 0;
-            end;*/
-            //<< 31-03-20 ZY-LD 006
-            //<< 04-06-24 ZY-LD 007
             until Item.Next() = 0;
 
         //>> 04-06-24 ZY-LD 007
