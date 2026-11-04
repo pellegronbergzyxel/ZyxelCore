@@ -220,6 +220,9 @@ Report 50026 "WEEE Excel Export"
         recSalesShipHead: Record "Sales Shipment Header";
         recSalesCrMemoHead: Record "Sales Cr.Memo Header";
         SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesReturnReceiptHeader: Record "Return Receipt Header";
+        zgt: Codeunit "ZyXEL General Tools";
+
     begin
         begin
             pItemLedgerEntry.Quantity := -pItemLedgerEntry.Quantity;
@@ -242,6 +245,29 @@ Report 50026 "WEEE Excel Export"
                                             ShipToCountry := recSalesShipHead."Sell-to Country/Region Code" + Text003
                                         else
                                             if recSalesShipHead."Sell-to Country/Region Code" <> '' then
+                                                CurrReport.Skip();
+                                end else
+                                    CurrReport.Skip();
+
+                                pItemLedgerEntry."Return Reason Code" := '';
+                            end;
+                        pItemLedgerEntry."document type"::"Sales Return Receipt":
+                            begin
+                                if zgt.IsZComCompany() then
+                                    CurrReport.Skip();
+
+                                if pCompanyName <> '' then
+                                    SalesReturnReceiptHeader.ChangeCompany(pCompanyName);
+
+                                SalesReturnReceiptHeader.Get(pItemLedgerEntry."Document No.");
+                                if (SalesReturnReceiptHeader."Ship-to Country/Region Code" = '') or (StrPos(ShipToCountries, SalesReturnReceiptHeader."Ship-to Country/Region Code") <> 0) then begin
+                                    if SalesReturnReceiptHeader."Ship-to Country/Region Code" <> '' then
+                                        ShipToCountry := SalesReturnReceiptHeader."Ship-to Country/Region Code"
+                                    else
+                                        if StrPos(ShipToCountries, SalesReturnReceiptHeader."Sell-to Country/Region Code") <> 0 then
+                                            ShipToCountry := SalesReturnReceiptHeader."Sell-to Country/Region Code" + Text003
+                                        else
+                                            if SalesReturnReceiptHeader."Sell-to Country/Region Code" <> '' then
                                                 CurrReport.Skip();
                                 end else
                                     CurrReport.Skip();
