@@ -16,10 +16,32 @@ Codeunit 50056 "Job Queue Event"
             Rec."Last Support Mail Sent" := 0DT;
     end;
 
+// V29
+ [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue Dispatcher", 'OnBeforeHandleRequest', '', false, false)]
+ local procedure OnBeforeHandleRequest(var JobQueueEntry: Record "Job Queue Entry")
+     var
+        AutoSetup: Record "Automation Setup";
+
+    begin
+        //>> 05-04-24 ZY-LD 002 -> V29
+        AutoSetup.get;
+        if AutoSetup."Default Job Queue User" <> '' then begin
+            If JobQueueEntry."Job Queue Category Code" IN ['ZCOM', 'ZNET', 'ZYXEL'] then begin
+                JobQueueEntry."User ID" := AutoSetup."Default Job Queue User";
+                JobQueueEntry.Modify(true);
+            end;
+        end;
+        //<< 05-04-24 ZY-LD 002
+    end;
+
+
+
+// V29 skal fjerne ikke i 290
     [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnScheduleTaskOnAfterCalcShouldChangeUserID', '', false, false)]
     local procedure OnScheduleTaskOnAfterCalcShouldChangeUserID(var JobQueueEntry: Record "Job Queue Entry"; var ShouldChangeUserID: Boolean)
     var
         AutoSetup: Record "Automation Setup";
+        
     begin
         //>> 05-04-24 ZY-LD 002
         AutoSetup.get;
