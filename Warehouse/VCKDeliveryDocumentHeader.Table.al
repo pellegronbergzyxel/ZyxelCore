@@ -854,12 +854,18 @@ Table 50041 "VCK Delivery Document Header"
     trigger OnInsert()
     var
         WarehouseSetup: Record "Warehouse Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series"; //UpgradeReady;
+        NoSeriesCode: Code[20];
     begin
         if "No." = '' then begin
             WarehouseSetup.Get;
             WarehouseSetup.TestField("Whse. Delivery Document Nos.");
-            NoSeriesMgt.InitSeries(WarehouseSetup."Whse. Delivery Document Nos.", xRec."No. Series", 0D, "No.", "No. Series");
+            // V29
+            NoSeriesCode := WarehouseSetup."Whse. Delivery Document Nos.";
+            rec."No. Series" := copystr(NoSeriesCode, 1, 10);
+            if NoSeriesMgt.AreRelated("No. Series", xRec."No. Series") then
+                "No. Series" := xrec."No. Series";
+            "No." := NoSeriesMgt.GetNextNo("No. Series", 0D);
         end;
 
         "Create User ID" := UserId;
@@ -881,7 +887,8 @@ Table 50041 "VCK Delivery Document Header"
         recShiptoFDAdd: Record "Ship-to Address";
         recShipMethod: Record "Shipment Method";
         recLocation: Record Location;
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        //V29
+        // NoSeriesMgt: Codeunit NoSeriesManagement;
         recDeliveryNoteComments: Record "VCK Delivery Note Comments";
         Text001: label 'You must cancel the approval process if you wish to change the %1.';
         EmailAddMgt: Codeunit "E-mail Address Management";
@@ -903,12 +910,13 @@ Table 50041 "VCK Delivery Document Header"
     procedure AssistEdit(): Boolean
     var
         WarehouseSetup: Record "Warehouse Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series";
     begin
         WarehouseSetup.Get;
         WarehouseSetup.TestField("Whse. Delivery Document Nos.");
-        if NoSeriesMgt.SelectSeries(WarehouseSetup."Whse. Delivery Document Nos.", xRec."No. Series", "No. Series") then begin
-            NoSeriesMgt.SetSeries("No.");
+        //UpgradeReady
+        if NoSeriesMgt.LookupRelatedNoSeries(WarehouseSetup."Whse. Delivery Document Nos.", xRec."No. Series", "No. Series") then begin
+            NoSeriesMgt.GetNextNo("No.", 0D, true);
             exit(true);
         end;
     end;

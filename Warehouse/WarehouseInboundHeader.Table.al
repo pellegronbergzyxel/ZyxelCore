@@ -450,13 +450,14 @@ Table 50024 "Warehouse Inbound Header"
     trigger OnInsert()
     var
         WarehouseSetup: Record "Warehouse Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series";
     begin
         if "No." = '' then begin
             WarehouseSetup.Get;
             WarehouseSetup.TestField("Whse. Inbound Order Nos.");
-            NoSeriesMgt.InitSeries(WarehouseSetup."Whse. Inbound Order Nos.", xRec."No. Series", 0D, "No.", "No. Series");
+            "No." := NoSeriesMgt.GetNextNo(WarehouseSetup."Whse. Inbound Order Nos.", Today, true);
         end;
+
 
         "Creation Date" := CurrentDatetime;
     end;
@@ -494,12 +495,13 @@ Table 50024 "Warehouse Inbound Header"
     procedure AssistEdit(): Boolean
     var
         WarehouseSetup: Record "Warehouse Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series";
     begin
         WarehouseSetup.Get;
         WarehouseSetup.TestField("Whse. Inbound Order Nos.");
-        if NoSeriesMgt.SelectSeries(WarehouseSetup."Whse. Inbound Order Nos.", xRec."No. Series", "No. Series") then begin
-            NoSeriesMgt.SetSeries("No.");
+        //UpgradeReady
+        if NoSeriesMgt.LookupRelatedNoSeries(WarehouseSetup."Whse. Inbound Order Nos.", xRec."No. Series", "No. Series") then begin
+            NoSeriesMgt.GetNextNo("No.", 0D, true);
             exit(true);
         end;
     end;
@@ -524,7 +526,7 @@ Table 50024 "Warehouse Inbound Header"
             recContainerDetail.SetRange("Document No.", "No.");
             repContainerDetail.SetTableview(recContainerDetail);
             TempBlob.CreateOutStream(varoutstream);
-            repContainerDetail.SaveAs(dummy,ReportFormat::Excel,varoutstream);
+            repContainerDetail.SaveAs(dummy, ReportFormat::Excel, varoutstream);
             //repContainerDetail.SaveAsExcel(ServerFilename);
             Clear(EmailAddMgt);
             SI.SetMergefield(100, "No.");

@@ -615,8 +615,9 @@ Codeunit 50073 "Transfer Event"
     begin
         WarehouseShipmentLine.Validate("Qty. to Ship", 0);
     end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Post Shipment", 'OnHandleSalesLineOnSourceDocumentSalesOrderOnBeforeModifyLine', '', false, false)]
+// Method 'OnHandleSalesLineOnSourceDocumentSalesOrderOnBeforeModifyLine' is marked for removal. Reason: Moved to codeunit Sales Whse. Post Shipment
+// V29
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales Whse. Post Shipment", 'OnHandleSalesLineOnSourceDocumentSalesOrderOnBeforeModifyLine', '', false, false)]
     local procedure WhsePostShipment_OnHandleSalesLineOnSourceDocumentSalesOrderOnBeforeModifyLine(var SalesLine: Record "Sales Line"; WhseShptLine: Record "Warehouse Shipment Line");
     begin
         if (SalesLine."Picking List No." <> SalesLine."Delivery Document No.") OR
@@ -626,8 +627,9 @@ Codeunit 50073 "Transfer Event"
             SalesLine.Modify();
         end;
     end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Post Shipment", 'OnHandleSalesLineOnNonWhseLineOnAfterCalcModifyLine', '', false, false)]
+//Method 'OnHandleSalesLineOnNonWhseLineOnAfterCalcModifyLine' is marked for removal. Reason: Moved to codeunit Sales Whse. Post Shipment.
+// V29
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales Whse. Post Shipment", 'OnHandleSalesLineOnNonWhseLineOnAfterCalcModifyLine', '', false, false)]
     local procedure WhsePostShipment_OnHandleSalesLineOnNonWhseLineOnAfterCalcModifyLine(var SalesLine: Record "Sales Line"; WhseShptLine: Record "Warehouse Shipment Line"; var ModifyLine: Boolean)
     begin
         if (SalesLine."Picking List No." <> '') OR
