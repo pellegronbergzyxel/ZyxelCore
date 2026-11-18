@@ -458,10 +458,10 @@ Table 50109 "ZyXEL Employee"
             Description = 'PAB 1.0';
         }
         field(50008; Nationality; Code[10])
-        {
+        {//V29
             Caption = 'Nationality';
             Description = '16-08-21 ZY-LD 020';
-            TableRelation = Nationality;
+            //     TableRelation = Nationality;
         }
         field(50010; "Driving License Checked"; Boolean)
         {
